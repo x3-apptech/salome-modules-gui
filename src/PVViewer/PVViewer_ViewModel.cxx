@@ -16,6 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
 
 #include "PVViewer_ViewModel.h"
 #include "PVViewer_ViewWindow.h"
@@ -29,7 +30,6 @@ PVViewer_Viewer::PVViewer_Viewer()
 {
   MESSAGE("PVViewer_Viewer: creating view model ...");
 }
-
 
 /*!
   Create new instance of view window on desktop \a theDesktop.

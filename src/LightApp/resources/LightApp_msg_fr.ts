@@ -632,6 +632,66 @@ Les modifications seront appliquées à la prochaine session.</translation>
         <translation>Scène OCC 3D</translation>
     </message>
     <message>
+        <source>PREF_GROUP_STEREO</source>
+        <translation>Rendu stéréo</translation>
+    </message>
+    <message>
+        <source>PREF_STEREO_TYPE</source>
+        <translation>Type de rendu stéréo</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_FILTER</source>
+        <translation>Filtre anaglyphique</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_RED_CYAN</source>
+        <translation>Rouge-Cyan</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+        <translation>Jaune-Bleu</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+        <translation>Vert-Magenta</translation>
+    </message>
+    <message>
+        <source>PREF_FOCUS_TYPE</source>
+        <translation> type=&quot;unfinished&quot;Convergence distance type</translation>
+    </message>
+    <message>
+        <source>PREF_FOCUS_VALUE</source>
+        <translation>Valeur de la focalisation stéréographique</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_TYPE</source>
+        <translation>Type de distance intraoculaire</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_VALUE</source>
+        <translation>Valeur de la distance intraoculaire</translation>
+    </message>
+    <message>
+        <source>PREF_ABSOLUTE</source>
+        <translation>Absolu</translation>
+    </message>
+    <message>
+        <source>PREF_RELATIVE</source>
+        <translation>Relatif</translation>
+    </message>
+    <message>
+        <source>PREF_REVERSE_STEREO</source>
+        <translation>Stéréo inversée</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_VSYNC</source>
+        <translation>Activer la synchronisation verticale</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+        <translation>Activer le support du quad-buffer</translation>
+    </message>
+    <message>
         <source>PREF_LOGARITHMIC</source>
         <translation>Logarithmique</translation>
     </message>
@@ -793,7 +853,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_SCALE</source>
-        <translation>Facteur d'échelle</translation>
+        <translation>Facteur d&apos;échelle</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>
@@ -893,6 +953,14 @@ Le fichier n&apos;existe pas</translation>
         <translation>Réglage des raccourcis clavier</translation>
     </message>
     <message>
+        <source>PREF_GROUP_FULL_SCREEN</source>
+        <translation>Plein écran</translation>
+    </message>
+    <message>
+        <source>PREF_FULL_SCREEN_AUTO</source>
+        <translation>Cacher l&apos;arbre d&apos;étude and les barres d&apos;outils des vues</translation>
+    </message>
+    <message>
         <source>PREF_TAB_PYEDITOR</source>
         <translation>Editeur python</translation>
     </message>
@@ -906,7 +974,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_GROUP_PY_DISPLAY</source>
-        <translation>Paramètres d'affichage</translation>
+        <translation>Paramètres d&apos;affichage</translation>
     </message>
     <message>
         <source>PREF_PY_CURRLINE_HIGHLIGHT</source>
@@ -930,11 +998,11 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_PY_TAB_WHITESPACES</source>
-        <translation>Affiche les guides d'indentation</translation>
+        <translation>Affiche les guides d&apos;indentation</translation>
     </message>
     <message>
         <source>PREF_PY_TAB_SIZE</source>
-        <translation>Largeur d'intentation:</translation>
+        <translation>Largeur d&apos;intentation:</translation>
     </message>
     <message>
         <source>PREF_GROUP_VERT_EDGE</source>
@@ -1056,6 +1124,10 @@ Le fichier n&apos;existe pas</translation>
     <message>
         <source>DEFAULT_BTN_TEXT</source>
         <translation>Défauts</translation>
+    </message>
+    <message>
+        <source>PREF_NEED_RESTART</source>
+        <translation>Des changements prendront effets seulement après un redémarrage de l&apos;application</translation>
     </message>
 </context>
 <context>

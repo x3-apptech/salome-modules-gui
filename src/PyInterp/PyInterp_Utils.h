@@ -27,8 +27,14 @@
 
 #include "PyInterp.h"
 #include <Python.h>
+#ifdef _DEBUG_
+  #include <iostream>
+#endif
 
 /**
+ * \class PyLockWrapper
+ * \brief Python GIL wrapper.
+ *
  * Utility class wrapping the Python GIL acquisition. This makes use of the high level
  * API (PyGILState_Ensure and PyGILState_Release), and is hence compatible with only
  * one running Python interpreter (no call to Py_NewInterpreter()).
@@ -39,12 +45,35 @@ class PYINTERP_EXPORT PyLockWrapper
 {
 
 public:
-  PyLockWrapper();
-  ~PyLockWrapper();
+  /**
+   * \brief Constructor. Automatically acquires GIL.
+   */
+  PyLockWrapper()
+  {
+    _gil_state = PyGILState_Ensure();
+    // Save current thread state for later comparison
+    _state = PyGILState_GetThisThreadState();
+  }
+
+  /**
+   * \brief Destructor. Automatically releases GIL.
+   */
+  ~PyLockWrapper()
+  {
+    PyThreadState* _currState = PyGILState_GetThisThreadState();
+#ifdef _DEBUG_
+    if (_currState != _state)
+    {
+      std::cout << "!!!!!!!!! PyLockWrapper inconsistency - now entering infinite loop for debugging\n";
+      while(1);
+    }
+#endif
+    PyGILState_Release(_gil_state);
+  }
 
 private:
   PyGILState_STATE _gil_state;
-  PyThreadState * _state;
+  PyThreadState* _state;
 
   // "Rule of 3" - Forbid usage of copy operator and copy-constructor
   PyLockWrapper(const PyLockWrapper & another);
@@ -53,7 +82,8 @@ private:
 
 
 /**
- * Utility class to properly handle the reference counting required on Python objects.
+ * \class PyObjWrapper
+ * \brief Utility class to properly handle the reference counting required on Python objects.
  */
 class PYINTERP_EXPORT PyObjWrapper
 {

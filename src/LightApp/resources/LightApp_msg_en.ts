@@ -632,6 +632,66 @@ The changes will be applied on the next application session.</translation>
         <translation>OCC 3D Viewer</translation>
     </message>
     <message>
+        <source>PREF_GROUP_STEREO</source>
+        <translation>Stereo render</translation>
+    </message>
+    <message>
+        <source>PREF_STEREO_TYPE</source>
+        <translation>Stereo type</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_FILTER</source>
+        <translation>Anaglyph filter</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_RED_CYAN</source>
+        <translation>Red-Cyan</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+        <translation>Yellow-Blue</translation>
+    </message>
+    <message>
+        <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+        <translation>Green-Magenta</translation>
+    </message>
+    <message>
+        <source>PREF_FOCUS_TYPE</source>
+        <translation>Convergence distance type</translation>
+    </message>
+    <message>
+        <source>PREF_FOCUS_VALUE</source>
+        <translation>Stereographic focus value</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_TYPE</source>
+        <translation>IOD type</translation>
+    </message>
+    <message>
+        <source>PREF_IOD_VALUE</source>
+        <translation>Interocular distance (IOD) value</translation>
+    </message>
+    <message>
+        <source>PREF_ABSOLUTE</source>
+        <translation>Absolute</translation>
+    </message>
+    <message>
+        <source>PREF_RELATIVE</source>
+        <translation>Relative</translation>
+    </message>
+    <message>
+        <source>PREF_REVERSE_STEREO</source>
+        <translation>Reverse stereo</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_VSYNC</source>
+        <translation>Enable V-Sync</translation>
+    </message>
+    <message>
+        <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+        <translation>Enable quad-buffer support</translation>
+    </message>
+    <message>
         <source>PREF_LOGARITHMIC</source>
         <translation>Logarithmic</translation>
     </message>
@@ -892,6 +952,14 @@ File does not exist</translation>
         <source>PREF_GROUP_SHORTCUTS</source>
         <translation>Shortcuts settings</translation>
     </message>
+    <message>
+        <source>PREF_GROUP_FULL_SCREEN</source>
+        <translation>Full-screen</translation>
+    </message>
+    <message>
+        <source>PREF_FULL_SCREEN_AUTO</source>
+        <translation>Hide object browser and viewers toolbars</translation>
+    </message>
   <message>
     <source>PREF_TAB_PYEDITOR</source>
     <translation>Python Viewer</translation>
@@ -1056,6 +1124,10 @@ File does not exist</translation>
     <message>
         <source>DEFAULT_BTN_TEXT</source>
         <translation>Defaults</translation>
+    </message>
+    <message>
+        <source>PREF_NEED_RESTART</source>
+        <translation>Some changes will take effect only after application restart</translation>
     </message>
 </context>
 <context>

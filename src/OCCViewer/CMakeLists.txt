@@ -32,10 +32,10 @@ INCLUDE_DIRECTORIES(
   ${PTHREAD_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/CASCatch
   ${PROJECT_SOURCE_DIR}/src/Qtx
-  ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/ViewerData
   ${PROJECT_SOURCE_DIR}/src/ViewerTools
+  ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
 )
 
 # additional preprocessor / compiler flags
@@ -45,7 +45,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
   ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKOpenGl}
-  CASCatch qtx suit OpenGLUtils ViewerTools ViewerData
+  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils
 )
 
 # --- headers ---
@@ -122,7 +122,9 @@ SET(_other_RESOURCES
   resources/occ_view_left.png
   resources/occ_view_maximized.png
   resources/occ_view_minimized.png
+  resources/occ_view_orthographic.png
   resources/occ_view_pan.png
+  resources/occ_view_perspective.png
   resources/occ_view_preselection.png
   resources/occ_view_presets.png
   resources/occ_view_reset.png
@@ -133,6 +135,7 @@ SET(_other_RESOURCES
   resources/occ_view_scaling.png
   resources/occ_view_selection.png
   resources/occ_view_shoot.png
+  resources/occ_view_stereo.png
   resources/occ_view_style_switch.png
   resources/occ_view_top.png
   resources/occ_view_triedre.png

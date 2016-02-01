@@ -52,8 +52,8 @@ vtkStandardNewMacro(VTKViewer_UnScaledActor);
 /*!Constructor*/
 VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() 
 {
-  Bounds[0] = Bounds[2] = Bounds[4] = VTK_LARGE_FLOAT;
-  Bounds[1] = Bounds[3] = Bounds[5] = -VTK_LARGE_FLOAT;
+  Bounds[0] = Bounds[2] = Bounds[4] = VTK_FLOAT_MAX;
+  Bounds[1] = Bounds[3] = Bounds[5] = -VTK_FLOAT_MAX;
 }
 
 /*!

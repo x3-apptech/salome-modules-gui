@@ -28,7 +28,7 @@
 
 class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
-class SUIT_Desktop;
+class QMainWindow;
 class QMenu;
 class QToolBar;
 class QAction;
@@ -44,7 +44,7 @@ class PVVIEWER_EXPORT PVViewer_GUIElements: public QObject
   Q_OBJECT
 
 public:
-  static PVViewer_GUIElements * GetInstance(SUIT_Desktop* desk);
+  static PVViewer_GUIElements * GetInstance(QMainWindow * desk);
 
   pqPropertiesPanel * getPropertiesPanel() { return propertiesPanel; }
   pqPipelineBrowserWidget * getPipelineBrowserWidget() { return pipelineBrowserWidget; }
@@ -56,17 +56,14 @@ public:
   pqVCRToolbar* getVCRToolbar() { return vcrToolbar; }
   pqAnimationTimeToolbar* getTimeToolbar() { return timeToolbar; }
 
-  void myBuildToolbars(SUIT_Desktop* desk);
-  void addToolbars(SUIT_Desktop* desk);
+  void myBuildToolbars(QMainWindow* desk);
+  void addToolbars(QMainWindow* desk);
   void setToolBarVisible(bool show);
   void setToolBarEnabled(bool enabled);
   QList<QToolBar*> getToolbars();
 
-public slots:
-  void onEmulateApply();  // better use the slot from PVViewer_ViewManager if you want to trigger "Apply"
-
 private:
-  PVViewer_GUIElements(SUIT_Desktop* desk);
+  PVViewer_GUIElements(QMainWindow* desk);
   virtual ~PVViewer_GUIElements() {}
 
   static PVViewer_GUIElements* theInstance;

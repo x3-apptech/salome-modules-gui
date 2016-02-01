@@ -255,12 +255,13 @@ public:
               std::string::size_type debut = 0;
               std::string::size_type fin;
               SalomeApp_DataObject* anObj = dynamic_cast<SalomeApp_DataObject*>( myStudy->root() );
-              while ( 1 ) {
+              while ( anObj ) {
                 fin = obj_id.find_first_of( ':', debut );
                 if ( fin == std::string::npos ) {
                   //last id
                   anObj = dynamic_cast<SalomeApp_DataObject*>(anObj->childObject(atoi(obj_id.substr(debut).c_str())-1));
-                  entry2SuitObject[parent_id] = anObj;
+                  if ( anObj )
+                    entry2SuitObject[parent_id] = anObj;
                   break;
                 }
                 anID = root_id + obj_id.substr( 0, fin );
@@ -268,13 +269,15 @@ public:
                 if ( it2 == entry2SuitObject.end() ) {
                   //the ID is not known in entry2SuitObject
                   anObj = dynamic_cast<SalomeApp_DataObject*>(anObj->childObject(atoi(obj_id.substr(debut, fin-debut).c_str())-1));
-                  entry2SuitObject[anID] = anObj;
+                  if ( anObj )
+                    entry2SuitObject[anID] = anObj;
                 }
                 else
                   anObj = it2->second;
                 debut = fin+1;
               }
-              anObj->insertChildAtTag( suit_obj, tag );
+              if ( anObj )
+                anObj->insertChildAtTag( suit_obj, tag );
             }
           }
           entry2SuitObject[theID] = suit_obj;

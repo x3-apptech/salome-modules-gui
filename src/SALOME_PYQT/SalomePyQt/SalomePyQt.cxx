@@ -38,11 +38,18 @@
 
 #include "LightApp_SelectionMgr.h"
 #include "LogWindow.h"
+#ifndef DISABLE_OCCVIEWER
 #include "OCCViewer_ViewWindow.h"
+#include "OCCViewer_ViewFrame.h"
+#endif // DISABLE_OCCVIEWER
+#ifndef DISABLE_PLOT2DVIEWER
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewWindow.h"
+#endif // DISABLE_PLOT2DVIEWER
+#ifndef DISABLE_PVVIEWER
 #include "PVViewer_ViewManager.h"
 #include "PVViewer_ViewModel.h"
+#endif // DISABLE_PVVIEWER
 #include "QtxActionMenuMgr.h"
 #include "QtxWorkstack.h"
 #include "QtxTreeView.h"
@@ -52,6 +59,8 @@
 #include "SUIT_ResourceMgr.h"
 #include "SUIT_Session.h"
 #include "SUIT_Tools.h"
+#include "SUIT_ViewManager.h"
+#include "SUIT_ViewWindow.h"
 #include "PyConsole_Console.h"
 
 #include <QAction>
@@ -59,87 +68,162 @@
 #include <QPaintEvent>
 #include <QCoreApplication>
 
-/*!
-  \brief Get the currently active application.
-  \internal
-  \return active application object or 0 if there is no any
-*/
-static LightApp_Application* getApplication()
+namespace
 {
-  if ( SUIT_Session::session() )
-    return dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
-  return 0;
-}
-
-/*!
-  \brief Get the currently active study.
-  \internal
-  \return active study or 0 if there is no study opened
-*/
-static LightApp_Study* getActiveStudy()
-{
-  if ( getApplication() )
-    return dynamic_cast<LightApp_Study*>( getApplication()->activeStudy() );
-  return 0;
-}
-
-/*!
-  \brief Get the currently active module.
-  \internal
-  This function returns correct result only if Python-based
-  module is currently active. Otherwize, 0 is returned.
-*/
-static LightApp_Module* getActiveModule()
-{
-  LightApp_Module* module = 0;
-  if ( LightApp_Application* anApp = getApplication() ) {
-    module = PyModuleHelper::getInitModule();
-    if ( !module )
-      module = dynamic_cast<LightApp_Module*>( anApp->activeModule() );
+  /*!
+    \brief Get the currently active application.
+    \internal
+    \return active application object or 0 if there is no any
+  */
+  LightApp_Application* getApplication()
+  {
+    if ( SUIT_Session::session() )
+      return dynamic_cast<LightApp_Application*>( SUIT_Session::session()->activeApplication() );
+    return 0;
   }
-  return module;
-}
-
-/*!
-  \brief Get the currently active Python module's helper.
-  \internal
-  This function returns correct result only if Python-based
-  module is currently active. Otherwize, 0 is returned.
-*/
-static PyModuleHelper* getPythonHelper()
-{
-  LightApp_Module* module = getActiveModule();
-  PyModuleHelper* helper = module ? qFindChild<PyModuleHelper*>( module, "python_module_helper" ) : 0;
-  return helper;
-}
-
-/*!
-  \brief Get SALOME verbose level
-  \internal
-  \return \c true if SALOME debug output is allowed or \c false otherwise
-*/
-static bool verbose()
-{
-  bool isVerbose = false;
-  if ( getenv( "SALOME_VERBOSE" ) ) {
-    QString envVar = getenv( "SALOME_VERBOSE" );
-    bool ok;
-    int value = envVar.toInt( &ok );
-    isVerbose = ok && value != 0;
+  
+  /*!
+    \brief Get the currently active study.
+    \internal
+    \return active study or 0 if there is no study opened
+  */
+  LightApp_Study* getActiveStudy()
+  {
+    if ( getApplication() )
+      return dynamic_cast<LightApp_Study*>( getApplication()->activeStudy() );
+    return 0;
   }
-  return isVerbose;
+
+  /*!
+    \brief Get the currently active module.
+    \internal
+    This function returns correct result only if Python-based
+    module is currently active. Otherwize, 0 is returned.
+  */
+  LightApp_Module* getActiveModule()
+  {
+    LightApp_Module* module = 0;
+    if ( LightApp_Application* anApp = getApplication() ) {
+      module = PyModuleHelper::getInitModule();
+      if ( !module )
+        module = dynamic_cast<LightApp_Module*>( anApp->activeModule() );
+    }
+    return module;
+  }
+  
+  /*!
+    \brief Get the currently active Python module's helper.
+    \internal
+    This function returns correct result only if Python-based
+    module is currently active. Otherwize, 0 is returned.
+  */
+  PyModuleHelper* getPythonHelper()
+  {
+    LightApp_Module* module = getActiveModule();
+    PyModuleHelper* helper = module ? qFindChild<PyModuleHelper*>( module, "python_module_helper" ) : 0;
+    return helper;
+  }
+  
+  /*!
+    \brief Get SALOME verbose level
+    \internal
+    \return \c true if SALOME debug output is allowed or \c false otherwise
+  */
+  bool verbose()
+  {
+    bool isVerbose = false;
+    if ( getenv( "SALOME_VERBOSE" ) ) {
+      QString envVar = getenv( "SALOME_VERBOSE" );
+      bool ok;
+      int value = envVar.toInt( &ok );
+      isVerbose = ok && value != 0;
+    }
+    return isVerbose;
+  }
+
+  /*!
+    \brief Get menu item title
+    \internal
+    \param menuId menu identifier
+    \return menu title (localized)
+  */
+  QString getMenuName( const QString& menuId )
+  {
+    QStringList contexts;
+    contexts << "SalomeApp_Application" << "LightApp_Application" << "STD_TabDesktop" <<
+      "STD_MDIDesktop" << "STD_Application" << "SUIT_Application" << "";
+    QString menuName = menuId;
+    for ( int i = 0; i < contexts.count() && menuName == menuId; i++ )
+      menuName = QApplication::translate( contexts[i].toLatin1().data(), menuId.toLatin1().data() );
+    return menuName;
+  }
+
+  /*!
+    \brief Load module icon
+    \internal
+    \param module module name
+    \param fileName path to the icon file
+    \return icon
+  */
+  QIcon loadIconInternal( const QString& module, const QString& fileName )
+  {
+    QIcon icon;
+    
+    LightApp_Application* app = getApplication();
+    
+    if ( app && !fileName.isEmpty() ) {
+      QPixmap pixmap = app->resourceMgr()->loadPixmap( module, 
+                                                       QApplication::translate( module.toLatin1().data(), 
+                                                                                fileName.toLatin1().data() ) );
+      if ( !pixmap.isNull() )
+        icon = QIcon( pixmap );
+    }
+    return icon;
+  }
+
+  /*!
+    \brief Gets window with specified identifier 
+    \internal
+    \param id window identifier 
+    \return pointer on the window
+  */
+  SUIT_ViewWindow* getWnd( const int id )
+  {
+    SUIT_ViewWindow* resWnd = 0;
+    
+    LightApp_Application* app = getApplication();
+    if ( app ) {
+      ViewManagerList vmlist = app->viewManagers();
+      foreach( SUIT_ViewManager* vm, vmlist ) {
+        QVector<SUIT_ViewWindow*> vwlist = vm->getViews();
+        foreach ( SUIT_ViewWindow* vw, vwlist ) {
+          if ( id == vw->getId() ) {
+            resWnd = vw;
+            break;
+          }
+        }
+      }
+    }
+    return resWnd;
+  }
+
+  /*!
+    \brief Map of created selection objects.
+    \internal
+  */
+  QMap<LightApp_Application*, SALOME_Selection*> SelMap;
+
+  /*!
+    \brief Default resource file section name.
+    \internal
+  */
+  const char* DEFAULT_SECTION = "SalomePyQt";
 }
 
 /*!
   \class SALOME_Selection
   \brief The class represents selection which can be used in Python.
 */
-
-/*!
-  \brief Map of created selection objects.
-  \internal
-*/
-static QMap<LightApp_Application*, SALOME_Selection*> SelMap;
 
 /*!
   \brief Get the selection object for the specified application.
@@ -374,23 +458,6 @@ public:
     }
   }
 };
-
-/*!
-  \brief Get menu item title
-  \internal
-  \param menuId menu identifier
-  \return menu title (localized)
-*/
-static QString getMenuName( const QString& menuId )
-{
-  QStringList contexts;
-  contexts << "SalomeApp_Application" << "LightApp_Application" << "STD_TabDesktop" <<
-    "STD_MDIDesktop" << "STD_Application" << "SUIT_Application" << "";
-  QString menuName = menuId;
-  for ( int i = 0; i < contexts.count() && menuName == menuId; i++ )
-    menuName = QApplication::translate( contexts[i].toLatin1().data(), menuId.toLatin1().data() );
-  return menuName;
-}
 
 QMenu* SalomePyQt::getPopupMenu( const MenuName menu )
 {
@@ -721,12 +788,6 @@ void SalomePyQt::setModified( bool flag )
   };
   ProcessVoidEvent( new TEvent( flag ) );
 }
-
-/*!
-  \brief Default resource file section name.
-  \internal
-*/
-static const char* DEFAULT_SECTION = "SalomePyQt";
 
 /*!
   \brief Add string setting to the application preferences.
@@ -1462,22 +1523,6 @@ QString SalomePyQt::getExistingDirectory( QWidget*       parent,
   \param fileName icon file name
   \return icon object
 */
-
-static QIcon loadIconInternal( const QString& module, const QString& fileName )
-{
-  QIcon icon;
-
-  LightApp_Application* app = getApplication();
-
-  if ( app && !fileName.isEmpty() ) {
-    QPixmap pixmap = app->resourceMgr()->loadPixmap( module, 
-						     QApplication::translate( module.toLatin1().data(), 
-									      fileName.toLatin1().data() ) );
-    if ( !pixmap.isNull() )
-      icon = QIcon( pixmap );
-  }
-  return icon;
-}
 
 class TLoadIconEvent: public SALOME_Event 
 {
@@ -2268,37 +2313,6 @@ void SalomePyQt::clearMessages()
 }
 
 /*!
-  \brief Gets window with specified identifier 
-  \internal
-  \param id window identifier 
-  \return pointer on the window
-*/
-static SUIT_ViewWindow* getWnd( const int id )
-{
-  SUIT_ViewWindow* resWnd = 0;
-
-  LightApp_Application* app = getApplication();
-  if ( app )
-  {
-    ViewManagerList vmlist = app->viewManagers();
-    foreach( SUIT_ViewManager* vm, vmlist )
-    {
-      QVector<SUIT_ViewWindow*> vwlist = vm->getViews();
-      foreach ( SUIT_ViewWindow* vw, vwlist )
-      {
-        if ( id == vw->getId() )
-        {
-          resWnd = vw;
-          break;
-        }
-      }
-    }
-  }
-
-  return resWnd;
-}
-
-/*!
   \fn bool SalomePyQt::dumpView( const QString& filename, const int id = 0 );
   \brief Dump the contents of the id view window. If id is 0 then current active view is processed. 
   to the image file in the specified format.
@@ -2319,44 +2333,40 @@ public:
   QString myFileName;
   int myWndId;
   TDumpViewEvent( const QString& filename, const int id ) 
-    : myResult ( false ), myFileName( filename ), myWndId(id) {}
+    : myResult ( false ), myFileName( filename ), myWndId( id ) {}
   virtual void Execute() 
   {
-	SUIT_ViewWindow* wnd = NULL;
-	if(myWndId == 0)
-	{
+    SUIT_ViewWindow* wnd = 0;
+    if ( !myWndId ) {
       if ( LightApp_Application* anApp = getApplication() ) {
-	    SUIT_ViewManager* vm = anApp->activeViewManager();
-	    if ( vm )
-	      wnd = vm->getActiveView();
-	  }
+        SUIT_ViewManager* vm = anApp->activeViewManager();
+        if ( vm )
+          wnd = vm->getActiveView();
+      }
       myWndId = wnd->getId();
-	}
-	else
-	{
-	  wnd = dynamic_cast<SUIT_ViewWindow*>(getWnd( myWndId ));
-	}
+    }
+    else {
+      wnd = dynamic_cast<SUIT_ViewWindow*>( getWnd( myWndId ) );
+    }
     if ( wnd ) {
       QString fmt = SUIT_Tools::extension( myFileName ).toUpper();
-      Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>(wnd);
-      if(fmt == "PS" || fmt == "EPS" || fmt == "PDF") {
-    	if(wnd2D) {
-    	  myResult = wnd2D->getViewFrame()->print(myFileName, fmt);
-    	} else {
-    	  myResult = false;
-    	}
-      } else {
-	if(wnd2D) {
-	  qApp->postEvent( wnd2D->getViewFrame(), new QPaintEvent( QRect( 0, 0, wnd2D->getViewFrame()->width(), wnd2D->getViewFrame()->height() ) ) );
-	  qApp->postEvent( wnd2D, new QPaintEvent( QRect( 0, 0, wnd2D->width(), wnd2D->height() ) ) );
-	  qApp->processEvents();
-	}
-	QImage im = wnd->dumpView();
-	if ( !im.isNull() && !myFileName.isEmpty() ) {
-	  if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
-	  if ( fmt == "JPG" )  fmt = "JPEG";
-	  myResult = im.save( myFileName, fmt.toLatin1() );
+#ifndef DISABLE_PLOT2DVIEWER
+      Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>( wnd );
+      if ( wnd2D ) {
+        qApp->postEvent( wnd2D->getViewFrame(), new QPaintEvent( QRect( 0, 0, wnd2D->getViewFrame()->width(), wnd2D->getViewFrame()->height() ) ) );
+        qApp->postEvent( wnd2D, new QPaintEvent( QRect( 0, 0, wnd2D->width(), wnd2D->height() ) ) );
+        qApp->processEvents();
+        if ( fmt == "PS" || fmt == "EPS" || fmt == "PDF" ) {
+    	  myResult = wnd2D->getViewFrame()->print( myFileName, fmt );
+          return;
         }
+      }
+#endif // DISABLE_PLOT2DVIEWER
+      QImage im = wnd->dumpView();
+      if ( !im.isNull() && !myFileName.isEmpty() ) {
+        if ( fmt.isEmpty() ) fmt = QString( "BMP" ); // default format
+        if ( fmt == "JPG" )  fmt = "JPEG";
+        myResult = im.save( myFileName, fmt.toLatin1() );
       }
     }
   }
@@ -2365,7 +2375,6 @@ bool SalomePyQt::dumpView( const QString& filename, const int id )
 {
   return ProcessEvent( new TDumpViewEvent( filename, id ) );
 }
-
 
 /*!
   \fn QList<int> SalomePyQt::getViews();
@@ -2383,11 +2392,9 @@ public:
   {
     myResult.clear();
     LightApp_Application* app  = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       STD_TabDesktop* tabDesk = dynamic_cast<STD_TabDesktop*>( app->desktop() );
-      if ( tabDesk )
-      {
+      if ( tabDesk ) {
         QList<SUIT_ViewWindow*> wndlist = tabDesk->windows();
         SUIT_ViewWindow* wnd;
         foreach ( wnd, wndlist )
@@ -2417,11 +2424,9 @@ public:
   virtual void Execute() 
   {
     LightApp_Application* app = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       SUIT_ViewManager* viewMgr = app->activeViewManager();
-      if ( viewMgr )
-      {
+      if ( viewMgr ) {
         SUIT_ViewWindow* wnd = viewMgr->getActiveView();
         if ( wnd )
           myResult = wnd->getId();
@@ -2452,8 +2457,7 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       SUIT_ViewManager* viewMgr = wnd->getViewManager();
       if ( viewMgr )
         myResult = viewMgr->getType();
@@ -2487,8 +2491,7 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       wnd->setWindowTitle( myTitle );
       myResult = true;
     }
@@ -2499,6 +2502,86 @@ bool SalomePyQt::setViewTitle( const int id, const QString& title )
   return ProcessEvent( new TSetViewTitle( id, title ) );
 }
 
+/*!
+  \fn bool SalomePyQt::setViewSize( const int w, const int h, const int id );
+  \brief Set view size
+  \param w window width
+  \param h window height
+  \param id window identifier
+  \return \c true if operation is completed successfully and \c false otherwise 
+*/
+
+class TSetViewSize: public SALOME_Event
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  int myWndWidth;
+  int myWndHeight;
+  int myWndId;
+  TSetViewSize( const int w, const int h, const int id )
+    : myResult( false ),
+      myWndWidth( w ),
+      myWndHeight( h ),
+      myWndId( id ) {}
+  virtual void Execute() 
+  {
+    SUIT_ViewWindow* wnd = 0;
+    if ( !myWndId ) {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        SUIT_ViewManager* vm = anApp->activeViewManager();
+        if ( vm )
+          wnd = vm->getActiveView();
+      }
+    }
+    else {
+      wnd = dynamic_cast<SUIT_ViewWindow*>( getWnd( myWndId ) );
+    }
+    if ( wnd ) {
+      SUIT_ViewManager* viewMgr = wnd->getViewManager();
+      if ( viewMgr ) {
+        QString type = viewMgr->getType();
+        if ( type == "OCCViewer") {
+#ifndef DISABLE_OCCVIEWER
+          // specific processing for OCC viewer:
+          // OCC view can embed up to 4 sub-views, split according to the specified layout;
+          // - if there is only one sub-view active; it will be resized;
+          // - if there are several sub-views, each of them will be resized.
+          OCCViewer_ViewWindow* occView = qobject_cast<OCCViewer_ViewWindow*>( wnd );
+          for ( int i = OCCViewer_ViewFrame::BOTTOM_RIGHT; i <= OCCViewer_ViewFrame::TOP_RIGHT; i++ ) {
+            if ( occView && occView->getView( i ) ) {
+              occView->getView( i )->centralWidget()->resize( myWndWidth, myWndHeight );
+              myResult = true;
+            }
+          }
+#endif // DISABLE_OCCVIEWER
+        }
+        else if ( type == "ParaView") {
+#ifndef DISABLE_PVVIEWER
+          // specific processing for ParaView viewer:
+          // hierarchy of ParaView viewer is much complex than for usual view;
+          // we look for sub-widget named "Viewport"
+          QList<QWidget*> lst = qFindChildren<QWidget*>( wnd, "Viewport" );
+          if ( !lst.isEmpty() ) {
+            lst[0]->resize( myWndWidth, myWndHeight );
+            myResult = true;
+          }
+#endif // DISABLE_PVVIEWER
+        }
+        else {
+          if ( wnd->centralWidget() ) {
+            wnd->centralWidget()->resize( myWndWidth, myWndHeight );
+            myResult = true;
+          }
+        }
+      }
+    }
+  }
+};
+bool SalomePyQt::setViewSize( const int w, const int h, const int id )
+{
+  return ProcessEvent( new TSetViewSize( w, h, id ) );
+}
 
 /*!
   \fn QString SalomePyQt::getViewTitle( const int id );
@@ -2547,16 +2630,13 @@ public:
   {
     myResult.clear();
     LightApp_Application* app  = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       ViewManagerList vmList;
       app->viewManagers( myType, vmList );
       SUIT_ViewManager* viewMgr;
-      foreach ( viewMgr, vmList )
-      {
+      foreach ( viewMgr, vmList ) {
         QVector<SUIT_ViewWindow*> vec = viewMgr->getViews();
-        for ( int i = 0, n = vec.size(); i < n; i++ )
-        {
+        for ( int i = 0, n = vec.size(); i < n; i++ ) {
           SUIT_ViewWindow* wnd = vec[ i ];
           if ( wnd )
             myResult.append( wnd->getId() );
@@ -2589,8 +2669,7 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       wnd->setFocus();
       myResult = true;
     }
@@ -2629,30 +2708,27 @@ public:
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
-    if ( app )
-      {
-        SUIT_ViewManager* viewMgr = app->createViewManager( myType );
-        if ( viewMgr )
-          {
-            SUIT_ViewWindow* wnd = viewMgr->getActiveView();
-            if ( wnd ) {
-              wnd->setShown(myVisible);
-              if(!myVisible && myWidth == 0 && myHeight == 0) {
-                myWidth = 1024;
-                myHeight = 768;
-              }
-              if(myWidth > 0 && myHeight > 0) {
-                Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>(wnd);
-                if(wnd2D) {
-                  wnd2D->getViewFrame()->setGeometry(0,0,myWidth,myHeight);
-                } else {
-                  wnd->setGeometry(0,0,myWidth,myHeight);
-                }
-              }
-              myResult = wnd->getId();
-            }
+    if ( app ) {
+      SUIT_ViewManager* viewMgr = app->createViewManager( myType );
+      if ( viewMgr ) {
+        QWidget* wnd = viewMgr->getActiveView();
+        myResult = viewMgr->getActiveView()->getId();
+        if ( wnd ) {
+          wnd->setShown(myVisible);
+          if ( !myVisible && myWidth == 0 && myHeight == 0 ) {
+            myWidth = 1024;
+            myHeight = 768;
           }
+          if (myWidth > 0 && myHeight > 0) {
+#ifndef DISABLE_PLOT2DVIEWER
+            Plot2d_ViewWindow* wnd2D = dynamic_cast<Plot2d_ViewWindow*>( wnd );
+            if ( wnd2D ) wnd = wnd2D->getViewFrame();
+#endif // DISABLE_PLOT2DVIEWER
+            wnd->setGeometry( 0, 0, myWidth, myHeight );
+          }
+        }
       }
+    }
   }
 };
 int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height )
@@ -2684,11 +2760,9 @@ public:
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       SUIT_ViewManager* viewMgr = app->createViewManager( myType, myWidget );
-      if ( viewMgr )
-      {
+      if ( viewMgr ) {
         SUIT_ViewWindow* wnd = viewMgr->getActiveView();
         if ( wnd )
           myResult = wnd->getId();
@@ -2722,11 +2796,9 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       SUIT_ViewManager* viewMgr = wnd->getViewManager();
-      if ( viewMgr )
-      {
+      if ( viewMgr ) {
         wnd->close();
         myResult = true;
       }
@@ -2757,30 +2829,28 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       SUIT_ViewManager* viewMgr = wnd->getViewManager();
-      if ( viewMgr )
-      {
-        if ( wnd->inherits( "OCCViewer_ViewWindow" ) )
-        {
+      if ( viewMgr ) {
+#ifndef DISABLE_OCCVIEWER
+        if ( wnd->inherits( "OCCViewer_ViewWindow" ) ) {
           OCCViewer_ViewWindow* occView = (OCCViewer_ViewWindow*)( wnd );
           occView->onCloneView();
-
           wnd = viewMgr->getActiveView();
           if ( wnd )
             myResult = wnd->getId();
         }
-        else if ( wnd->inherits( "Plot2d_ViewWindow" ) ) 
-        {
+#endif // DISABLE_OCCVIEWER
+#ifndef DISABLE_PLOT2DVIEWER
+        if ( wnd->inherits( "Plot2d_ViewWindow" ) ) {
           Plot2d_ViewManager* viewMgr2d = dynamic_cast<Plot2d_ViewManager*>( viewMgr );
           Plot2d_ViewWindow* srcWnd2d = dynamic_cast<Plot2d_ViewWindow*>( wnd );
-          if ( viewMgr2d && srcWnd2d )
-          {
+          if ( viewMgr2d && srcWnd2d ) {
             Plot2d_ViewWindow* resWnd = viewMgr2d->cloneView( srcWnd2d );
             myResult = resWnd->getId();
           }
         }
+#endif // DISABLE_OCCVIEWER
       }
     }
   }
@@ -2917,14 +2987,11 @@ public:
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       STD_TabDesktop* tabDesk = dynamic_cast<STD_TabDesktop*>( app->desktop() );
-      if ( tabDesk )
-      {
+      if ( tabDesk ) {
         QtxWorkstack* wStack = tabDesk->workstack();
-        if ( wStack )
-        {
+        if ( wStack ) {
           wStack->stack();
           myResult = true;
         }
@@ -2964,21 +3031,17 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       // activate view
       // wnd->setFocus(); ???
 
       // split workstack
-      if ( getApplication() )
-      {
+      if ( getApplication() ) {
         STD_TabDesktop* desk = 
           dynamic_cast<STD_TabDesktop*>( getApplication()->desktop() );
-        if ( desk )
-        {
+        if ( desk ) {
           QtxWorkstack* wStack = desk->workstack();
-          if ( wStack )
-          {
+          if ( wStack ) {
             Qt::Orientation qtOri = 
               ( myOri == Horizontal ) ? Qt::Horizontal : Qt::Vertical;
 
@@ -3031,8 +3094,7 @@ public:
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
     SUIT_ViewWindow* wnd_to = getWnd( myWndToId );
-    if ( wnd && wnd_to )
-    {
+    if ( wnd && wnd_to ) {
       QtxWorkstack* wStack = dynamic_cast<STD_TabDesktop*>( 
         getApplication()->desktop() )->workstack();
       if ( wStack )
@@ -3065,16 +3127,13 @@ public:
   {
     myResult.clear();
     SUIT_ViewWindow* wnd = getWnd( myWndId );
-    if ( wnd )
-    {
+    if ( wnd ) {
       QtxWorkstack* wStack = dynamic_cast<STD_TabDesktop*>( 
         getApplication()->desktop() )->workstack();
-      if ( wStack )
-      {
+      if ( wStack ) {
         QWidgetList wgList = wStack->windowList( wnd );
         QWidget* wg;
-        foreach ( wg, wgList )
-        {
+        foreach ( wg, wgList ) {
           SUIT_ViewWindow* tmpWnd = dynamic_cast<SUIT_ViewWindow*>( wg );
           if ( tmpWnd && tmpWnd != wnd )
             myResult.append( tmpWnd->getId() );
@@ -3547,6 +3606,8 @@ QStringList SalomePyQt::getChildren( const QString& entry, const bool recursive 
   return ProcessEvent( new TGetChildrenEvent( entry, recursive ) ); 
 }
 
+#ifndef DISABLE_PLOT2DVIEWER
+// Next set of methods relates to the Plot2d viewer functionality
 
 /*!
   \fn void SalomePyQt::displayCurve( const int id, Plot2d_Curve* theCurve )
@@ -3560,18 +3621,16 @@ class TDisplayCurve: public SALOME_Event
 public:
   int myWndId;
   Plot2d_Curve* myCurve;
-  TDisplayCurve(const int id, Plot2d_Curve* theCurve) : myWndId(id), myCurve(theCurve) {}
+  TDisplayCurve( const int id, Plot2d_Curve* theCurve ) : myWndId( id ), myCurve( theCurve ) {}
   virtual void Execute() {
-	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-	if ( wnd )
-	{
-	  wnd->getViewFrame()->displayCurve(myCurve);
-	}
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    if ( wnd )
+      wnd->getViewFrame()->displayCurve( myCurve );
   }
 };
-void SalomePyQt::displayCurve(const int id, Plot2d_Curve* theCurve)
+void SalomePyQt::displayCurve( const int id, Plot2d_Curve* theCurve )
 {
-	ProcessVoidEvent( new TDisplayCurve(id, theCurve) ); 
+  ProcessVoidEvent( new TDisplayCurve( id, theCurve ) ); 
 }
 
 /*!
@@ -3586,18 +3645,15 @@ class TEraseCurve: public SALOME_Event
 public:
   int myWndId;
   Plot2d_Curve* myCurve;
-  TEraseCurve(const int id, Plot2d_Curve* theCurve) : myWndId(id), myCurve(theCurve) {}
+  TEraseCurve( const int id, Plot2d_Curve* theCurve ) : myWndId( id ), myCurve( theCurve ) {}
   virtual void Execute() {
-	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-	if ( wnd )
-	{
-	  wnd->getViewFrame()->eraseCurve(myCurve);
-	}
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    wnd->getViewFrame()->eraseCurve( myCurve );
   }
 };
-void SalomePyQt::eraseCurve(const int id, Plot2d_Curve* theCurve)
+void SalomePyQt::eraseCurve( const int id, Plot2d_Curve* theCurve )
 {
-	ProcessVoidEvent( new TEraseCurve(id, theCurve) ); 
+  ProcessVoidEvent( new TEraseCurve( id, theCurve ) ); 
 }
 
 /*!
@@ -3610,37 +3666,32 @@ class TDeleteCurve: public SALOME_Event
 {
 public:
   Plot2d_Curve* myCurve;
-  TDeleteCurve(Plot2d_Curve* theCurve) : myCurve(theCurve) {}
+  TDeleteCurve( Plot2d_Curve* theCurve ) : myCurve( theCurve ) {}
   virtual void Execute() {
     LightApp_Application* app  = getApplication();
-    if ( app )
-    {
+    if ( app ) {
       STD_TabDesktop* tabDesk = dynamic_cast<STD_TabDesktop*>( app->desktop() );
-      if ( tabDesk )
-      {
+      if ( tabDesk ) {
         QList<SUIT_ViewWindow*> wndlist = tabDesk->windows();
         SUIT_ViewWindow* wnd;
-        foreach ( wnd, wndlist )
-        {
-          Plot2d_ViewWindow* aP2d = dynamic_cast<Plot2d_ViewWindow*>(wnd);
-          if(aP2d)
-          {
-        	aP2d->getViewFrame()->eraseObject(myCurve);
-          }
+        foreach ( wnd, wndlist ) {
+          Plot2d_ViewWindow* aP2d = dynamic_cast<Plot2d_ViewWindow*>( wnd );
+          if ( aP2d )
+            aP2d->getViewFrame()->eraseObject( myCurve );
         }
       }
     }
   }
 };
-void SalomePyQt::eraseCurve(Plot2d_Curve * theCurve)
+void SalomePyQt::eraseCurve( Plot2d_Curve* theCurve )
 {
-	ProcessVoidEvent( new TDeleteCurve(theCurve) );
+  ProcessVoidEvent( new TDeleteCurve( theCurve ) );
 }
 
 /*!
   \brief updateCurves (repaint) curves in view window.
 */
-void SalomePyQt::updateCurves(const int id)
+void SalomePyQt::updateCurves( const int id )
 {
   class TEvent: public SALOME_Event
   {
@@ -3649,14 +3700,12 @@ void SalomePyQt::updateCurves(const int id)
     TEvent( const int id ) : myWndId( id ) {}
     virtual void Execute()
     {
-      Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
+      Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
       if ( wnd )
-      {
     	wnd->getViewFrame()->DisplayAll();
-      }
     }
   };
-  ProcessVoidEvent( new TEvent(id) );
+  ProcessVoidEvent( new TEvent( id ) );
 }
 
 /*!
@@ -3675,19 +3724,17 @@ public:
   int myWndId;
   ObjectType myType;
   TGetPlot2dTitle(const int id, ObjectType type) :
-	  myWndId(id),
-	  myType(type) {}
+    myWndId( id ),
+    myType( type ) {}
   virtual void Execute() {
-	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-	if ( wnd )
-	{
-	  myResult = wnd->getViewFrame()->getTitle((Plot2d_ViewFrame::ObjectType)myType);
-	}
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    if ( wnd )
+      myResult = wnd->getViewFrame()->getTitle( (Plot2d_ViewFrame::ObjectType)myType );
   }
 };
-QString SalomePyQt::getPlot2dTitle(const int id, ObjectType type)
+QString SalomePyQt::getPlot2dTitle( const int id, ObjectType type )
 {
-	return ProcessEvent( new TGetPlot2dTitle(id, type) ); 
+  return ProcessEvent( new TGetPlot2dTitle( id, type ) ); 
 }
 
 
@@ -3708,22 +3755,19 @@ public:
   QString myTitle;
   ObjectType myType;
   bool myShow;
-  TSetPlot2dTitle(const int id, const QString& title, ObjectType type, bool show) :
-	  myWndId(id),
-	  myTitle(title),
-	  myType(type),
-	  myShow(show) {}
+  TSetPlot2dTitle( const int id, const QString& title, ObjectType type, bool show ) :
+    myWndId( id ),
+    myTitle( title ),
+    myType( type ),
+    myShow( show ) {}
   virtual void Execute() {
-	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-	if ( wnd )
-	{
-	  wnd->getViewFrame()->setTitle(myShow, myTitle, (Plot2d_ViewFrame::ObjectType)myType, false);
-	}
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    wnd->getViewFrame()->setTitle( myShow, myTitle, (Plot2d_ViewFrame::ObjectType)myType, false );
   }
 };
-void SalomePyQt::setPlot2dTitle(const int id, const QString& title, ObjectType type, bool show)
+void SalomePyQt::setPlot2dTitle( const int id, const QString& title, ObjectType type, bool show )
 {
-	ProcessVoidEvent( new TSetPlot2dTitle(id, title, type, show) ); 
+  ProcessVoidEvent( new TSetPlot2dTitle( id, title, type, show ) ); 
 }
 
 /*!
@@ -3744,15 +3788,14 @@ public:
   virtual void Execute() 
   {
     myResult.clear();
-    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-    if ( wnd )
-    {
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    if ( wnd ) {
       double XMin, XMax, YMin, YMax, Y2Min, Y2Max;
-      wnd->getViewFrame()->getFitRangeByCurves(XMin, XMax, YMin, YMax, Y2Min, Y2Max);
-      myResult.append(XMin);
-      myResult.append(XMax);
-      myResult.append(YMin);
-      myResult.append(YMax);
+      wnd->getViewFrame()->getFitRangeByCurves( XMin, XMax, YMin, YMax, Y2Min, Y2Max );
+      myResult.append( XMin );
+      myResult.append( XMax );
+      myResult.append( YMin );
+      myResult.append( YMax );
     }
   }
 };
@@ -3779,15 +3822,14 @@ public:
   virtual void Execute() 
   {
     myResult.clear();
-    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-    if ( wnd )
-    {
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    if ( wnd ) {
       double XMin, XMax, YMin, YMax, Y2Min, Y2Max;
-      wnd->getViewFrame()->getFitRanges(XMin, XMax, YMin, YMax, Y2Min, Y2Max);
-      myResult.append(XMin);
-      myResult.append(XMax);
-      myResult.append(YMin);
-      myResult.append(YMax);
+      wnd->getViewFrame()->getFitRanges( XMin, XMax, YMin, YMax, Y2Min, Y2Max );
+      myResult.append( XMin );
+      myResult.append( XMax );
+      myResult.append( YMin );
+      myResult.append( YMax );
     }
   }
 };
@@ -3814,65 +3856,65 @@ public:
   double myXMax;
   double myYMin;
   double myYMax;
-  TPlot2dFitRange(const int id, const double XMin, const double XMax, const double YMin, const double YMax) :
-	  myWndId(id),
-	  myXMin(XMin),
-	  myXMax(XMax),
-	  myYMin(YMin),
-	  myYMax(YMax) {}
+  TPlot2dFitRange( const int id, const double XMin, const double XMax, const double YMin, const double YMax ) :
+    myWndId( id ),
+    myXMin( XMin ),
+    myXMax( XMax ),
+    myYMin( YMin ),
+    myYMax( YMax ) {}
   virtual void Execute() {
-	Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>(getWnd( myWndId ));
-	if ( wnd )
-	{
-	  wnd->getViewFrame()->fitData(0, myXMin, myXMax, myYMin, myYMax);
-	}
+    Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( getWnd( myWndId ) );
+    if ( wnd )
+      wnd->getViewFrame()->fitData( 0, myXMin, myXMax, myYMin, myYMax );
   }
 };
-void SalomePyQt::setPlot2dFitRange(const int id, const double XMin, const double XMax, const double YMin, const double YMax)
+void SalomePyQt::setPlot2dFitRange( const int id, const double XMin, const double XMax, const double YMin, const double YMax )
 {
-	ProcessVoidEvent( new TPlot2dFitRange(id, XMin, XMax, YMin, YMax) ); 
+  ProcessVoidEvent( new TPlot2dFitRange( id, XMin, XMax, YMin, YMax ) ); 
 }
 
-//class TInitParaview: public SALOME_Event
-//{
-//public:
-//  TInitParaview() {}
-//  virtual void Execute() {
-//    LightApp_Application* anApp = getApplication();
-//    // Create PVViewer_ViewManager, which will initialize ParaView stuff
-//    PVViewer_ViewManager* viewMgr =
-//          dynamic_cast<PVViewer_ViewManager*>( anApp->getViewManager( PVViewer_Viewer::Type(), true ) );
-//  }
-//};
-//void SalomePyQt::initializeParaViewGUI()
-//{
-//  ProcessVoidEvent( new TInitParaview() );
-//}
+// End of methods related to the Plot2d viewer functionality
+#endif // DISABLE_PLOT2DVIEWER
 
+/*!
+  \brief Process Qt event loop
+*/
 void SalomePyQt::processEvents()
 {
   QCoreApplication::processEvents();
 }
 
-void SalomePyQt::setVisibilityState( const QString& theEntry, VisibilityState theState)
+/*!
+  \brief Set visibility state for given object
+  \param theEntry study ID of the object
+  \param theState visibility state
+*/
+void SalomePyQt::setVisibilityState( const QString& theEntry, VisibilityState theState )
 {
   class TEvent: public SALOME_Event
   {
     QString myEntry;
     int myState;
   public:
-    TEvent( const QString& theEntry, int theState):
-      myEntry(theEntry), myState(theState) {}
+    TEvent( const QString& theEntry, int theState ):
+      myEntry( theEntry ), myState( theState ) {}
     virtual void Execute() 
     {
       LightApp_Study* aStudy = getActiveStudy();
       if ( !aStudy )
         return;
-      aStudy->setVisibilityState(myEntry, (Qtx::VisibilityState)myState);
+      aStudy->setVisibilityState( myEntry, (Qtx::VisibilityState)myState );
     }
   };
-  ProcessVoidEvent( new TEvent(theEntry, theState ) );
+  ProcessVoidEvent( new TEvent( theEntry, theState ) );
 }
+
+/*!
+  \fn VisibilityState SalomePyQt::getVisibilityState( const QString& theEntry )
+  \brief Get visibility state for given object
+  \param theEntry study ID of the object
+  \return visibility state
+*/
 
 class TGetVisibilityStateEvent: public SALOME_Event 
 {
@@ -3880,21 +3922,24 @@ public:
   typedef int TResult;
   TResult myResult;
   QString myEntry;
-  TGetVisibilityStateEvent(const QString& theEntry) : myResult( 0 ), myEntry(theEntry) {}
+  TGetVisibilityStateEvent( const QString& theEntry ) : myResult( 0 ), myEntry( theEntry ) {}
   virtual void Execute()
   {
     LightApp_Study* aStudy = getActiveStudy();
     if ( aStudy )
-      myResult = aStudy->visibilityState(myEntry);
+      myResult = aStudy->visibilityState( myEntry );
   }
 };
-
 VisibilityState SalomePyQt::getVisibilityState( const QString& theEntry )
 {
-  return (VisibilityState) ProcessEvent( new TGetVisibilityStateEvent(theEntry) );
+  return (VisibilityState) ProcessEvent( new TGetVisibilityStateEvent( theEntry ) );
 }
 
-
+/*!
+  \brief Set position of given object in the tree
+  \param theEntry study ID of the object
+  \param thePos position
+*/
 void SalomePyQt::setObjectPosition( const QString& theEntry, int thePos )
 {
   class TEvent: public SALOME_Event
@@ -3902,19 +3947,24 @@ void SalomePyQt::setObjectPosition( const QString& theEntry, int thePos )
     QString myEntry;
     int myPos;
   public:
-    TEvent( const QString& theEntry, int thePos):
-      myEntry(theEntry), myPos(thePos) {}
+    TEvent( const QString& theEntry, int thePos ):
+      myEntry( theEntry ), myPos( thePos ) {}
     virtual void Execute() 
     {
       SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
       if ( module )
-        module->setObjectPosition(myEntry, myPos );
+        module->setObjectPosition( myEntry, myPos );
     }
   };
-  ProcessVoidEvent( new TEvent(theEntry, thePos ) );
+  ProcessVoidEvent( new TEvent( theEntry, thePos ) );
 }
 
-
+/*!
+  \fn int SalomePyQt::getObjectPosition( const QString& theEntry )
+  \brief Get position of given object in the tree
+  \param theEntry study ID of the object
+  \return position
+*/
 
 class TGetObjectPositionEvent: public SALOME_Event 
 {
@@ -3922,21 +3972,24 @@ public:
   typedef int TResult;
   TResult myResult;
   QString myEntry;
-  TGetObjectPositionEvent(const QString& theEntry) : myResult( 0 ), myEntry(theEntry) {}
+  TGetObjectPositionEvent( const QString& theEntry ) : myResult( 0 ), myEntry( theEntry ) {}
   virtual void Execute()
   {
     SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
     if ( module )
-      myResult = module->getObjectPosition(myEntry);
+      myResult = module->getObjectPosition( myEntry );
   }
 };
-
 int SalomePyQt::getObjectPosition( const QString& theEntry )
 {
-  return ProcessEvent( new TGetObjectPositionEvent(theEntry) );
+  return ProcessEvent( new TGetObjectPositionEvent( theEntry ) );
 }
 
-void SalomePyQt::startPyLog(const QString& theFileName)
+/*!
+  \brief Start recordind a log of Python commands from embedded console
+  \param theFileName output lof file name
+*/
+void SalomePyQt::startPyLog( const QString& theFileName )
 {
   class TEvent: public SALOME_Event
   {
@@ -3955,6 +4008,9 @@ void SalomePyQt::startPyLog(const QString& theFileName)
   ProcessVoidEvent( new TEvent( theFileName ) );
 }
 
+/*!
+  \brief Stop recordind a log of Python commands from embedded console
+*/
 void SalomePyQt::stopPyLog()
 {
   class TEvent: public SALOME_Event

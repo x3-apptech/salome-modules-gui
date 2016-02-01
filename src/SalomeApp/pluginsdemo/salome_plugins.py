@@ -271,11 +271,11 @@ def runSalomeShellSession(context):
     kernel_appli_dir = os.environ['KERNEL_ROOT_DIR']
     command = ""
     if os.path.exists("/usr/bin/gnome-terminal"):
-      command = 'gnome-terminal -t "SALOME %s - Shell session" -e %s/runSession &'%(version,kernel_appli_dir)
+      command = 'gnome-terminal -t "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
     elif os.path.exists("/usr/bin/konsole"):
-      command = 'PATH="/usr/bin:/sbin:/bin" LD_LIBRARY_PATH="" konsole -e %s/runSession &'%(kernel_appli_dir)
+      command = 'PATH="/usr/bin:/sbin:/bin" LD_LIBRARY_PATH="" konsole -e "%s/salome shell" &'%(kernel_appli_dir)
     elif os.path.exists("/usr/bin/xterm"):
-      command = 'xterm -T "SALOME %s - Shell session" -e %s/runSession &'%(version,kernel_appli_dir)
+      command = 'xterm -T "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
     else:
       print "Neither xterm nor gnome-terminal nor konsole is installed."
 

@@ -392,7 +392,7 @@
     </message>
     <message>
       <source>Open in</source>
-      <translation type="unfinished">次のアプリケーションで開く:</translation>
+      <translation>次のアプリケーションで開く:</translation>
     </message>
     <message>
       <source>Save file</source>
@@ -404,7 +404,7 @@
     </message>
     <message>
       <source>Use this program for all files of this type</source>
-      <translation type="unfinished">このタイプのすべてのファイルでこのプログラムを使用</translation>
+      <translation>このタイプのすべてのファイルでこのプログラムを使用</translation>
     </message>
     <message>
       <source>&amp;OK</source>
@@ -416,15 +416,15 @@
     </message>
     <message>
       <source>You are opening the file</source>
-      <translation type="unfinished">ファイルを開いています。</translation>
+      <translation>ファイルを開いています。</translation>
     </message>
     <message>
       <source>Please choose the action to be done</source>
-      <translation type="unfinished">実行するアクションを選択してください。</translation>
+      <translation>実行するアクションを選択してください。</translation>
     </message>
     <message>
       <source>Choose program</source>
-      <translation type="unfinished">プログラムの選択</translation>
+      <translation>プログラムの選択</translation>
     </message>
     <message>
       <source>Go Back</source>
@@ -476,7 +476,7 @@
     </message>
     <message>
       <source>Help Browser</source>
-      <translation type="unfinished">ヘルプブラウザ</translation>
+      <translation>ヘルプブラウザ</translation>
     </message>
     <message>
       <source>Error</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>%1 has been developed using %2</source>
-      <translation type="unfinished">%1 は %2 を使用して開発されています。</translation>
+      <translation>%1 は %2 を使用して開発されています。</translation>
     </message>
   </context>
 </TS>

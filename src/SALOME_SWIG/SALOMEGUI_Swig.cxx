@@ -52,6 +52,10 @@
 #ifndef DISABLE_VTKVIEWER
     #include <SVTK_ViewModel.h>
     #include <SVTK_ViewWindow.h>
+    #include <SVTK_Renderer.h>
+    
+    #include <vtkCamera.h>
+    #include <vtkRenderer.h>
 #endif
 #ifndef DISABLE_PLOT2DVIEWER
     #include <SPlot2d_ViewWindow.h>
@@ -858,3 +862,190 @@ void SALOMEGUI_Swig::ViewBack()
 {
   setView( __ViewBack );
 }
+
+/*
+  \fn bool SALOMEGUI_Swig::getViewParameters()
+  \brief Get camera parameters of the active view.
+
+  NOTE: For the current moment implemented for VTK viewer only.
+
+  \return \c string with the view parameters
+*/
+
+class TGetViewParameters: public SALOME_Event
+{
+public:
+  typedef QString TResult;
+  TResult myResult;
+  TGetViewParameters() : myResult( "" ) {}
+  virtual void Execute() {  
+    if ( LightApp_Application* anApp = getApplication() ) {
+      if ( SUIT_ViewWindow* window = anApp->desktop()->activeWindow() ) {
+#ifndef DISABLE_VTKVIEWER
+	if ( SVTK_ViewWindow* svtk = dynamic_cast<SVTK_ViewWindow*>( window ) ) {	  
+	  if ( vtkRenderer* ren = svtk->getRenderer()) {		    
+	    if ( vtkCamera* camera = ren->GetActiveCamera() ) {
+   	      double pos[3], focalPnt[3], viewUp[3], scale[3], parScale;	    
+	      
+	      // save position, focal point, viewUp, scale
+	      camera->GetPosition( pos );
+	      camera->GetFocalPoint( focalPnt );
+	      camera->GetViewUp( viewUp );
+	      parScale = camera->GetParallelScale();
+	      svtk->GetRenderer()->GetScale( scale );
+
+	      myResult += QString("sg.setCameraPosition( %1, %2, %3 )\n").arg(pos[0]).arg(pos[1]).arg(pos[2]);
+	      myResult += QString("sg.setCameraFocalPoint( %1, %2, %3 )\n").arg(focalPnt[0]).arg(focalPnt[1]).arg(focalPnt[2]);
+	      myResult += QString("sg.setCameraViewUp( %1, %2, %3 )\n").arg(viewUp[0]).arg(viewUp[1]).arg(viewUp[2]);
+	      myResult += QString("sg.setViewScale(%1, %2, %3, %4 )\n").arg(parScale).arg(scale[0]).arg(scale[1]).arg(scale[2]);
+	    }
+	  }
+        }
+#endif
+      }
+    }
+  }
+};
+	
+const char* SALOMEGUI_Swig::getViewParameters() {
+  QString result = ProcessEvent( new TGetViewParameters() );
+  return result.isEmpty() ? 0 : strdup( result.toLatin1().constData() );  
+}
+
+
+/*!
+  \brief View parameter type.
+  \internal
+*/
+enum {
+  __CameraPosition,   //!< position of the active camera
+  __CameraFocalPoint, //!< focal point of the active camera      
+  __CameraViewUp,     //!< view up of the active camera         
+  __ViewScale         //!< scale of the view
+};
+
+
+/*!
+  \brief Change the camera parameters of the current view window.
+  \internal
+
+  NOTE: For the current moment implemented for VTK viewer only.
+
+  \param parameter type of the parameter
+  \param values value of the parameter
+*/
+static void setViewParameter( int parameter, QList<double>& values ) {
+  class TEvent: public SALOME_Event {
+  private:
+    int           myParameter;
+    QList<double> myValues;
+  public:
+    TEvent( int parameter , QList<double>& values ) : myParameter(parameter), myValues( values ) {}
+
+    virtual void Execute() {
+      if ( LightApp_Application* anApp = getApplication() ) {
+	if ( SUIT_ViewWindow* window = anApp->desktop()->activeWindow() ) {
+#ifndef DISABLE_VTKVIEWER
+	  if ( SVTK_ViewWindow* svtk = dynamic_cast<SVTK_ViewWindow*>( window ) ) {	  
+	    if ( vtkRenderer* ren = svtk->getRenderer()) {		    
+	      if ( vtkCamera* camera = ren->GetActiveCamera() ) {
+	        switch(myParameter) {	    
+                  case __CameraPosition : {
+	            if ( myValues.size() == 3 ) {  
+	              camera->SetPosition( myValues[0], myValues[1], myValues[2] );
+                    }
+                    break;
+                  }
+                  case __CameraFocalPoint : {
+	            if ( myValues.size() == 3 ) {  
+	              camera->SetFocalPoint( myValues[0], myValues[1], myValues[2] );
+                    }
+                    break;
+                  }
+                  case __CameraViewUp : {
+	            if ( myValues.size() == 3 ) {  
+	              camera->SetViewUp( myValues[0], myValues[1], myValues[2] );
+                    }
+                    break;
+                  }
+                  case __ViewScale : {
+	            if ( myValues.size() == 4 ) {  
+	              camera->SetParallelScale( myValues[0] );
+                      double scale[] = { myValues[1], myValues[2], myValues[3] };
+                      svtk->GetRenderer()->SetScale( scale );
+                    }
+                    break;
+                  }
+                  default: break;
+                }
+              }
+            }
+	    svtk->Repaint();
+          }
+#endif
+        }
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( parameter, values ) );
+}
+
+/*!
+  \brief Set camera position of the active view .
+  \param x - X coordinate of the camera
+  \param y - Y coordinate of the camera
+  \param z - Z coordinate of the camera
+*/
+void SALOMEGUI_Swig::setCameraPosition( double x, double y, double z ) {
+  QList<double> lst;
+  lst.push_back( x );
+  lst.push_back( y );
+  lst.push_back( z );
+  setViewParameter( __CameraPosition, lst );
+}
+
+/*!
+  \brief Set camera focal point of the active view.
+  \param x - X coordinate of the focal point
+  \param y - Y coordinate of the focal point
+  \param z - Z coordinate of the focal point
+*/
+void SALOMEGUI_Swig::setCameraFocalPoint( double x, double y, double z ) {
+  QList<double> lst;
+  lst.push_back( x );
+  lst.push_back( y );
+  lst.push_back( z );
+  setViewParameter( __CameraFocalPoint, lst );
+}
+
+/*!
+  \brief Set the view up direction for the camera.
+  \param x - X component of the direction vector
+  \param y - Y component of the direction vector
+  \param z - Z component of the direction vector
+*/
+void SALOMEGUI_Swig::setCameraViewUp( double x, double y, double z ) {
+  QList<double> lst;
+  lst.push_back( x );
+  lst.push_back( y );
+  lst.push_back( z );
+  setViewParameter( __CameraViewUp, lst );
+}
+
+/*!
+  \brief Set view scale.
+  \param parallelScale  - scaling used for a parallel projection.
+  \param x - X scale
+  \param y - Y scale
+  \param z - Z scale
+*/
+void SALOMEGUI_Swig::setViewScale( double parallelScale, double x, double y, double z ) {
+  QList<double> lst;
+  lst.push_back( parallelScale );
+  lst.push_back( x );
+  lst.push_back( y );
+  lst.push_back( z );
+  setViewParameter( __ViewScale, lst );
+}
+
+     

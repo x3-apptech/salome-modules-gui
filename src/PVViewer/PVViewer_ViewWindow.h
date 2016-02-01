@@ -16,9 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : Plot2d_ViewWindow.h
-// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+// Author : Adrien Bruneton (CEA)
+
 
 #ifndef PVViewer_VIEWWINDOW_H
 #define PVViewer_VIEWWINDOW_H
@@ -44,12 +43,6 @@ public:
   virtual void      setVisualParameters( const QString& );
   
   pqTabbedMultiViewWidget*    getMultiViewManager() const;
-
-signals:
-  void applyRequest();
-
-public slots:
-  void onEmulateApply();
 
 private:
   SUIT_Desktop*     myDesktop;

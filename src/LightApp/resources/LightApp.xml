@@ -145,6 +145,16 @@
   </section>
   <section name="OCCViewer" >
     <!-- OCC viewer preferences -->
+    <parameter name="projection_mode"     value="0"/>
+    <parameter name="stereo_type"         value="0"/>
+    <parameter name="anaglyph_filter"     value="0"/>
+    <parameter name="focus_type"          value="1"/>
+    <parameter name="focus_value"         value="1.0"/>
+    <parameter name="iod_type"            value="1"/>
+    <parameter name="iod_value"           value="0.05"/>
+    <parameter name="reverse_stereo"      value="false"/>
+    <parameter name="enable_vsync"        value="true"/>
+    <parameter name="enable_quad_buffer_support" value="false"/>
     <parameter name="enable_preselection" value="true"/>
     <parameter name="enable_selection"    value="true"/>
     <parameter name="clipping_color"      value="50, 50, 50"/>
@@ -160,6 +170,9 @@
     <!-- VTK viewer preferences -->
     <parameter name="background"                       value="0, 0, 0"/>
     <parameter name="projection_mode"                  value="0"/>
+    <parameter name="stereo_type"                      value="0"/>
+    <parameter name="anaglyph_filter"                  value="0"/>
+    <parameter name="enable_quad_buffer_support"       value="false"/>
     <parameter name="preselection"                     value="0"/>
     <parameter name="enable_selection"                 value="true"/>
     <parameter name="speed_value"                      value="10"/>

@@ -230,6 +230,15 @@ class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
   //! Set current projection mode
   virtual void SetProjectionMode( const int );
 
+  //! Sets stereo type
+  virtual void SetStereoType( const int );
+
+  //! Sets anaglyph filter
+  virtual void SetAnaglyphFilter( const int );
+
+  //! Set support quad-buffered stereo
+  virtual void SetQuadBufferSupport( const bool );
+
   //! Set interactive style
   virtual void SetInteractionStyle( const int );
 
@@ -309,7 +318,9 @@ public slots:
   void activatePanning(); 
   void activateGlobalPanning(); 
 
-  void onPerspectiveMode();
+  void onProjectionMode( QAction* theAction );
+  void onStereoMode( bool activate );
+  void onProjectionMode();
 
   void activateProjectionMode(int);
 
@@ -393,6 +404,13 @@ protected slots:
   void onMouseReleased(QMouseEvent* event);
   void onMouseMoving(QMouseEvent* event);
 
+public:
+  enum ProjectionType { Parallel, Projection, Stereo };
+
+  enum StereoType { CrystalEyes, RedBlue, Interlaced, Left, Right, Dresden, Anaglyph, Checkerboard, SplitViewPortHorizontal };
+
+  enum AnaglyphFilter { RedCyan, YellowBlue, GreenMagenta };
+
 protected:
   virtual void Initialize(SVTK_View* theView,
                           SVTK_ViewModelBase* theModel);
@@ -402,6 +420,8 @@ protected:
                             unsigned long event,
                             void* clientdata,
                             void* calldata);
+
+  bool isOpenGlStereoSupport() const;
 
   void doSetVisualParameters( const QString&, bool = false );
   void SetEventDispatcher(vtkObject* theDispatcher);
@@ -420,8 +440,8 @@ protected:
   enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
          ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId, ResetId,
-	 ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate,
-         ParallelModeId, ProjectionModeId, ViewParametersId, SynchronizeId, SwitchInteractionStyleId,
+         ViewTrihedronId, NonIsometric, GraduatedAxes, UpdateRate,
+         ParallelModeId, ProjectionModeId, StereoModeId, ViewParametersId, SynchronizeId, SwitchInteractionStyleId,
          SwitchZoomingStyleId, 
 	 PreselectionId, StandardPreselectionId, DynamicPreselectionId, DisablePreselectionId, 
 	 EnableSelectionId,

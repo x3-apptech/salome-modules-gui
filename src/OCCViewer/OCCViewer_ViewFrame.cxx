@@ -52,6 +52,7 @@ OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Vie
 
   myLayout->addWidget( view0, 0, 0 );
   myMaximizedView = view0;
+  myActiveView = view0;
   connectViewSignals(view0);
 }
 
@@ -77,6 +78,12 @@ OCCViewer_ViewWindow* OCCViewer_ViewFrame::getView( const int i ) const
 }
 
 //**************************************************************************************
+OCCViewer_ViewWindow* OCCViewer_ViewFrame::getActiveView( ) const
+{
+  return myActiveView;
+}
+
+//**************************************************************************************
 void OCCViewer_ViewFrame::setViewManager( SUIT_ViewManager* theMgr )
 {
   OCCViewer_ViewWindow::setViewManager(theMgr);
@@ -93,7 +100,10 @@ void OCCViewer_ViewFrame::returnTo3dView()
     view = myViews.at(i);
     view->setVisible( view->get2dMode() == No2dMode );
     view->setMaximized( true, false );
-    if (view->get2dMode() == No2dMode) myMaximizedView = view;
+    if (view->get2dMode() == No2dMode) {
+      myMaximizedView = view;
+      myActiveView = view;
+    }
   }
   myLayout->setColumnStretch(0, 0);
   myLayout->setColumnStretch(1, 0);
@@ -107,6 +117,7 @@ void OCCViewer_ViewFrame::returnTo3dView()
 void OCCViewer_ViewFrame::onMaximizedView( OCCViewer_ViewWindow* theView, bool isMaximized)
 {
   myMaximizedView = theView;
+  myActiveView = theView;
   if (isMaximized) {
     if (myViews.count() <= 1)
       return;
@@ -315,6 +326,130 @@ void OCCViewer_ViewFrame::setInteractionStyle( const int i )
 }
 
 //**************************************************************************************
+int OCCViewer_ViewFrame::projectionType() const
+{
+  return getView(MAIN_VIEW)->projectionType();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setProjectionType( int t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setProjectionType(t);
+  }
+}
+
+//**************************************************************************************
+int OCCViewer_ViewFrame::stereoType() const
+{
+  return getView(MAIN_VIEW)->stereoType();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setStereoType( int t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setStereoType(t);
+  }
+}
+
+//**************************************************************************************
+int OCCViewer_ViewFrame::anaglyphFilter() const
+{
+  return getView(MAIN_VIEW)->anaglyphFilter();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setAnaglyphFilter( int t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setAnaglyphFilter(t);
+  }
+}
+
+//**************************************************************************************
+int OCCViewer_ViewFrame::stereographicFocusType() const
+{
+  return getView(MAIN_VIEW)->stereographicFocusType();
+}
+
+//**************************************************************************************
+double OCCViewer_ViewFrame::stereographicFocusValue() const
+{
+  return getView(MAIN_VIEW)->stereographicFocusValue();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setStereographicFocus( int t, double v)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setStereographicFocus(t, v);
+  }
+}
+
+//**************************************************************************************
+int OCCViewer_ViewFrame::interocularDistanceType() const
+{
+  return getView(MAIN_VIEW)->interocularDistanceType();
+}
+
+//**************************************************************************************
+double OCCViewer_ViewFrame::interocularDistanceValue() const
+{
+  return getView(MAIN_VIEW)->interocularDistanceValue();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setInterocularDistance( int t, double v)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setInterocularDistance(t, v);
+  }
+}
+
+//**************************************************************************************
+bool OCCViewer_ViewFrame::isReverseStereo() const
+{
+  return getView(MAIN_VIEW)->isReverseStereo();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setReverseStereo( bool t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setReverseStereo(t);
+  }
+}
+
+//**************************************************************************************
+bool OCCViewer_ViewFrame::isVSync() const
+{
+  return getView(MAIN_VIEW)->isVSync();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setVSync( bool t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setVSync(t);
+  }
+}
+
+//**************************************************************************************
+bool OCCViewer_ViewFrame::isQuadBufferSupport() const
+{
+  return getView(MAIN_VIEW)->isQuadBufferSupport();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setQuadBufferSupport( bool t)
+{
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    aView->setQuadBufferSupport(t);
+  }
+}
+
+//**************************************************************************************
 void OCCViewer_ViewFrame::setZoomingStyle( const int i ) 
 { 
   foreach (OCCViewer_ViewWindow* aView, myViews) {
@@ -342,6 +477,9 @@ void OCCViewer_ViewFrame::connectViewSignals(OCCViewer_ViewWindow* theView)
            this, SIGNAL( mouseDoubleClicked(SUIT_ViewWindow*, QMouseEvent*) ) );
   connect( theView, SIGNAL( mousePressed(SUIT_ViewWindow*, QMouseEvent*) ), 
            this, SIGNAL( mousePressed(SUIT_ViewWindow*, QMouseEvent*) ) );
+  // The signal is used to mouse pressed for choose the current window
+  connect( theView, SIGNAL( mousePressed(SUIT_ViewWindow*, QMouseEvent*) ),
+           this, SLOT( onMousePressed(SUIT_ViewWindow*, QMouseEvent*) ) );
   connect( theView, SIGNAL( mouseReleased(SUIT_ViewWindow*, QMouseEvent*) ), 
            this, SIGNAL( mouseReleased(SUIT_ViewWindow*, QMouseEvent*) ) );
   connect( theView, SIGNAL( mouseMoving(SUIT_ViewWindow*, QMouseEvent*) ), 
@@ -455,6 +593,11 @@ void OCCViewer_ViewFrame::onContextMenuRequested(QContextMenuEvent*)
   myPopupRequestedView = dynamic_cast<OCCViewer_ViewWindow*>(sender());
 }
 
+void OCCViewer_ViewFrame::onMousePressed(SUIT_ViewWindow* view, QMouseEvent*)
+{
+  myActiveView = dynamic_cast<OCCViewer_ViewWindow*>(view);
+}
+
 void OCCViewer_ViewFrame::onDumpView()
 {
   if (myPopupRequestedView) {
@@ -564,4 +707,13 @@ void OCCViewer_ViewFrame::enablePreselection( bool isEnabled )
   foreach (OCCViewer_ViewWindow* aView, myViews) {
     aView->enablePreselection(isEnabled); 
   }
+}
+
+bool OCCViewer_ViewFrame::enableDrawMode( bool on )
+{
+  bool prev = false;
+  foreach (OCCViewer_ViewWindow* aView, myViews) {
+    prev = prev || aView->enableDrawMode( on ); 
+  }
+  return prev;
 }

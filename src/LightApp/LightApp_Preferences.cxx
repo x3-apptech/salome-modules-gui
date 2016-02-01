@@ -22,7 +22,7 @@
 
 // File:      LightApp_Preferences.cxx
 // Author:    Sergey TELKOV
-//
+
 #include "LightApp_Preferences.h"
 
 /*!
@@ -97,6 +97,7 @@ void LightApp_Preferences::onApply()
 /*!Emit preference changed.*/
 void LightApp_Preferences::changedResources( const ResourceMap& map )
 {
+  bool toRestart = false;
   for ( ResourceMap::ConstIterator it = map.begin(); 
         it != map.end(); ++it )
   {
@@ -104,6 +105,10 @@ void LightApp_Preferences::changedResources( const ResourceMap& map )
     it.key()->resource( sec, param );
     QString mod = module( it.key()->id() );
     emit preferenceChanged( mod, sec, param );
+    toRestart = toRestart || it.key()->isRestartRequired();
+  }
+  if ( toRestart ) {
+    emit restartRequired();
   }
 }
 

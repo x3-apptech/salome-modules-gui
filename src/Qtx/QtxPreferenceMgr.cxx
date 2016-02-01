@@ -132,7 +132,8 @@ void QtxPreferenceItem::Updater::customEvent( QEvent* /*e*/ )
 */
 QtxPreferenceItem::QtxPreferenceItem( QtxPreferenceItem* parent )
 : myParent( 0 ),
-myEval( true )
+  myEval( true ),
+  myRestartNeeded( false )
 {
   myId = generateId();
 
@@ -147,6 +148,8 @@ myEval( true )
 */
 QtxPreferenceItem::QtxPreferenceItem( const QString& title, QtxPreferenceItem* parent )
 : myParent( 0 ),
+  myEval( true ),
+  myRestartNeeded( false ),
   myTitle( title )
 {
   myId = generateId();
@@ -165,6 +168,8 @@ QtxPreferenceItem::QtxPreferenceItem( const QString& title, QtxPreferenceItem* p
 QtxPreferenceItem::QtxPreferenceItem( const QString& title, const QString& sect,
                                       const QString& param, QtxPreferenceItem* parent )
 : myParent( 0 ),
+  myEval( true ),
+  myRestartNeeded( false ),
   myTitle( title ),
   mySection( sect ),
   myParameter( param )
@@ -452,14 +457,40 @@ void QtxPreferenceItem::setOption( const QString& name, const QVariant& val )
     sendItemChanges();
 }
 
+/*!
+  \brief Get variables auto-conversion option value
+  \return option value
+*/
 bool QtxPreferenceItem::isEvaluateValues() const
 {
   return myEval;
 }
 
+/*!
+  \brief Switch variables auto-conversion option on/off
+  \param on option value
+*/
 void QtxPreferenceItem::setEvaluateValues( const bool on )
 {
   myEval = on;
+}
+
+/*!
+  \brief Get restart needed option value
+  \return option value
+*/
+bool QtxPreferenceItem::isRestartRequired() const
+{
+  return myRestartNeeded;
+}
+
+/*!
+  \brief Switch restart needed option on/off
+  \param on option value
+*/
+void QtxPreferenceItem::setRestartRequired( const bool on )
+{
+  myRestartNeeded = on;
 }
 
 /*!
@@ -807,6 +838,8 @@ QVariant QtxPreferenceItem::optionValue( const QString& name ) const
   QVariant val;
   if ( name == "eval" || name == "evaluation" || name == "subst" || name == "substitution" )
     val = isEvaluateValues();
+  else if ( name == "restart" )
+    val = isRestartRequired();
   else if ( name == "title" )
     val = title();
   return val;
@@ -828,6 +861,11 @@ void QtxPreferenceItem::setOptionValue( const QString& name, const QVariant& val
   {
     if ( val.canConvert( QVariant::Bool ) )
       setEvaluateValues( val.toBool() );
+  }
+  if ( name == "restart" )
+  {
+    if ( val.canConvert( QVariant::Bool ) )
+      setRestartRequired( val.toBool() );
   }
   else if ( name == "title" )
   {

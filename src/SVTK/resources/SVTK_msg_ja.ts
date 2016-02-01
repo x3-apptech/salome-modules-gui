@@ -132,12 +132,12 @@
       <translation>選択領域の表示</translation>
     </message>
     <message>
-        <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+      <source>MNU_FITSELECTION</source>
+      <translation>選択をフィット</translation>
     </message>
     <message>
-        <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+      <source>DSC_FITSELECTION</source>
+      <translation>ビューフレームの内側にある選択されたすべてのオブジェクトをフィット</translation>
     </message>
     <message>
       <source>DSC_BOTTOM_VIEW</source>
@@ -200,6 +200,14 @@
       <translation>透視投影を選択します。</translation>
     </message>
     <message>
+      <source>MNU_SVTK_STEREO_MODE</source>
+      <translation>ステレオモード</translation>
+    </message>
+    <message>
+      <source>DSC_SVTK_STEREO_MODE</source>
+      <translation>ステレオ投影タイプを設定</translation>
+    </message>
+    <message>
       <source>DSC_SVTK_STYLE_SWITCH</source>
       <translation>相互作用のスタイルを変更します。</translation>
     </message>
@@ -246,6 +254,10 @@
     <message>
       <source>MNU_SVTK_ENABLE_SELECTION</source>
       <translation>選択を有効/無効にします。</translation>
+    </message>
+    <message>
+      <source>WRN_SUPPORT_QUAD_BUFFER</source>
+      <translation>グラフィックドライバは quad-buffer をサポートしていません</translation>
     </message>
   </context>
   <context>
@@ -661,6 +673,42 @@
     <message>
       <source>BG_IMAGE_FILES</source>
       <translation>ファイル (*.png *.jpg *.jpeg、*.bmp, *.tif, *.tiff *.mhd *.mha)</translation>
+    </message>
+    <message>
+      <source>ST_CRYSTALEYES</source>
+      <translation>水晶の目</translation>
+    </message>
+    <message>
+      <source>ST_REDBLUE</source>
+      <translation>赤-青投影</translation>
+    </message>
+    <message>
+      <source>ST_INTERLACED</source>
+      <translation>インターレース</translation>
+    </message>
+    <message>
+      <source>ST_LEFT</source>
+      <translation>左</translation>
+    </message>
+    <message>
+      <source>ST_RIGHT</source>
+      <translation>右</translation>
+    </message>
+    <message>
+      <source>ST_DRESDEN</source>
+      <translation>Dresden</translation>
+    </message>
+    <message>
+      <source>ST_ANAGLYPH</source>
+      <translation>Anaglyph</translation>
+    </message>
+    <message>
+      <source>ST_CHECKERBOARD</source>
+      <translation>Checkerboard</translation>
+    </message>
+    <message>
+      <source>ST_SPLITVIEWPORTHORIZONTAL</source>
+      <translation>ビューポートを水平に分割</translation>
     </message>
   </context>
 </TS>

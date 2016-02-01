@@ -4,7 +4,6 @@
 <context>
     <name>@default</name>
     <message>
-        <!-- used in GEOM module: to be moved there? -->
         <source>OCC_TEXTURE_FILES</source>
         <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
         <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
@@ -182,11 +181,11 @@
     </message>
     <message>
         <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+        <translation>Adapter la sélection</translation>
     </message>
     <message>
         <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+        <translation>Adapter tous les objets sélectionnés dans la vue</translation>
     </message>
     <message>
         <source>MNU_PRESETS_VIEW</source>
@@ -289,12 +288,40 @@
         <translation>Opérations sur la vue XZ</translation>
     </message>
     <message>
-        <source>>LBL_YZTOOLBAR_LABEL</source>
+        <source>LBL_YZTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue YZ</translation>
     </message>
     <message>
         <source>LBL_3DTOOLBAR_LABEL</source>
         <translation>Opérations sur la vue 3D</translation>
+    </message>
+    <message>
+        <source>MNU_ORTHOGRAPHIC_MODE</source>
+        <translation>Mode orthogonal</translation>
+    </message>
+    <message>
+        <source>DSC_ORTHOGRAPHIC_MODE</source>
+        <translation>Choisir la projection orthogonale</translation>
+    </message>
+    <message>
+        <source>MNU_PERSPECTIVE_MODE</source>
+        <translation>Mode perspective</translation>
+    </message>
+    <message>
+        <source>DSC_PERSPECTIVE_MODE</source>
+        <translation>Choisir la projection en perspective</translation>
+    </message>
+    <message>
+        <source>MNU_STEREO_MODE</source>
+        <translation>Mode Stéréo</translation>
+    </message>
+    <message>
+        <source>DSC_STEREO_MODE</source>
+        <translation>Choisir le type de projection stéréo</translation>
+    </message>
+    <message>
+        <source>WRN_SUPPORT_QUAD_BUFFER</source>
+        <translation>Le pilote graphique ne supporte pas le quad-buffer</translation>
     </message>
 </context>
 <context>
@@ -427,6 +454,34 @@
     <message>
         <source>BG_IMAGE_FILES</source>
         <translation>Fichiers images (*.bmp *.gif *.pix *.xwd *.rgb *.rs)</translation>
+    </message>
+    <message>
+        <source>ST_QUADBUFFER</source>
+        <translation>Lunette à obturation (OpenGL quad-buffer)</translation>
+    </message>
+    <message>
+        <source>ST_ANAGLYPH</source>
+        <translation>Anaglyphe</translation>
+    </message>
+    <message>
+        <source>ST_ROWINTERLACED</source>
+        <translation>Entrelacement horizontal</translation>
+    </message>
+    <message>
+        <source>ST_COLUMNINTERLACED</source>
+        <translation>Entrelacement vertical</translation>
+    </message>
+    <message>
+        <source>ST_CHESSBOARD</source>
+        <translation>Damier pour téléviseurs polarisés</translation>
+    </message>
+    <message>
+        <source>ST_SIDEBYSIDE</source>
+        <translation>Horizontal anamorphosé (côte-à-côte)</translation>
+    </message>
+    <message>
+        <source>ST_OVERUNDER</source>
+        <translation>Vertical anamorphosé (Half OverUnder)</translation>
     </message>
 </context>
 <context>

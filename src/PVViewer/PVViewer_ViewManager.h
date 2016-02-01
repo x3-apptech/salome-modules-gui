@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
+
 #ifndef PVViewer_VIEWMANAGER_H
 #define PVViewer_VIEWMANAGER_H
 
@@ -23,16 +25,12 @@
 
 #include <SUIT_ViewManager.h>
 
-class PVViewer_EngineWrapper;
 class SUIT_Desktop;
 class SUIT_Study;
 class SUIT_ViewWindow;
-class pqTabbedMultiViewWidget;
-class pqPVApplicationCore;
-class PVViewer_Behaviors;
-class pqPropertiesPanel;
-class pqPipelineBrowserWidget;
 class LogWindow;
+class PVServer_ServiceWrapper;
+class QMainWindow;
 
 class PVVIEWER_EXPORT PVViewer_ViewManager : public SUIT_ViewManager
 {
@@ -42,30 +40,20 @@ public:
   PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop*, LogWindow *);
   ~PVViewer_ViewManager() {}
 
-  static pqPVApplicationCore * GetPVApplication();
-  static PVViewer_EngineWrapper * GetEngine();
+  //! Get the CORBA engine wrapper.
+  static PVServer_ServiceWrapper * GetService();
 
-  //! Initialize ParaView if not yet done (once per session)
-  static bool   ParaviewInitApp(SUIT_Desktop* aDesktop, LogWindow * w);
-  static void   ParaviewInitBehaviors(bool fullSetup=false, SUIT_Desktop* aDesktop=0);
-  static void   ParaviewLoadConfigurations(bool force=false);
-  static void   ParaviewCleanup();
+  //! Get PVViewer configuration path as stored by SALOME's resource manager:
+  static QString GetPVConfigPath();
 
   //! Connect to the external PVServer, using the PARAVIS engine to launch it if it is not
   //! already up.
-  static bool   ConnectToExternalPVServer(SUIT_Desktop* aDesktop);
-
-public slots:
-  void onEmulateApply();
+  static bool   ConnectToExternalPVServer(QMainWindow* aDesktop);
 
 protected slots:
   void onWindowActivated(SUIT_ViewWindow*);
 
 private:
-  static pqPVApplicationCore* MyCoreApp;
-  static bool ConfigLoaded;
-  static PVViewer_Behaviors * ParaviewBehaviors;
-
   SUIT_Desktop * desktop;
 };
 

@@ -161,8 +161,7 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application(), 
-    myIsSiman( false ),
+  : LightApp_Application(),
     myIsCloseFromExit( false )
 {
 }
@@ -199,9 +198,8 @@ void SalomeApp_Application::start()
       }
       else {
         QRegExp rxp ("--pyscript=\\[(.+)\\]");
-	QRegExp rxl ("--siman-study=(.+)");
         if ( rxp.indexIn( QString(qApp->argv()[i]) ) >= 0 && rxp.capturedTexts().count() > 1 ) {
-	  // pyscript
+          // pyscript
           QStringList dictList = rxp.capturedTexts()[1].split("},", QString::SkipEmptyParts);
           for (int k = 0; k < dictList.count(); ++k) {
             QRegExp rxd ("[\\s]*\\{?([^\\{\\}]+)\\}?[\\s]*");
@@ -212,13 +210,6 @@ void SalomeApp_Application::start()
             }
           }
         }
-#ifdef WITH_SIMANIO
-	if ( rxl.indexIn( QString(qApp->argv()[i]) ) >= 0 && rxl.capturedTexts().count() > 1 ) {
-	  // siman
-	  loadStudy = rxl.capturedTexts()[1];
-	  myIsSiman = true;
-	}
-#endif
       }
     }
     // Here pyfiles elements are: "script_name": [list_of_"arg"s]
@@ -327,18 +318,6 @@ void SalomeApp_Application::createActions()
                 Qt::CTRL+Qt::Key_U, desk, false, this, SLOT( onUnloadDoc() ) );
 
 
-#ifdef WITH_SIMANIO
-  if (myIsSiman) {
-    // check-in operations for SIMAN study  
-    createAction( SimanCheckInId, tr( "TOT_SIMAN_CHECK_IN" ), QIcon(),
-                tr( "MEN_SIMAN_CHECK_IN" ), tr( "PRP_SIMAN_CHECK_IN" ),
-                0, desk, false, this, SLOT( onCheckIn() ) );
-    createAction( SimanLocalCheckInId, tr( "TOT_SIMAN_LOCAL_CHECK_IN" ), QIcon(),
-                tr( "MEN_SIMAN_LOCAL_CHECK_IN" ), tr( "PRP_SIMAN_LOCAL_CHECK_IN" ),
-                0, desk, false, this, SLOT( onLocalCheckIn() ) );
-  }
-#endif
-
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
 
   // "Save GUI State" command is renamed to "Save VISU State" and
@@ -349,15 +328,6 @@ void SalomeApp_Application::createActions()
   createMenu( DisconnectId, fileMenu, 5 );
   createMenu( separator(),  fileMenu, -1, 5 );
 
-#ifdef WITH_SIMANIO
-  if (myIsSiman) {
-    // check-in operation for SIMAN study
-    // last argument "5" locates this just after "Save As" but certain constant is bad => insert after the separator
-    createMenu( SimanCheckInId, fileMenu, 5);
-    createMenu( SimanLocalCheckInId, fileMenu, 5);
-    createMenu( separator(), fileMenu, 5 );
-  }
-#endif
   createMenu( DumpStudyId, fileMenu, 10, -1 );
   createMenu( LoadScriptId, fileMenu, 10, -1 );
   createMenu( separator(), fileMenu, -1, 10, -1 );
@@ -416,7 +386,7 @@ void SalomeApp_Application::onLoadDoc()
   std::vector<std::string> List = studyMgr()->GetOpenStudies();
 
   // rnv: According to the single-study approach on the server side
-  //      can be only one study. So if it is exists connect to them,  
+  //      can be only one study. So if it is exists connect to them,
   //      overwise show warning message: "No active study on the server"
 
   /*
@@ -452,7 +422,7 @@ void SalomeApp_Application::onLoadDoc()
                               QObject::tr("WRN_NO_STUDY_ON SERV") );
     return;
   }
-  
+
   studyName = List[0].c_str();
 
 #ifndef WIN32
@@ -476,18 +446,18 @@ void SalomeApp_Application::onUnloadDoc( bool ask )
     if ( activeStudy()->isModified() ) {
       QString docName = activeStudy()->studyName().trimmed();
       int answer = SUIT_MessageBox::question( desktop(), tr( "DISCONNECT_CAPTION" ),
-					    tr( "DISCONNECT_DESCRIPTION" ),
-					    tr( "DISCONNECT_SAVE" ), 
-					    tr( "DISCONNECT_WO_SAVE" ),
-					    tr( "APPCLOSE_CANCEL" ), 0 );
+                                            tr( "DISCONNECT_DESCRIPTION" ),
+                                            tr( "DISCONNECT_SAVE" ),
+                                            tr( "DISCONNECT_WO_SAVE" ),
+                                            tr( "APPCLOSE_CANCEL" ), 0 );
       if ( answer == 0 ) { // save before unload
-	if ( activeStudy()->isSaved() )
-	  onSaveDoc();
-	else if ( !onSaveAsDoc() )
-	  return;
+        if ( activeStudy()->isSaved() )
+          onSaveDoc();
+        else if ( !onSaveAsDoc() )
+          return;
       }
       else if ( answer == 2 ) // Cancel
-	return;
+        return;
     }
   }
   closeActiveDoc( false );
@@ -562,17 +532,7 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
 /*!SLOT. Parse message for desktop.*/
 void SalomeApp_Application::onDesktopMessage( const QString& message )
 {
-  if (message.indexOf("simanCheckoutDone ") == 0) {
-#ifdef WITH_SIMANIO
-    // Load document with a name, specified in aMessage.
-    onLoadDoc(message.section(' ', 1));
-#else
-    printf( "****************************************************************\n" );
-    printf( "*    Warning: SALOME is built without SIMAN support.\n" );
-    printf( "****************************************************************\n" );
-#endif
-  }
-  else if (message.indexOf("studyCreated:") == 0) {
+  if (message.indexOf("studyCreated:") == 0) {
     // Enable 'Connect' action
     updateCommandsStatus();
   }
@@ -801,10 +761,12 @@ void SalomeApp_Application::updateCommandsStatus()
   if ( a )
     a->setEnabled( activeStudy() );
 
+#ifndef DISABLE_PYCONSOLE
   // Load script menu
   a = action( LoadScriptId );
   if( a )
     a->setEnabled( pythonConsole() );
+#endif
 
   // Properties menu
   a = action( PropertiesId );
@@ -964,17 +926,6 @@ void SalomeApp_Application::onLoadScript( )
   QString anInitialPath = "";
   if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
     anInitialPath = QDir::currentPath();
-  
-#ifdef WITH_SIMANIO
-  // MPV: if it is SIMAN study, make the initial path as the path to the Siman scripts storage
-  if (myIsSiman) {
-    SALOMEDSClient_StudyManager* aMgr = studyMgr();
-    aMgr->GetSimanStudy()->StudyId();
-    anInitialPath = QString(QDir::separator()) + "tmp" + QDir::separator() + "SimanSalome" + QDir::separator() + 
-      aMgr->GetSimanStudy()->StudyId().c_str() + QDir::separator() +
-      aMgr->GetSimanStudy()->ScenarioId().c_str() + QDir::separator() + aMgr->GetSimanStudy()->UserId().c_str();
-  }
-#endif
 
   QString aFile = SUIT_FileDlg::getFileName( desktop(), anInitialPath, filtersList, tr( "TOT_DESK_FILE_LOAD_SCRIPT" ), true, true );
 
@@ -1001,40 +952,6 @@ void SalomeApp_Application::onSaveGUIState()
     updateObjectBrowser();
   }
   updateActions();
-}
-
-/*!Public SLOT. On SIMAN check in operation.*/
-void SalomeApp_Application::onCheckIn()
-{
-#ifdef WITH_SIMANIO
-  setMenuShown(SimanCheckInId, false); // check in may be performed only once
-  setMenuShown(SimanLocalCheckInId, false);
-  SALOMEDSClient_StudyManager* aMgr = studyMgr();
-  aMgr->GetSimanStudy()->CheckIn("");
-#else
-  printf( "****************************************************************\n" );
-  printf( "*    Warning: SALOME is built without SIMAN support.\n" );
-  printf( "****************************************************************\n" );
-#endif
-}
-
-/*!Public SLOT. On SIMAN local check in operation.*/
-void SalomeApp_Application::onLocalCheckIn()
-{
-#ifdef WITH_SIMANIO
-  // get the active module
-  CAM_Module* aModule = activeModule();
-  if (!aModule) return; // there is no active module
-  
-  setMenuShown(SimanCheckInId, false); // check in may be performed only once
-  setMenuShown(SimanLocalCheckInId, false);
-  SALOMEDSClient_StudyManager* aMgr = studyMgr();
-  aMgr->GetSimanStudy()->CheckIn(aModule->name().toLatin1().data());
-#else
-  printf( "****************************************************************\n" );
-  printf( "*    Warning: SALOME is built without SIMAN support.\n" );
-  printf( "****************************************************************\n" );
-#endif
 }
 
 /*!Public SLOT. Performs some actions when dockable windows are triggered.*/
@@ -1235,7 +1152,7 @@ int SalomeApp_Application::closeChoice( const QString& docName )
   choices.insert( idx++, CloseCancel );           // ...
 
   int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ),
-					  tr( "APPCLOSE_DESCRIPTION" ), buttons, 0 );
+                                          tr( "APPCLOSE_DESCRIPTION" ), buttons, 0 );
   return choices[answer];
 }
 
@@ -1461,20 +1378,20 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
   if ( aStudy ) {
     _PTR(Study) aStudyDS = aStudy->studyDS();
     _PTR(SObject) anObj;
-    
+
     for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
     {
       if( it.Value()->hasEntry() )
       {
-	_PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
-	while( aRefObj && aRefObj->ReferencedObject( anObj ) )
-	  aRefObj = anObj;
-	
-	if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
-	  isInvalidRefs = true;
+        _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
+        while( aRefObj && aRefObj->ReferencedObject( anObj ) )
+          aRefObj = anObj;
+
+        if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
+          isInvalidRefs = true;
       }
     }
-    
+
     // Add "Delete reference" item to popup
     if ( isInvalidRefs )
     {
@@ -1487,41 +1404,41 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
     if ( aList.Extent() == 1 ) {
       aList.Clear();
       mgr->selectedObjects( aList );
-      
+
       Handle(SALOME_InteractiveObject) aIObj = aList.First();
-      
+
       // add extra popup menu (defined in XML)
       if ( myExtActions.size() > 0 ) {
-	// Use only first selected object
-	SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-	if ( study ) {
-	  _PTR(Study) stdDS = study->studyDS();
-	  if ( stdDS ) {
-	    _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
-	    if ( aSO ) {
-	      _PTR( GenericAttribute ) anAttr;
-	      std::string auid = "AttributeUserID";
-	      auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
-	      if ( aSO->FindAttribute( anAttr, auid ) ) {
-		_PTR(AttributeUserID) aAttrID = anAttr;
-		QString aId = aAttrID->Value().c_str();
-		if ( myExtActions.contains( aId ) ) {
-		  thePopup->addAction(myExtActions[aId]);
-		}
-	      }
-	    }
-	  }
-	}
+        // Use only first selected object
+        SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
+        if ( study ) {
+          _PTR(Study) stdDS = study->studyDS();
+          if ( stdDS ) {
+            _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
+            if ( aSO ) {
+              _PTR( GenericAttribute ) anAttr;
+              std::string auid = "AttributeUserID";
+              auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
+              if ( aSO->FindAttribute( anAttr, auid ) ) {
+                _PTR(AttributeUserID) aAttrID = anAttr;
+                QString aId = aAttrID->Value().c_str();
+                if ( myExtActions.contains( aId ) ) {
+                  thePopup->addAction(myExtActions[aId]);
+                }
+              }
+            }
+          }
+        }
       }
-      
+
       // check if item is a "GUI state" item (also a first level object)
       QString entry( aIObj->getEntry() );
       if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
-	QString aModuleName( aIObj->getComponentDataType() );
-	QString aModuleTitle = moduleTitle( aModuleName );
-	CAM_Module* currentModule = activeModule();
-	if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
-	  thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
+        QString aModuleName( aIObj->getComponentDataType() );
+        QString aModuleTitle = moduleTitle( aModuleName );
+        CAM_Module* currentModule = activeModule();
+        if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
+          thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
       }
     }
   }
@@ -2137,7 +2054,7 @@ bool SalomeApp_Application::checkExistingDoc()
       std::vector<std::string> List = studyMgr()->GetOpenStudies();
       if( List.size() > 0 ) {
         SUIT_MessageBox::critical( desktop(), tr( "WRN_WARNING" ), tr( "ERR_ACTIVEDOC_LOAD" ));
-	result = false;
+        result = false;
       }
     }
   }

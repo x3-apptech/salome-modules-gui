@@ -19,7 +19,6 @@
 // Author: Adrien Bruneton (CEA)
 
 #include "PVViewer_GUIElements.h"
-#include "SUIT_Desktop.h"
 
 #include <pqPropertiesPanel.h>
 #include <pqPipelineBrowserWidget.h>
@@ -36,6 +35,7 @@
 #include <pqPythonManager.h>
 #include <pqApplicationCore.h>
 
+#include <QMainWindow>
 #include <QMenu>
 #include <QList>
 #include <QAction>
@@ -46,7 +46,7 @@
 
 PVViewer_GUIElements * PVViewer_GUIElements::theInstance = 0;
 
-PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
+PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desk) :
   propertiesPanel(0), pipelineBrowserWidget(0),
   sourcesMenu(0)
 {
@@ -65,7 +65,7 @@ PVViewer_GUIElements::PVViewer_GUIElements(SUIT_Desktop* desk) :
   myBuildToolbars(desk);
 }
 
-PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
+PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(QMainWindow* desk)
 {
   if (! theInstance)
     theInstance = new PVViewer_GUIElements(desk);
@@ -76,7 +76,7 @@ PVViewer_GUIElements * PVViewer_GUIElements::GetInstance(SUIT_Desktop* desk)
  * See ParaView source code: pqParaViewMenuBuilders::buildToolbars()
  * to keep this function up to date:
  */
-void PVViewer_GUIElements::myBuildToolbars(SUIT_Desktop* mainWindow)
+void PVViewer_GUIElements::myBuildToolbars(QMainWindow* mainWindow)
 {
   mainToolBar = new pqMainControlsToolbar(mainWindow)
     << pqSetName("MainControlsToolbar");
@@ -158,7 +158,7 @@ void PVViewer_GUIElements::setToolBarVisible(bool show)
   dataAction->trigger();
 }
 
-void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
+void PVViewer_GUIElements::addToolbars(QMainWindow* desk)
 {
   desk->addToolBar(Qt::TopToolBarArea, mainToolBar);
   desk->addToolBar(Qt::TopToolBarArea, vcrToolbar);
@@ -182,12 +182,6 @@ void PVViewer_GUIElements::addToolbars(SUIT_Desktop* desk)
   macrosAction = macrosToolbar->toggleViewAction();
   commonAction = commonToolbar->toggleViewAction();
   dataAction = dataToolbar->toggleViewAction();
-}
-
-void PVViewer_GUIElements::onEmulateApply()
-{
-  if (propertiesPanel)
-    propertiesPanel->apply();
 }
 
 QList<QToolBar*> PVViewer_GUIElements::getToolbars()

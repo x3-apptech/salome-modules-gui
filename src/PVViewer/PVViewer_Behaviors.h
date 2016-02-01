@@ -26,8 +26,7 @@
 
 #include <QObject>
 
-class SalomeApp_Module;
-class SUIT_Desktop;
+class QMainWindow;
 class pqPropertiesPanel;
 
 /**!
@@ -40,15 +39,12 @@ class PVVIEWER_EXPORT PVViewer_Behaviors: public QObject
   Q_OBJECT
 
 public:
-  PVViewer_Behaviors(SUIT_Desktop * parent);
+  PVViewer_Behaviors(QMainWindow * parent);
 
-  void instanciateMinimalBehaviors(SUIT_Desktop * desk);
-  void instanciateAllBehaviors(SUIT_Desktop * desk);
+  void instanciateMinimalBehaviors(QMainWindow * desk);
+  void instanciateAllBehaviors(QMainWindow * desk);
 
   virtual ~PVViewer_Behaviors() {}
-
-//public slots:
-//  void onEmulateApply();
 
 private:
   static int BehaviorLoadingLevel;

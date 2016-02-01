@@ -2,93 +2,90 @@
 
 \page python_viewer_page Python viewer
 
-The functionalities of Python viewer are available via its Viewer
-Toolbar.
+The functionalities of Python viewer are available via its Toolbar.
 
 \image html pythonviewer_toolbar.png
 <hr>
 
 \image html python_new.png
 
-<b>New</b> - clears viewer in order to create a new script. If viewer was modified, you will be asked to close it before removing.
+<b>New</b> - clears the viewer to create a new script. If viewer was modified, you will be asked to close it before removing.
 <hr>
 
 \image html python_open.png
-<b>Open</b> - allows to open an existing script by browsing for it in a standard Open File dialog box, choosing the required .py file and clicking Open button. If there is already opened script, you will be asked to close it before opening new one.
+<b>Open</b> - allows opening an existing script by browsing for it in a standard <b>Open File</b> dialog box, choosing the required .py file and clicking \b Open button. If there is an already opened script, you will be asked to close it before opening new one.
 <hr>
 
 \image html python_save.png
 
 <b>Save</b> - saves the current script.
 
-\note If the script hasn't been previously saved, Save will call the standard Save File dialog box where you can enter the name for your script and save it.
+\note If the script has not been previously saved, Save calls the standard <b>Save File</b> dialog, where you can enter the script name and save it.
 
 <hr>
 
 \image html python_saveas.png
 
-<b>Save As...</b> - allows to save the current script with a new name. Input a new name for the script in the standard Save file as dialog box and click Save button.
+<b>Save As...</b> - allows saving the current script with a new name. Input a new name for the script in the standard <b>Save file as </b> dialog box and click \b Save button.
 <hr>
 
 \image html python_undo.png
 
-<b>Undo</b> - undo the last user's action in Python viewer.
+<b>Undo</b> - undoes the last action in Python viewer.
 <hr>
 
 \image html python_redo.png
 
-<b>Redo</b> - redo the previously user's action in Python viewer.
+<b>Redo</b> - redoes the previously undone action in Python viewer.
 <hr>
 
 \image html python_cut.png
 
-<b>Cut</b> - save the selected text into clipboard and remove it from the viewer.
+<b>Cut</b> - saves the selected text into the clipboard and removes it from the viewer.
 <hr>
 
 \image html python_copy.png
 
-<b>Copy</b> - save the selected text into clipboard.
+<b>Copy</b> - saves the selected text into the clipboard.
 <hr>
 
 \image html python_paste.png
 
-<b>Paste</b> - restore the saved text from clipboard.
+<b>Paste</b> - restores the saved text from the clipboard.
 <hr>
 
 \image html python_delete.png
 
-<b>Delete</b> - remove the selected text.
+<b>Delete</b> - removes the selected text.
 <hr>
 
 \image html python_selectall.png
 
-<b>Select All</b> - select whole the text.
+<b>Select All</b> - selects the whole text.
 <hr>
 
 \image html python_preferences.png
 
-<b>Preferences</b> - provides an access to the preferences dialog box, that allows to specify advanced parameters for the Python Viewer.
+<b>Preferences</b> - provides  access to the preferences dialog box, that allows specifying advanced parameters for the Python Viewer.
 
 \anchor custom_python_preferences
 \image html python_view_preferences.png
 
 The following options are available:
 
-- <b>Font settings</b> allows setting font variant and it's size.
+- <b>Font settings</b> allows setting font variant and its size.
   
 - <b>Display settings</b> specifies the script representation in the viewer:
 
-  - <b>Enable current line highlight</b> switches on a background coloring of current line.
-  - <b>Enable text wrapping</b> allows lines wrapping at the view border of the editor.
-
+  - <b>Enable current line highlight</b> switches on background coloring of the current line.
+  - <b>Enable text wrapping</b> wraps lines at the view border of the editor.
   - <b>Center cursor on scroll</b> scrolls the script vertically to make the cursor visible at the center of the viewer.
+  - <b>Display line numbers area</b> shows a panel with line numbers of the script at the left border of the editor.
 
-  - <b>Display line numbers area</b> will make a panel displaying the line numbers of the script visible in the left border of the editor.
+- <b>Tab settings</b> allows displaying tab indentation as a certain number of white-spaces.
 
-- <b>Tab settings</b> allows to display tab indentation as a set of desirable number of white spaces.
+- <b>Vertical edge settings</b> manages drawing of a vertical line at the specified column of the viewer.
 
-- <b>Vertical edge settings</b> manages drawing of vertical line at the specified column of the viewer.
-
-- <b>Save settings as default</b> will store the applied Python viewer settings in the SALOME preferences .xml file and restore it in the current and next SALOME sessions.
+- <b>Save settings as default</b> button stores the applied Python viewer settings in the SALOME preferences .xml file. The settings will be restored in the current and next SALOME sessions.
 
 */

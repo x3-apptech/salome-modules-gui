@@ -94,6 +94,8 @@ public:
 
   void                  showStaticTrihedron( bool );
 
+  //void                  repaintViewAfterMove( );
+
   void                  setDefaultCursor( Qt::CursorShape theCursorShape );
   QCursor*              getDefaultCursor() const;
 

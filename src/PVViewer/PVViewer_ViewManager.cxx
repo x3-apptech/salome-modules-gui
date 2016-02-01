@@ -16,47 +16,27 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
+
 #include "PVViewer_ViewManager.h"
-#include "PVViewer_ViewModel.h"
 #include "PVViewer_ViewWindow.h"
-#include "PVViewer_LogWindowAdapter.h"
+#include "PVViewer_ViewModel.h"
 #include "PVViewer_GUIElements.h"
-#include "PVViewer_Behaviors.h"
-#include "PVViewer_EngineWrapper.h"
+#include "PVViewer_Core.h"
+#include "PVServer_ServiceWrapper.h"
 
 #include <utilities.h>
-#include <SUIT_MessageBox.h>
-#include <SUIT_Desktop.h>
-#include <SUIT_Session.h>
-#include <SUIT_Study.h>
-#include <SUIT_ResourceMgr.h>
-#include <PyInterp_Interp.h>
-#include <PyConsole_Interp.h>
-#include <PyConsole_Console.h>
+
 #include <LogWindow.h>
+#include <SUIT_Desktop.h>
+#include <SUIT_Study.h>
+#include <SUIT_Session.h>
+#include <SUIT_MessageBox.h>
+#include <SUIT_ResourceMgr.h>
 
-#include <QApplication>
-#include <QStringList>
-#include <QDir>
-
-#include <string>
-
-#include <pqOptions.h>
 #include <pqServer.h>
-#include <pqSettings.h>
-#include <pqServerDisconnectReaction.h>
-#include <pqPVApplicationCore.h>
-#include <pqTabbedMultiViewWidget.h>
-#include <pqActiveObjects.h>
 #include <pqServerConnectReaction.h>
-
-#include <pqParaViewMenuBuilders.h>
-#include <pqPipelineBrowserWidget.h>
-
-//---------- Static init -----------------
-pqPVApplicationCore* PVViewer_ViewManager::MyCoreApp = 0;
-bool PVViewer_ViewManager::ConfigLoaded = false;
-PVViewer_Behaviors * PVViewer_ViewManager::ParaviewBehaviors = NULL;
+#include <pqActiveObjects.h>
 
 /*!
   Constructor
@@ -67,114 +47,27 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
 {
   MESSAGE("PVViewer - view manager created ...")
   setTitle( tr( "PARAVIEW_VIEW_TITLE" ) );
+
   // Initialize minimal paraview stuff (if not already done)
-  ParaviewInitApp(desk, logWindow);
+  PVViewer_Core::ParaviewInitApp(desk, logWindow);
 
   connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
-//  connect(this, SIGNAL(viewCreated(SUIT_ViewWindow*)), this, SLOT(onPVViewCreated(SUIT_ViewWindow*)));
 }
 
-pqPVApplicationCore * PVViewer_ViewManager::GetPVApplication()
+
+PVServer_ServiceWrapper * PVViewer_ViewManager::GetService()
 {
-  return MyCoreApp;
+  return PVServer_ServiceWrapper::GetInstance();
 }
 
-/*!
-  \brief Static method, performs initialization of ParaView session.
-  \param fullSetup whether to instanciate all behaviors or just the minimal ones.
-  \return \c true if ParaView has been initialized successfully, otherwise false
-*/
-bool PVViewer_ViewManager::ParaviewInitApp(SUIT_Desktop * aDesktop, LogWindow * logWindow)
+QString PVViewer_ViewManager::GetPVConfigPath()
 {
-  if ( ! MyCoreApp) {
-      // Obtain command-line arguments
-      int argc = 0;
-      char** argv = 0;
-      QString aOptions = getenv("PARAVIEW_OPTIONS");
-      QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
-      argv = new char*[aOptList.size() + 1];
-      QStringList args = QApplication::arguments();
-      argv[0] = (args.size() > 0)? strdup(args[0].toLatin1().constData()) : strdup("paravis");
-      argc++;
-
-      foreach (QString aStr, aOptList) {
-        argv[argc] = strdup( aStr.toLatin1().constData() );
-        argc++;
-      }
-      MyCoreApp = new pqPVApplicationCore (argc, argv);
-      if (MyCoreApp->getOptions()->GetHelpSelected() ||
-          MyCoreApp->getOptions()->GetUnknownArgument() ||
-          MyCoreApp->getOptions()->GetErrorMessage() ||
-          MyCoreApp->getOptions()->GetTellVersion()) {
-          return false;
-      }
-
-      // Direct VTK log messages to our SALOME window - TODO: review this
-      PVViewer_LogWindowAdapter * w = PVViewer_LogWindowAdapter::New();
-      w->setLogWindow(logWindow);
-      vtkOutputWindow::SetInstance(w);
-
-      new pqTabbedMultiViewWidget(); // registers a "MULTIVIEW_WIDGET" on creation
-
-      for (int i = 0; i < argc; i++)
-        free(argv[i]);
-      delete[] argv;
-  }
-  // Initialize GUI elements if needed:
-  PVViewer_GUIElements::GetInstance(aDesktop);
-  return true;
+  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+  return resMgr->stringValue("resources", "PVViewer", QString());
 }
 
-void PVViewer_ViewManager::ParaviewInitBehaviors(bool fullSetup, SUIT_Desktop* aDesktop)
-{
-  if (!ParaviewBehaviors)
-      ParaviewBehaviors = new PVViewer_Behaviors(aDesktop);
-
-  if(fullSetup)
-    ParaviewBehaviors->instanciateAllBehaviors(aDesktop);
-  else
-    ParaviewBehaviors->instanciateMinimalBehaviors(aDesktop);
-}
-
-void PVViewer_ViewManager::ParaviewLoadConfigurations(bool force)
-{
-  if (!ConfigLoaded || force)
-    {
-      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-      QString aPath = resMgr->stringValue("resources", "PVViewer", QString());
-      if (!aPath.isNull()) {
-          MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewFilters.xml");
-          MyCoreApp->loadConfiguration(aPath + QDir::separator() + "ParaViewSources.xml");
-      }
-      ConfigLoaded = true;
-    }
-}
-
-void PVViewer_ViewManager::ParaviewCleanup()
-{
-  // Disconnect from server
-  pqServer* server = pqActiveObjects::instance().activeServer();
-  if (server && server->isRemote())
-    {
-      MESSAGE("~PVViewer_Module(): Disconnecting from remote server ...");
-      pqServerDisconnectReaction::disconnectFromServer();
-    }
-
-  pqApplicationCore::instance()->settings()->sync();
-
-  pqPVApplicationCore * app = GetPVApplication();
-  // Schedule destruction of PVApplication singleton:
-  if (app)
-    app->deleteLater();
-}
-
-PVViewer_EngineWrapper * PVViewer_ViewManager::GetEngine()
-{
-  return PVViewer_EngineWrapper::GetInstance();
-}
-
-bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
+bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
 {
   SUIT_ResourceMgr* aResourceMgr = SUIT_Session::session()->resourceMgr();
   bool noConnect = aResourceMgr->booleanValue( "PARAVIS", "no_ext_pv_server", false );
@@ -189,7 +82,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
       return false;
     }
 
-  if (GetEngine()->GetGUIConnected())
+  if (GetService()->GetGUIConnected())
     {
       // Should never be there as the above should already tell us that we are connected.
       std::stringstream msg2;
@@ -211,7 +104,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
   else
     {
       // Get the URL from the engine (possibly starting the pvserver)
-      serverUrl = GetEngine()->FindOrStartPVServer(0);  // take the first free port
+      serverUrl = GetService()->FindOrStartPVServer(0);  // take the first free port
     }
 
   msg << "connectToExternalPVServer(): Trying to connect to the external PVServer '" << serverUrl << "' ...";
@@ -230,16 +123,11 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(SUIT_Desktop* aDesktop)
   else
     {
       MESSAGE("connectToExternalPVServer(): Connected!");
-      GetEngine()->SetGUIConnected(true);
+      GetService()->SetGUIConnected(true);
     }
   return true;
 }
 
-void PVViewer_ViewManager::onEmulateApply()
-{
-  PVViewer_GUIElements * guiElements = PVViewer_GUIElements::GetInstance(desktop);
-  guiElements->onEmulateApply();
-}
 
 /*!Enable toolbars if view \a view is ParaView viewer and disable otherwise.
 */

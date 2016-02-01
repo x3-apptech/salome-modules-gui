@@ -51,46 +51,59 @@ MACRO(SALOME_GUI_WITH_CORBA)
   ENDIF()
 ENDMACRO(SALOME_GUI_WITH_CORBA)
 
-#----------------------------------------------------------------------------
-# FULL_GUI is a macro useful for determining whether a GUI module
-# builded in full mode
-#----------------------------------------------------------------------------
-MACRO(FULL_GUI)
-  SET(_options)
-  LIST(APPEND _options SALOME_USE_OCCVIEWER SALOME_USE_GLVIEWER SALOME_USE_VTKVIEWER
-              SALOME_USE_PLOT2DVIEWER SALOME_USE_GRAPHICSVIEW SALOME_USE_QXGRAPHVIEWER
-              SALOME_USE_SALOMEOBJECT SALOME_USE_PYCONSOLE)
-  SALOME_GUI_MODE(${_options})
-ENDMACRO(FULL_GUI)
 
 #----------------------------------------------------------------------------
 # SALOME_GUI_MODE is a macro useful for determining whether a GUI module
 # builded in particular mode 
 #----------------------------------------------------------------------------
 #########################################################################
-# FULL_GUI()
+# SALOME_GUI_MODE()
 # 
-# USAGE: FULL_GUI(_options)
+# USAGE: SALOME_GUI_MODE(_options)
 #
 # ARGUMENTS:
 #   _options [input] List - The list of CMake options given to SALOME GUI
 #
-MACRO(SALOME_GUI_MODE _options)
-  MESSAGE(STATUS "Checking status of GUI options ${_options}")
-  SET(_message) 
-  FOREACH(_option ${_options})
-    IF(NOT ${_option})
-      LIST(APPEND _message ${_option})
+# Notes:
+# - The arguments list can include "OPTIONAL" keywords:
+#   * All arguments preceded by "OPTIONAL" keyword are mandatory for current module.
+#     If GUI module was compiled without this functionality, further installation 
+#     of the current module becomes impossible.
+#   * All arguments following "OPTIONAL" keyword are optional for current module, which
+#     uses this functionality, but can be installed without it.
+#
+# - At present there are next options in the GUI module:
+#   SALOME_USE_OCCVIEWER, SALOME_USE_VTKVIEWER, SALOME_USE_GLVIEWER, SALOME_USE_PLOT2DVIEWER,
+#   SALOME_USE_GRAPHICSVIEW, SALOME_USE_QXGRAPHVIEWER, SALOME_USE_PVVIEWER, SALOME_USE_PYVIEWER,
+#   SALOME_USE_PYCONSOLE, SALOME_USE_SALOMEOBJECT
+#
+# Example of usage:
+#   SALOME_GUI_MODE(SALOME_USE_OCCVIEWER SALOME_USE_SALOMEOBJECT OPTIONAL SALOME_USE_PYCONSOLE)
+#
+MACRO(SALOME_GUI_MODE)
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "  Checking status of GUI options")
+  MESSAGE(STATUS "  ==================================== ")
+  MESSAGE(STATUS "")
+  SET(_message)
+  SET(_length 25)   
+  SET(_is_optional OFF)
+  FOREACH(_option ${ARGN})
+    IF(${_option} STREQUAL "OPTIONAL")
+      SET(_is_optional ON)
+      MESSAGE(STATUS "  Optional:")
+    ELSE()
+      SALOME_JUSTIFY_STRING(${_option} ${_length} _option_name)
+      MESSAGE(STATUS "  * ${_option_name}  ->  ${${_option}}")
+      IF(NOT ${_option} AND NOT ${_is_optional})
+        LIST(APPEND _message ${_option})
+      ENDIF()
     ENDIF()
   ENDFOREACH()
+  MESSAGE(STATUS "")
+  
   IF(_message)
-    SET(_message "We absolutely need a Salome GUI module in full mode.\nThe following options should be set to ON when building GUI module:\n${_message}\n")
-    IF(_corba_message)
-      MESSAGE(FATAL_ERROR "${_corba_message}\n${_message}")
-    ELSE()
-      MESSAGE(FATAL_ERROR "${_message}")
-    ENDIF()
-  ELSEIF(_corba_message)
-    MESSAGE(FATAL_ERROR "${_corba_message}") 
-  ENDIF() 
+    SET(_message "We absolutely need a Salome GUI module in special mode. The following options should be set to ON when building GUI module: \n${_message}\n")
+    MESSAGE(FATAL_ERROR "${_message}")
+  ENDIF()
 ENDMACRO(SALOME_GUI_MODE)

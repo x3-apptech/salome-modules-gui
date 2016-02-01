@@ -16,7 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #ifndef _STANDARDAPP_MODULE_HXX_
 #define _STANDARDAPP_MODULE_HXX_
@@ -86,7 +86,7 @@ public slots:
 public:
   /* Creates an action with standard default values */
   int createStandardAction(const QString& label,
-			   QObject * slotobject,
+                           QObject * slotobject,
                            const char* slotmember,
                            const QString& iconName=QString(),
                            const QString& tooltip=QString(),
@@ -94,7 +94,7 @@ public:
 
   void addActionInToolbar(int actionId);
   void addActionInMenubar(int actionId, int menuId=UNSPECIFIED_INT);
-  void addActionInPopupMenu(int actionId,const QString& rule="client='ObjectBrowser'");
+  void addActionInPopupMenu(int actionId,const QString& menus="",const QString& rule="client='ObjectBrowser'");
 
 protected:
   /* Implement this to create additionnal widget (e.g. docked widget) */
@@ -125,7 +125,7 @@ protected:
   };
   virtual void setDockLayout(DockLayoutType layoutType);
   virtual void unsetDockLayout();
-  
+
   SUIT_ResourceMgr* _resourceMgr;
   int _defaultMenuId;
   int _defaultToolbarId;

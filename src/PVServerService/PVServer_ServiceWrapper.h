@@ -18,47 +18,35 @@
 //
 // Author: Adrien Bruneton (CEA)
 
-#ifndef PVVIEWERENGINEWRAPPER_H_
-#define PVVIEWERENGINEWRAPPER_H_
+#ifndef PVSERVERSERVICEWRAPPER_H_
+#define PVSERVERSERVICEWRAPPER_H_
 
-#include "PVViewer.h"
+#include "PVServerService.h"
 
-#include <PyInterp_Utils.h>
 #include <string>
-
-//#include <SALOMEconfig.h>
-//#include <SALOME_LifeCycleCORBA.hxx>
-//#include <SALOMEDS_SObject.hxx>
-//#include CORBA_SERVER_HEADER(SALOME_ModuleCatalog)
-//#include CORBA_SERVER_HEADER(SALOMEDS)
-
 
 /*!
  * Class facilitating the access to the PARAVIS engine without having to link
  * to it. Documentation of the method is found in the PARAVIS module (in the idl directory).
- *
- * (Two implementations are provided: one with CORBA dynamic invokation from C++, one using
- * Python - see commented elements in the .cxx file)
  */
-class PVVIEWER_EXPORT PVViewer_EngineWrapper
+class PVSERVERSERVICE_EXPORT PVServer_ServiceWrapper
 {
+  class Private;
 public:
   //! Returns the unique instance of the engine.
-  static PVViewer_EngineWrapper * GetInstance();
+  static PVServer_ServiceWrapper* GetInstance();
 
   bool GetGUIConnected();
   void SetGUIConnected(bool isConnected);
   std::string FindOrStartPVServer(int port);
-  void PutPythonTraceStringToEngine(const char *);
+  bool StopPVServer();
 
 private:
-  PVViewer_EngineWrapper();
-  virtual ~PVViewer_EngineWrapper() {}
+  PVServer_ServiceWrapper();
+  virtual ~PVServer_ServiceWrapper();
 
-  static PVViewer_EngineWrapper * instance;
-  //Engines::EngineComponent_var _component;
-
-  PyObjWrapper pvserverEngine;
+  static PVServer_ServiceWrapper* instance;
+  Private* myData;
 };
 
-#endif /* PVVIEWERENGINEWRAPPER_H_ */
+#endif /* PVSERVERSERVICEWRAPPER_H_ */

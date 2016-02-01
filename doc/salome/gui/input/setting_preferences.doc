@@ -39,7 +39,7 @@ the whole GUI SALOME session.
   otherwise a system locale will be used. The locale change will come in force only after
   the application is restarted.
 - <b>Look and feel</b>
-  - <b>Show splash screen at start-up</b> - allows to show or not splash screen at start-up.
+  - <b>Show splash screen at start-up</b> - allows showing or hiding the splash screen at start-up.
   - <b>Opaque resize</b> - force opaque resize mode for viewers area (tabbed workspace).
   Clear this checkbox for less perfomant workstations.
   - <b>Drop-down buttons in toolbars for action groups</b> - when
@@ -94,16 +94,19 @@ the whole GUI SALOME session.
     - \b Parameters - additional parameters required for launching of
     the external browser (if applicable).
 - <b>Python console</b>
-    - \b Font - allows quickly set the parameters (style, size, face) of the 
+    - \b Font - allows quickly setting the parameters (style, size, face) of the 
     \ref font_color_dlg "font" used in embedded Python console.
     - <b>Show banner</b> - this option allows to show/hide the Python banner 
-    in the top of the console window.
+    on top of the console window.
 - <b>Show MRU items</b> - allows to define the maximum \b Number of
 items in <b>Most Recently Used</b> list and the <b>Link type</b>: 
   - \b Long - shows the full path to the file. 
   - \b Short - shows the file name only.
   - \b Auto - shows full paths to the files only if some files from
 different locations have the same name.
+- <b>Full-screen</b> - options concerned full-screen mode:
+  - <b>Hide object browser and viewers toolbars</b> - switches automatic hiding of 
+  Object Browser and OCC viewer toolbar in full-screen mode.
 
 <h2>3D Viewer Preferences</h2>
 
@@ -139,6 +142,36 @@ different locations have the same name.
 
 \image html pref_salome_occviewer.png
 
+- <b>Projection mode</b> - sets the default projection mode for the viewers: Orthogonal or Perpective.
+- <b>Stereo render</b> - group of stereoscopic view settings:
+  - <b>Stereo type</b> - specifies a stereo pair type:
+    - Shutter glasses (OpenGL quad-buffer)
+    - Anaglyph
+    - Row-interlaced
+    - Column-interlaced
+    - Chess-board stereo for DLP TVs
+    - Horizontal-anamorphic (side-by-side)
+    - Vertical-anamorphic (Half OverUnder)
+    \note The stereo pair type selected in this combobox is applied 
+    for all existing OCC 3D views with stereo rendering already turned on 
+    within the same SALOME GUI session. It is not possible to use 
+    different stereo modes in several OCC 3D views at the same time 
+    within the same SALOME GUI session.
+  - <b>Anaglyph filter</b> - specifies format of anaglyph stereo pair:
+    - Red-Cyan (default)
+    - Yellow-Blue
+    - Green-Magenta
+  - <b>Convergence distance type</b>: Absolute or Relative (default).
+  - <b>Stereographic focus value</b> - 1 by default.
+  - <b>IOD type</b> - Absolute or Relative (default).
+  - <b>Interocular distance (IOD) value</b> - 0.05 by default.
+  - <b>Reverse stereo</b> - option to swap left and right frames.
+  - <b>Enable V-Sync</b> - activates vertical synchronization.
+  - <b>Enable quad-buffer support</b> - allows quad-buffered rendering.
+  \note It is neccessary to enable quad-buffered stereoscopic rendering 
+  manually in graphic driver settings. SALOME does not do it automatically.
+  \note All existing OCC 3D views should be re-created for quad-buffer support.
+
 - <b>Background</b> - specifies the default background for the viewers,
   separately for (for more details, refer to the \ref viewer_background
   "this page"):
@@ -153,9 +186,8 @@ different locations have the same name.
   - <b>Color</b> - allows to change the color of the clipped region.
   - <b>Use default texture</b> - if this option is switched on, the default texture
     will be used for clipping texture, otherwise - the texture specified in "Texture" field.
-  - <b>Texture</b> - allows to change the texture of the clipped region 
-    (enable if "Use default texture" is switched off).
-  - <b>Modulate</b> - controls if "Texture" should be mixed with "Color" parameter or no.
+  - <b>Texture</b> - allows to change the texture of the clipped region (enable if "Use default texture" is switched off).
+  - <b>Modulate</b> - controls if "Texture" should be mixed with "Color" parameter or not.
   - <b>Scale factor</b> - sets the scale factor for default and custom textures.
 
 \anchor vtk_preferences
@@ -172,14 +204,38 @@ different locations have the same name.
   or [-] keyboard buttons.
 - <b>Modification Mode</b> - allows choosing between \b Arithmetic
   and \b Geometrical progression used for zooming.
+- <b>Stereo render</b> - group of stereoscopic view settings:
+  - <b>Stereo type</b> - specifies a stereo pair type:
+    - Crystal Eyes
+    - Red-Blue
+    - Interlaced
+    - Left
+    - Right
+    - Dresden
+    - Anaglyph
+    - Checkerboard
+    - Split View Port Horizontal
+    \note The stereo pair type selected in this combobox is applied 
+    for all existing VTK 3D views with stereo rendering already turned on 
+    within the same SALOME GUI session. It is not possible to use 
+    different stereo modes in several VTK 3D views at the same time 
+    within the same SALOME GUI session.
+  - <b>Anaglyph filter</b> - specifies format of anaglyph stereo pair:
+    - Red-Cyan (default)
+    - Yellow-Blue
+    - Green-Magenta
+  - <b>Enable quad-buffer support</b> - allows quad-buffered rendering.
+  \note It is neccessary to enable quad-buffered stereoscopic rendering 
+  manually in graphic driver settings. SALOME does not do it automatically.
+  \note All existing VTK 3D views should be re-created for quad-buffer support.
 - <b>Selection</b>
-  - <b>Preselection</b> - allows to choose preselection mode from three regimes:
-    - <b>Standard</b> - this preselection mode works quickly, by checking only 
-    bounding boxes of objects, not dealing with the order of the actors in the view 
-    and not dealing with their data (points/ cells).
-    - <b>Dynamic</b> - works directly with cells of actors that allows to have the 
-    exact area of preselection. But this mode is much more slower. 
-    - <b>Disabled</b> - allows to switch off the preselection.
+  - <b>Preselection</b> - allows to choose among three possible preselection modes:
+    - <b>Standard</b> - this mode works quickly, by checking only 
+    bounding boxes of objects. It does not deal with the order of actors in the view 
+    or with their data (points/ cells).
+    - <b>Dynamic</b> - works directly with cells of actors, which provides the 
+    exact area of preselection. This mode is much more slower. 
+    - <b>Disabled</b> - switches off the preselection.
   - <b>Enable selection</b> - switches selection on/off.
 - <b>Spacemouse</b> - a mouse-like manipulator device specially designed
   for working with 3D presentations, objects, etc. You can reassign the
@@ -257,22 +313,22 @@ selected object in the viewer.
 
 \image html pref_salome_pythonviewer.png
 
-\note The following settings are default and will be applied for a new created Python viewers only. Customization of already opened viewers can be done using local \ref custom_python_preferences "Preferences dialog box" that is called by click on corresponding icon of \ref python_viewer_page "Python viewer toolbar".
+\note The following settings are default and will be applied only for newly created Python viewers. Customization of already opened viewers can be done using local \ref custom_python_preferences "Preferences dialog box" called by clicking on the corresponding icon of \ref python_viewer_page "Python viewer toolbar".
 
 - <b>Font settings</b> allows setting font variant, size and style.
   
 - <b>Display settings</b> specifies the script representation in the viewer:
 
-  - <b>Enable current line highlight</b> switches on a background coloring of current line.
-  - <b>Enable text wrapping</b> allows lines wrapping at the view border of the editor.
+  - <b>Enable current line highlight</b> switches on background coloring of the current line.
+  - <b>Enable text wrapping</b> wraps lines at the view border of the editor.
 
   - <b>Center cursor on scroll</b> scrolls the script vertically to make the cursor visible at the center of the viewer.
 
-  - <b>Display line numbers area</b> will make a panel displaying the line numbers of the script visible in the left border of the editor.
+  - <b>Display line numbers area</b> shows a panel with line numbers of the script at the left border of the editor.
 
-- <b>Tab settings</b> allows to display tab indentation as a set of desirable number of white spaces.
+- <b>Tab settings</b> allows displaying tab indentation as a certain number of white-spaces.
 
-- <b>Vertical edge settings</b> manages drawing of vertical line at the specified column of the viewer.
+- <b>Vertical edge settings</b> manages drawing of a vertical line at the specified column of the viewer.
 
 <h2>Directories Preferences</h2>
 

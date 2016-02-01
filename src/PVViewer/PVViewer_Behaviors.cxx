@@ -20,7 +20,7 @@
 
 #include "PVViewer_Behaviors.h"
 
-#include <SUIT_Desktop.h>
+#include <QMainWindow>
 
 #include <pqInterfaceTracker.h>
 #include <pqApplicationCore.h>
@@ -53,8 +53,8 @@
 
 int PVViewer_Behaviors::BehaviorLoadingLevel = 0;
 
-PVViewer_Behaviors::PVViewer_Behaviors(SUIT_Desktop * parent)
-  : QObject(static_cast<QObject *>(parent))
+PVViewer_Behaviors::PVViewer_Behaviors(QMainWindow * parent)
+  : QObject(parent)
 {
 }
 
@@ -62,7 +62,7 @@ PVViewer_Behaviors::PVViewer_Behaviors(SUIT_Desktop * parent)
  * This method should be updated at each new version of ParaView with what is found in
  *    Qt/ApplicationComponents/pqParaViewBehaviors.cxx
  */
-void PVViewer_Behaviors::instanciateMinimalBehaviors(SUIT_Desktop * desk)
+void PVViewer_Behaviors::instanciateMinimalBehaviors(QMainWindow * desk)
 {
   if (BehaviorLoadingLevel < 1)
     {
@@ -93,7 +93,7 @@ void PVViewer_Behaviors::instanciateMinimalBehaviors(SUIT_Desktop * desk)
  * This method should be updated at each new version of ParaView with what is found in
  *    Qt/ApplicationComponents/pqParaViewBehaviors.cxx
  */
-void PVViewer_Behaviors::instanciateAllBehaviors(SUIT_Desktop * desk)
+void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
 {
   //    "new pqParaViewBehaviors(anApp->desktop(), this);"
   // -> (which loads all standard ParaView behaviors at once) has to be replaced in order to

@@ -111,6 +111,7 @@ signals:
   void                  viewManagerRemoved( SUIT_ViewManager* );
   /*!emit that view manager activated*/
   void                  viewManagerActivated( SUIT_ViewManager* );
+  void                  appClosed();
 
 public slots:
   virtual void          onNewDoc();
@@ -169,6 +170,8 @@ protected:
   virtual bool          closeAction( const int, bool& );
   virtual bool          closeDoc( bool ask = true );
   virtual bool          closeActiveDoc( bool permanently = true );
+
+  virtual bool          abortAllOperations();
 
 private:
   ViewManagerList       myViewMgrs;

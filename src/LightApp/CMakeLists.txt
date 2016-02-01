@@ -101,7 +101,7 @@ SET(_link_LIBRARIES
   ${CAS_KERNEL}
   ${QT_LIBRARIES}
   ${HDF5_LIBRARIES}
-  CASCatch qtx suit std SalomeStyle SalomePrs CAM LogWindow ObjBrowser 
+  CASCatch qtx suit std SalomeStyle SalomePrs CAM LogWindow ObjBrowser Event 
   ${KERNEL_SalomeHDFPersist} ${KERNEL_SALOMELocalTrace}
 )
 IF(SALOME_USE_SALOMEOBJECT)

@@ -278,6 +278,7 @@ void SUIT_Application::setDesktop( SUIT_Desktop* desk )
   myDesktop = desk;
   if ( myDesktop ) {
     connect( myDesktop, SIGNAL( activated() ), this, SLOT( onDesktopActivated() ) );
+//    connect( myDesktop, SIGNAL( moved() ), this, SLOT( onDesktopMoved() ) );
     // Force desktop activation (NPAL16628)
     QApplication::postEvent(myDesktop, new QEvent(QEvent::WindowActivate));
   }
@@ -689,6 +690,13 @@ void SUIT_Application::onDesktopActivated()
   emit activated( this );
 }
 
+/*!
+  SLOT: it is called when desktop is moved
+*/
+/*void SUIT_Application::onDesktopMoved()
+{
+  emit moving();
+}*/
 /*!
   SLOT: is used for Help browsing
 */

@@ -125,11 +125,11 @@
     </message>
     <message>
         <source>MNU_FITSELECTION</source>
-        <translation type="unfinished">Fit Selection</translation>
+        <translation>Adapter la sélection</translation>
     </message>
     <message>
         <source>DSC_FITSELECTION</source>
-        <translation type="unfinished">Fit all selected objects inside the view frame</translation>
+        <translation>Adapter tous les objets sélectionnés dans la vue</translation>
     </message>
     <message>
         <source>DSC_BOTTOM_VIEW</source>

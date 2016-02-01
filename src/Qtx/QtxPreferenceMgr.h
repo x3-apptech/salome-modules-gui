@@ -78,6 +78,9 @@ public:
   bool                      isEvaluateValues() const;
   void                      setEvaluateValues( const bool );
 
+  bool                      isRestartRequired() const;
+  void                      setRestartRequired( const bool );
+
   virtual void              store() = 0;
   virtual void              retrieve() = 0;
 
@@ -136,6 +139,7 @@ private:
   ItemList                  myChildren;
 
   bool                      myEval;
+  bool                      myRestartNeeded;
   QIcon                     myIcon;
   QString                   myTitle;
   QString                   mySection;

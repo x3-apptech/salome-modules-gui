@@ -102,6 +102,8 @@ OCCViewer_ViewWindow::Mode2dType OCCViewer_Utilities::setViewer2DMode
                << OCCViewer_ViewWindow::RightId
                << OCCViewer_ViewWindow::AntiClockWiseId
                << OCCViewer_ViewWindow::ClockWiseId
+               << OCCViewer_ViewWindow::OrthographicId
+               << OCCViewer_ViewWindow::PerspectiveId
                << OCCViewer_ViewWindow::ResetId;
 
   QtxActionToolMgr* aToolMgr = aView->toolMgr();

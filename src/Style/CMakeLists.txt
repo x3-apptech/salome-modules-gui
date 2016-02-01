@@ -63,7 +63,8 @@ SET(SalomeStyle_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 SET(_rcc_RESOURCES Style.qrc)
 
 # resource files / to be processed by lrelease
-SET(_ts_RESOURCES resources/Style_msg_fr.ts)
+SET(_ts_RESOURCES resources/Style_msg_fr.ts
+                  resources/Style_msg_ja.ts)
 
 # resource files / other (static)
 SET(_other_RESOURCES resources/SalomeStyle.xml)

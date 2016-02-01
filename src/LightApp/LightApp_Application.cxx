@@ -116,6 +116,7 @@
 #ifndef DISABLE_OCCVIEWER
   #include <OCCViewer_ViewManager.h>
   #include <OCCViewer_ViewFrame.h>
+  #include <OCCViewer_ViewPort3d.h>
 #ifndef DISABLE_SALOMEOBJECT
   #include <SOCC_ViewModel.h>
 #else
@@ -317,6 +318,8 @@ LightApp_Application::LightApp_Application()
   myAutoSaveTimer->setSingleShot( true );
   connect( myAutoSaveTimer, SIGNAL( timeout() ), this, SLOT( onSaveDoc() ) );
 
+  //connect( this, SIGNAL( moving() ), this, SLOT( onMoved() ) );
+
   SUIT_ResourceMgr* aResMgr = SUIT_Session::session()->resourceMgr();
   QPixmap aLogo = aResMgr->loadPixmap( "LightApp", tr( "APP_DEFAULT_ICO" ), false );
 
@@ -512,8 +515,9 @@ bool LightApp_Application::activateModule( const QString& modName )
   updateWindows();
   updateViewManagers();
 
-  if ( activeStudy() && activeStudy()->root() && objectBrowser() && objectBrowser()->root() != activeStudy()->root() ) {
-    objectBrowser()->setRoot( activeStudy()->root() );
+  if ( activeStudy() && activeStudy()->root() && objectBrowser() ) {
+    if ( objectBrowser()->root() != activeStudy()->root() ) 
+      objectBrowser()->setRoot( activeStudy()->root() );
     updateObjectBrowser( true );
   }
   return true;
@@ -754,10 +758,7 @@ void LightApp_Application::createActions()
   createActionForViewer( NewGraphicsViewId, newWinMenu, QString::number( 5 ), Qt::ALT+Qt::Key_C );
 #endif
 #ifndef DISABLE_PVVIEWER
-  QStringList aModuleNames;
-  modules( aModuleNames, false );
-  if ( aModuleNames.contains( "ParaViS", Qt::CaseInsensitive ) )
-    createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
+  createActionForViewer( NewPVViewId, newWinMenu, QString::number( 6 ), Qt::ALT+Qt::Key_A );
 #endif
 #ifndef DISABLE_PYVIEWER
   createActionForViewer( NewPyViewerId, newWinMenu, QString::number( 7 ), Qt::ALT+Qt::Key_Y );
@@ -1533,6 +1534,19 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm->setTrihedronSize(  resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
     vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
+    vm->setProjectionType( resMgr->integerValue( "OCCViewer", "projection_mode", vm->projectionType() ) );
+  #if OCC_VERSION_LARGE > 0x06090000
+    vm->setStereoType( resMgr->integerValue( "OCCViewer", "stereo_type", vm->stereoType() ) );
+    vm->setAnaglyphFilter( resMgr->integerValue( "OCCViewer", "anaglyph_filter", vm->anaglyphFilter() ) );
+    vm->setStereographicFocus( resMgr->integerValue( "OCCViewer", "focus_type", vm->stereographicFocusType() ),
+                               resMgr->doubleValue( "OCCViewer", "focus_value", vm->stereographicFocusValue() ));
+    vm->setInterocularDistance( resMgr->integerValue( "OCCViewer", "iod_type", vm->interocularDistanceType() ),
+                                resMgr->doubleValue( "OCCViewer", "iod_value", vm->interocularDistanceValue() ));
+
+    vm->setReverseStereo( resMgr->booleanValue( "OCCViewer", "reverse_stereo", vm->isReverseStereo() ) );
+    vm->setVSync( resMgr->booleanValue( "OCCViewer", "enable_vsync", vm->isVSync() ) );
+    vm->setQuadBufferSupport( resMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", vm->isQuadBufferSupport() ) );
+  #endif
     vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
     vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
     vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
@@ -1560,6 +1574,9 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     if( vm )
     {
       vm->setProjectionMode( resMgr->integerValue( "VTKViewer", "projection_mode", vm->projectionMode() ) );
+      vm->setStereoType( resMgr->integerValue( "VTKViewer", "stereo_type", vm->stereoType() ) );
+      vm->setAnaglyphFilter( resMgr->integerValue( "VTKViewer", "anaglyph_filter", vm->anaglyphFilter() ) );
+      vm->setQuadBufferSupport( resMgr->booleanValue( "VTKViewer", "enable_quad_buffer_support", vm->isQuadBufferSupport() ) );
       vm->setBackground( resMgr->backgroundValue( "VTKViewer", "background", vm->background() ) );
       vm->setTrihedronSize( resMgr->doubleValue( "3DViewer", "trihedron_size", vm->trihedronSize() ),
                             resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ) );
@@ -1835,6 +1852,22 @@ void LightApp_Application::onRenamed()
   updateActions();
 }
 
+// IMN 08.07.2015 : issue 002556: Some stereo outputs are affected by window position.
+// To prevent reversion the window should be either aligned during movement and resize.
+/*!Private SLOT. Update actions after rename object.*/
+/*void LightApp_Application::onMoved()
+{
+  OCCViewer_ViewManager* viewMgr = 0;
+  viewMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager( OCCViewer_Viewer::Type(), false ) );
+  if (viewMgr) {
+    OCCViewer_ViewWindow* view = 0;
+    view = dynamic_cast<OCCViewer_ViewWindow*>( viewMgr->getActiveView() );
+    if (view) {
+      view->getViewPort()->repaintViewAfterMove();
+    }
+  }
+}
+*/
 /*!Private SLOT. Support drag-and-drop operation.*/
 void LightApp_Application::onDropped( const QList<SUIT_DataObject*>& objects, SUIT_DataObject* parent, int row, Qt::DropAction action )
 {
@@ -2179,9 +2212,11 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   }
   pref->setItemProperty( "strings", aLangs, curLang );
   pref->setItemProperty( "icons",   aIcons, curLang );
+  pref->setItemProperty( "restart",  true, curLang );
 
   int curLocale = pref->addPreference( tr( "PREF_CURRENT_LOCALE" ), langGroup,
                                           LightApp_Preferences::Bool, "language", "locale" );
+  pref->setItemProperty( "restart",  true, curLocale );
   // ... "Language" group <<end>>
 
   // ... "Look and feel" group <<start>>
@@ -2255,6 +2290,15 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "strings", aValuesList,   mruLinkType );
   pref->setItemProperty( "indexes", anIndicesList, mruLinkType );
   // ... "MRU" preferences group <<end>>
+
+  // ... "Full-screen" group <<start>>
+  int fullScreenGroup = pref->addPreference( tr( "PREF_GROUP_FULL_SCREEN" ), genTab );
+  pref->setItemProperty( "columns", 2, fullScreenGroup );
+  // .... -> automatic hiding toolbars
+  pref->addPreference( tr( "PREF_FULL_SCREEN_AUTO" ), fullScreenGroup,
+		       LightApp_Preferences::Bool, "OCCViewer", "automatic_hiding" );
+  // ... "Full-screen" group <<end>>
+
   // .. "General" preferences tab <<end>>
 
   // .. "3D viewer" group <<start>>
@@ -2298,12 +2342,94 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .. "OCC viewer" group <<start>>
   int occGroup = pref->addPreference( tr( "PREF_GROUP_OCCVIEWER" ), salomeCat );
 
+  // .... -> Projection mode
+  int occProjMode = pref->addPreference( tr( "PREF_PROJECTION_MODE" ), occGroup,
+                                         LightApp_Preferences::Selector, "OCCViewer", "projection_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ORTHOGRAPHIC") << tr("PREF_PERSPECTIVE");
+  anIndicesList << 0                       << 1;
+  pref->setItemProperty( "strings", aValuesList,   occProjMode );
+  pref->setItemProperty( "indexes", anIndicesList, occProjMode );
+#if OCC_VERSION_LARGE > 0x06090000
+  // .... -> Stereo group
+  int stereoGroup = pref->addPreference( tr( "PREF_GROUP_STEREO" ), occGroup);
+  pref->setItemProperty( "columns", 2, stereoGroup );
+  // .... -> Stereo type
+  int stereoType = pref->addPreference( tr( "PREF_STEREO_TYPE" ), stereoGroup,
+                                            LightApp_Preferences::Selector, "OCCViewer", "stereo_type" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  idList.clear();
+  OCCViewer_Viewer::stereoData( aValuesList, idList);
+  foreach( int gid, idList ) anIndicesList << gid;
+  pref->setItemProperty( "strings", aValuesList,   stereoType );
+  pref->setItemProperty( "indexes", anIndicesList, stereoType );
+
+  // .... -> Anaglyph filter
+  int anaglyphFilter = pref->addPreference( tr( "PREF_ANAGLYPH_FILTER" ), stereoGroup,
+                                            LightApp_Preferences::Selector, "OCCViewer", "anaglyph_filter" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ANAGLYPH_RED_CYAN") << tr("PREF_ANAGLYPH_YELLOW_BLUE") << tr("PREF_ANAGLYPH_GREEN_MAGENTA");
+  anIndicesList << 0                            << 1                               << 2;
+
+  pref->setItemProperty( "strings", aValuesList,   anaglyphFilter );
+  pref->setItemProperty( "indexes", anIndicesList, anaglyphFilter );
+
+  // .... -> Convergence distance type
+  int occFocusType = pref->addPreference( tr( "PREF_FOCUS_TYPE" ), stereoGroup,
+                                           LightApp_Preferences::Selector, "OCCViewer", "focus_type" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ABSOLUTE") << tr("PREF_RELATIVE");
+  anIndicesList << 0                   << 1;
+  pref->setItemProperty( "strings", aValuesList,   occFocusType );
+  pref->setItemProperty( "indexes", anIndicesList, occFocusType );
+
+  // .... -> Stereographic focus value
+  int focusValue = pref->addPreference( tr( "PREF_FOCUS_VALUE" ), stereoGroup,
+               LightApp_Preferences::DblSpin, "OCCViewer", "focus_value" );
+  pref->setItemProperty( "precision", 3, focusValue );
+  pref->setItemProperty( "min", 1.0E-03, focusValue );
+  pref->setItemProperty( "max", 1.0E03, focusValue );
+  pref->setItemProperty( "step", 0.05, focusValue );
+
+  // .... -> IOD type
+  int occIODType = pref->addPreference( tr( "PREF_IOD_TYPE" ), stereoGroup,
+                                           LightApp_Preferences::Selector, "OCCViewer", "iod_type" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ABSOLUTE") << tr("PREF_RELATIVE");
+  anIndicesList << 0                   << 1;
+  pref->setItemProperty( "strings", aValuesList,   occIODType );
+  pref->setItemProperty( "indexes", anIndicesList, occIODType );
+
+  // .... -> Interocular distance (IOD) value
+  int IODValue = pref->addPreference( tr( "PREF_IOD_VALUE" ), stereoGroup,
+                                      LightApp_Preferences::DblSpin, "OCCViewer", "iod_value" );
+  pref->setItemProperty( "precision", 3, IODValue );
+  pref->setItemProperty( "min", 1.0E-03, IODValue );
+  pref->setItemProperty( "max", 1.0E03, IODValue );
+  pref->setItemProperty( "step", 0.05, IODValue );
+
+  // .... -> Reverse stereo
+  pref->addPreference( tr( "PREF_REVERSE_STEREO" ), stereoGroup,
+ 		       LightApp_Preferences::Bool, "OCCViewer", "reverse_stereo" );
+  // .... -> Enable V-Sync
+  pref->addPreference( tr( "PREF_ENABLE_VSYNC" ), stereoGroup,
+ 		       LightApp_Preferences::Bool, "OCCViewer", "enable_vsync" );
+  // .... -> Enable quad-buffer support
+  pref->addPreference( tr( "PREF_ENABLE_QUAD_BUFFER_SUPPORT" ), stereoGroup,
+ 		       LightApp_Preferences::Bool, "OCCViewer", "enable_quad_buffer_support" );
+#endif
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
   //  pref->setItemProperty( "columns", 2, bgGroup );
   aValuesList.clear();
   anIndicesList.clear();
   txtList.clear();
+  idList.clear();
   formats = OCCViewer_Viewer::backgroundData( aValuesList, idList, txtList );
   foreach( int gid, idList ) anIndicesList << gid;
   // .... -> 3D viewer background
@@ -2395,6 +2521,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "margin",  0, occGen );
   pref->setItemProperty( "columns", 2, occGen );
   // ... -> empty frame (for layout) <<end>>
+
   // .. "OCC viewer" group <<end>>
 #endif
 
@@ -2414,10 +2541,40 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                       << 1;
   pref->setItemProperty( "strings", aValuesList,   vtkProjMode );
   pref->setItemProperty( "indexes", anIndicesList, vtkProjMode );
+
+  // .... -> Stereo group
+  int vtkStereoGroup = pref->addPreference( tr( "PREF_GROUP_STEREO" ), vtkGroup);
+  pref->setItemProperty( "columns", 2, vtkStereoGroup );
+  // .... -> Stereo type
+  int vtkStereoType = pref->addPreference( tr( "PREF_STEREO_TYPE" ), vtkStereoGroup,
+                                           LightApp_Preferences::Selector, "VTKViewer", "stereo_type" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  idList.clear();
+  SVTK_Viewer::stereoData( aValuesList, idList);
+  foreach( int gid, idList ) anIndicesList << gid;
+  pref->setItemProperty( "strings", aValuesList,   vtkStereoType );
+  pref->setItemProperty( "indexes", anIndicesList, vtkStereoType );
+  // .... -> Anaglyph filter
+  int vtkAnaglyphFilter = pref->addPreference( tr( "PREF_ANAGLYPH_FILTER" ), vtkStereoGroup,
+                                               LightApp_Preferences::Selector, "VTKViewer", "anaglyph_filter" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_ANAGLYPH_RED_CYAN") << tr("PREF_ANAGLYPH_YELLOW_BLUE") << tr("PREF_ANAGLYPH_GREEN_MAGENTA");
+  anIndicesList << 0                            << 1                               << 2;
+
+  pref->setItemProperty( "strings", aValuesList,   vtkAnaglyphFilter );
+  pref->setItemProperty( "indexes", anIndicesList, vtkAnaglyphFilter );
+
+  // .... -> Enable quad-buffer support
+  pref->addPreference( tr( "PREF_ENABLE_QUAD_BUFFER_SUPPORT" ), vtkStereoGroup,
+                       LightApp_Preferences::Bool, "VTKViewer", "enable_quad_buffer_support" );
+
   // .... -> background
   aValuesList.clear();
   anIndicesList.clear();
   txtList.clear();
+  idList.clear();
 #ifndef DISABLE_SALOMEOBJECT
   formats = SVTK_Viewer::backgroundData( aValuesList, idList, txtList );
 #endif
@@ -2952,6 +3109,162 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
   }
 #endif
 
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "projection_mode" ) )
+  {
+    int mode = resMgr->integerValue( "OCCViewer", "projection_mode", 0 );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setProjectionType( mode );
+    }
+  }
+#endif
+#if OCC_VERSION_LARGE > 0x06090000
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "stereo_type" ) )
+  {
+    int mode = resMgr->integerValue( "OCCViewer", "stereo_type", 0 );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setStereoType( mode );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "anaglyph_filter" ) )
+  {
+    int mode = resMgr->integerValue( "OCCViewer", "anaglyph_filter", 0 );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setAnaglyphFilter( mode );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && ( param == QString( "focus_type" ) ||
+                                          param == QString( "focus_value" ) ) )
+  {
+    int aType = resMgr->integerValue( "OCCViewer", "focus_type" );
+    double aValue = resMgr->doubleValue( "OCCViewer", "focus_value" );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setStereographicFocus( aType, aValue );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && ( param == QString( "iod_type" ) ||
+                                          param == QString( "iod_value" ) ) )
+  {
+    int aType = resMgr->integerValue( "OCCViewer", "iod_type" );
+    double aValue = resMgr->doubleValue( "OCCViewer", "iod_value" );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setInterocularDistance( aType, aValue );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "reverse_stereo" ) )
+  {
+    bool reverse = resMgr->booleanValue( "OCCViewer", "reverse_stereo", false );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setReverseStereo( reverse );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "enable_vsync" ) )
+  {
+    bool enable = resMgr->booleanValue( "OCCViewer", "enable_vsync", true );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setVSync( enable );
+    }
+  }
+#endif
+
+#ifndef DISABLE_OCCVIEWER
+  if ( sec == QString( "OCCViewer" ) && param == QString( "enable_quad_buffer_support" ) )
+  {
+    bool enable = resMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", false );
+    QList<SUIT_ViewManager*> lst;
+    viewManagers( OCCViewer_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "OCCViewer_Viewer" ) )
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setQuadBufferSupport( enable );
+    }
+  }
+#endif
+#endif
   if ( sec == QString( "3DViewer" ) && param == QString( "zooming_mode" ) )
   {
     int mode = resMgr->integerValue( "3DViewer", "zooming_mode", 0 );
@@ -3024,6 +3337,69 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
 
       SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
       if( vtkVM ) vtkVM->setProjectionMode( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "stereo_type" ) )
+  {
+    int mode = resMgr->integerValue( "VTKViewer", "stereo_type", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setStereoType( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "anaglyph_filter" ) )
+  {
+    int mode = resMgr->integerValue( "VTKViewer", "anaglyph_filter", 0 );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setAnaglyphFilter( mode );
+    }
+#endif
+  }
+#endif
+
+#ifndef DISABLE_VTKVIEWER
+  if ( sec == QString( "VTKViewer" ) && param == QString( "enable_quad_buffer_support" ) )
+  {
+    int enable = resMgr->booleanValue( "VTKViewer", "enable_quad_buffer_support", false );
+    QList<SUIT_ViewManager*> lst;
+#ifndef DISABLE_SALOMEOBJECT
+    viewManagers( SVTK_Viewer::Type(), lst );
+    QListIterator<SUIT_ViewManager*> it( lst );
+    while ( it.hasNext() )
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if ( !vm || !vm->inherits( "SVTK_Viewer" ) )
+        continue;
+
+      SVTK_Viewer* vtkVM = dynamic_cast<SVTK_Viewer*>( vm );
+      if( vtkVM ) vtkVM->setQuadBufferSupport( enable );
     }
 #endif
   }
@@ -3164,11 +3540,13 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
   }
   if ( sec == "language" && param == "language" )
   {
-    SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LANG_CHANGED" ) );
+    // VSR 18.06.2015 : commented out : single warning dialog box is now shown by the LightApp_PreferencesDlg
+    //SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LANG_CHANGED" ) );
   }
   if ( sec == "language" && param == "locale")
   {
-    SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LOCALE_CHANGED" ) );
+    // VSR 18.06.2015: commented out : single warning dialog box is now shown by the LightApp_PreferencesDlg
+    //SUIT_MessageBox::information( desktop(), tr( "WRN_WARNING" ), tr( "LOCALE_CHANGED" ) );
   }
   if ( sec == "desktop" && param == "opaque_resize" ) {
     bool opaqueResize = resMgr->booleanValue( "desktop", "opaque_resize", false );
@@ -3815,6 +4193,8 @@ void LightApp_Application::setDesktop( SUIT_Desktop* desk )
              this, SLOT( onDesktopMessage( const QString& ) ), Qt::UniqueConnection );
     connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
              this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ), Qt::UniqueConnection );
+    /* connect( desk, SIGNAL( windowMoved( SUIT_ViewWindow* ) ),
+             this, SLOT( onWindowMoved( SUIT_ViewWindow* ) ), Qt::UniqueConnection ); */
   }
 }
 

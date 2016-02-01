@@ -26,16 +26,20 @@
 %Module SalomePyQt
 
 %Feature ENABLE_CORBA
+%Feature ENABLE_PLOT2D
 
 %Import QtGuimod.sip
 %Import QtXmlmod.sip
+
+%If (ENABLE_PLOT2D)
+%Include SalomePyQt_Plot2d.sip
+%End
 
 %ExportedHeaderCode
 #include <QtxAction.h>
 #include <QtxActionSet.h>
 #include <QtxActionGroup.h>
 #include <SalomePyQt.h>
-#include <Plot2d_Curve.h>
 %End
 
 class SALOME_Selection : QObject
@@ -105,13 +109,6 @@ enum Action {
   LeaveWidget  = 1, 
   SplitAt      = 2  
 };
-
-enum Axis {
-  yLeft,
-  yRight,
-  xBottom,
-  xTop,		
-};	
 
 class QtxAction : QWidgetAction
 {
@@ -209,85 +206,12 @@ private:
   QtxActionGroup( const QtxActionGroup& );
 };
 
-enum ObjectType
-{
-  MainTitle,
-  XTitle,
-  YTitle,
-  Y2Title,
-  XAxis,
-  YAxis,
-  Y2Axis
-};
-
-class Plot2d_Curve
-{
-%TypeHeaderCode
-#include <Plot2d_Curve.h>
-%End
-
-%ConvertToSubClassCode
-    if ( dynamic_cast<Plot2d_Curve*>( sipCpp ) )
-      sipClass = sipClass_Plot2d_Curve;
-    else
-      sipClass = NULL;
-%End
-
-public:
-  Plot2d_Curve();
-  virtual ~Plot2d_Curve();
-  void setName( const QString& );
-  void addPoint( double, double );
-  void addPoints(SIP_PYLIST X, SIP_PYLIST Y);
-%MethodCode
-  int nx = PyList_Size(a0);
-  int ny = PyList_Size(a1);
-  
-  if( nx != ny ) { 
-    PyErr_Format(PyExc_TypeError,"The dimension of x and y should be the same. It is %d and %d currently.", nx, ny);
-  }
-  
-  int i;
-  PyObject *pX, *pY;
-
-  for (i=0; i<nx; i++) {
-    pX = PyList_GET_ITEM(a0,i);
-    pY = PyList_GET_ITEM(a1,i);
-    double aX = PyFloat_AsDouble(pX);
-    double aY = PyFloat_AsDouble(pY);
-    sipCpp->addPoint(aX, aY);
-  }
-%End
-  void insertPoint( int, double, double );
-  void deletePoint( int );
-  void clearAllPoints();
-  void setXAxis( Axis );
-%MethodCode
-  int ax = int(a0);
-  sipCpp->setXAxis(QwtPlot::Axis(ax));
-%End
-  Axis getXAxis() const;
-%MethodCode
-  sipRes = Axis(sipCpp->getXAxis());
-%End
-  void setYAxis( Axis );
-%MethodCode
-  int ay = int(a0);
-  sipCpp->setYAxis(QwtPlot::Axis(ay));
-%End
-  Axis getYAxis() const;
-%MethodCode
-  sipRes = Axis(sipCpp->getYAxis());
-%End
-};
-
 enum VisibilityState 
 {
   ShownState,
   HiddenState,
   UnpresentableState 
 };
-
 
 class SalomePyQt
 {
@@ -439,6 +363,7 @@ public:
   static QString           getViewType( const int ) /ReleaseGIL/ ;
   static bool              setViewTitle( const int, const QString& ) /ReleaseGIL/ ;
   static QString           getViewTitle( const int ) /ReleaseGIL/ ;
+  static bool              setViewSize( const int, const int, const int = 0 ) /ReleaseGIL/ ;
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
   static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 ) /ReleaseGIL/ ;
@@ -455,6 +380,8 @@ public:
   static bool              moveView( const int, const int, const bool ) /ReleaseGIL/ ;
   static QList<int>        neighbourViews( const int ) /ReleaseGIL/ ;
   
+%If (ENABLE_PLOT2D)
+// start Plot2d-related functionality
   static void              displayCurve(const int, Plot2d_Curve*) /ReleaseGIL/ ;
   static void              eraseCurve(const int, Plot2d_Curve*) /ReleaseGIL/ ;
   static void              eraseCurve(Plot2d_Curve*) /ReleaseGIL/ ;
@@ -464,9 +391,10 @@ public:
   static QList<double>     getPlot2dFitRangeByCurves(const int) /ReleaseGIL/ ;
   static QList<double>     getPlot2dFitRangeCurrent(const int) /ReleaseGIL/ ;
   static void              setPlot2dFitRange(const int, const double XMin, const double XMax, const double YMin, const double YMax ) /ReleaseGIL/ ;
+// end of Plot2d-related functionality
+%End
 
   static void              processEvents();
-  
 
   static void              startPyLog(const QString&) /ReleaseGIL/ ;
   static void              stopPyLog() /ReleaseGIL/ ;

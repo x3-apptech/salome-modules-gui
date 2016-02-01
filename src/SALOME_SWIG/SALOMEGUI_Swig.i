@@ -92,4 +92,11 @@ public:
   void ViewRight();
   void ViewFront();
   void ViewBack();
+
+  /* view parameters */
+  const char* getViewParameters();
+  void setCameraPosition( double x, double y, double z );
+  void setCameraFocalPoint( double x, double y, double z );
+  void setCameraViewUp( double x, double y, double z );
+  void setViewScale( double parallelScale,double x, double y, double z );
 };

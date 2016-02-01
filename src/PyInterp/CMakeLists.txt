@@ -64,7 +64,6 @@ SET(_other_SOURCES
   PyInterp_Event.cxx
   PyInterp_Interp.cxx
   PyInterp_Request.cxx
-  PyInterp_Utils.cxx
 )
 
 # sources / to compile

@@ -528,16 +528,16 @@ QtxWorkstackArea::QtxWorkstackArea( QWidget* parent )
   base->setMargin( frameWidth() );
   base->setSpacing( 0 );
 
-  QWidget* top = new QWidget( this );
-  base->addWidget( top );
+  myTop = new QWidget( this );
+  base->addWidget( myTop );
 
-  QHBoxLayout* tl = new QHBoxLayout( top );
+  QHBoxLayout* tl = new QHBoxLayout( myTop );
   tl->setMargin( 0 );
 
-  myBar = new QtxWorkstackTabBar( top );
+  myBar = new QtxWorkstackTabBar( myTop );
   tl->addWidget( myBar, 1 );
 
-  CloseButton* close = new CloseButton( top );
+  CloseButton* close = new CloseButton( myTop );
   close->setIcon( style()->standardIcon( QStyle::SP_TitleBarCloseButton ) );
   myClose = close;
   tl->addWidget( myClose );
@@ -901,6 +901,16 @@ bool QtxWorkstackArea::restoreState( QDataStream& stream, QMap<QString, QtxWorks
 
   return true;
 }
+
+/*!
+  \brief Show/Hide tab bar.
+*/
+void QtxWorkstackArea::showTabBar( bool visible)
+{
+  myTop->setVisible(visible);
+  myBar->setVisible(visible);
+}
+
 
 /*!
   \brief Get rectangle to be drawn when highlighting drop area.
@@ -3179,6 +3189,91 @@ bool QtxWorkstack::opaqueResize() const
   return mySplit->opaqueResize();
 }
 
+/*!
+  \brief Show/hide splitter state and area.
+  \param wid widget (and parent area) will be shown/hidden
+  \param parent_list parent splitters list
+  \param split splitter will be shown/hidden
+  \param visible splitter
+*/
+void QtxWorkstack::splitterVisible(QWidget* wid, QList<QSplitter*>& parent_list, QSplitter* split, bool visible)
+{
+  QList<QSplitter*> recList;
+  splitters( split, recList, false );
+  for ( QList<QSplitter*>::iterator itr = recList.begin(); itr != recList.end(); ++itr ) {
+    parent_list.prepend( *itr );
+    splitterVisible( wid, parent_list, *itr, visible );
+  }
+
+  QList<QtxWorkstackArea*> areaList;
+  areas( split, areaList, false );
+  for ( QList<QtxWorkstackArea*>::const_iterator it = areaList.begin(); it != areaList.end(); ++it ) {
+    QtxWorkstackArea* area = *it;
+    bool isCurrentWidget = false;
+
+    area->showTabBar(visible);
+
+    // 1. Looking for the selected widget at the lowest level among all splitted areas.
+    QList<QtxWorkstackChild*> childList = area->childList();
+    for ( QList<QtxWorkstackChild*>::iterator itr = childList.begin(); itr != childList.end(); ++itr ) {
+      QWidget* aCurWid = (*itr)->widget();
+      if ( aCurWid == wid ) {
+        isCurrentWidget = true;
+        aCurWid->setVisible( true );
+      }
+      else
+        aCurWid->setVisible( visible );
+    }
+
+    // 2. Show/Hide other areas and widgets that don't contain the desired widget
+    if ( !isCurrentWidget || visible )
+      area->setVisible( visible );
+
+    if ( !isCurrentWidget && !visible )
+      continue;
+
+    // 3. Show/hide all parent widgets
+    QSplitter* pSplit = splitter( area );
+    int count = pSplit->count();
+    for ( int i = 0; i < count; i++ ) {
+      if ( pSplit->indexOf( area ) == i && !visible )
+        continue;
+      pSplit->widget(i)->setVisible( visible );
+    }
+
+    // 4. Show/hide all parent splitters don't contain the selected widget
+    if ( visible )
+      pSplit->setVisible( true );
+
+    if ( isCurrentWidget && !visible ) {
+      for ( QList<QSplitter*>::iterator itr = parent_list.begin(); itr != parent_list.end() && pSplit != mySplit; ++itr ) {
+        if ( pSplit == *itr )
+          continue;
+        QList<QSplitter*> splitList;
+        splitters( *itr, splitList, false );
+        for ( QList<QSplitter*>::iterator iter = splitList.begin(); iter != splitList.end(); ++iter ) {
+          if ( pSplit == (*iter) ) {
+            pSplit = *itr;
+            continue;
+          }
+          (*iter)->setVisible( false );
+        }
+      }
+    }
+  }
+}
+
+/*!
+  \brief Show/hide splitters state and area.
+  \param wid widget (and parent area) will be shown/hidden
+  \param visible splitters
+*/
+void QtxWorkstack::splittersVisible( QWidget* wid, bool visible )
+{
+  QList<QSplitter*> parent_list;
+  parent_list.append( mySplit );
+  splitterVisible( wid, parent_list, mySplit, visible );
+}
 
 /*!
   \fn void QtxWorkstack::windowActivated( QWidget* w )

@@ -48,7 +48,7 @@ ResetCamera(vtkRenderer* theRenderer,
   int aCount = ComputeVisiblePropBounds(theRenderer,aBounds);
 
   if(theUsingZeroFocalPoint || aCount){
-    static double MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+    static double MIN_DISTANCE = 1.0 / VTK_FLOAT_MAX;
 
     double aLength = aBounds[1]-aBounds[0];
     aLength = std::max((aBounds[3]-aBounds[2]),aLength);
@@ -120,8 +120,8 @@ ComputeBounds(vtkActorCollection* theCollection, double theBounds[6])
 {
   int aCount = 0;
 
-  theBounds[0] = theBounds[2] = theBounds[4] = VTK_LARGE_FLOAT;
-  theBounds[1] = theBounds[3] = theBounds[5] = -VTK_LARGE_FLOAT;
+  theBounds[0] = theBounds[2] = theBounds[4] = VTK_FLOAT_MAX;
+  theBounds[1] = theBounds[3] = theBounds[5] = -VTK_FLOAT_MAX;
 
   // loop through all props
   theCollection->InitTraversal();
@@ -132,8 +132,8 @@ ComputeBounds(vtkActorCollection* theCollection, double theBounds[6])
         if(anActor->IsInfinitive())
           continue;
       double *aBounds = aProp->GetBounds();
-      static double MIN_DISTANCE = 1./VTK_LARGE_FLOAT;
-      static double MAX_DISTANCE = 0.9*VTK_LARGE_FLOAT;
+      static double MIN_DISTANCE = 1./VTK_FLOAT_MAX;
+      static double MAX_DISTANCE = 0.9*VTK_FLOAT_MAX;
 
       if(fabs(aBounds[1] - aBounds[0]) < MIN_DISTANCE) {
         aBounds[0]-=0.001;
@@ -248,8 +248,8 @@ bool IsBBEmpty(vtkRenderer* theRenderer)
     return false;
 
   double aNewBndBox[6];
-  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
-  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
+  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_FLOAT_MAX;
+  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_FLOAT_MAX;
   
   // iterate through displayed objects and set size if necessary
   VTK::ActorCollectionCopy aCopy(theRenderer->GetActors());
@@ -262,9 +262,9 @@ bool IsBBEmpty(vtkRenderer* theRenderer)
       if(anActor->GetVisibility() && !anActor->IsInfinitive())
       {
         double *aBounds = anActor->GetBounds();
-        if(aBounds[0] > -VTK_LARGE_FLOAT && aBounds[1] < VTK_LARGE_FLOAT &&
-           aBounds[2] > -VTK_LARGE_FLOAT && aBounds[3] < VTK_LARGE_FLOAT &&
-           aBounds[4] > -VTK_LARGE_FLOAT && aBounds[5] < VTK_LARGE_FLOAT)
+        if(aBounds[0] > -VTK_FLOAT_MAX && aBounds[1] < VTK_FLOAT_MAX &&
+           aBounds[2] > -VTK_FLOAT_MAX && aBounds[3] < VTK_FLOAT_MAX &&
+           aBounds[4] > -VTK_FLOAT_MAX && aBounds[5] < VTK_FLOAT_MAX)
           isAny = true;
       }
   
@@ -292,8 +292,8 @@ bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
     return false;
 
   double aNewBndBox[6];
-  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
-  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
+  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_FLOAT_MAX;
+  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_FLOAT_MAX;
 
   // iterate through displayed objects and set size if necessary
   VTK::ActorCollectionCopy aCopy(theRenderer->GetActors());
@@ -312,9 +312,9 @@ bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
 	//Ignore invalid bounds
 	if(!isBoundValid(aBounds)) continue;
 
-        if(aBounds[0] > -VTK_LARGE_FLOAT && aBounds[1] < VTK_LARGE_FLOAT &&
-           aBounds[2] > -VTK_LARGE_FLOAT && aBounds[3] < VTK_LARGE_FLOAT &&
-           aBounds[4] > -VTK_LARGE_FLOAT && aBounds[5] < VTK_LARGE_FLOAT)
+        if(aBounds[0] > -VTK_FLOAT_MAX && aBounds[1] < VTK_FLOAT_MAX &&
+           aBounds[2] > -VTK_FLOAT_MAX && aBounds[3] < VTK_FLOAT_MAX &&
+           aBounds[4] > -VTK_FLOAT_MAX && aBounds[5] < VTK_FLOAT_MAX)
         {
           for(int i = 0; i < 5; i = i + 2){
             if(aBounds[i] < aNewBndBox[i]) 
@@ -334,11 +334,11 @@ bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
     return true;
   }
 
-  if(aNewBndBox[0] > -VTK_LARGE_FLOAT && aNewBndBox[1] < VTK_LARGE_FLOAT &&
-     aNewBndBox[2] > -VTK_LARGE_FLOAT && aNewBndBox[3] < VTK_LARGE_FLOAT &&
-     aNewBndBox[4] > -VTK_LARGE_FLOAT && aNewBndBox[5] < VTK_LARGE_FLOAT)
+  if(aNewBndBox[0] > -VTK_FLOAT_MAX && aNewBndBox[1] < VTK_FLOAT_MAX &&
+     aNewBndBox[2] > -VTK_FLOAT_MAX && aNewBndBox[3] < VTK_FLOAT_MAX &&
+     aNewBndBox[4] > -VTK_FLOAT_MAX && aNewBndBox[5] < VTK_FLOAT_MAX)
   {
-    static double MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+    static double MIN_DISTANCE = 1.0 / VTK_FLOAT_MAX;
     
     double aLength = aNewBndBox[1]-aNewBndBox[0];
     aLength = std::max((aNewBndBox[3]-aNewBndBox[2]),aLength);
@@ -371,7 +371,7 @@ bool ComputeBBCenter(vtkRenderer* theRenderer, double theCenter[3])
   printf("aCount = %d\n",aCount);
 
   if(aCount){
-    static double MIN_DISTANCE = 1.0 / VTK_LARGE_FLOAT;
+    static double MIN_DISTANCE = 1.0 / VTK_FLOAT_MAX;
 
     double aLength = aBounds[1]-aBounds[0];
     aLength = max((aBounds[3]-aBounds[2]),aLength);

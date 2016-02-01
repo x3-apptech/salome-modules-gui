@@ -59,6 +59,7 @@ private slots:
   void                  onApply();
   void                  onDefault();
   void                  onImportPref();
+  void                  onRestartRequired();
 
 private:
   LightApp_Preferences* myPrefs;

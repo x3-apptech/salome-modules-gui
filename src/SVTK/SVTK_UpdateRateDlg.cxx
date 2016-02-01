@@ -50,7 +50,7 @@
 #include <vtkDataSet.h>
 
 static double OFF_UPDATE_RATE = 0.00001;
-static double FLOAT_TOLERANCE = 1.0 / VTK_LARGE_FLOAT;
+static double FLOAT_TOLERANCE = 1.0 / VTK_FLOAT_MAX;
 
 namespace
 {
@@ -195,7 +195,7 @@ SVTK_UpdateRateDlg
       aLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       aGridLayout->addWidget(aLabel, 0, 0);
 
-      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
+      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_FLOAT_MAX, 2, aGroupBox);
       aDblSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       aGridLayout->addWidget(aDblSpinBox, 0, 1);
 
@@ -209,7 +209,7 @@ SVTK_UpdateRateDlg
       aLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
       aGridLayout->addWidget(aLabel, 1, 0);
 
-      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_LARGE_FLOAT, 2, aGroupBox);
+      QtxDoubleSpinBox* aDblSpinBox = new QtxDoubleSpinBox(OFF_UPDATE_RATE, VTK_FLOAT_MAX, 2, aGroupBox);
       aDblSpinBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
       aGridLayout->addWidget(aDblSpinBox, 1, 1);
 

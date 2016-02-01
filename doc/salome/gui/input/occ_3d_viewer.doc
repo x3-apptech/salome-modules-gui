@@ -137,6 +137,28 @@ These buttons orientate the scene strictly about coordinate axes:
 <b>Rotate clockwise</b> - rotates view 90 @htmlonly &deg; @endhtmlonly clockwise.
 <hr>
 
+\image html occ_view_orthographic.png
+
+<b>Ortographic projection</b> - default OCC viewer projection mode.
+<hr>
+
+\image html occ_view_perspective.png
+
+<b>Perspective projection</b> - perspective OCC viewer projection mode.
+<hr>
+
+\image html occ_view_stereo.png
+
+<b>Stereo projection</b> - stereoscopic rendering of the view.
+\note Activation of this mode also switches the view to perpective projection 
+in case if orthographic one has been active.
+\note By default, quad-buffered stereo is activated, if it is supported by graphic card. 
+If no stereo capabilities are available, an error message is shown.
+\note Settigs of stereoscopic view take place in 
+\ref occ_preferences "OCC 3D Viewer" preferences.
+
+<hr>
+
 \image html occ_view_reset.png
 
 <b>Reset</b> - restores the default position (isometric) of objects in

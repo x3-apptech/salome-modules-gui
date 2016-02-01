@@ -16,14 +16,13 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : PVViewer_ViewWindow.cxx
-// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+// Author : Adrien Bruneton (CEA)
 
 #include "PVViewer_ViewWindow.h"
-#include "PVViewer_ViewManager.h"
+#include "PVViewer_Core.h"
 #include "PVViewer_ViewModel.h"
 #include "PVViewer_GUIElements.h"
+#include "PVViewer_ViewManager.h"
 
 #include <SUIT_ViewManager.h>
 #include <SUIT_ResourceMgr.h>
@@ -58,9 +57,10 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
     setCentralWidget( myPVMgr );
 
     // Finish ParaView set up: behaviors, connection and configurations.
-    PVViewer_ViewManager::ParaviewInitBehaviors(true, theDesktop);
+    const QString configPath(PVViewer_ViewManager::GetPVConfigPath());
+    PVViewer_Core::ParaviewInitBehaviors(true, theDesktop);
     PVViewer_ViewManager::ConnectToExternalPVServer(theDesktop);
-    PVViewer_ViewManager::ParaviewLoadConfigurations();
+    PVViewer_Core::ParaviewLoadConfigurations(configPath);
 
     // Hide toolbars
     PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(myDesktop);
@@ -115,7 +115,7 @@ pqTabbedMultiViewWidget* PVViewer_ViewWindow::getMultiViewManager() const
   return myPVMgr;
 }
 
-void PVViewer_ViewWindow::onEmulateApply()
-{
-  emit this->applyRequest();
-}
+//void PVViewer_ViewWindow::onEmulateApply()
+//{
+//  emit this->applyRequest();
+//}

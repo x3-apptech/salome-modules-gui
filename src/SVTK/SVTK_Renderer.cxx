@@ -395,9 +395,9 @@ inline
 bool
 CheckBndBox(const double theBounds[6])
 {
-  if(theBounds[0] > -VTK_LARGE_FLOAT && theBounds[1] < VTK_LARGE_FLOAT &&
-     theBounds[2] > -VTK_LARGE_FLOAT && theBounds[3] < VTK_LARGE_FLOAT &&
-     theBounds[4] > -VTK_LARGE_FLOAT && theBounds[5] < VTK_LARGE_FLOAT)
+  if(theBounds[0] > -VTK_FLOAT_MAX && theBounds[1] < VTK_FLOAT_MAX &&
+     theBounds[2] > -VTK_FLOAT_MAX && theBounds[3] < VTK_FLOAT_MAX &&
+     theBounds[4] > -VTK_FLOAT_MAX && theBounds[5] < VTK_FLOAT_MAX)
     return true;
   return false;
 }
@@ -413,8 +413,8 @@ SVTK_Renderer
   bool aCDisplayed = IsCubeAxesDisplayed();
 
   double aNewBndBox[6];
-  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_LARGE_FLOAT;
-  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_LARGE_FLOAT;
+  aNewBndBox[ 0 ] = aNewBndBox[ 2 ] = aNewBndBox[ 4 ] = VTK_FLOAT_MAX;
+  aNewBndBox[ 1 ] = aNewBndBox[ 3 ] = aNewBndBox[ 5 ] = -VTK_FLOAT_MAX;
 
   int aVisibleNum = myTrihedron->GetVisibleActorCount(GetDevice());
   if(aVisibleNum){
@@ -708,10 +708,15 @@ void SVTK_Renderer::onFitSelection()
   vtkActorCollection* aCollection = aCopy.GetActors();
   aCollection->InitTraversal();
   while ( vtkActor* aProp = aCollection->GetNextActor() )
-    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) )
-      if ( mySelector->IsSelected( anActor ) )
+    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) ) {
+      const Handle(SALOME_InteractiveObject)& io = anActor->getIO();
+      if ( !io.IsNull() && mySelector->IsSelected( io ) )
         aSelectedCollection->AddItem( aProp );
-
+    }
+  
+  if( aSelectedCollection->GetNumberOfItems() == 0 )
+    return; // if collection is empty
+  
   double bounds[6];
   ::ComputeBounds( aSelectedCollection, bounds );
 

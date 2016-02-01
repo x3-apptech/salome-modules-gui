@@ -76,6 +76,7 @@ public:
 signals:
   void                     activated();
   void                     deactivated();
+//  void                     moved();
   void                     windowActivated( SUIT_ViewWindow* );
   void                     closing( SUIT_Desktop*, QCloseEvent* );
   void                     message( const QString& );

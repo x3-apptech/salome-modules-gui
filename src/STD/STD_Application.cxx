@@ -111,7 +111,7 @@ void STD_Application::closeApplication()
     beforeCloseDoc( study );
 
     study->closeDocument();
-
+    emit appClosed();
     setActiveStudy( 0 );
     delete study;
 
@@ -324,6 +324,9 @@ void STD_Application::onOpenDoc()
 /*! \retval true, if document was opened successful, else false.*/
 bool STD_Application::onOpenDoc( const QString& aName )
 {
+  if ( !abortAllOperations() )
+    return false;
+
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
   bool res = openAction( openChoice( aName ), aName );
@@ -356,8 +359,6 @@ bool STD_Application::onReopenDoc()
     // update views / windows / status bar / title
     clearViewManagers();
     setActiveStudy( 0 );
-    updateDesktopTitle();
-    updateCommandsStatus();
 
     // delete study
     delete study;
@@ -366,13 +367,21 @@ bool STD_Application::onReopenDoc()
     // post closing actions
     afterCloseDoc();
 
+    int aNbStudies = 0;
+    QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
+    for ( int i = 0; i < apps.count(); i++ )
+      aNbStudies += apps.at( i )->getNbStudies();
+
     // reload study from the file
     res = useFile( studyName ) && activeStudy();
 
     // if reloading is failed, close the desktop
-    if ( !res ) {
-      setDesktop( 0 );
+    if ( aNbStudies && !res )
       closeApplication();
+    else
+    {
+      updateDesktopTitle();
+      updateCommandsStatus();
     }
   }
   return res;
@@ -558,6 +567,9 @@ void STD_Application::onSaveDoc()
   if ( !activeStudy() )
     return;
 
+  if ( !abortAllOperations() )
+    return;
+
   bool isOk = false;
   if ( activeStudy()->isSaved() )
   {
@@ -591,6 +603,9 @@ bool STD_Application::onSaveAsDoc()
 {
   SUIT_Study* study = activeStudy();
   if ( !study )
+    return false;
+
+  if ( !abortAllOperations() )
     return false;
 
   bool isOk = false;
@@ -1007,3 +1022,11 @@ int STD_Application::viewManagerId( const SUIT_ViewManager* theManager) const
   return myViewMgrs.indexOf(const_cast<SUIT_ViewManager*>(theManager));
 }
 
+/*!
+  \brief Abort active operations if there are any
+  \return \c false if some operation cannot be aborted
+*/
+bool STD_Application::abortAllOperations()
+{
+  return true;
+}

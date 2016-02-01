@@ -632,6 +632,66 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>OCC 3D　Viewer</translation>
     </message>
     <message>
+      <source>PREF_GROUP_STEREO</source>
+      <translation>ステレオレンダリング</translation>
+    </message>
+    <message>
+      <source>PREF_STEREO_TYPE</source>
+      <translation>ステレオタイプ</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_FILTER</source>
+      <translation>Anaglyph filter</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_RED_CYAN</source>
+      <translation>赤-シアン投影</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_YELLOW_BLUE</source>
+      <translation>黄-青投影</translation>
+    </message>
+    <message>
+      <source>PREF_ANAGLYPH_GREEN_MAGENTA</source>
+      <translation>緑-マゼンタ投影</translation>
+    </message>
+    <message>
+      <source>PREF_FOCUS_TYPE</source>
+      <translation>一致距離型</translation>
+    </message>
+    <message>
+      <source>PREF_FOCUS_VALUE</source>
+      <translation>立体画法焦点値</translation>
+    </message>
+    <message>
+      <source>PREF_IOD_TYPE</source>
+      <translation>眼間距離（IOD）型</translation>
+    </message>
+    <message>
+      <source>PREF_IOD_VALUE</source>
+      <translation>眼間距離（IOD）値</translation>
+    </message>
+    <message>
+      <source>PREF_ABSOLUTE</source>
+      <translation>絶対</translation>
+    </message>
+    <message>
+      <source>PREF_RELATIVE</source>
+      <translation>早退</translation>
+    </message>
+    <message>
+      <source>PREF_REVERSE_STEREO</source>
+      <translation>Reverse stereo</translation>
+    </message>
+    <message>
+      <source>PREF_ENABLE_VSYNC</source>
+      <translation>V-Syncを有効</translation>
+    </message>
+    <message>
+      <source>PREF_ENABLE_QUAD_BUFFER_SUPPORT</source>
+      <translation>quad-buffer サポートを有効</translation>
+    </message>
+    <message>
       <source>PREF_LOGARITHMIC</source>
       <translation>対数</translation>
     </message>
@@ -892,6 +952,14 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>ショートカットの設定</translation>
     </message>
     <message>
+      <source>PREF_GROUP_FULL_SCREEN</source>
+      <translation>全画面表示</translation>
+    </message>
+    <message>
+      <source>PREF_FULL_SCREEN_AUTO</source>
+      <translation>オブジェクトブラウザと表示ツールバーを隠す</translation>
+    </message>
+    <message>
       <source>PREF_TAB_PYEDITOR</source>
       <translation>Python Viewer</translation>
     </message>
@@ -1054,6 +1122,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>DEFAULT_BTN_TEXT</source>
       <translation>デフォルト</translation>
+    </message>
+    <message>
+      <source>PREF_NEED_RESTART</source>
+      <translation>幾つかの変更はアプリケーションを再起動後に有効になります</translation>
     </message>
   </context>
   <context>

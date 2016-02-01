@@ -16,6 +16,8 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author: Adrien Bruneton (CEA)
+
 #if !defined(_PVViewer_VIEWMODEL_H)
 #define _PVViewer_VIEWMODEL_H
 

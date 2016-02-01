@@ -116,10 +116,14 @@ public:
   void                setOpaqueResize( bool = true );
   bool                opaqueResize() const;
 
+  void                splittersVisible( QWidget*, bool = true );
+
   void Split( QWidget* wid, const Qt::Orientation o, const SplitType type );
   void Attract( QWidget* wid1, QWidget* wid2, const bool all );
   void SetRelativePosition( QWidget* wid, const Qt::Orientation o, const double pos );
   void SetRelativePositionInSplitter( QWidget* wid, const double pos );
+
+  void                updateState();
 
 signals:
   void                windowActivated( QWidget* );
@@ -164,8 +168,9 @@ private:
 
   QtxWorkstackArea*   createArea( QWidget* ) const;
 
-  void                updateState();
   void                updateState( QSplitter* );
+
+  void                splitterVisible(QWidget*, QList<QSplitter*>&, QSplitter*, bool );
 
   void                distributeSpace( QSplitter* ) const;
 
@@ -244,6 +249,8 @@ public:
   void                saveState( QDataStream& ) const;
   bool                restoreState( QDataStream&, QMap<QString, QtxWorkstackChild*>& );
 
+  void                showTabBar( bool = true);
+
 signals:
   void                activated( QWidget* );
   void                contextMenuRequested( QWidget*, QPoint );
@@ -294,6 +301,7 @@ private:
   typedef QList<QtxWorkstackChild*> ChildList;
 
 private:
+  QWidget*            myTop;     //!< workarea top widget
   QtxWorkstackTabBar* myBar;     //!< workarea tab bar header
   ChildList           myList;    //!< child widgets list
   QAbstractButton*    myClose;   //!< close button

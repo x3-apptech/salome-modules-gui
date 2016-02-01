@@ -151,19 +151,27 @@ public:
 	 SwitchInteractionStyleId, SwitchZoomingStyleId, 
 	 SwitchPreselectionId, SwitchSelectionId,
 	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
+	 OrthographicId, PerspectiveId, StereoId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
                       PANGLOBAL, WINDOWFIT, FITALLVIEW, FITSELECTION, RESETVIEW,
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
-		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW };
+		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW, PROJECTION };
 
   enum RotationPointType{ GRAVITY, SELECTED };
 
   enum SketchingType { NoSketching, Rect, Polygon };
 
-  enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane};
+  enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane };
 
+  enum ProjectionType { Orthographic, Perspective, Stereo };
+  
+  enum StereoType { QuadBuffer, Anaglyph, RowInterlaced, ColumnInterlaced, ChessBoard, SideBySide, OverUnder, SoftPageFlip, NumberOfModes };
+
+  enum AnaglyphFilter { RedCyan, YellowBlue, GreenMagenta };
+
+  enum FocusIODType { Absolute, Relative };
 
   OCCViewer_ViewWindow(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel);
   virtual ~OCCViewer_ViewWindow();
@@ -177,6 +185,8 @@ public:
   virtual void performRestoring( const viewAspect&, bool = false );
   
   virtual void initLayout();
+
+  virtual bool enableDrawMode( bool );
 
   virtual void updateEnabledDrawMode();
 
@@ -206,9 +216,34 @@ public:
   virtual bool                    isSelectionEnabled() const;
   virtual void                    enableSelection( bool );
  
+  virtual int                     projectionType() const;
+  virtual void                    setProjectionType( int );
+
+  virtual int                     stereoType() const;
+  virtual void                    setStereoType( const int );
+
+  virtual int                     anaglyphFilter() const;
+  virtual void                    setAnaglyphFilter( const int );
+
+  virtual void                    setStereographicFocus( const int, const double );
+  virtual int                     stereographicFocusType() const;
+  virtual double                  stereographicFocusValue() const;
+
+  virtual void                    setInterocularDistance( const int, const double );
+  virtual int                     interocularDistanceType() const;
+  virtual double                  interocularDistanceValue() const;
+
+  virtual bool                    isReverseStereo() const;
+  virtual void                    setReverseStereo( const bool );
+
+  virtual bool                    isVSync() const;
+  virtual void                    setVSync( const bool );
+
+  virtual bool                    isQuadBufferSupport() const;
+  virtual void                    setQuadBufferSupport( const bool );
+
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
-
 
   void            set2dMode( Mode2dType );
   Mode2dType      get2dMode() const { return my2dMode; }
@@ -246,6 +281,9 @@ public slots:
   virtual void onRightView();
   virtual void onClockWiseView();
   virtual void onAntiClockWiseView();
+  virtual void onProjectionType( QAction* theAction );
+  virtual void onStereoType( bool activate );
+  virtual void onProjectionType();
   virtual void onResetView();
   virtual void onFitAll();
   virtual void onFitSelection();
@@ -299,6 +337,8 @@ public:
 protected:
   virtual QString  filter() const;
 
+  bool isOpenGlStereoSupport() const;
+
   /* Transformation selected but not started yet */
   bool transformRequested() const;
   bool setTransformRequested ( OperationType );
@@ -317,7 +357,7 @@ protected:
 
   void createActions();
   void createToolBar();
- 
+
   virtual OperationType getButtonState(QMouseEvent* theEvent, int theInteractionStyle);
 
   viewAspect getViewParams() const;
@@ -358,6 +398,7 @@ protected:
   bool                  myCursorIsHand;                 
   bool                  myDrawRect;           // set when a rect is used for selection or magnify 
   bool                  myEnableDrawMode;
+  bool                  myDrawRectEnabled;
   bool                  myPaintersRedrawing;  // set to draw with external painters  
   bool                  IsSketcherStyle;
   bool                  myIsKeyFree;

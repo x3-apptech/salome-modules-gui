@@ -44,12 +44,16 @@ class LIGHTAPP_EXPORT LightApp_FullScreenHelper {
   void switchToNormalScreen();
 
  private:
+  void toolbarVisible(SUIT_ViewWindow*, bool=false);
+
+ private:
   typedef QMap<QDockWidget*,bool> DocWidgetMap;
   DocWidgetMap myDocWidgetMap;
-
   typedef QMap<QToolBar*, bool> ToolBarMap;
   ToolBarMap myToolBarMap;
-
+  QList<SUIT_ViewWindow*> myWindowsList;
+  typedef QMap<int, QList<int> > FrameHideMap;
+  FrameHideMap myFrameHideMap;
 
   bool myStatusBarVisibility;
 

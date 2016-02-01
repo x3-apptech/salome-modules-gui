@@ -46,6 +46,8 @@ public:
 
   OCCViewer_ViewWindow*   getView( const int ) const;
 
+  OCCViewer_ViewWindow*   getActiveView() const;
+
   virtual OCCViewer_ViewPort3d* getViewPort() { return getView(MAIN_VIEW)->getViewPort(); }
   OCCViewer_ViewPort3d* getViewPort(int theView);
 
@@ -70,6 +72,32 @@ public:
   virtual int  interactionStyle() const { return getView(MAIN_VIEW)->interactionStyle(); }
   virtual void setInteractionStyle( const int i );
 
+  virtual int projectionType() const;
+  virtual void setProjectionType( int );
+
+  virtual int stereoType() const;
+  virtual void setStereoType( const int );
+
+  virtual int anaglyphFilter() const;
+  virtual void setAnaglyphFilter( const int );
+
+  virtual void setStereographicFocus( const int, const double );
+  virtual int stereographicFocusType() const;
+  virtual double stereographicFocusValue() const;
+
+  virtual void setInterocularDistance( const int, const double );
+  virtual int interocularDistanceType() const;
+  virtual double interocularDistanceValue() const;
+
+  virtual bool isReverseStereo() const;
+  virtual void setReverseStereo( const bool );
+
+  virtual bool isVSync() const;
+  virtual void setVSync( const bool );
+
+  virtual bool isQuadBufferSupport() const;
+  virtual void setQuadBufferSupport( const bool );
+
   virtual int  zoomingStyle() const { return getView(MAIN_VIEW)->zoomingStyle(); }
   virtual void setZoomingStyle( const int );
 
@@ -78,6 +106,8 @@ public:
 
   virtual bool isPreselectionEnabled() const { return getView(MAIN_VIEW)->isPreselectionEnabled(); }
   virtual void enablePreselection( bool );
+
+  virtual bool enableDrawMode( bool );
 
   virtual void setViewManager( SUIT_ViewManager* );
 
@@ -135,6 +165,7 @@ protected:
 
 private slots:
   void onContextMenuRequested(QContextMenuEvent*);
+  void onMousePressed(SUIT_ViewWindow*, QMouseEvent*);
 
 private:
   void connectViewSignals( OCCViewer_ViewWindow* theView );
@@ -145,6 +176,7 @@ private:
   QList<OCCViewer_ViewWindow*> myViews;
   QGridLayout* myLayout;
   OCCViewer_ViewWindow* myMaximizedView;
+  OCCViewer_ViewWindow* myActiveView;
   int mySplitMode;
   QList<int> myViewsMode;
 

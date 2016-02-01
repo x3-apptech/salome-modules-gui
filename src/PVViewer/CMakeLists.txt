@@ -24,32 +24,31 @@ ADD_SUBDIRECTORY(resources)
 
 # --- options ---
 
-INCLUDE_DIRECTORIES(${GUI_INCLUDE_DIRS} 
-    ${QT_INCLUDES}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_SOURCE_DIR}/src/SUIT
-    ${CMAKE_SOURCE_DIR}/src/CAM
-    ${CMAKE_SOURCE_DIR}/src/STD
-    ${CMAKE_SOURCE_DIR}/src/Qtx
-    ${CMAKE_SOURCE_DIR}/src/Event
-    ${CMAKE_SOURCE_DIR}/src/PyInterp
-    ${CMAKE_SOURCE_DIR}/src/PyConsole
-    ${CMAKE_SOURCE_DIR}/src/LogWindow
-    )
-
-SET(_PARAVIEW_APP_COMPO_LIB
-  pqApplicationComponents
+INCLUDE_DIRECTORIES(
+  ${PROJECT_SOURCE_DIR}/src/SUIT
+  ${PROJECT_SOURCE_DIR}/src/STD
+  ${PROJECT_SOURCE_DIR}/src/Qtx
+  ${PROJECT_SOURCE_DIR}/src/Event
+  ${PROJECT_SOURCE_DIR}/src/PyInterp
+  ${PROJECT_SOURCE_DIR}/src/PVServerService
+  ${CMAKE_SOURCE_DIR}/src/LogWindow
   )
 
-ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
-ADD_DEFINITIONS(${OMNIORB_DEFINITIONS} ${PYTHON_DEFINITIONS})
+ADD_DEFINITIONS(
+  ${KERNEL_DEFINITIONS}
+  ${PYTHON_DEFINITIONS}
+  )
 
 SET(_link_LIBRARIES 
-  ${KERNEL_LDFLAGS} ${KERNEL_SALOMELocalTrace} ${KERNEL_OpUtil} 
-  ${GUI_LDFLAGS} suit Event PyInterp 
-  ${_PARAVIEW_APP_COMPO_LIB}
+  ${KERNEL_SALOMELocalTrace} 
+  ${KERNEL_OpUtil}
+  PyInterp  
+  suit 
+  Event 
+  PVServerService
+  pqApplicationComponents
   vtkRenderingFreeTypeOpenGL
-)
+  )
 
 # --- headers ---
 
@@ -66,7 +65,7 @@ SET(_moc_HEADERS
 SET(_other_HEADERS
   PVViewer.h
   PVViewer_LogWindowAdapter.h
-  PVViewer_EngineWrapper.h
+  PVViewer_Core.h
 )
 # header files / to install
 SET(PVViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
@@ -94,7 +93,7 @@ SET(_other_SOURCES
   PVViewer_LogWindowAdapter.cxx
   PVViewer_Behaviors.cxx
   PVViewer_GUIElements.cxx
-  PVViewer_EngineWrapper.cxx
+  PVViewer_Core.cxx
   )
   
 # sources / to compile

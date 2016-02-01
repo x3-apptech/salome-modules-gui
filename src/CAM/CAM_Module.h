@@ -143,7 +143,9 @@ protected:
   bool                   unregisterAction( QAction* );
   // IMN 05/03/2015: we copied myActionMap for reset/unset actions accelerator keys
   // after activate/deactivate modules
-  QMap<QPair<int, QAction*>, QKeySequence> myActionShortcutMap; //!< copy actions shortcut map
+  QMap<QAction*, QKeySequence> myActionShortcutMap; //!< copy actions shortcut map
+
+  virtual bool           abortAllOperations();
 
 private:
   CAM_Application*       myApp;             //!< parent application object

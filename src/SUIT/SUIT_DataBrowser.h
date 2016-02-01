@@ -83,6 +83,7 @@ signals:
   void             requestRename();
   void             clicked( SUIT_DataObject* );
   void             doubleClicked( SUIT_DataObject* );
+  void             updated();
 
 private slots:
   void             onModelUpdated();

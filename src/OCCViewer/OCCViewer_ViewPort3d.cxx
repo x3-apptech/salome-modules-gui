@@ -522,7 +522,8 @@ void OCCViewer_ViewPort3d::startRotation( int x, int y,
     default:
       break;
     }
-    activeView()->DepthFitAll();
+    // VSR: 10.06.2015: next line commented out - causes ugly blinking on starting rotation with Perspective projection mode
+    //activeView()->DepthFitAll();
   }
 }
 
@@ -613,6 +614,17 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
     activeView()->MustBeResized();
 }
 
+/*!
+  Moved the viewport
+*/
+/*
+void OCCViewer_ViewPort3d::repaintViewAfterMove( )
+{
+  if ( !activeView().IsNull() ){
+    activeView()->MustBeResized();
+  }
+}
+*/
 /*!
   Fits all objects in view. [ virtual protected ]
 */

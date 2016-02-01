@@ -695,8 +695,10 @@ void LightApp_Study::setVisibilityState( const QString& theEntry, Qtx::Visibilit
   SUIT_DataBrowser* db = app->objectBrowser();
   if ( !db ) return;
   SUIT_AbstractModel* treeModel = dynamic_cast<SUIT_AbstractModel*>( db->model() );
-  if ( treeModel )
+  if ( treeModel ) {
     treeModel->setVisibilityState( theEntry, theState );
+    emit objVisibilityChanged( theEntry, theState );
+  }
 }
 
 /*!

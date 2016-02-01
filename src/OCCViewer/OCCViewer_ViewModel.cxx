@@ -91,6 +91,21 @@ QString OCCViewer_Viewer::backgroundData( QStringList& gradList, QIntList& idLis
 }
 
 /*!
+  Get data for supported stereo pair modes: stereo types and identifiers
+*/
+void OCCViewer_Viewer::stereoData( QStringList& typeList, QIntList& idList)
+{
+  typeList << tr("ST_QUADBUFFER")    << tr("ST_ANAGLYPH")         <<
+              tr("ST_ROWINTERLACED") << tr("ST_COLUMNINTERLACED") <<
+              tr("ST_CHESSBOARD")    << tr("ST_SIDEBYSIDE")       <<
+              tr("ST_OVERUNDER");
+  idList   << QuadBufferType    << AnaglyphType         <<
+              RowInterlacedType << ColumnInterlacedType <<
+              ChessBoardType    << SideBySideType       <<
+              OverUnderType;
+}
+
+/*!
   Constructor
   \param DisplayTrihedron - is trihedron displayed
 */
@@ -152,6 +167,18 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   mySelectionEnabled = true;
   myMultiSelectionEnabled = true;
 
+  // set projection type to orthographic
+  myProjectionType = 0;
+  // set stereo parameters
+  myStereoType = 0;
+  myAnaglyphFilter = 0;
+  myToReverseStereo = 0;
+  myVSyncMode = 1;
+  myQuadBufferSupport = 0;
+  myStereographicFocusType = 1;
+  myInterocularDistanceType = 1;
+  myStereographicFocusValue = 1.0;
+  myInterocularDistanceValue = 0.05;
   //set clipping color and texture to standard
   myClippingColor = QColor( 50, 50, 50 );
   myDefaultTextureUsed = true;
@@ -215,10 +242,18 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     view->initLayout();
     view->initSketchers();
     view->setInteractionStyle( interactionStyle() );
+    view->setProjectionType( projectionType() );
+    view->setStereoType( stereoType() );
+    view->setAnaglyphFilter( anaglyphFilter() );
+    view->setStereographicFocus( stereographicFocusType(), stereographicFocusValue() );
+    view->setInterocularDistance( interocularDistanceType(), interocularDistanceValue() );
+    view->setReverseStereo( isReverseStereo() );
+    view->setVSync( isVSync() );
+    view->setQuadBufferSupport( isQuadBufferSupport() );
     view->setZoomingStyle( zoomingStyle() );
     view->enablePreselection( isPreselectionEnabled() );
     view->enableSelection( isSelectionEnabled() );
-    
+
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
     {
@@ -472,6 +507,253 @@ void OCCViewer_Viewer::setInteractionStyle( const int theStyle )
     OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
     if ( win )
       win->setInteractionStyle( theStyle );
+  }
+}
+
+/*!
+  \return projection type
+*/
+int OCCViewer_Viewer::projectionType() const
+{
+  return myProjectionType;
+}
+
+/*!
+  Sets projection type: 0 - orthographic, 1 - perspective
+  \param theType - new projection type
+*/
+void OCCViewer_Viewer::setProjectionType( const int theType )
+{
+  if ( myProjectionType != theType ) {
+    if ( theType != OCCViewer_ViewWindow::Stereo )
+      myProjectionType = theType;
+
+    if ( !myViewManager )
+      return;
+
+    QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+    for ( int i = 0; i < (int)wins.count(); i++ )
+    {
+      OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+      if ( win )
+        win->setProjectionType( (OCCViewer_ViewWindow::ProjectionType)theType );
+    }
+  }
+}
+
+/*!
+  \return stereo type
+*/
+int OCCViewer_Viewer::stereoType() const
+{
+  return myStereoType;
+}
+
+/*!
+  Sets stereo type
+  \param theType - new stereo type
+*/
+void OCCViewer_Viewer::setStereoType( const int theType )
+{
+  myStereoType = theType;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setStereoType( (OCCViewer_ViewWindow::StereoType)theType );
+  }
+}
+
+/*!
+  \return stereographic focus type
+*/
+int OCCViewer_Viewer::stereographicFocusType() const
+{
+  return myStereographicFocusType;
+}
+
+/*!
+  \return stereographic focus value
+*/
+double OCCViewer_Viewer::stereographicFocusValue() const
+{
+  return myStereographicFocusValue;
+}
+
+/*!
+  Sets stereographic focus parameters
+  \param theType - new stereographic focus type
+  \param theValue - new stereographic focus value
+*/
+void OCCViewer_Viewer::setStereographicFocus( const int theType, const double theValue )
+{
+  myStereographicFocusType = theType;
+  myStereographicFocusValue = theValue;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setStereographicFocus( (OCCViewer_ViewWindow::FocusIODType)theType, theValue );
+  }
+}
+
+/*!
+  \return stereographic focus type
+*/
+int OCCViewer_Viewer::interocularDistanceType() const
+{
+  return myInterocularDistanceType;
+}
+
+/*!
+  \return stereographic focus value
+*/
+double OCCViewer_Viewer::interocularDistanceValue() const
+{
+  return myInterocularDistanceValue;
+}
+
+/*!
+  Sets interocular distance parameters
+  \param theType - new IOD type
+  \param theValue - new IOD value
+*/
+void OCCViewer_Viewer::setInterocularDistance( const int theType, const double theValue )
+{
+  myInterocularDistanceType = theType;
+  myInterocularDistanceValue = theValue;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setInterocularDistance( (OCCViewer_ViewWindow::FocusIODType)theType, theValue );
+  }
+}
+
+/*!
+  \return anaglyph filter
+*/
+int OCCViewer_Viewer::anaglyphFilter() const
+{
+  return myAnaglyphFilter;
+}
+
+/*!
+  Sets anaglyph filter
+  \param theType - new anaglyph filter
+*/
+void OCCViewer_Viewer::setAnaglyphFilter( const int theType )
+{
+  myAnaglyphFilter = theType;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setAnaglyphFilter( (OCCViewer_ViewWindow::AnaglyphFilter)theType );
+  }
+}
+
+/*!
+  \return reverse stereo
+*/
+bool OCCViewer_Viewer::isReverseStereo() const
+{
+  return myToReverseStereo;
+}
+
+/*!
+  Sets reverse stereo
+  \param theReverse - enable/disable reverse mode
+*/
+void OCCViewer_Viewer::setReverseStereo( const bool theReverse )
+{
+  myToReverseStereo = theReverse;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setReverseStereo( theReverse );
+  }
+}
+
+/*!
+  \return V-Sync mode
+*/
+bool OCCViewer_Viewer::isVSync() const
+{
+  return myVSyncMode;
+}
+
+/*!
+  Set V-Sync mode
+  \param theEnable - enable/disable V-Sync mode
+*/
+void OCCViewer_Viewer::setVSync( const bool theEnable )
+{
+  myVSyncMode = theEnable;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setVSync( theEnable );
+  }
+}
+
+/*!
+  \return support quad-buffered stereo
+*/
+bool OCCViewer_Viewer::isQuadBufferSupport() const
+{
+  return myQuadBufferSupport;
+}
+
+/*!
+  Set support quad-buffered stereo
+  \param theEnable - enable/disable support quad-buffered stereo
+*/
+void OCCViewer_Viewer::setQuadBufferSupport( const bool theEnable )
+{
+  myQuadBufferSupport = theEnable;
+
+  if ( !myViewManager )
+    return;
+
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win )
+      win->setQuadBufferSupport( theEnable );
   }
 }
 
@@ -956,8 +1238,13 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
     return;
 
   if ( on ) {
-    myAISContext->Display( myTrihedron );
-    myAISContext->Deactivate(myTrihedron);
+    myAISContext->Display( myTrihedron,
+                           0 /*wireframe*/,
+                           -1 /* selection mode */,
+                           Standard_True /* update viewer*/,
+                           Standard_False /* allow decomposition */,
+                           AIS_DS_Displayed /* display status */);
+    myAISContext->Deactivate( myTrihedron );
   }
   else {
     myAISContext->Erase( myTrihedron );
@@ -1256,4 +1543,23 @@ void OCCViewer_Viewer::setClippingDlg(OCCViewer_ClippingDlg* theDlg) {
   if(myClippingDlg != theDlg) {
     myClippingDlg = theDlg;
   }
+}
+
+
+bool OCCViewer_Viewer::enableDrawMode( bool on )
+{
+  //!! To be done for view windows
+  if ( !myViewManager )
+    return false;
+
+  bool prev = false;
+  QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+  for ( int i = 0; i < (int)wins.count(); i++ )
+  {
+    OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>( wins.at( i ) );
+    if ( win ) {
+      prev = prev || win->enableDrawMode( on ); 
+    }
+  }
+  return prev;
 }
