@@ -218,7 +218,9 @@ void OCCViewer_ViewPort::initialize()
   setBackgroundRole( QPalette::NoRole );//NoBackground );
   // set focus policy to threat QContextMenuEvent from keyboard  
   setFocusPolicy( Qt::StrongFocus );
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0) && OCC_VERSION_LARGE < 0x07000000
   setAttribute( Qt::WA_PaintOnScreen );
+#endif
   setAttribute( Qt::WA_NoSystemBackground );
 }
 
