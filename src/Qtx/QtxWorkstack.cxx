@@ -2651,7 +2651,7 @@ void QtxWorkstack::insertWidget( QWidget* wid, QWidget* pWid, QWidget* after )
   for ( QWidgetList::iterator itr = moveList.begin(); itr != moveList.end(); ++itr )
   {
     (*itr)->setParent( pWid );
-    (*itr)->setShown( map.contains( *itr ) ? map[*itr] : false );
+    (*itr)->setVisible( map.contains( *itr ) ? map[*itr] : false );
   }
 }
 
@@ -3309,7 +3309,7 @@ QtxWorkstackArea* QtxWorkstack::wgArea( QWidget* wid ) const
   \param wid_to widget specified the destination area
   \param before specifies whether the first widget has to be moved before or after
          the second widget
-  \return TRUE if operation is completed successfully, FALSE otherwise
+  \return \c true if operation is completed successfully, \c false otherwise
 */
 bool QtxWorkstack::move( QWidget* wid, QWidget* wid_to, const bool before )
 {
@@ -3345,7 +3345,7 @@ bool QtxWorkstack::move( QWidget* wid, QWidget* wid_to, const bool before )
 
 /*!
   \brief Group all windows in one area
-  \return TRUE if operation is completed successfully, FALSE otherwise
+  \return \c true if operation is completed successfully, \c false otherwise
 */
 void QtxWorkstack::stack()
 {

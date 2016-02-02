@@ -103,13 +103,15 @@ void MessageOutput( QtMsgType type, const char* msg )
   switch ( type )
   {
   case QtDebugMsg:
-    //MESSAGE( "Debug: " << msg );
+#ifdef QT_DEBUG_MESSAGE
+    MESSAGE( "Debug: " << qPrintable( QString(msg) ) );
+#endif
     break;
   case QtWarningMsg:
-    MESSAGE( "Warning: " << msg );
+    MESSAGE( "Warning: " << qPrintable( QString(msg) ) );
     break;
   case QtFatalMsg:
-    MESSAGE( "Fatal: " << msg );
+    MESSAGE( "Fatal: " << qPrintable( QString(msg) ) );
     break;
   }
 }
@@ -377,7 +379,7 @@ int main( int argc, char **argv )
   _qappl.setApplicationVersion( salomeVersion() );
 
   // Add application library path (to search style plugin etc...)
-  QString path = QDir::convertSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
+  QString path = QDir::toNativeSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
   _qappl.addLibraryPath( path );
 
   bool isGUI    = isFound( "GUI",    argc, argv );

@@ -70,18 +70,18 @@ public:
   *\paran byCircle - true if needs round sensitive area around mouse cursor, else rectangle
   *function search object rectangle which intersect with sensitive area and call object highlight method
   */
-  int                   MoveTo( int x, int y, bool byCircle = FALSE );
+  int                   MoveTo( int x, int y, bool byCircle = false );
   /*! A function selecting already highlighting object by calling object method select
   *\param Append - true if new selection will be append to existing selection, false - another
   *\param byCircle - true if needs round selection area in complex object
   */
-  int                   Select( bool Append = FALSE, bool byCircle = FALSE );
+  int                   Select( bool Append = false, bool byCircle = false );
   /*! A function selecting objects on scene by rectangle
   *\param theRect - rectangle of selection
   *\param Append - true if new selection will be append to existing selection, false - another
   *function search object rectangle which intersect with theRect and call object select method
   */
-  int                   SelectByRect( const QRect& theRect, bool Append = FALSE );
+  int                   SelectByRect( const QRect& theRect, bool Append = false );
 
   //! A function installing highlight color for all presentation (does not work)
   void                  SetHighlightColor( Quantity_NameOfColor aCol );

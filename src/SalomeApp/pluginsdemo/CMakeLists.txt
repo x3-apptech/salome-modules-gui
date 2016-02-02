@@ -25,12 +25,24 @@
 # variable *_ROOT_DIR).  
 #
 
+INCLUDE(UsePyQt4)
+
+# --- resources ---
+
+# uic files / to be processed by pyuic 
+SET(_pyuic_files
+  minmax.ui
+)
+
+# scripts / pyuic wrappings
+PYQT4_WRAP_UIC(_pyuic_SCRIPTS ${_pyuic_files})
+
 # --- scripts ---
 
 # scripts / static
 # TODO: process UIC files via PyQt4 pyuic tool, see UsePyQt4.cmake
 SET(_plugins_SCRIPTS
-  minmax_dialog.py
+  ${_pyuic_SCRIPTS}
   minmax_plugin.py
   trihedron.py
   tubedialog_ui.py

@@ -68,7 +68,7 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
 {
   setModal( true );
   setWindowTitle( tr("TLT_SETUP_PLOT2D_VIEW") );
-  setSizeGripEnabled( TRUE );
+  setSizeGripEnabled( true );
 
   QGridLayout* topLayout = new QGridLayout( this );
   topLayout->setSpacing( SPACING_SIZE );
@@ -411,12 +411,12 @@ Plot2d_SetupViewDlg::Plot2d_SetupViewDlg( QWidget* parent,
 
   /* OK/Cancel buttons */
   myOkBtn = new QPushButton( tr( "BUT_OK" ), this );
-  myOkBtn->setAutoDefault( TRUE );
-  myOkBtn->setDefault( TRUE );
+  myOkBtn->setAutoDefault( true );
+  myOkBtn->setDefault( true );
   myCancelBtn = new QPushButton( tr( "BUT_CANCEL" ), this );
-  myCancelBtn->setAutoDefault( TRUE );
+  myCancelBtn->setAutoDefault( true );
   myHelpBtn = new QPushButton( tr( "BUT_HELP" ), this );
-  myHelpBtn->setAutoDefault( TRUE );
+  myHelpBtn->setAutoDefault( true );
   QHBoxLayout* btnLayout = new QHBoxLayout;
   btnLayout->addWidget( myOkBtn );
   btnLayout->addStretch();

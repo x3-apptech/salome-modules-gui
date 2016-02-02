@@ -36,7 +36,7 @@
 /*!
  * \brief Constructor
 *
-* Constructor sets myModule in NULL and myIsAutoResumed in TRUE
+* Constructor sets myModule in NULL and myIsAutoResumed in \c true
 */
 LightApp_Operation::LightApp_Operation()
 : SUIT_Operation( 0 ),
@@ -278,7 +278,7 @@ void LightApp_Operation::setDialogActive( const bool active )
 * Autoresume property is used during automatic resuming operation. If operation is
 * suspended and cursor is moved above dialog of the operation then operation is resumed
 * automatically (if possible). It can be resumed only program call otherwise (see
-* LightApp_SwitchOp for more description). This property is TRUE by default and may be
+* LightApp_SwitchOp for more description). This property is \c true by default and may be
 * changed with setAutoResumed() method call.
 */
 bool LightApp_Operation::isAutoResumed() const

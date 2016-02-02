@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(${QT_USE_FILE})
+
 INSTALL(CODE "MACRO(QT4_COMPILE_TS_ON_INSTALL MYLRELEASE MYTSFILE MYFULLDIR MYOUTQMFILE)
   FILE(MAKE_DIRECTORY \${MYFULLDIR})
   MESSAGE(STATUS \"Compiling \${MYTSFILE}\")

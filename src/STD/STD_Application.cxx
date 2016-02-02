@@ -321,7 +321,7 @@ void STD_Application::onOpenDoc()
   onOpenDoc( aName );
 }
 
-/*! \retval true, if document was opened successful, else false.*/
+/*! \retval \c true, if document was opened successful, else \c false.*/
 bool STD_Application::onOpenDoc( const QString& aName )
 {
   if ( !abortAllOperations() )
@@ -457,7 +457,7 @@ bool STD_Application::closeActiveDoc( bool permanently )
 }
 
 /*!Check the application on closing.
- * \retval true if possible, else false
+ * \retval \c true if possible, else \c false
  */
 bool STD_Application::isPossibleToClose( bool& closePermanently )
 {
@@ -598,7 +598,7 @@ void STD_Application::onSaveDoc()
     onSaveAsDoc();
 }
 
-/*! \retval TRUE, if doument saved successful, else FALSE.*/
+/*! \retval \c true, if document saved successfully, else \c false.*/
 bool STD_Application::onSaveAsDoc()
 {
   SUIT_Study* study = activeStudy();
@@ -669,7 +669,7 @@ void STD_Application::setEditEnabled( bool theEnable )
   }
 }
 
-/*!\retval true, if document opened successful, else false.*/
+/*!\retval \c true, if document opened successfully, else \c false.*/
 bool STD_Application::useFile(const QString& theFileName)
 {
   bool res = SUIT_Application::useFile( theFileName );
@@ -819,7 +819,7 @@ void STD_Application::clearViewManagers()
   }
 }
 
-/*!\retval TRUE, if view manager \a vm, already in view manager list (\a myViewMgrs).*/
+/*!\retval \c true, if view manager \a vm, already in view manager list (\a myViewMgrs).*/
 bool STD_Application::containsViewManager( SUIT_ViewManager* vm ) const
 {
   return myViewMgrs.contains( vm );
@@ -831,7 +831,7 @@ void STD_Application::onViewManagerActivated( SUIT_ViewManager* vm )
   setActiveViewManager( vm );
 }
 
-/*!Sets status bar show, if \on = true, else status bar hide.*/
+/*!Shows status bar, if on is \c true, else hides status bar.*/
 void STD_Application::onViewStatusBar( bool on )
 {
   if ( on )

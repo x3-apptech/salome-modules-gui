@@ -91,55 +91,55 @@ void GLViewer_ViewFrame::createActions()
   aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_DUMP" ) ),
                           tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onDumpView()));
   toolMgr()->registerAction( aAction, DumpId );
 
   // FitAll
   aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITALL" ) ),
                           tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitAll()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewFitAll()));
   toolMgr()->registerAction( aAction, FitAllId );
 
   // FitRect
   aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITAREA" ) ),
                           tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitArea()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewFitArea()));
   toolMgr()->registerAction( aAction, FitRectId );
 
   // FitSelect
   aAction = new QtxAction(tr("MNU_FITSELECT"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_FITSELECT" ) ),
                           tr( "MNU_FITSELECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITSELECT"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewFitSelect()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewFitSelect()));
   toolMgr()->registerAction( aAction, FitSelectId );
 
   // Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_ZOOM" ) ),
                           tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewZoom()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewZoom()));
   toolMgr()->registerAction( aAction, ZoomId );
 
   // Panning
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_PAN" ) ),
                           tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewPan()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewPan()));
   toolMgr()->registerAction( aAction, PanId );
 
   // Global Panning
   aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_GLOBALPAN" ) ),
                           tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewGlobalPan()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewGlobalPan()));
   toolMgr()->registerAction( aAction, GlobalPanId );
 
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "GLViewer", tr( "ICON_GL_RESET" ) ),
                           tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onViewReset()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onViewReset()));
   toolMgr()->registerAction( aAction, ResetId );
 }
 

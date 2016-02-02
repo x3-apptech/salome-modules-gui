@@ -43,7 +43,7 @@ GraphicsView_Object::GraphicsView_Object( QGraphicsItem* theParent )
 //=======================================================================
 GraphicsView_Object::~GraphicsView_Object()
 {
-  QListIterator<QGraphicsItem*> aChildIter( children() );
+  QListIterator<QGraphicsItem*> aChildIter( childItems() );
   while( aChildIter.hasNext() )
   {
     if( QGraphicsItem* aChild = aChildIter.next() )

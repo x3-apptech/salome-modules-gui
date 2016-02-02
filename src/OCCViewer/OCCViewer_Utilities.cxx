@@ -141,7 +141,7 @@ bool OCCViewer_Utilities::isDialogOpened( OCCViewer_ViewWindow* theView, const Q
 {
   bool isFound = false;
   OCCViewer_ViewFrame* aViewFrame = dynamic_cast<OCCViewer_ViewFrame*>( theView->parent()->parent() );
-  QList<QDialog*> allDialogs = qFindChildren<QDialog*>( aViewFrame );
+  QList<QDialog*> allDialogs = aViewFrame->findChildren<QDialog*>();
   foreach ( QDialog* d, allDialogs )
     if ( d->objectName() == theName )
       isFound = true;

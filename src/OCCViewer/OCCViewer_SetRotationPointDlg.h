@@ -46,7 +46,7 @@ class OCCVIEWER_EXPORT OCCViewer_SetRotationPointDlg : public QDialog
 
 public:
   OCCViewer_SetRotationPointDlg(OCCViewer_ViewWindow* , 
-                                const char* name = 0, bool modal = FALSE, Qt::WindowFlags fl = 0);
+                                const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
   ~OCCViewer_SetRotationPointDlg();
 
   void SetAction( QtxAction* theAction ) { myAction = theAction; }

@@ -673,7 +673,7 @@ QString Qtx::findEnvVar( const QString& str, int& start, int& len )
   if ( pos != -1 )
   {
     int i = 1;
-    while ( i <= rx.numCaptures() && varName.isEmpty() )
+    while ( i <= rx.captureCount() && varName.isEmpty() )
     {
       QString capStr = rx.cap( i );
       if ( !capStr.contains( "%" ) && !capStr.contains( "$" ) )
@@ -688,7 +688,7 @@ QString Qtx::findEnvVar( const QString& str, int& start, int& len )
       int end = start + varName.length();
       if ( capIdx > 1 && rx.cap( capIdx - 1 ).contains( QRegExp( "\\$|%" ) ) )
         start = rx.pos( capIdx - 1 ) + rx.cap( capIdx - 1 ).indexOf( QRegExp( "\\$|%" ) );
-      if ( capIdx < rx.numCaptures() && !rx.cap( capIdx - 1 ).isEmpty() )
+      if ( capIdx < rx.captureCount() && !rx.cap( capIdx - 1 ).isEmpty() )
         end++;
       len = end - start;
     }
@@ -863,7 +863,7 @@ QImage Qtx::grayscale( const QImage& img )
 {
   QImage res = img;
 
-  int colNum = res.numColors();
+  int colNum = res.colorCount();
   if ( colNum )
   {
     for ( int i = 0; i < colNum; i++ )

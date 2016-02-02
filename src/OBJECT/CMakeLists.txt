@@ -26,10 +26,10 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(${CAS_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_TKV3d} ViewerData)
+SET(_link_LIBRARIES ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_TKV3d} ViewerData)
 
 # --- headers ---
 

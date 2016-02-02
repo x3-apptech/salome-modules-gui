@@ -902,7 +902,7 @@ void QDS_Datum::setShown( const bool visible, const int flags )
   while ( flag )
   {
     if ( flags & flag && widget( flag ) )
-      widget( flag )->setShown( visible );
+      widget( flag )->setVisible( visible );
     flag = flag >> 1;
   }
 }

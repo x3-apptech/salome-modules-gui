@@ -229,7 +229,7 @@ QToolBar* QtxActionToolMgr::find( const QString& title, QMainWindow* mw ) const
   QString pattern = title.toLower();
 
   QToolBar* res = 0;
-  QList<QToolBar*> toolbars = qFindChildren<QToolBar*>( mw );
+  QList<QToolBar*> toolbars = mw->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator it = toolbars.begin(); it != toolbars.end() && !res; ++it )
   {
     if ( (*it)->windowTitle().toLower() == pattern )

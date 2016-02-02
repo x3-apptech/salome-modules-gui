@@ -85,8 +85,8 @@ SUIT_Desktop* SUIT_Application::desktop()
 }
 
 /*!
-   \return FALSE if application can not be closed (because of non saved data for example).
-   This method called by SUIT_Session whin closing of application was requested.
+   \return \c false if application can not be closed (because of non saved data for example).
+   This method called by SUIT_Session when closing of application was requested.
 */
 bool SUIT_Application::isPossibleToClose( bool& )
 {
@@ -506,7 +506,7 @@ int SUIT_Application::createMenu( const int id, const QString& menu, const int g
 /*!
   Show/hide menu item corresponding to action
   \param a - action
-  \param on - if it is true, the item will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the item will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setMenuShown( QAction* a, const bool on )
 {
@@ -521,7 +521,7 @@ void SUIT_Application::setMenuShown( QAction* a, const bool on )
 /*!
   Show/hide menu item corresponding to action
   \param id - identificator of action in menu manager
-  \param on - if it is true, the item will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the item will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setMenuShown( const int id, const bool on )
 {
@@ -531,7 +531,7 @@ void SUIT_Application::setMenuShown( const int id, const bool on )
 /*!
   Show/hide tool button corresponding to action
   \param a - action
-  \param on - if it is true, the button will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the button will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setToolShown( QAction* a, const bool on )
 {
@@ -546,7 +546,7 @@ void SUIT_Application::setToolShown( QAction* a, const bool on )
 /*!
   Show/hide menu item corresponding to action
   \param id - identificator of action in tool manager
-  \param on - if it is true, the button will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the button will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setToolShown( const int id, const bool on )
 {
@@ -556,7 +556,7 @@ void SUIT_Application::setToolShown( const int id, const bool on )
 /*!
   Show/hide both menu item and tool button corresponding to action
   \param a - action
-  \param on - if it is true, the item will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the item will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setActionShown( QAction* a, const bool on )
 {
@@ -567,7 +567,7 @@ void SUIT_Application::setActionShown( QAction* a, const bool on )
 /*!
   Show/hide both menu item and tool button corresponding to action
   \param id - identificator in both menu manager and tool manager
-  \param on - if it is true, the item will be shown, otherwise it will be hidden
+  \param on - if it is \c true, the item will be shown, otherwise it will be hidden
 */
 void SUIT_Application::setActionShown( const int id, const bool on )
 {
@@ -622,7 +622,7 @@ QList<int> SUIT_Application::actionIds() const
   \param tip - tool tip
   \param key - shortcut
   \param parent - parent object
-  \param toggle - if it is TRUE the action will be a toggle action, otherwise it will be a command action
+  \param toggle - if it is \c true the action will be a toggle action, otherwise it will be a command action
   \param reciever - object that contains slot
   \param member - slot to be called when action is activated
 */

@@ -4013,7 +4013,7 @@ void LightApp_Application::loadDockWindowsState()
   }
 
   if(dwMap) {
-    QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
+    QList<QDockWidget*> dwList = desktop()->findChildren<QDockWidget*>();
     for ( QList<QDockWidget*>::iterator dit = dwList.begin(); dit != dwList.end(); ++dit )
       {
 	QDockWidget* dw = *dit;
@@ -4066,14 +4066,14 @@ void LightApp_Application::saveDockWindowsState()
   QMap<QString, bool> tbMap, dwMap;
   dockWindowsState( visArr, tbMap, dwMap );
 
-  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
+  QList<QToolBar*> tbList = desktop()->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator it = tbList.begin(); it != tbList.end(); ++it )
   {
     QToolBar* tb = *it;
     tbMap.insert( tb->objectName(), tb->toggleViewAction()->isChecked() );
   }
 
-  QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
+  QList<QDockWidget*> dwList = desktop()->findChildren<QDockWidget*>();
   for ( QList<QDockWidget*>::iterator it = dwList.begin(); it != dwList.end(); ++it )
   {
     QDockWidget* wid = *it;
@@ -4860,7 +4860,7 @@ void LightApp_Application::onDesktopMessage( const QString& message )
 QList<QToolBar*> LightApp_Application::findToolBars( const QStringList& names )
 {
   QList<QToolBar*> aResult;
-  QList<QToolBar*> tbList = qFindChildren<QToolBar*>( desktop() );
+  QList<QToolBar*> tbList = desktop()->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit ) {
     QToolBar* tb = *tit;    
     QObject* po = Qtx::findParent( tb, "QMainWindow" );

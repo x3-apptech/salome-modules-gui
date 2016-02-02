@@ -30,7 +30,7 @@ def minmax(context):
   from PyQt4.QtCore import Qt
   from PyQt4.QtCore import SIGNAL
 
-  from minmax_dialog import Ui_Dialog
+  from minmax_ui import Ui_Dialog
 
   import salome
   import SMESH

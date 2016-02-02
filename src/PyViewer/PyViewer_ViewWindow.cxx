@@ -33,8 +33,13 @@
 #include <QtxActionToolMgr.h>
 #include <QtxMultiAction.h>
 
-#include <QtGui>
 #include <QLocale>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QApplication>
+#include <QProcess>
+#include <QStatusBar>
+#include <QTextStream>
 
 /*!
   \class PyViewer_ViewWindow

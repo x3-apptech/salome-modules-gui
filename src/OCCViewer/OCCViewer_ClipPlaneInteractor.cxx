@@ -110,7 +110,7 @@ void OCCViewer_ClipPlaneInteractor::setEnabled( const bool theIsEnabled )
 
 /*!
   \brief Checks whether the interactive operation is in progress.
-  \return TRUE if the interaction is performed on IO object meaning
+  \return \c true if the interaction is performed on IO object meaning
           that no other operations in viewer should be processed.
 */
 bool OCCViewer_ClipPlaneInteractor::isPerforming() const
@@ -120,7 +120,7 @@ bool OCCViewer_ClipPlaneInteractor::isPerforming() const
 
 /*!
   \brief Checks whether the interactive plane can be clicked.
-  \return TRUE if the click interaction is supported for the plane.
+  \return \c true if the click interaction is supported for the plane.
 */
 bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePlane )
 {
@@ -151,7 +151,7 @@ bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePla
 
 /*!
   \brief Checks whether the interactive plane can be dragged.
-  \return TRUE if the dragging interaction is supported for the plane.
+  \return \c true if the dragging interaction is supported for the plane.
 */
 bool OCCViewer_ClipPlaneInteractor::isDraggable( const Handle(AIS_Plane)& thePlane )
 {

@@ -22,5 +22,6 @@
 
 %Module SalomePyQtGUILight
 
+%Import QtCore/QtCoremod.sip
 %Import QtGui/QtGuimod.sip
 %Import QtXml/QtXmlmod.sip

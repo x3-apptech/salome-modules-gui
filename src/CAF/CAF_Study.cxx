@@ -168,8 +168,8 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
   bool save = false;
   if ( !stdDoc().IsNull() && stdDoc()->IsSaved() )
   {
-    QString path = QDir::convertSeparators( CAF_Tools::toQString( stdDoc()->GetPath() ) );
-    save = path == QDir::convertSeparators( fname );
+    QString path = QDir::toNativeSeparators( CAF_Tools::toQString( stdDoc()->GetPath() ) );
+    save = path == QDir::toNativeSeparators( fname );
   }
 
   bool status = false;

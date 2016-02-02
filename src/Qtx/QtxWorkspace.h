@@ -25,13 +25,13 @@
 
 #include "Qtx.h"
 
-#include <QWorkspace>
+#include <QMdiArea>
 
 #ifdef WIN32
 #pragma warning( disable:4251 )
 #endif
 
-class QTX_EXPORT QtxWorkspace : public QWorkspace
+class QTX_EXPORT QtxWorkspace : public QMdiArea
 {
   Q_OBJECT
 
@@ -39,9 +39,15 @@ public:
   QtxWorkspace( QWidget* = 0 );
   virtual ~QtxWorkspace();
 
+signals:
+  void        windowActivated( QWidget* );
+
 public slots:
   void        tileVertical();
   void        tileHorizontal();
+
+private slots:
+  void        onSubWindowActivated( QMdiSubWindow* );
 };
 
 #ifdef WIN32

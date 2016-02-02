@@ -212,7 +212,7 @@ bool GLViewer_MarkerSet::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVie
     }
     aBuffer+="closepath\nstroke\n";
 
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
 
     return true;
 }
@@ -250,7 +250,7 @@ bool GLViewer_MarkerSet::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aV
         }
         aBuffer+="PU;\n";
 
-        hFile.write( aBuffer.toAscii() );
+        hFile.write( aBuffer.toLatin1() );
     }
 
     return true;
@@ -370,12 +370,12 @@ GLboolean GLViewer_MarkerSet::highlight( GLfloat x, GLfloat y, GLfloat tol, GLbo
     if ( ( isCircle && ( xdist * xdist + ydist * ydist <= myMarkerSize * myMarkerSize ) ) ||
          ( !isCircle && ( fabs( xdist ) <= radius && fabs( ydist ) <= radius ) ) )
     {
-      isFound = FALSE;
+      isFound = false;
       count++;
       for ( it = myCurSelNumbers.begin(); it != myCurSelNumbers.end(); ++it )
         if( i == *it )
         {
-          isFound = TRUE;
+          isFound = true;
           curHNumbers.append( i );
         }
       
@@ -462,13 +462,13 @@ GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewe
       count++;
       if ( isShift )
       {
-        bool isFound = FALSE;
+        bool isFound = false;
           for( it = mySelNumbers.begin(); it != mySelNumbers.end(); ++it )
             if ( *it == i )
             {
               myUSelNumbers.append( *it );
             remIt = it;
-              isFound = TRUE;
+              isFound = true;
               break;
             }
 
@@ -651,7 +651,7 @@ void GLViewer_MarkerSet::exportNumbers( QList<int>& highlight,
 bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
 {
   if( index < 0 || index > myNumber )
-    return FALSE;
+    return false;
 
   int n = mySelNumbers.indexOf( index );
   if( n == -1 )
@@ -661,7 +661,7 @@ bool GLViewer_MarkerSet::addOrRemoveSelected( int index )
     mySelNumbers.removeAt(n);
     myUSelNumbers.append( index );
   }
-  return TRUE;
+  return true;
 }
 
 /*!
@@ -869,7 +869,7 @@ bool GLViewer_Polyline::translateToPS( QFile& hFile, GLViewer_CoordSystem* aView
 
     aBuffer+="closepath\nstroke\n";
     
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
 
     return true;
 }
@@ -895,7 +895,7 @@ bool GLViewer_Polyline::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* aVi
 
     aBuffer+="PU;\n";
     
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
 
     return true;
 }
@@ -1394,7 +1394,7 @@ bool GLViewer_TextObject::translateToPS( QFile& hFile, GLViewer_CoordSystem* aVi
     AddCoordsToPS( aBuffer, "moveto", aViewerCS, aPSCS, double(xPos), double(yPos) );
     aBuffer += "(" + aText + ") show\n";
 
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
 
     return true;
 }
@@ -1416,7 +1416,7 @@ bool GLViewer_TextObject::translateToHPGL( QFile& hFile, GLViewer_CoordSystem* a
     
     aBuffer = "LB" + aText + "#;";
     
-    hFile.write( aBuffer.toAscii() );
+    hFile.write( aBuffer.toLatin1() );
 
     return true;
 }
@@ -1438,16 +1438,16 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
            y = double( yPos );
 
     aViewerCS->transform( *aEMFCS, x, y );
-    const char* str = aText.toAscii();
+    const char* str = aText.toLatin1();
 
     int nHeight = 35*14;       // height of font
     int nWidth = 35*12;        // average character width
     int nEscapement = 0;       // angle of escapement
     int nOrientation = 0;      // base-line orientation angle
     int fnWeight = FW_NORMAL;  // font weight
-    DWORD fdwItalic = FALSE;    // italic attribute option
-    DWORD fdwUnderline = FALSE; // underline attribute option
-    DWORD fdwStrikeOut = FALSE; // strikeout attribute option
+    DWORD fdwItalic = false;    // italic attribute option
+    DWORD fdwUnderline = false; // underline attribute option
+    DWORD fdwStrikeOut = false; // strikeout attribute option
     DWORD fdwCharSet = ANSI_CHARSET; // character set identifier
     DWORD fdwOutputPrecision = OUT_DEFAULT_PRECIS;  // output precision
     DWORD fdwClipPrecision = CLIP_DEFAULT_PRECIS;    // clipping precision
@@ -1573,9 +1573,9 @@ GLboolean GLViewer_TextObject::highlight( GLfloat theX, GLfloat theY, GLfloat th
     QRegion circle( (int)(theX - theTol), (int)(theY - theTol),
                       (int)(2 * theTol), (int)(2 * theTol), QRegion::Ellipse );
     if( isCircle )
-        intersection = obj.intersect( circle );
+        intersection = obj.intersected( circle );
     else
-        intersection = obj.intersect( region );
+        intersection = obj.intersected( region );
     
     if( intersection.isEmpty() )
         myIsHigh = false;
@@ -1631,9 +1631,9 @@ GLboolean GLViewer_TextObject::select( GLfloat theX, GLfloat theY, GLfloat theTo
     QRegion circle( (int)(theX - theTol), (int)(theY - theTol),
                       (int)(2 * theTol), (int)(2 * theTol), QRegion::Ellipse );
     if( isCircle )
-        intersection = obj.intersect( circle );
+        intersection = obj.intersected( circle );
     else
-        intersection = obj.intersect( region );
+        intersection = obj.intersected( region );
     
     if( intersection.isEmpty() )
         myIsSel = false;
