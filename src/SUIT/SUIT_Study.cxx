@@ -96,7 +96,7 @@ SUIT_Operation* SUIT_Study::activeOperation() const
 }
 
 /*!
- *\retval TRUE - if study saved, else FALSE.
+ *\retval \c true - if study saved, else \c false.
  */
 bool SUIT_Study::isSaved() const
 {
@@ -104,7 +104,7 @@ bool SUIT_Study::isSaved() const
 }
 
 /*!
- *\retval TRUE - if study modified, else FALSE.
+ *\retval \c true - if study modified, else \c false.
  */
 bool SUIT_Study::isModified() const
 {
@@ -128,7 +128,7 @@ bool SUIT_Study::createDocument( const QString& )
 }
 
 /*!
- * Open document. Sets file name. return true.
+ * Open document. Sets file name. return \c true.
  */
 bool SUIT_Study::openDocument( const QString& fileName )
 {
@@ -152,7 +152,7 @@ bool SUIT_Study::saveDocumentAs( const QString& fileName )
 }
 
 /*!
- *\retval TRUE - if document saved successful, else FALSE.
+ *\retval \c true - if document saved successful, else \c false.
  */
 bool SUIT_Study::saveDocument()
 {
@@ -266,13 +266,13 @@ SUIT_Operation* SUIT_Study::blockingOperation( SUIT_Operation* theOp ) const
 /*!
  * \brief Starts operation
   * \param theOp - operation to be started
-  * \param toCheck - if parameters is equal TRUE then checking performed whether
+  * \param toCheck - if parameters is equal \c true then checking performed whether
   * all already started operations allow to start this operation above them (default
-  * value is TRUE
-  * \return TRUE if operation is started, FALSE otherwise
+  * value is \c true
+  * \return \c true if operation is started, \c false otherwise
 *
 * Verifies whether theOp operation can be started above already started ones (if toCheck
-* parameter is equal TRUE) and starts it
+* parameter is equal \c true) and starts it
 */
 bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 {
@@ -320,7 +320,7 @@ bool SUIT_Study::start( SUIT_Operation* theOp, const bool toCheck )
 /*!
  * \brief Aborts operation
   * \param theOp - operation to be aborted
-  * \return TRUE if operation is aborted successfully
+  * \return \c true if operation is aborted successfully
 *
 * Verifies whether operation already started and aborts it in this case (sets execution
 * status to Rejected and stops operation)
@@ -344,7 +344,7 @@ bool SUIT_Study::abort( SUIT_Operation* theOp )
 /*!
  * \brief Commits operation
   * \param theOp - operation to be committed
-  * \return TRUE if operation is committed successfully
+  * \return \c true if operation is committed successfully
 *
 * Verifies whether operation already started and commits it in this case (sets execution
 * status to Accepted and stops operation)
@@ -370,7 +370,7 @@ bool SUIT_Study::commit( SUIT_Operation* theOp )
 /*!
  * \brief Commits operation
   * \param theOp - operation to be committed
-  * \return TRUE if operation is suspended successfully
+  * \return \c true if operation is suspended successfully
 *
 * Verifies whether operation already started and suspends it in this case. Operations
 * ususlly are suspended to start other one above them.
@@ -390,7 +390,7 @@ bool SUIT_Study::suspend( SUIT_Operation* theOp )
 /*!
  * \brief Resumes operation
   * \param theOp - operation to be resumed
-  * \return TRUE if operation is aborted successfully
+  * \return \c true if operation is aborted successfully
 *
 * Verifies whether operation already started but suspended and resumesit in this case.
 */
@@ -523,7 +523,7 @@ bool SUIT_Study::commitTransaction( const QString& )
 }
 
 /*!
- * \brief Returns TRUE if transaction is opened.
+ * \brief Returns \c true if transaction is opened.
 */
 bool SUIT_Study::hasTransaction() const
 {

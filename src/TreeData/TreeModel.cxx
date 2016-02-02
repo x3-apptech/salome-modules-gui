@@ -20,8 +20,6 @@
 // Author: Guillaume Boulant (EDF/R&D)
 
 
-#include <QtGui>
-
 #include "TreeItem.hxx"
 #include "TreeModel.hxx"
 

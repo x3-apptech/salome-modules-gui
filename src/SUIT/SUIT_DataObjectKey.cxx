@@ -93,7 +93,7 @@ SUIT_DataObjectKeyHandle::~SUIT_DataObjectKeyHandle()
 
 /*!
  * Checks: Is key null?
- *\retval TRUE - if null, esle false.
+ *\retval \c true - if null, esle \c false.
 */
 bool SUIT_DataObjectKeyHandle::isNull() const
 {
@@ -110,7 +110,7 @@ void SUIT_DataObjectKeyHandle::nullify()
 
 /*!
  *  Operator less.
- *\retval boolean. TRUE - If current key less than \a kw.
+ *\retval boolean. \c true - If current key less than \a kw.
  */
 bool SUIT_DataObjectKeyHandle::operator<( const SUIT_DataObjectKeyHandle& kw ) const
 {
@@ -134,7 +134,7 @@ bool SUIT_DataObjectKeyHandle::operator<( const SUIT_DataObjectKeyHandle& kw ) c
 
 /*!
  * Operator is equal.
- *\retval boolean. TRUE - If current key equal \a kw.
+ *\retval boolean. \c true - If current key equal \a kw.
  */
 bool SUIT_DataObjectKeyHandle::operator==( const SUIT_DataObjectKeyHandle& kw ) const
 {

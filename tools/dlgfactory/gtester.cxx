@@ -23,15 +23,14 @@
 // (gboulant - 12/10/2010)
 //
 #include <QApplication>
-#include <QtGui>
 #include "GDialogTest.h"
 
 void TEST_show() {
-  GDialogTest * dialog = new GDialogTest();
+  GDialogTest* dialog = new GDialogTest();
   dialog->show();
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   QApplication app(argc, argv);
   TEST_show();

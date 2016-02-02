@@ -886,7 +886,7 @@ void QtxSearchTool::init( Qt::Orientation orientation )
   myModWidget_layout->setMargin( 0 );
 
   myClose = new QToolButton( myBtnWidget );
-  myClose->setIcon( QIcon( QPixmap( close_xpm ) ) );
+  myClose->setIcon( QPixmap( close_xpm ) );
   myClose->setAutoRaise( true );
   myBtnWidget_layout->addWidget( wrapWidget( myBtnWidget, myClose ) );
   connect( myClose, SIGNAL( clicked() ), this, SLOT( hide() ) );
@@ -899,28 +899,28 @@ void QtxSearchTool::init( Qt::Orientation orientation )
   myData->installEventFilter( this );
 
   myToFirst = new QToolButton( myBtnWidget );
-  myToFirst->setIcon( QIcon( QPixmap( first_xpm ) ) );
+  myToFirst->setIcon( QPixmap( first_xpm ) );
   myToFirst->setAutoRaise( true );
   myBtnWidget_layout->addWidget( wrapWidget( myBtnWidget, myToFirst ), 0 );
   connect( myToFirst, SIGNAL( clicked() ), this, SLOT( findFirst() ) );
   myToFirst->installEventFilter( this );
 
   myPrev = new QToolButton( myBtnWidget );
-  myPrev->setIcon( QIcon( QPixmap( prev_xpm ) ) );
+  myPrev->setIcon( QPixmap( prev_xpm ) );
   myPrev->setAutoRaise( true );
   myBtnWidget_layout->addWidget( wrapWidget( myBtnWidget, myPrev ), 0 );
   connect( myPrev, SIGNAL( clicked() ), this, SLOT( findPrevious() ) );
   myPrev->installEventFilter( this );
 
   myNext = new QToolButton( myBtnWidget );
-  myNext->setIcon( QIcon( QPixmap( next_xpm ) ) );
+  myNext->setIcon( QPixmap( next_xpm ) );
   myNext->setAutoRaise( true );
   myBtnWidget_layout->addWidget( wrapWidget( myBtnWidget, myNext ), 0 );
   connect( myNext, SIGNAL( clicked() ), this, SLOT( findNext() ) );
   myNext->installEventFilter( this );
 
   myToLast = new QToolButton( myBtnWidget );
-  myToLast->setIcon( QIcon( QPixmap( last_xpm ) ) );
+  myToLast->setIcon( QPixmap( last_xpm ) );
   myToLast->setAutoRaise( true );
   myBtnWidget_layout->addWidget( wrapWidget( myBtnWidget, myToLast ), 0 );
   connect( myToLast, SIGNAL( clicked() ), this, SLOT( findLast() ) );

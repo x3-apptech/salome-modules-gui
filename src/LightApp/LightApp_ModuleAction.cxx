@@ -146,7 +146,7 @@ QList<QtxComboBox*> LightApp_ModuleAction::ComboAction::widgets() const
 
   QList<QWidget*> wlist = createdWidgets();
   for ( QList<QWidget*>::const_iterator wit = wlist.begin(); wit != wlist.end(); ++wit )
-    lst += (*wit)->findChildren<QtxComboBox *>();
+    lst += (*wit)->findChildren<QtxComboBox*>();
 
   return lst;
 }

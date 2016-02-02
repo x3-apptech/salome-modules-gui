@@ -4022,7 +4022,7 @@ void LightApp_Application::loadDockWindowsState()
   }
 
   if(dwMap) {
-    QList<QDockWidget*> dwList = qFindChildren<QDockWidget*>( desktop() );
+    QList<QDockWidget*> dwList = desktop()->findChildren<QDockWidget*>();
     for ( QList<QDockWidget*>::iterator dit = dwList.begin(); dit != dwList.end(); ++dit )
       {
 	QDockWidget* dw = *dit;

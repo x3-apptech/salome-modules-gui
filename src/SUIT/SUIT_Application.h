@@ -68,7 +68,7 @@ public:
   //! Returns main widget (Desktop) of the application (if it exists)
   virtual SUIT_Desktop* desktop();
 
-  /*! Returns FALSE if application can not be closed (because of non saved data for example). 
+  /*! Returns \c false if application can not be closed (because of non saved data for example). 
       This method called by SUIT_Session whin closing of application was requested. */
   virtual bool          isPossibleToClose( bool& );
 

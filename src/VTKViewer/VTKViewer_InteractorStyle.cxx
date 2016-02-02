@@ -674,7 +674,7 @@ void VTKViewer_InteractorStyle::startGlobalPan()
 }
 
 
-/*!\retval TRUE if needs redrawing*/
+/*!\retval \c true if needs redrawing*/
 bool VTKViewer_InteractorStyle::needsRedrawing()
 {
   return State == VTK_INTERACTOR_STYLE_CAMERA_ZOOM   ||
@@ -1482,7 +1482,7 @@ void  VTKViewer_InteractorStyle::RemoveFilter( const int theId )
 /*!Checks: is valid cell(node) with id \a theId in actor \a theActor.
  *\param theActor - VTKViewer_Actor pointer.
  *\param theId    - cell id.
- *\param theIsNode - boolean flag, if true - node, else - cell.
+ *\param theIsNode - boolean flag, if \c true - node, else - cell.
  */
 bool VTKViewer_InteractorStyle::IsValid( VTKViewer_Actor* theActor,
                                                const int     theId,

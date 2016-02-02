@@ -215,7 +215,7 @@ void QtxMainWindow::Resizer::setFilters( bool on )
       myMain->layout()->removeEventFilter( this );
   }
 
-  QTimer* t = myMain->layout()->findChild<QTimer*>( );
+  QTimer* t = myMain->layout()->findChild<QTimer*>();
   if ( t ) {
     if ( on )
       t->installEventFilter( this );
