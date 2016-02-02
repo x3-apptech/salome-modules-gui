@@ -500,7 +500,7 @@ public:
   virtual void Execute()
   {
     LightApp_Application* anApp = getApplication();
-    if ( anApp ) {
+    if ( anApp && anApp->objectBrowser() ) {
       myResult = anApp->objectBrowser()->treeView();
     }
   }
