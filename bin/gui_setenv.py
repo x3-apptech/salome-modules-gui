@@ -29,6 +29,7 @@ def set_env( args ):
     dirs = re.split( ":|;", os.getenv( 'VTK_AUTOLOAD_PATH', vtk_overloads_dir ) )
     if vtk_overloads_dir not in dirs: dirs[0:0] = [vtk_overloads_dir]
     os.environ['VTK_AUTOLOAD_PATH'] = os.pathsep.join(dirs)
+    os.environ['QT_PLUGIN_PATH'] = ''
     return
 
 
