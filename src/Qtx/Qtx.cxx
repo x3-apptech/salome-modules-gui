@@ -2164,3 +2164,61 @@ Qt::HANDLE Qtx::getVisual()
 }
 
 #endif // WIN32
+
+/*!
+  \class Qtx::CmdLineArgs
+  \brief Get access to the command line arguments in the C-like manner.
+
+  This class translates command line arguments stored in QApplication in form of QStrlingList
+  to the char* array, in the same way as they specified to main() function.
+
+  Constructor of class allocates required memory to store arguments; destructor deallocates it,
+  This allows using this class as a local variable:
+
+  \code
+  Qtx::CmdLineArgs args;
+  some_function(args.argc(), args.argv()); // function that has main()-like syntax.
+  \endcode
+*/
+
+/*!
+  \brief Default constructor.
+*/
+Qtx::CmdLineArgs::CmdLineArgs()
+{
+  QStringList args = QCoreApplication::arguments();
+  myArgc = args.size();
+  myArgv = new char*[myArgc];
+  for ( int i = 0; i < myArgc; i++ ) {
+    QByteArray ba = args[i].toUtf8();
+    myArgv[i] = qstrdup(ba.constData());
+  }
+}
+
+/*!
+  \brief Destructor. Deallocates the array with command line arguments
+*/
+Qtx::CmdLineArgs::~CmdLineArgs()
+{
+  for ( int i = 0; i < myArgc; i++ )
+    delete myArgv[i];
+  delete[] myArgv;
+}
+
+/*!
+  \brief Get number of command line arguments
+  \return number of arguments
+*/
+int Qtx::CmdLineArgs::argc() const
+{
+  return myArgc;
+}
+
+/*!
+  \brief Get command line arguments
+  \return command line arguments
+*/
+char** Qtx::CmdLineArgs::argv() const
+{
+  return myArgv;
+}

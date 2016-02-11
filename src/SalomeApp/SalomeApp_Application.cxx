@@ -1318,19 +1318,9 @@ CORBA::ORB_var SalomeApp_Application::orb()
   static CORBA::ORB_var _orb;
 
   if ( CORBA::is_nil( _orb ) ) {
-    QStringList args = QApplication::arguments();
-    int argc = args.size();
-    std::vector<std::string> args1(argc);
-    char** argv = new char*[argc];
-    for ( int i = 0; i < argc; ++i ) {
-      args1[i] = args[i].toStdString();
-      argv[i]  = const_cast<char*>( args1[i].c_str() );
-    }
-
+    Qtx::CmdLineArgs args;
     ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-    _orb = init( argc, argv );
-
-    delete [] argv;
+    _orb = init( args.argc(), args.argv() );
   }
 
   return _orb;
