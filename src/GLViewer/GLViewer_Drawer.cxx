@@ -398,7 +398,9 @@ static GLuint displayListBase( QFont* theFont )
     listBase += 256;
 
     HDC glHdc = ::wglGetCurrentDC();
+ #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     ::SelectObject( glHdc, theFont->handle() );
+ #endif
     if ( !::wglUseFontBitmaps( glHdc, 0, 256, listBase ) )
       listBase = 0;
     aList = listBase;

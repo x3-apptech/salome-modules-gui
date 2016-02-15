@@ -1438,7 +1438,7 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
            y = double( yPos );
 
     aViewerCS->transform( *aEMFCS, x, y );
-    const char* str = aText.toAscii();
+    const char* str = aText.toLatin1().data();
 
     int nHeight = 35*14;       // height of font
     int nWidth = 35*12;        // average character width
