@@ -2714,7 +2714,8 @@ public:
         QWidget* wnd = viewMgr->getActiveView();
         myResult = viewMgr->getActiveView()->getId();
         if ( wnd ) {
-          wnd->setVisible(myVisible);
+          if ( !myVisible )
+            wnd->setVisible(false);
           if ( !myVisible && myWidth == 0 && myHeight == 0 ) {
             myWidth = 1024;
             myHeight = 768;
