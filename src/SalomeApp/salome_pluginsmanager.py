@@ -149,8 +149,8 @@ logger=Logger("PluginsManager") #,color=GREEN)
 class PluginsManager:
     def __init__(self,module,name,basemenuname,menuname):
         self.name=name
-        self.basemenuname=unicode(basemenuname)
-        self.menuname=unicode(menuname)
+        self.basemenuname=unicode(basemenuname, "utf-8")
+        self.menuname=unicode(menuname, "utf-8")
         self.module=module
         self.registry={}
         self.handlers={}
