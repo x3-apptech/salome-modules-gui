@@ -20,7 +20,7 @@
 // Created on: 4 avr. 2013
 
 
-#include "PyConsole.h"
+#include "PyConsoleBase.h"
 
 #include "PyConsole_EnhInterp.h"
 

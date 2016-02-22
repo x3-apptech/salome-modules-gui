@@ -19,31 +19,51 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
+//  Author : Vadim SANDLER (Open CASCADE S.A.S), Adrien Bruneton (CEA/DEN)
 
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
+#ifndef PYCONSOLE_EVENT_H
+#define PYCONSOLE_EVENT_H
 
-#include "PyConsole.h"
-#include "PyInterp_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include "PyConsoleBase.h"
 
-#include <QStringList>
+#include <QEvent>
+#include <QString>
 
-class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
+/*!
+  \class PrintEvent
+  \brief Python command output backend event.
+  \internal
+*/
+class PrintEvent : public QEvent
 {
 public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
+  static const int EVENT_ID = 65432;
 
-  virtual int afterRun();
-  virtual int beforeRun();
+  /*!
+    \brief Constructor
+    \param c message text (python trace)
+    \param isError default to false - if true indicates that an error is being printed.
+  */
+  PrintEvent( const QString& c, bool isError = false) :
+    QEvent( (QEvent::Type)EVENT_ID ), myText( c ), errorFlag(isError)
+  {}
 
-  virtual QStringList getLastMatches() const;
-  virtual QString getDocStr() const;
+  /*!
+    \brief Get message
+    \return message text (python trace)
+  */
+  QString text() const { return myText; }
 
-  virtual int runDirCommand(const QString&, const QString&);
-  virtual void clearCompletion();
+  /**
+   * @return true if this is an error message
+   */
+  bool isError() const { return errorFlag; }
+
+protected:
+  QString myText; //!< Event message (python trace)
+
+  /** Set to true if an error msg is to be displayed */
+  bool errorFlag;
 };
 
-#endif // PYCONSOLE_INTERP_H
+#endif // PYCONSOLE_EVENT_H

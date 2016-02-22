@@ -2095,6 +2095,17 @@ QString Qtx::qtDir( const QString& context )
   return qtPath;
 }
 
+/*!
+  Creates font from string description
+*/
+QFont Qtx::stringToFont( const QString& fontDescription )
+{
+  QFont font;
+  if ( fontDescription.trimmed().isEmpty() || !font.fromString( fontDescription ) )
+    font = QFont( "Courier", 11 );
+  return font;
+}
+
 #ifndef WIN32
 
 #include <X11/Xlib.h>

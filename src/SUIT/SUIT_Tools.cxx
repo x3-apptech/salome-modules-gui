@@ -63,17 +63,6 @@ QRect SUIT_Tools::makeRect( const int x1, const int y1, const int x2, const int 
 }
 
 /*!
-  Creates font from string description
-*/
-QFont SUIT_Tools::stringToFont( const QString& fontDescription )
-{
-  QFont font;
-  if ( fontDescription.trimmed().isEmpty() || !font.fromString( fontDescription ) )
-    font = QFont( "Courier", 11 );
-  return font;
-}
-
-/*!
   Creates font's string description
 */
 QString SUIT_Tools::fontToString( const QFont& font )

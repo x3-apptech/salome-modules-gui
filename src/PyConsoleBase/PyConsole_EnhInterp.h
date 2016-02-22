@@ -23,7 +23,7 @@
 #ifndef PYCONSOLE_ENHINTERP_H_
 #define PYCONSOLE_ENHINTERP_H_
 
-#include "PyConsole.h"
+#include "PyConsoleBase.h"
 
 #include <Python.h>
 #include "PyConsole_Interp.h"
@@ -35,7 +35,7 @@
  * Enhanced Python interpreter used for auto-completion.
  * This extends PyConsole_Interp with an API wrapping the Python dir() command nicely.
  */
-class PYCONSOLE_EXPORT PyConsole_EnhInterp: public PyConsole_Interp
+class PYCONSOLEBASE_EXPORT PyConsole_EnhInterp: public PyConsole_Interp
 {
 public:
   PyConsole_EnhInterp();
