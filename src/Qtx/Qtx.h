@@ -44,6 +44,7 @@
 
 #include <QString>
 #include <QList>
+#include <QFont>
 #include <QColor>
 #include <QImage>
 #include <QPixmap>
@@ -275,6 +276,8 @@ public:
   static long        versionToId( const QString& );
 
   static QString     qtDir( const QString& = QString());
+
+  static QFont   stringToFont( const QString& fontDescription );
 
 #ifndef WIN32
   static void*       getDisplay();

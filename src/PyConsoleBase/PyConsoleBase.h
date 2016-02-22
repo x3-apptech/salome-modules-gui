@@ -20,30 +20,29 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SUIT_TOOLS_H
-#define SUIT_TOOLS_H
+// File   : PyConsoleBase.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
+#if !defined ( PYCONSOLEBASE_H )
+#define PYCONSOLEBASE_H
 
-#include "SUIT.h"
+// ========================================================
+// set dllexport type for Win platform 
+#ifdef WIN32
+#  if defined PYCONSOLEBASE_EXPORTS || defined PyConsoleBase_EXPORTS
+#    define PYCONSOLEBASE_EXPORT __declspec(dllexport)
+#  else
+#    define PYCONSOLEBASE_EXPORT __declspec(dllimport)
+#  endif
+#else   // WIN32
+#  define PYCONSOLEBASE_EXPORT
+#endif  // WIN32
 
-#include <Qtx.h>
-
-#include <QRect>
-#include <QString>
-#include <QFont>
-
-/*!
-  \class SUIT_Tools
-  Prodives set of auxiliary static methods
-*/
-class SUIT_EXPORT SUIT_Tools : public Qtx
-{
-public:
-  static void    trace( const char* pLog, const char* szFormat, ... );//!< Traces output to log-file.
-  static QRect   makeRect( const int x1, const int y1, const int x2, const int y2 ); 
-
-  static QString fontToString( const QFont& font );
-
-  static void    centerWidget( QWidget* src, const QWidget* ref );
-};
-
+// ========================================================
+// avoid warning messages
+#ifdef WIN32
+#pragma warning (disable : 4786)
+#pragma warning (disable : 4251)
 #endif
+
+#endif // PYCONSOLEBASE_H
