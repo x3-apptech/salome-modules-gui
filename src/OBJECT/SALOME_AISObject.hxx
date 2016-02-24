@@ -35,14 +35,14 @@ public:
   Standard_EXPORT SALOME_AISObject();
   Standard_EXPORT ~SALOME_AISObject();
 
-  Standard_EXPORT virtual Handle_SALOME_InteractiveObject getIO() = 0;
+  Standard_EXPORT virtual Handle(SALOME_InteractiveObject) getIO() = 0;
   Standard_EXPORT virtual Standard_Boolean hasIO() = 0;
 
   Standard_EXPORT virtual Standard_CString getName() = 0;
   Standard_EXPORT virtual void setName(const Standard_CString aName) = 0;
 
 public:
-  DEFINE_STANDARD_RTTI(SALOME_AISObject);
+  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_AISObject,AIS_InteractiveObject)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_AISObject, AIS_InteractiveObject)

@@ -33,6 +33,8 @@
 #include <MMgt_TShared.hxx>
 #include <Standard_DefineHandle.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 class VTKViewer_Actor;
 
 DEFINE_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared);
@@ -61,7 +63,7 @@ protected:
   VTKViewer_Actor*                             myActor;
 
 public:  
-  DEFINE_STANDARD_RTTI(VTKViewer_Filter)
+  OCCT_DEFINE_STANDARD_RTTIEXT(VTKViewer_Filter,MMgt_TShared)
 };
 
 #endif

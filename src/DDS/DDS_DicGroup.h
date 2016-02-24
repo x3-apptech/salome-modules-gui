@@ -89,7 +89,7 @@ private:
   friend class DDS_Dictionary;
 
 public:
-  DEFINE_STANDARD_RTTI(DDS_DicGroup)
+  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_DicGroup,MMgt_TShared)
 };
 
 typedef NCollection_IndexedDataMap<TCollection_AsciiString, Handle(DDS_DicGroup)> DDS_IndexedDataMapOfDicGroups;

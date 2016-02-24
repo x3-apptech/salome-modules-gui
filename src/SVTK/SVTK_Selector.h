@@ -31,18 +31,18 @@
 #include "SVTK_Selection.h"
 #include "SALOME_ListIO.hxx"
 
+#include <VTKViewer_Filter.h>
+
 #include <TColStd_MapOfInteger.hxx>
 #include <TColStd_IndexedMapOfInteger.hxx>
 
 #include <vtkObject.h>
 
-class Handle(VTKViewer_Filter);
-
+class SALOME_InteractiveObject;
 class SALOME_Actor;
 class SVTK_SelectionEvent;
 class vtkActorCollection;
 class vtkRenderer;
-class Handle(SALOME_InteractiveObject);
 
 //! Define an abstract interface for selection in SVTK package
 /*!

@@ -36,6 +36,7 @@
 #include <V3d_View.hxx>
 #include <AIS_Trihedron.hxx>
 #include <AIS_InteractiveContext.hxx>
+#include <AIS_ListOfInteractive.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 
 class QKeyEvent;
@@ -46,8 +47,6 @@ class SUIT_Desktop;
 class OCCViewer_ClippingDlg;
 class OCCViewer_ViewWindow;
 class OCCViewer_ViewPort3d;
-
-class AIS_ListOfInteractive;
 
 class QtxAction;
 

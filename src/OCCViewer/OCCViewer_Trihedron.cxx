@@ -45,8 +45,7 @@
 
 #define PI   3.14159265359
 
-IMPLEMENT_STANDARD_HANDLE( OCCViewer_Trihedron, AIS_InteractiveObject )
-IMPLEMENT_STANDARD_RTTIEXT( OCCViewer_Trihedron, AIS_InteractiveObject )
+OCCT_IMPLEMENT_STANDARD_RTTIEXT( OCCViewer_Trihedron, AIS_InteractiveObject )
 
 /*!
  * Constructor

@@ -86,8 +86,10 @@
 #include <Graphic3d_RenderingParams.hxx>
 #endif
 
+#if OCC_VERSION_MAJOR < 7
+  #include <Visual3d_View.hxx>
+#endif
 
-#include <Visual3d_View.hxx>
 #include <V3d_Plane.hxx>
 #include <V3d_Light.hxx>
 
@@ -2273,7 +2275,11 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
   if ( format != "PS" && format != "EPS")
    res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
 
+#if OCC_VERSION_MAJOR < 7
   Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
+#else
+  Handle(Graphic3d_CView) a3dView = myViewPort->getView()->View();
+#endif
 
   if (format == "PS")
     res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);

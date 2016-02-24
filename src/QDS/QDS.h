@@ -41,11 +41,11 @@
 #include <QString>
 #include <QList>
 
-#include <TCollection_ExtendedString.hxx>
+#include <TCollection_HExtendedString.hxx>
+#include <TCollection_HAsciiString.hxx>
 
 class QDS_Datum;
-class Handle(TCollection_HAsciiString);
-class Handle(TCollection_HExtendedString);
+
 
 class QDS_EXPORT QDS
 {

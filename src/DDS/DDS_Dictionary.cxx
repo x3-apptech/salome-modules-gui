@@ -38,8 +38,7 @@
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(DDS_Dictionary, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
+OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
 
 Handle(DDS_Dictionary) DDS_Dictionary::myDictionary = Handle(DDS_Dictionary)();
 
@@ -423,7 +422,7 @@ void DDS_Dictionary::SetActiveUnitSystem( const TCollection_AsciiString& theSyst
   \brief Get the only instance of the data dictionary.
   \return the only instance of the data dictionary
 */
-Handle_DDS_Dictionary DDS_Dictionary::Get()
+Handle(DDS_Dictionary) DDS_Dictionary::Get()
 {
   if ( myDictionary.IsNull() )
     myDictionary = new DDS_Dictionary();
@@ -493,7 +492,7 @@ LDOMString DDS_Dictionary::KeyWord( const TCollection_AsciiString& key )
   \param theComponent component name
   \return handle to the data dictionary item
 */
-Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID,
+Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID,
                                                 const TCollection_AsciiString& theComponent ) const
 {
   Handle(DDS_DicItem) aDicItem;
@@ -514,7 +513,7 @@ Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& th
   \param theID data dictionary item ID
   \return handle to the data dictionary item
 */
-Handle_DDS_DicItem DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID ) const
+Handle(DDS_DicItem) DDS_Dictionary::GetDicItem( const TCollection_AsciiString& theID ) const
 {
   Handle(DDS_DicItem) aDicItem;
   for ( Standard_Integer i = 1; i <= myGroupMap.Extent() && aDicItem.IsNull(); i++ )

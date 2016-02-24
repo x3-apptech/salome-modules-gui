@@ -56,7 +56,7 @@ public:
 
   virtual void           display();
 
-  DEFINE_STANDARD_RTTI( OCCViewer_Trihedron )
+  OCCT_DEFINE_STANDARD_RTTIEXT(OCCViewer_Trihedron,AIS_InteractiveObject)
 
 private:
   unsigned int           myTextList;

@@ -33,7 +33,6 @@
 
 #include <TDF_Delta.hxx>
 #include <TDF_ListIteratorOfDeltaList.hxx>
-#include <TDocStd_Application.hxx>
 
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>

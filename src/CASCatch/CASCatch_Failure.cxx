@@ -29,9 +29,7 @@
 #include <Standard_Type.hxx>
 #include <string.h>
 
-IMPLEMENT_STANDARD_HANDLE( CASCatch_Failure, Standard_Transient )
-IMPLEMENT_STANDARD_RTTIEXT( CASCatch_Failure, Standard_Transient ) 
-
+OCCT_IMPLEMENT_STANDARD_RTTIEXT( CASCatch_Failure, Standard_Transient )
 
 #ifndef NO_CXX_EXCEPTION
 static Handle(CASCatch_Failure) RaisedError;

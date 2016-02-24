@@ -27,8 +27,6 @@
 
 #include <SUIT_ViewManager.h>
 
-#include <SelectMgr_EntityOwner.hxx>
-
 /*!
   Constructor
 
@@ -88,7 +86,7 @@ void OCCViewer_ToolTip::onToolTip( QPoint p, QString& str, QFont& f, QRect& txtR
   if( !owner.IsNull() )
     emit toolTipFor( owner, txt );
 
-  Handle_AIS_InteractiveObject obj = aCont->DetectedInteractive();
+  Handle(AIS_InteractiveObject) obj = aCont->DetectedInteractive();
   if( txt.isEmpty() && !obj.IsNull() )
     emit toolTipFor( obj, txt );
 

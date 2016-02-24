@@ -31,7 +31,7 @@
 #include "SVTK_Selector.h"
 #include "SVTK.h"
 
-class Handle(SALOME_InteractiveObject);
+class SALOME_InteractiveObject;
 
 // undefining min and max because CASCADE's defines them and
 // it clashes with std::min(), std::max()

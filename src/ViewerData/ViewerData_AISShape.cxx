@@ -23,11 +23,9 @@
 #include "ViewerData_AISShape.hxx"
 
 #ifdef USE_TEXTURED_SHAPE
-IMPLEMENT_STANDARD_HANDLE (ViewerData_AISShape, AIS_TexturedShape)
-IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_TexturedShape)
+  OCCT_IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_TexturedShape)
 #else
-IMPLEMENT_STANDARD_HANDLE (ViewerData_AISShape, AIS_Shape)
-IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_Shape)
+  OCCT_IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_Shape)
 #endif
 
 /*!

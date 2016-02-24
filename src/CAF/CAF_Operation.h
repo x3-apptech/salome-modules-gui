@@ -28,9 +28,9 @@
 #include "SUIT_Operation.h"
 
 #include <Standard.hxx>
+#include <TDocStd_Document.hxx>
 
 class CAF_Study;
-class Handle(TDocStd_Document);
 
 class CAF_EXPORT CAF_Operation : public SUIT_Operation
 {

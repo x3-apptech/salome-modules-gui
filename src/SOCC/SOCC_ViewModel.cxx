@@ -25,8 +25,6 @@
 #include "SOCC_Prs.h"
 #include "SOCC_ViewWindow.h"
 
-#include "OCCViewer_Trihedron.h"
-
 #include "SUIT_Session.h"
 #include "SUIT_ResourceMgr.h"
 //#include "SUIT_Application.h"
@@ -40,7 +38,6 @@
 //#include CORBA_CLIENT_HEADER(SALOMEDS)
 
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
-#include <Visual3d_View.hxx>
 
 #include <SALOME_AISShape.hxx>
 #include <SALOME_AISObject.hxx>
@@ -491,8 +488,7 @@ void SOCC_Viewer::EraseAll( SALOME_Displayer* d, const bool forced )
   ic->DisplayedObjects( aList );
   AIS_ListIteratorOfListOfInteractive anIter( aList );
   for ( ; anIter.More(); anIter.Next() ) {
-    if ( (isTrihedronDisplayed && anIter.Value()->DynamicType() == STANDARD_TYPE( AIS_Trihedron )) ||
-         anIter.Value()->DynamicType() == STANDARD_TYPE( OCCViewer_Trihedron ))
+    if ( (isTrihedronDisplayed && anIter.Value()->DynamicType() == STANDARD_TYPE( AIS_Trihedron ) ) )
       continue;
 
     // erase an object

@@ -40,7 +40,6 @@
 #include <Basics_OCCTVersion.hxx>
 
 #include <V3d_View.hxx>
-#include <Visual3d_View.hxx>
 #include <Geom_Plane.hxx>
 #include <Prs3d_Presentation.hxx>
 #include <Prs3d_PlaneAspect.hxx>
@@ -647,8 +646,8 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
 
   OCCViewer_ViewManager* aViewMgr = (OCCViewer_ViewManager*) myModel->getViewManager();
   myInteractor = new OCCViewer_ClipPlaneInteractor( aViewMgr, this );
-  connect( myInteractor, SIGNAL( planeClicked( const Handle_AIS_Plane& ) ), SLOT( onPlaneClicked( const Handle_AIS_Plane& ) ) );
-  connect( myInteractor, SIGNAL( planeDragged( const Handle_AIS_Plane& ) ), SLOT( onPlaneDragged( const Handle_AIS_Plane& ) ) );
+  connect( myInteractor, SIGNAL( planeClicked( const Handle(AIS_Plane)& ) ), SLOT( onPlaneClicked( const Handle(AIS_Plane)& ) ) );
+  connect( myInteractor, SIGNAL( planeDragged( const Handle(AIS_Plane)& ) ), SLOT( onPlaneDragged( const Handle(AIS_Plane)& ) ) );
 
   myLocalPlanes = myModel->getClipPlanes();
   synchronize();

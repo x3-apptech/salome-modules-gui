@@ -34,7 +34,7 @@
 
 #include <vector>
 
-class Handle(V3d_View);
+#include <V3d_View.hxx>
 
 /*!
   \class OCCViewer_ClipPlaneInteractor.

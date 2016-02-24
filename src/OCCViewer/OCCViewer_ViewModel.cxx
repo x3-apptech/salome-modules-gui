@@ -60,7 +60,6 @@
 #else
   #include <AIS_Drawer.hxx>
 #endif
-#include <AIS_ListOfInteractive.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
 #include <Graphic3d_Texture2Dmanual.hxx>
@@ -73,10 +72,12 @@
 #include <Prs3d_LineAspect.hxx>
 #include <Prs3d_TextAspect.hxx>
 
-#include <Visual3d_View.hxx>
-
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_AmbientLight.hxx>
+
+#if OCC_VERSION_MAJOR < 7
+  #include <Visual3d_View.hxx>
+#endif
 
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats

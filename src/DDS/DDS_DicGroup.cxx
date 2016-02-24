@@ -32,8 +32,7 @@
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
-IMPLEMENT_STANDARD_HANDLE(DDS_DicGroup, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, MMgt_TShared)
+OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, MMgt_TShared)
 
 /*!
   \class DDS_DicGroup
@@ -208,7 +207,7 @@ void DDS_DicGroup::FillDataMap( const LDOM_Element& theComponentData, const LDOM
   \param theID item identifier
   \return dictionary item
 */
-Handle_DDS_DicItem DDS_DicGroup::GetDicItem( const TCollection_AsciiString& theID ) const
+Handle(DDS_DicItem) DDS_DicGroup::GetDicItem( const TCollection_AsciiString& theID ) const
 {
   Handle(DDS_DicItem) aDicItem;
   // get dictionary item by id

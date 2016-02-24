@@ -26,8 +26,7 @@
 
 #include "VTKViewer_Filter.h"
 
-IMPLEMENT_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(VTKViewer_Filter, MMgt_TShared)
+OCCT_IMPLEMENT_STANDARD_RTTIEXT(VTKViewer_Filter, MMgt_TShared)
 
 /*!
  * \class       VTKViewer_Filter

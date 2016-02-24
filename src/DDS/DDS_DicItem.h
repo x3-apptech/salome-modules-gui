@@ -35,12 +35,13 @@
 #include <NCollection_DataMap.hxx>
 #include <NCollection_DefineIndexedDataMap.hxx>
 
+#include <TColStd_MapOfReal.hxx>
+#include <TColStd_SequenceOfInteger.hxx>
+#include <TColStd_SequenceOfAsciiString.hxx>
+#include <TColStd_SequenceOfExtendedString.hxx>
+
 class LDOM_Element;
 class DDS_Dictionary;
-class TColStd_MapOfReal;
-class TColStd_SequenceOfInteger;
-class TColStd_SequenceOfAsciiString;
-class TColStd_SequenceOfExtendedString;
 
 //  Class, containing all information about one parameter:
 //  unique    : id
@@ -252,8 +253,7 @@ private:
   friend class DDS_DicGroup;
 
 public:
-  // Declaration of CASCADE RTTI
-  DEFINE_STANDARD_RTTI(DDS_DicItem)
+  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_DicItem,MMgt_TShared)
 };
 
 DEFINE_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)

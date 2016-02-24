@@ -92,7 +92,7 @@ private:
   static Handle(DDS_Dictionary)                  myDictionary;
 
 public:
-  DEFINE_STANDARD_RTTI(DDS_Dictionary)
+  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_Dictionary,MMgt_TShared)
 };
 
 #endif

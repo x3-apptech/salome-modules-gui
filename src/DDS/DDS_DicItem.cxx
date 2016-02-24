@@ -23,9 +23,6 @@
 #include "DDS_DicItem.h"
 #include "DDS_Dictionary.h"
 
-#include <TColStd_SequenceOfInteger.hxx>
-#include <TColStd_SequenceOfExtendedString.hxx>
-
 #include <LDOM_Text.hxx>
 #include <LDOMString.hxx>
 #include <LDOM_Element.hxx>
@@ -33,11 +30,7 @@
 #include <UnitsAPI.hxx>
 #include <Units_Dimensions.hxx>
 
-#include <TColStd_MapOfReal.hxx>
-#include <TColStd_SequenceOfAsciiString.hxx>
-
-IMPLEMENT_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(DDS_DicItem, MMgt_TShared)
+OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_DicItem, MMgt_TShared)
 
 /*!
   \class DDS_DicItem

@@ -29,12 +29,11 @@
 #include "Qtx.h"
 
 #include <V3d_View.hxx>
+#include <V3d_Viewer.hxx>
 
 class QColor;
 class QString;
 class QRect;
-
-class Handle(V3d_Viewer);
 
 #ifdef WIN32
 #pragma warning ( disable:4251 )

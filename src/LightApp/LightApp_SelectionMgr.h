@@ -34,9 +34,10 @@
   #include <QMap>
   #include <NCollection_DataMap.hxx>
 
+  #include <TColStd_IndexedMapOfInteger.hxx>
+  #include <TColStd_MapOfInteger.hxx>
+
   class SALOME_ListIO;
-  class TColStd_IndexedMapOfInteger;
-  class TColStd_MapOfInteger;
   class TCollection_AsciiString;
 #else
 #include <QStringList>

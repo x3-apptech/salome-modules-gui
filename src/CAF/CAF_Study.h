@@ -28,9 +28,9 @@
 #include "SUIT_Study.h"
 
 #include <TDocStd_Document.hxx>
+#include <TDocStd_Application.hxx>
 
 class CAF_Application;
-class Handle(TDocStd_Application);
 
 #if defined WIN32
 #pragma warning ( disable: 4251 )

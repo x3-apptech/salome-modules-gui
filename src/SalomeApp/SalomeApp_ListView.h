@@ -36,10 +36,10 @@
 #include <QLineEdit>
 #include <QComboBox>
 
-class QToolButton; 
+#include <TColStd_ListOfInteger.hxx>
+#include <TColStd_ListOfReal.hxx>
 
-class TColStd_ListOfInteger;
-class TColStd_ListOfReal;
+class QToolButton; 
 
 // enumeration for ListView updating mode
 enum UpdateType {

@@ -35,6 +35,8 @@
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 class ViewerData_AISShape
 #ifdef USE_TEXTURED_SHAPE
   : public AIS_TexturedShape
@@ -62,13 +64,18 @@ protected:
   bool myIsClippable;
 
 public:
-  DEFINE_STANDARD_RTTI(ViewerData_AISShape)  
+
+#ifdef USE_TEXTURED_SHAPE
+  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape,AIS_TexturedShape)
+#else
+  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape,AIS_Shape)
+#endif
 };
 
 #ifdef USE_TEXTURED_SHAPE
-DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_TexturedShape)
+  DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_TexturedShape)
 #else
-DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_Shape)
+  DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_Shape)
 #endif
 
 #endif // _ViewerData_AISShape_HeaderFile

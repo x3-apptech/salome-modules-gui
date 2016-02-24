@@ -29,9 +29,6 @@
 #include <DDS_DicItem.h>
 #include <DDS_Dictionary.h>
 
-#include <TCollection_HAsciiString.hxx>
-#include <TCollection_HExtendedString.hxx>
-
 QList<QDS_Datum*> QDS::_datumList;
 
 /*!

@@ -22,8 +22,7 @@
 
 #include "DDS_KeyWords.h"
 
-IMPLEMENT_STANDARD_HANDLE(DDS_KeyWords, MMgt_TShared)
-IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, MMgt_TShared)
+OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, MMgt_TShared)
 
 /*!
   \class DDS_KeyWords
@@ -147,7 +146,7 @@ DDS_KeyWords::DDS_KeyWords()
   \brief Get the only instance of the class DDS_KeyWords.
   \return the only instance of the class
 */
-Handle_DDS_KeyWords DDS_KeyWords::Get()
+Handle(DDS_KeyWords) DDS_KeyWords::Get()
 {
   static Handle(DDS_KeyWords) keyWords;
 

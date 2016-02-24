@@ -33,7 +33,7 @@
 #ifndef DISABLE_OCCVIEWER
 #include <OCCViewer_ViewModel.h>
 
-class Handle_AIS_InteractiveObject;
+#include <AIS_InteractiveObject.hxx>
 #endif
 
 /*!

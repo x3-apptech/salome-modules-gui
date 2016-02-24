@@ -24,9 +24,10 @@
 #include <QtxToolTip.h>
 #include <QFont>
 
+#include <SelectMgr_EntityOwner.hxx>
+#include <AIS_InteractiveObject.hxx>
+
 class OCCViewer_ViewWindow;
-class Handle_SelectMgr_EntityOwner;
-class Handle_AIS_InteractiveObject;
 
 /*!
   \class OCCViewer_ToolTip

@@ -33,13 +33,19 @@
 #define PRS_EXPORT
 #endif
 
+#include <string>
+#include <list>
+
+#include <Basics_OCCTVersion.hxx>
+
 class SALOME_View;
 class SALOME_Displayer;
 class SALOME_ListIO;
-class Handle_SALOME_InteractiveObject;
-
-#include <string>
-#include <list>
+#if OCC_VERSION_MAJOR >= 7
+  class SALOME_InteractiveObject;
+#else
+  class Handle_SALOME_InteractiveObject;
+#endif
 
 /*!
  \class SALOME_Prs
@@ -303,7 +309,7 @@ public:
 
   // New methods (asv)
   //! \retval Return false.
-  virtual bool isVisible( const Handle_SALOME_InteractiveObject& ){ return false; }
+  virtual bool isVisible( const Handle(SALOME_InteractiveObject)& ){ return false; }
   virtual void Repaint() {} //!< Null body here.
   virtual void GetVisible( SALOME_ListIO& theList ) {}
 };

@@ -141,7 +141,7 @@ bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePla
 
   Handle(AIS_InteractiveContext) anAISContext = myViewer->getAISContext();
 
-  if ( anAISContext->IsSelected( thePlane ) )
+  if ( anAISContext->IsSelected( Handle(AIS_InteractiveObject)::DownCast(thePlane) ) )
   {
     return false;
   }
@@ -172,7 +172,7 @@ bool OCCViewer_ClipPlaneInteractor::isDraggable( const Handle(AIS_Plane)& thePla
 
   Handle(AIS_InteractiveContext) anAISContext = myViewer->getAISContext();
 
-  if ( !anAISContext->IsSelected( thePlane ) )
+  if ( !anAISContext->IsSelected( Handle(AIS_InteractiveObject)::DownCast(thePlane) ) ) 
   {
     return false;
   }
@@ -522,7 +522,7 @@ bool OCCViewer_ClipPlaneInteractor::mousePress( QMouseEvent* theEvent,
   // process mouse click on the object
   if ( myIsClickable )
   {
-    myViewer->getAISContext()->SetSelected( aPlane );
+    myViewer->getAISContext()->SetSelected( Handle(AIS_InteractiveObject)::DownCast(aPlane) );
     emit planeClicked( aPlane );
   }
 

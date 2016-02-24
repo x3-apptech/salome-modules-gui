@@ -39,8 +39,9 @@
 #include <QResizeEvent>
 #include <QApplication>
 
-#include <Visual3d_View.hxx>
-#include <V3d_Viewer.hxx>
+#if OCC_VERSION_MAJOR < 7
+  #include <Visual3d_View.hxx>
+#endif
 
 #if OCC_VERSION_LARGE > 0x06070100
 #include <V3d_View.hxx>
@@ -595,9 +596,14 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QApplication::syncX();
 #endif
-    QRect rc = e->rect();
-    if ( !myPaintersRedrawing )
+    if ( !myPaintersRedrawing ) {
+#if OCC_VERSION_MAJOR < 7
+      QRect rc = e->rect();
       activeView()->Redraw( rc.x(), rc.y(), rc.width(), rc.height() );
+#else
+      activeView()->Redraw();
+#endif
+    }
   }
   OCCViewer_ViewPort::paintEvent( e );
   myBusy = false;

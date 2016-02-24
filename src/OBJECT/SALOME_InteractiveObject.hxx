@@ -27,6 +27,8 @@
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 #include <string>
 
 class SALOME_InteractiveObject;
@@ -69,7 +71,7 @@ protected:
   std::string myReference;
 
 public:
-  DEFINE_STANDARD_RTTI(SALOME_InteractiveObject);
+  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_InteractiveObject,MMgt_TShared)
 };
 
 #endif // SALOME_INTERACTIVEOBJECT_HXX

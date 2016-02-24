@@ -38,7 +38,7 @@ public:
   Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& anObj) const = 0;
 
 public:
-  DEFINE_STANDARD_RTTI(SALOME_Filter);
+  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_Filter,MMgt_TShared)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_Filter, MMgt_TShared)

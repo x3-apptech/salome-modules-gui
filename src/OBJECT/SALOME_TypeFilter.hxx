@@ -40,7 +40,7 @@ protected:
   Standard_CString myKind;
 
 public:
-  DEFINE_STANDARD_RTTI(SALOME_TypeFilter);
+  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_TypeFilter,SALOME_Filter)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_TypeFilter, SALOME_Filter)

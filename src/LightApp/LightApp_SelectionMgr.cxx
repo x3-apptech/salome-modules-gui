@@ -34,9 +34,7 @@
   #include <SALOME_ListIO.hxx>
 
   // Open CASCADE Include
-  #include <TColStd_MapOfInteger.hxx>
   #include <TColStd_MapIteratorOfMapOfInteger.hxx>
-  #include <TColStd_IndexedMapOfInteger.hxx>
   #include <TCollection_AsciiString.hxx>
 #endif
 
@@ -458,9 +456,9 @@ void LightApp_SelectionMgr::setSelectionCacheEnabled( bool on )
 
 #ifndef DISABLE_SALOMEOBJECT
 
-QList<Handle_SALOME_InteractiveObject> LightApp_SelectionMgr::selectionCache( const QString& type ) const
+QList<Handle(SALOME_InteractiveObject)> LightApp_SelectionMgr::selectionCache( const QString& type ) const
 {
-  QList<Handle_SALOME_InteractiveObject> res;
+  QList<Handle(SALOME_InteractiveObject)> res;
 
   QStringList types;
   if ( !type.isEmpty() )

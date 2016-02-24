@@ -32,7 +32,7 @@
 #include "OCCViewer_ViewModel.h"
 
 class SALOME_ListIO;
-class Handle(SALOME_InteractiveObject);
+class SALOME_InteractiveObject;
 
 class SOCC_EXPORT SOCC_Viewer: public OCCViewer_Viewer, public SALOME_View
 {

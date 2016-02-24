@@ -29,8 +29,9 @@
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
 
+#include <TColStd_IndexedMapOfInteger.hxx>
+
 class TopoDS_Shape;
-class TColStd_IndexedMapOfInteger;
 
 class SALOME_AISShape : public ViewerData_AISShape
 {
@@ -41,7 +42,7 @@ public:
   Standard_EXPORT virtual Standard_CString getName() = 0;
   Standard_EXPORT virtual void setName(const Standard_CString aName) = 0;
 
-  Standard_EXPORT virtual Handle_SALOME_InteractiveObject getIO() = 0;
+  Standard_EXPORT virtual Handle(SALOME_InteractiveObject) getIO() = 0;
   Standard_EXPORT virtual Standard_Boolean hasIO() = 0;
 
   Standard_EXPORT virtual void setTopLevel(Standard_Boolean) = 0;
@@ -53,7 +54,7 @@ public:
   Standard_EXPORT virtual void highlightSubShapes(const TColStd_IndexedMapOfInteger& aIndexMap, const Standard_Boolean aHighlight ) = 0;
 
 public:
-  DEFINE_STANDARD_RTTI(SALOME_AISShape);
+  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_AISShape,ViewerData_AISShape)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_AISShape, ViewerData_AISShape)

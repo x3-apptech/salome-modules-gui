@@ -53,7 +53,7 @@ private:
   KeyWordMap                                  myKeyWord;
 
 public:
-  DEFINE_STANDARD_RTTI(DDS_KeyWords)
+  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_KeyWords,MMgt_TShared)
 };
 
 #endif
