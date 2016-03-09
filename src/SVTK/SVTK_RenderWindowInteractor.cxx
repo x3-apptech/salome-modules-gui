@@ -513,14 +513,20 @@ QVTK_RenderWindowInteractor
 }
 
 #endif
-#else
+
+#else // QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+
 bool QVTK_RenderWindowInteractor
 ::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
+#ifdef WIN32
+  // TODO: WIN32-related implementation
+#else
   if ( eventType == "xcb_generic_event_t" )
   {
     xcb_generic_event_t* ev = static_cast<xcb_generic_event_t *>(message);
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    // TODO: this code is never called
     if ( SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance() )
 #else
     if ( SVTK_SpaceMouseXCB* aSpaceMouse = SVTK_SpaceMouseXCB::getInstance() )
@@ -530,6 +536,7 @@ bool QVTK_RenderWindowInteractor
       {
         SVTK_SpaceMouse::MoveEvent anEvent;
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        // TODO: this code is never called
         int type = aSpaceMouse->translateEvent( QX11Info::display(), xEvent, &anEvent, 1.0, 1.0 );
 #else
         int type = aSpaceMouse->translateEvent( QX11Info::connection(), (xcb_client_message_event_t*)ev, &anEvent, 1.0, 1.0 );
@@ -549,7 +556,7 @@ bool QVTK_RenderWindowInteractor
       }
     }
   }
-
+#endif
  return QWidget::nativeEvent( eventType, message, result );
 }
 #endif

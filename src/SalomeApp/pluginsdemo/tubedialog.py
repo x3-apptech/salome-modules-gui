@@ -19,8 +19,7 @@
 # Author : Guillaume Boulant (EDF)
 
 import sys
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from qtsalome import *
 
 from tubedialog_ui import TubeDialog_UI
 
@@ -33,27 +32,27 @@ class TubeDialog(TubeDialog_UI):
 
     def handleAcceptWith(self,callbackFunction):
         """This defines the function to be connected to the signal 'accepted()' (click on Ok)"""
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), callbackFunction)
+        self.buttonBox.accepted.connect(callbackFunction)
 
     def handleRejectWith(self,callbackFunction):
         """This defines the function to be connected to the signal 'rejected()' (click on Cancel)"""
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), callbackFunction)
+        self.buttonBox.rejected.connect(callbackFunction)
 
     def handleApplyWith(self,callbackFunction):
         """This defines the function to be connected to the signal 'apply()' (click on Apply)"""
-        button = self.buttonBox.button(QtGui.QDialogButtonBox.Apply)        
-        QtCore.QObject.connect(button, QtCore.SIGNAL("clicked()"), callbackFunction);
+        button = self.buttonBox.button(QDialogButtonBox.Apply)
+        button.clicked.connect(callbackFunction);
 
     def accept(self):
         '''Callback function when dialog is accepted (click Ok)'''
         self._wasOk = True
         # We should test here the validity of values
-        QtGui.QDialog.accept(self)
+        QDialog.accept(self)
 
     def reject(self):
         '''Callback function when dialog is rejected (click Cancel)'''
         self._wasOk = False
-        QtGui.QDialog.reject(self)
+        QDialog.reject(self)
 
     def wasOk(self):
         return self._wasOk
@@ -83,13 +82,13 @@ class TubeDialogOnTopWithApply(TubeDialog):
         """
         TubeDialog.setupUi(self)
         # Add a button "Apply"
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|
-                                          QtGui.QDialogButtonBox.Apply|
-                                          QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|
+                                          QDialogButtonBox.Apply|
+                                          QDialogButtonBox.Ok)
 
         # Keep the dialog on top of the windows
         self.setWindowFlags(self.windowFlags() |
-                            QtCore.Qt.WindowStaysOnTopHint)
+                            Qt.WindowStaysOnTopHint)
 
 
 #
@@ -108,10 +107,9 @@ def TEST_getData_synchrone():
 
 
 def main( args ):
-    a = QtGui.QApplication(sys.argv)
+    a = QApplication(sys.argv)
     TEST_getData_synchrone()
     sys.exit(0)
 
 if __name__=="__main__":
     main(sys.argv)
-

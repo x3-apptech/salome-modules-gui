@@ -20,7 +20,7 @@
 
 __author__="gboulant"
 __date__ ="$31 mars 2010 17:09:53$"
-
+from qtsalome import *
 from mytestdialog_ui import Ui_MyTestDialog
 from genericdialog import GenericDialog
 
@@ -71,13 +71,15 @@ class MyTestDialog(GenericDialog):
         return name
 
 
-from PyQt4.QtCore import SIGNAL
 class MyTestDialogWithSignals(MyTestDialog):
     """
     This class is to illustrate the usage of the GenericDialog in the
     case where the dialog windows is not modal. In such a case, the
     controller must be warn of close events using Qt signals.
     """
+
+    inputValidated = pyqtSignal()
+
     def __init__(self, parent=None, name="MyTestDialogWithSignals"):
         MyTestDialog.__init__(self, parent, name)
 
@@ -92,7 +94,7 @@ class MyTestDialogWithSignals(MyTestDialog):
         # has been validated so that it can process the event
         MyTestDialog.accept(self)
         if self.wasOk():
-            self.emit(SIGNAL('inputValidated()'))
+            self.inputValidated.emit()
 
 
 
@@ -104,10 +106,9 @@ class MyTestDialogWithSignals(MyTestDialog):
 
 def TEST_MyTestDialog_modal():
     import sys
-    from PyQt4.QtCore import QObject, SIGNAL, SLOT
-    from PyQt4.QtGui import QApplication
+    from qtsalome import QApplication
     app = QApplication(sys.argv)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    app.lastWindowClosed.connect(app.quit)
 
     dlg=MyTestDialog()
     dlg.setData("A default name")
@@ -126,10 +127,8 @@ class DialogListener:
 
 def TEST_MyTestDialog_non_modal():
     import sys
-    from PyQt4.QtCore import QObject, SIGNAL, SLOT
-    from PyQt4.QtGui import QApplication
     app = QApplication(sys.argv)
-    QObject.connect(app, SIGNAL("lastWindowClosed()"), app, SLOT("quit()"))
+    app.lastWindowClosed.connect(app.quit)
 
     dlg=MyTestDialogWithSignals()
     # This dialog window will emit a inputValidated() signal when the
@@ -137,7 +136,7 @@ def TEST_MyTestDialog_non_modal():
     # connect this signal to a local slot so that the event can be
     # processed.
     dlgListener = DialogListener()
-    app.connect(dlg, SIGNAL('inputValidated()'), dlgListener.onProcessEvent)
+    dlg.inputValidated.connect(dlgListener.onProcessEvent)
     # This connect instruction means that the signal inputValidated()
     # emited by the dlg Qt object will raise a call to the slot
     # dlgListener.onProcessEvent

@@ -108,9 +108,9 @@
 
 static QEvent* l_mbPressEvent = 0;
 
-#ifdef WIN32
-# include <QWindowsStyle>
-#endif
+//#ifdef WIN32
+//# include <QWindowsStyle>
+//#endif
 
 #include <GL/gl.h>
 

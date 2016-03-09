@@ -394,10 +394,10 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   connect( myWebView, SIGNAL( linkClicked( QUrl ) ),     SLOT( linkClicked( QUrl ) ) ); 
   connect( myWebView->page(), SIGNAL( linkHovered( QString, QString, QString ) ), 
 	   SLOT( linkHovered( QString, QString, QString ) ) ); 
-  connect( myWebView->pageAction( QWebPage::DownloadLinkToDisk ), SIGNAL( activated() ),
+  connect( myWebView->pageAction( QWebPage::DownloadLinkToDisk ), SIGNAL( triggered() ),
 	   SLOT( linkAction() ) );
   disconnect( myWebView->pageAction( QWebPage::OpenLink ), 0, 0, 0 );
-  connect( myWebView->pageAction( QWebPage::OpenLink ), SIGNAL( activated() ),
+  connect( myWebView->pageAction( QWebPage::OpenLink ), SIGNAL( triggered() ),
 	   SLOT( linkAction() ) );
   
   setCentralWidget( frame );
@@ -621,11 +621,15 @@ void QtxWebBrowser::openLink( const QString& fileName, bool force )
   \brief Load URL
   \param url path to the file to be opened in the browser
 */
-void QtxWebBrowser::load( const QString& url )
+void QtxWebBrowser::load( const QString& link )
 {
-  QString u = url;
-  if ( !u.isEmpty() )
-    myWebView->load( QUrl( u.replace('\\', '/') ) );
+  QString linkPath = link;
+  linkPath.replace('\\', '/');
+  QUrl url = linkPath;
+  if ( !url.isEmpty() ) {
+    if ( url.scheme().isEmpty() ) url.setScheme( "file" );
+    myWebView->load( url );
+  }
 }
 
 /*!

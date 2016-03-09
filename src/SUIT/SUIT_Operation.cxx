@@ -142,7 +142,7 @@ void SUIT_Operation::clearFlags( const int f )
  * \brief Test the flags of operation
   * \param f - flags of operation to be tested
 *
-*  Returns TRUE if the specified flags setted in the operation (see Flags enumeration)
+*  Returns \c true if the specified flags setted in the operation (see Flags enumeration)
 */
 bool SUIT_Operation::testFlags( const int f ) const
 {
@@ -262,9 +262,9 @@ void SUIT_Operation::suspend()
 
 /*!
  * \brief Verifies whether operator is ready to start.
- * \return TRUE if operation is ready to start
+ * \return \c true if operation is ready to start
 *
-* Default implementation returns TRUE. Redefine this method to add own verifications
+* Default implementation returns \c true. Redefine this method to add own verifications
 */
 bool SUIT_Operation::isReadyToStart() const
 {
@@ -329,14 +329,14 @@ void SUIT_Operation::commitOperation()
 
 /*!
  * \brief Sets slot which is called when operation is started
-  * \param theReceiver - object containing slot
-  * \param theSlot - slot of theReceiver object
-  * \return TR if slot was connected successfully, FALSE otherwise
-*
-* Sets slot which is called when operation is started. There is no point in
-* using this method. It would be better to inherit own operator from base
-* one and redefine startOperation method
-*/
+ * \param theReceiver - object containing slot
+ * \param theSlot - slot of theReceiver object
+ * \return \c true if slot was connected successfully, \c false otherwise
+ *
+ * Sets slot which is called when operation is started. There is no point in
+ * using this method. It would be better to inherit own operator from base
+ * one and redefine startOperation method
+ */
 bool SUIT_Operation::setSlot( const QObject* theReceiver, const char* theSlot )
 {
   return connect( this, SIGNAL( callSlot() ), theReceiver, theSlot );
@@ -345,7 +345,7 @@ bool SUIT_Operation::setSlot( const QObject* theReceiver, const char* theSlot )
 /*!
  * \brief Verifies whether given operator is valid for this one
   * \param theOtherOp - other operation
-  * \return Returns TRUE if the given operator is valid for this one
+  * \return Returns \c true if the given operator is valid for this one
 *
 * Verifies whether given operator is valid for this one (i.e. can be started "above"
 * this operator)
@@ -357,10 +357,10 @@ bool SUIT_Operation::isValid( SUIT_Operation* ) const
 
 /*!
  * \brief Verifies whether this operator can be always started above any already runnig one
-  * \return Returns TRUE if current operation must not be checked for ActiveOperation->IsValid( this )
+  * \return Returns \c true if current operation must not be checked for ActiveOperation->IsValid( this )
 *
 * This method must be redefined in derived operation if operation of derived class
-* must be always can start above any launched one. Default implementation returns FALSE,
+* must be always can start above any launched one. Default implementation returns \c false,
 * so it is being checked for IsValid, but some operations may overload IsGranted()
 * In this case they will always start, no matter what operation is running.
 */
@@ -371,9 +371,9 @@ bool SUIT_Operation::isGranted() const
 
 /*!
  * \brief Verifies whether operation is an runned one (state()==Running)
-  * \return TRUE if operation is active, FALSE otherwise
+  * \return \c true if operation is active, \c false otherwise
 *
-* Verifies whether operation is an running. Returns TRUE if state of operator
+* Verifies whether operation is an running. Returns \c true if state of operator
 * is Running
 */
 bool SUIT_Operation::isRunning() const
@@ -383,9 +383,9 @@ bool SUIT_Operation::isRunning() const
 
 /*!
  * \brief Verifies whether operation is an active for study.
-  * \return TRUE if operation is active, FALSE otherwise
+  * \return \c true if operation is active, \c false otherwise
 *
-* Verifies whether operation is an active on. Returns TRUE if this operator
+* Verifies whether operation is an active on. Returns \c true if this operator
 * is active for study
 */
 bool SUIT_Operation::isActive() const
@@ -470,7 +470,7 @@ bool SUIT_Operation::commitTransaction( const QString& name )
 }
 
 /*!
- * \brief Returns TRUE if transaction is opened.
+ * \brief Returns \c true if transaction is opened.
 */
 bool SUIT_Operation::hasTransaction() const
 {

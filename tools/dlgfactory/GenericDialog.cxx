@@ -18,8 +18,9 @@
 //
 
 #include "GenericDialog.h"
+#include <QDebug>
 
-GenericDialog::GenericDialog(QDialog *parent) : QDialog(parent)
+GenericDialog::GenericDialog(QDialog* parent) : QDialog(parent)
 {
   ui.setupUi(this); // A faire en premier
   
@@ -32,16 +33,14 @@ GenericDialog::GenericDialog(QDialog *parent) : QDialog(parent)
   // buttonbox (inherited features) 
 }
 
-QFrame * GenericDialog::getPanel() {
+QFrame* GenericDialog::getPanel() {
   return ui.centralPanel;
 }
 
-QDialogButtonBox * GenericDialog::getButtonBox() {
+QDialogButtonBox* GenericDialog::getButtonBox() {
   return ui.buttonBox;
 }
 
-
-#include <QDebug>
 void GenericDialog::accept() {
   qDebug() << "accept() is not implemented yet";
   QDialog::accept();

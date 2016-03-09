@@ -191,98 +191,98 @@ void VTKViewer_ViewWindow::createActions()
   aAction = new QtxAction(tr("MNU_DUMP_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_DUMP" ) ),
                            tr( "MNU_DUMP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_DUMP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onDumpView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onDumpView()));
   myActionsMap[ DumpId ] = aAction;
 
   //! \li FitAll
   aAction = new QtxAction(tr("MNU_FITALL"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITALL" ) ),
                            tr( "MNU_FITALL" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITALL"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onFitAll()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onFitAll()));
   myActionsMap[ FitAllId ] = aAction;
 
   //! \li FitRect
   aAction = new QtxAction(tr("MNU_FITRECT"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITAREA" ) ),
                            tr( "MNU_FITRECT" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITRECT"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(activateWindowFit()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(activateWindowFit()));
   myActionsMap[ FitRectId ] = aAction;
 
   //! \li FitSelection
   aAction = new QtxAction(tr("MNU_FITSELECTION"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FITSELECTION" ) ),
                            tr( "MNU_FITSELECTION" ), 0, this);
   aAction->setStatusTip(tr("DSC_FITSELECTION"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onFitSelection()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onFitSelection()));
   myActionsMap[ FitSelectionId ] = aAction;
 
   //! \li Zoom
   aAction = new QtxAction(tr("MNU_ZOOM_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ZOOM" ) ),
                            tr( "MNU_ZOOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ZOOM_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(activateZoom()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(activateZoom()));
   myActionsMap[ ZoomId ] = aAction;
 
   //! \li Panning
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_PAN" ) ),
                            tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(activatePanning()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(activatePanning()));
   myActionsMap[ PanId ] = aAction;
 
   //! \li Global Panning
   aAction = new QtxAction(tr("MNU_GLOBALPAN_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_GLOBALPAN" ) ),
                            tr( "MNU_GLOBALPAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_GLOBALPAN_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(activateGlobalPanning()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(activateGlobalPanning()));
   myActionsMap[ GlobalPanId ] = aAction;
 
   //! \li Rotation
   aAction = new QtxAction(tr("MNU_ROTATE_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ROTATE" ) ),
                            tr( "MNU_ROTATE_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_ROTATE_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(activateRotation()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(activateRotation()));
   myActionsMap[ RotationId ] = aAction;
 
   //! \li Projections
   aAction = new QtxAction(tr("MNU_FRONT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_FRONT" ) ),
                            tr( "MNU_FRONT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_FRONT_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onFrontView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onFrontView()));
   myActionsMap[ FrontId ] = aAction;
 
   //! \li Back view
   aAction = new QtxAction(tr("MNU_BACK_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BACK" ) ),
                            tr( "MNU_BACK_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_BACK_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onBackView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onBackView()));
   myActionsMap[ BackId ] = aAction;
 
   //! \li Top view
   aAction = new QtxAction(tr("MNU_TOP_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TOP" ) ),
                            tr( "MNU_TOP_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_TOP_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onTopView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onTopView()));
   myActionsMap[ TopId ] = aAction;
 
   //! \li Bottom view
   aAction = new QtxAction(tr("MNU_BOTTOM_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BOTTOM" ) ),
                            tr( "MNU_BOTTOM_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_BOTTOM_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onBottomView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onBottomView()));
   myActionsMap[ BottomId ] = aAction;
 
   //! \li Left view
   aAction = new QtxAction(tr("MNU_LEFT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_LEFT" ) ),
                            tr( "MNU_LEFT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_LEFT_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onLeftView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onLeftView()));
   myActionsMap[ LeftId ] = aAction;
 
   //! \li Right view
   aAction = new QtxAction(tr("MNU_RIGHT_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RIGHT" ) ),
                            tr( "MNU_RIGHT_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RIGHT_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onRightView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onRightView()));
   myActionsMap[ RightId ] = aAction;
 
   // \li Rotate anticlockwise
@@ -303,14 +303,14 @@ void VTKViewer_ViewWindow::createActions()
   aAction = new QtxAction(tr("MNU_RESET_VIEW"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RESET" ) ),
                            tr( "MNU_RESET_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_RESET_VIEW"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onResetView()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onResetView()));
   myActionsMap[ ResetId ] = aAction;
 
   //! \li Trihedron shown
   aAction = new QtxAction(tr("MNU_SHOW_TRIHEDRON"), aResMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TRIHEDRON" ) ),
                            tr( "MNU_SHOW_TRIHEDRON" ), 0, this);
   aAction->setStatusTip(tr("DSC_SHOW_TRIHEDRON"));
-  connect(aAction, SIGNAL(activated()), this, SLOT(onTrihedronShow()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onTrihedronShow()));
   myActionsMap[ TrihedronShowId ] = aAction;
 }
 

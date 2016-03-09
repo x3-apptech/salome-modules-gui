@@ -124,7 +124,7 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
   myCheckPermissions( true )
 {
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-  
+  setOption(QFileDialog::DontUseNativeDialog, true);
   setModal( modal );
   setSizeGripEnabled( true );
   if ( parent )

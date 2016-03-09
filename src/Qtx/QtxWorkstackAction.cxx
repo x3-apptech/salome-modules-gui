@@ -524,12 +524,12 @@ QtxSplitDlg::QtxSplitDlg( QWidget* parent, QtxWorkstack* workstack, QtxSplitDlgM
 
   // Buttons for possibility of switching the variants of split
   myButtonPrevious = new QPushButton( this );
-  myButtonPrevious->setIcon( QIcon( QPixmap( prev_xpm ) ) );
+  myButtonPrevious->setIcon( QPixmap( prev_xpm ) );
   myButtonPrevious->setAutoDefault(true);
   myButtonPrevious->setEnabled( false );
 
   myButtonNext = new QPushButton( this );
-  myButtonNext->setIcon( QIcon( QPixmap( next_xpm ) ) );
+  myButtonNext->setIcon( QPixmap( next_xpm ) );
   myButtonNext->setAutoDefault(true);
   myButtonNext->setEnabled( false );
 

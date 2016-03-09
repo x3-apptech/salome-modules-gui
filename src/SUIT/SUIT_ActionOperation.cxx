@@ -84,7 +84,7 @@ void SUIT_ActionOperation::setAction( QtxAction* a )
 }
 
 /*! Add action to widget \a wid.
- *\retval TRUE - successful, FALSE - not successful.
+ *\retval true - successful, false - not successful.
  */
 bool SUIT_ActionOperation::addTo( QWidget* wid )
 {

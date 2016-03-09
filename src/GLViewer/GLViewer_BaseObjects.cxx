@@ -1438,16 +1438,15 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
            y = double( yPos );
 
     aViewerCS->transform( *aEMFCS, x, y );
-    const char* str = aText.toAscii();
 
     int nHeight = 35*14;       // height of font
     int nWidth = 35*12;        // average character width
     int nEscapement = 0;       // angle of escapement
     int nOrientation = 0;      // base-line orientation angle
     int fnWeight = FW_NORMAL;  // font weight
-    DWORD fdwItalic = FALSE;    // italic attribute option
-    DWORD fdwUnderline = FALSE; // underline attribute option
-    DWORD fdwStrikeOut = FALSE; // strikeout attribute option
+    DWORD fdwItalic = false;    // italic attribute option
+    DWORD fdwUnderline = false; // underline attribute option
+    DWORD fdwStrikeOut = false; // strikeout attribute option
     DWORD fdwCharSet = ANSI_CHARSET; // character set identifier
     DWORD fdwOutputPrecision = OUT_DEFAULT_PRECIS;  // output precision
     DWORD fdwClipPrecision = CLIP_DEFAULT_PRECIS;    // clipping precision
@@ -1467,7 +1466,7 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
     HGDIOBJ old1 = SelectObject( dc, aFont );
     HGDIOBJ old2 = SelectObject( dc, aBrush );
 
-    TextOut( dc, x, y, str, aText.length() );
+    TextOut( dc, x, y, aText.toLatin1().constData(), aText.length() );
 
     SelectObject ( dc, old1 );
     SelectObject ( dc, old2 );

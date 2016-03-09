@@ -108,13 +108,15 @@ void MessageOutput( QtMsgType type, const QMessageLogContext &context, const QSt
   switch ( type )
   {
   case QtDebugMsg:
-    //MESSAGE( "Debug: " << qPrintable(msg) );
+#ifdef QT_DEBUG_MESSAGE
+    MESSAGE( "Debug: " << qPrintable( QString(msg) ) );
+#endif
     break;
   case QtWarningMsg:
-    MESSAGE( "Warning: " << qPrintable(msg) );
+    MESSAGE( "Warning: " << qPrintable( QString(msg) ) );
     break;
   case QtFatalMsg:
-    MESSAGE( "Fatal: " << qPrintable(msg) );
+    MESSAGE( "Fatal: " << qPrintable( QString(msg) ) );
     break;
   }
 }

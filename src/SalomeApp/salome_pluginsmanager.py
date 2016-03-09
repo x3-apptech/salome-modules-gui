@@ -44,7 +44,7 @@ name salome_plugins.py (example follows)::
   import salome_pluginsmanager
 
   def about(context):
-    from PyQt4.QtGui import QMessageBox
+    from qtsalome import QMessageBox
     QMessageBox.about(None, "About SALOME pluginmanager", "SALOME plugins manager in SALOME virtual application ")
 
   salome_pluginsmanager.AddFunction('About plugins','About SALOME pluginmanager',about)
@@ -83,8 +83,7 @@ context attributes:
 """
 
 import os,sys,traceback
-from PyQt4 import QtGui
-from PyQt4 import QtCore
+from qtsalome import *
 
 import salome
 
@@ -124,13 +123,15 @@ class Context:
 
 def find_menu(smenu):
   lmenus=smenu.split("|")
-  main=lmenus.takeFirst().trimmed()
+  # Take first element from the list
+  main=lmenus.pop(0).strip()
   menu=sgPyQt.getPopupMenu(main)
   return findMenu(lmenus,menu)
 
 def findMenu(lmenu,menu):
   if not lmenu:return menu
-  m=lmenu.takeFirst().trimmed()
+  # Take first element from the list
+  m=lmenu.pop(0).strip()
   for a in menu.actions():
     if a.menu():
       if a.text() == m:
@@ -148,8 +149,8 @@ logger=Logger("PluginsManager") #,color=GREEN)
 class PluginsManager:
     def __init__(self,module,name,basemenuname,menuname):
         self.name=name
-        self.basemenuname=QtCore.QString.fromUtf8(basemenuname)
-        self.menuname=QtCore.QString.fromUtf8(menuname)
+        self.basemenuname=unicode(basemenuname, "utf-8")
+        self.menuname=unicode(menuname, "utf-8")
         self.module=module
         self.registry={}
         self.handlers={}
@@ -198,15 +199,15 @@ class PluginsManager:
         self.basemenu = find_menu(self.basemenuname)
 
         if self.module:
-          self.menu=QtGui.QMenu(self.menuname)
+          self.menu=QMenu(self.menuname)
           mid=sgPyQt.createMenu(self.menu.menuAction(),self.basemenuname)
         else:
-          self.menu=QtGui.QMenu(self.menuname,self.basemenu)
+          self.menu=QMenu(self.menuname,self.basemenu)
           self.basemenu.addMenu(self.menu)
 
         self.menu.menuAction().setVisible(False)
 
-        self.basemenu.connect(self.basemenu, QtCore.SIGNAL("aboutToShow()"), self.importPlugins)
+        self.basemenu.aboutToShow.connect(self.importPlugins)
 
     def analyseFile(self,filename):
       """
@@ -232,7 +233,7 @@ class PluginsManager:
             script(Context(sgPyQt))
           except:
             s=traceback.format_exc()
-            QtGui.QMessageBox.warning(None,"Exception occured",s)
+            QMessageBox.warning(None,"Exception occured",s)
 
         self.handlers[name]=handler
 
@@ -307,7 +308,7 @@ class PluginsManager:
               if submenus.has_key(name):
                 amenu=submenus[name]
               else:
-                amenu=QtGui.QMenu(name,parentMenu)
+                amenu=QMenu(name,parentMenu)
                 parentMenu.addMenu(amenu)
                 submenus[name]=amenu
               parentMenu=amenu

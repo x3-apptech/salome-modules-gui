@@ -154,6 +154,20 @@ public:
     QString myCurLocale;
   };
 
+  class QTX_EXPORT CmdLineArgs
+  {
+  public:
+    CmdLineArgs();
+    ~CmdLineArgs();
+    
+    int argc() const;
+    char** argv() const;
+
+  private:
+    int    myArgc;
+    char** myArgv;
+  };
+
   class QTX_EXPORT BackgroundData
   {
   public:

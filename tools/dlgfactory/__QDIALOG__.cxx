@@ -1,6 +1,7 @@
 #include "__CLASSNAME__.h"
+#include <QDebug>
 
-__CLASSNAME__::__CLASSNAME__(QDialog *parent) : QDialog(parent)
+__CLASSNAME__::__CLASSNAME__(QDialog* parent) : QDialog(parent)
 {
   ui.setupUi(this); // A faire en premier
   
@@ -13,7 +14,6 @@ __CLASSNAME__::__CLASSNAME__(QDialog *parent) : QDialog(parent)
   // buttonbox (inherited features) 
 }
 
-#include <QDebug>
 void __CLASSNAME__::accept() {
   qDebug() << "accept() is not implemented yet";
   QDialog::accept();

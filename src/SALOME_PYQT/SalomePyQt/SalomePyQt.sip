@@ -28,12 +28,12 @@
 %Feature ENABLE_CORBA
 %Feature ENABLE_PLOT2D
 
-%Import QtGui/QtGuimod.sip
 %Import QtCore/QtCoremod.sip
+%Import QtGui/QtGuimod.sip
 %If (Qt_5_0_0 -)
 %Import QtWidgets/QtWidgetsmod.sip
 %End
-%Import QtXmlmod.sip
+%Import QtXml/QtXmlmod.sip
 
 %If (ENABLE_PLOT2D)
 %Include SalomePyQt_Plot2d.sip
@@ -43,6 +43,7 @@
 #include <QtxAction.h>
 #include <QtxActionSet.h>
 #include <QtxActionGroup.h>
+#include <QtxTreeView.h>
 #include <SalomePyQt.h>
 %End
 
@@ -208,6 +209,32 @@ signals:
 
 private:
   QtxActionGroup( const QtxActionGroup& );
+};
+
+class QtxTreeView : public QTreeView
+{
+%TypeHeaderCode
+#include <QtxTreeView.h>
+%End
+
+%ConvertToSubClassCode
+    if ( qobject_cast<QtxTreeView*>( sipCpp ) )
+      sipClass = sipClass_QtxTreeView;
+    else
+      sipClass = NULL;
+%End
+
+public:
+  explicit QtxTreeView( QWidget* /TransferThis/ = 0 );
+  QtxTreeView( const bool, QWidget* /TransferThis/ = 0  );
+  virtual ~QtxTreeView();
+
+signals:
+  void     sortingEnabled( bool );
+  void     selectionChanged();
+
+private:
+  QtxTreeView( const QtxTreeView& );
 };
 
 enum VisibilityState 

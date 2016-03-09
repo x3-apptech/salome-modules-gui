@@ -500,7 +500,7 @@ public:
   virtual void Execute()
   {
     LightApp_Application* anApp = getApplication();
-    if ( anApp ) {
+    if ( anApp && anApp->objectBrowser() ) {
       myResult = anApp->objectBrowser()->treeView();
     }
   }
@@ -2714,7 +2714,8 @@ public:
         QWidget* wnd = viewMgr->getActiveView();
         myResult = viewMgr->getActiveView()->getId();
         if ( wnd ) {
-          wnd->setVisible(myVisible);
+          if ( !myVisible )
+            wnd->setVisible(false);
           if ( !myVisible && myWidth == 0 && myHeight == 0 ) {
             myWidth = 1024;
             myHeight = 768;

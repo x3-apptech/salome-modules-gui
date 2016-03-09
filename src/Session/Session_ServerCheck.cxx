@@ -37,6 +37,7 @@
 #include "SALOME_NamingService.hxx"
 #include "Basics_Utils.hxx"
 #include "utilities.h"
+#include "Qtx.h"
 
 #include <QApplication> 
 #include <QWaitCondition>
@@ -261,27 +262,17 @@ void Session_ServerCheck::run()
   // start check servers
   int current = 0;
   QString error;
-
-  QStringList args = QApplication::arguments();
-  int argc = args.size();
-  std::vector<std::string> args1(argc);
-  char** argv = new char*[argc];
-  for ( int i = 0; i < argc; ++i ) {
-    args1[i] = args[i].toStdString();
-    argv[i]  = const_cast<char*>( args1[i].c_str() );
-  }
-
-  bool OK = true;
+  Qtx::CmdLineArgs args;
   
   // 1. Check naming service
-  for ( int i = 0; (i < myAttempts) && OK; i++ ) {
+  for ( int i = 0; i < myAttempts; i++ ) {
     Locker locker( this );
 
     setStep( current * myAttempts + i );
 
     try {
       ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( argc, argv );
+      CORBA::ORB_var orb = init( args.argc(), args.argv() );
       CORBA::Object_var obj = orb->resolve_initial_references( "NameService" );
       CosNaming::NamingContext_var _root_context = CosNaming::NamingContext::_narrow( obj );
       if ( !CORBA::is_nil( _root_context ) ) {
@@ -298,19 +289,19 @@ void Session_ServerCheck::run()
 
     if ( i == myAttempts-1 ) {
       setError( tr( "Unable to contact the naming service.\n" ) );
-      OK = false;
-      //return;
+      return;
     }
   }
 
   // 2. Check registry server
-  for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+  for ( int i = 0; i < myAttempts ; i++ ) {
     Locker locker( this );
 
     setStep( current * myAttempts + i );
 
     try {
-      CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+      CORBA::ORB_var orb = init( args.argc(), args.argv() );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
       ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
       NS.init_orb( orb );
@@ -347,19 +338,19 @@ void Session_ServerCheck::run()
 
     if ( i == myAttempts-1 ) {
       setError( tr( "Registry server is not found.\n%1" ).arg ( error ) );
-      OK = false;
-      //return;
+      return;
     }
   }
 
   // 3. Check data server
-  for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+  for ( int i = 0; i < myAttempts ; i++ ) {
     Locker locker( this );
 
     setStep( current * myAttempts + i );
 
     try {
-      CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+      CORBA::ORB_var orb = init( args.argc(), args.argv() );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
       ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
       NS.init_orb( orb );
@@ -396,19 +387,19 @@ void Session_ServerCheck::run()
 
     if ( i == myAttempts-1 ) {
       setError( tr( "Study server is not found.\n%1" ).arg ( error ) );
-      OK = false;
-      //return;
+      return;
     }
   }
   
   // 4. Check module catalogue server
-  for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+  for ( int i = 0; i < myAttempts ; i++ ) {
     Locker locker( this );
 
     setStep( current * myAttempts + i );
 
     try {
-      CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+      CORBA::ORB_var orb = init( args.argc(), args.argv() );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
       ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
       NS.init_orb( orb );
@@ -445,19 +436,19 @@ void Session_ServerCheck::run()
 
     if ( i == myAttempts-1 ) {
       setError( tr( "Module catalogue server is not found.\n%1" ).arg ( error ) );
-      OK = false;
-      //return;
+      return;
     }
   }
 
   // 5. Check data server
-  for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+  for ( int i = 0; i < myAttempts ; i++ ) {
     Locker locker( this );
 
     setStep( current * myAttempts + i );
 
     try {
-      CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+      CORBA::ORB_var orb = init( args.argc(), args.argv() );
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
       ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
       NS.init_orb( orb );
@@ -494,20 +485,20 @@ void Session_ServerCheck::run()
 
     if ( i == myAttempts-1 ) {
       setError( tr( "Session server is not found.\n%1" ).arg ( error ) );
-      OK = false;
-      //return;
+      return;
     }
   }
 
   // 6. Check C++ container
   if ( myCheckCppContainer ) {
-    for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+    for ( int i = 0; i < myAttempts ; i++ ) {
       Locker locker( this );
       
       setStep( current * myAttempts + i );
 
       try {
-        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+        CORBA::ORB_var orb = init( args.argc(), args.argv() );
         SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
         ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
         NS.init_orb( orb );
@@ -545,21 +536,21 @@ void Session_ServerCheck::run()
       
       if ( i == myAttempts-1 ) {
         setError( tr( "C++ container is not found.\n%1" ).arg ( error ) );
-        OK = false;
-        //return;
+        return;
       }
     }
   }
 
   // 7. Check Python container
   if ( myCheckPyContainer ) {
-    for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+    for ( int i = 0; i < myAttempts ; i++ ) {
       Locker locker( this );
       
       setStep( current * myAttempts + i );
 
       try {
-        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+        CORBA::ORB_var orb = init( args.argc(), args.argv() );
         SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
         ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
         NS.init_orb( orb );
@@ -597,21 +588,21 @@ void Session_ServerCheck::run()
 
       if ( i == myAttempts-1 ) {
         setError( tr( "Python container is not found.\n%1" ).arg ( error ) );
-        OK = false;
-        //return;
+        return;
       }
     }
   }
 
   // 8. Check supervision container
   if ( myCheckSVContainer ) {
-    for ( int i = 0; (i < myAttempts) && OK ; i++ ) {
+    for ( int i = 0; i < myAttempts ; i++ ) {
       Locker locker( this );
       
       setStep( current * myAttempts + i );
 
       try {
-        CORBA::ORB_var orb = CORBA::ORB_init( argc, argv );
+        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
+        CORBA::ORB_var orb = init( args.argc(), args.argv() );
         SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
         ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
         NS.init_orb( orb );
@@ -649,11 +640,8 @@ void Session_ServerCheck::run()
     
       if ( i == myAttempts-1 ) {
         setError( tr( "Supervision container is not found.\n%1" ).arg ( error ) );
-        OK = false;
-        //return;
+        return;
       }
     }
   }
-
-  delete [] argv;
 }

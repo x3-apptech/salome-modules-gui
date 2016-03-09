@@ -39,9 +39,15 @@ public:
   QtxWorkspace( QWidget* = 0 );
   virtual ~QtxWorkspace();
 
+signals:
+  void        windowActivated( QWidget* );
+
 public slots:
   void        tileVertical();
   void        tileHorizontal();
+
+private slots:
+  void        onSubWindowActivated( QMdiSubWindow* );
 };
 
 #ifdef WIN32

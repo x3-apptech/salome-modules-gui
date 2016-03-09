@@ -209,7 +209,7 @@ void SalomeApp_Application::start()
 
     for (int i = 1; i < qApp->arguments().size(); i++) {
       QRegExp rxs ("--study-hdf=(.+)");
-      if ( rxs.indexIn( QString(qApp->arguments()[i]) ) >= 0 && rxs.capturedTexts().count() > 1 ) {
+      if ( rxs.indexIn( qApp->arguments()[i] ) >= 0 && rxs.capturedTexts().count() > 1 ) {
         QString file = rxs.capturedTexts()[1];
         QFileInfo fi ( file );
         QString extension = fi.suffix().toLower();
@@ -218,7 +218,7 @@ void SalomeApp_Application::start()
       }
       else {
         QRegExp rxp ("--pyscript=\\[(.+)\\]");
-        if ( rxp.indexIn( QString(qApp->arguments()[i]) ) >= 0 && rxp.capturedTexts().count() > 1 ) {
+        if ( rxp.indexIn( qApp->arguments()[i] ) >= 0 && rxp.capturedTexts().count() > 1 ) {
           // pyscript
           QStringList dictList = rxp.capturedTexts()[1].split("},", QString::SkipEmptyParts);
           for (int k = 0; k < dictList.count(); ++k) {
@@ -1049,6 +1049,12 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
       ob->setResizeOnExpandItem(resizeOnExpandItem);
       ob->setProperty( "shortcut", QKeySequence( "Alt+Shift+O" ) );
 
+      for ( int i = SalomeApp_DataObject::EntryId; i < SalomeApp_DataObject::LastId; i++ )
+      {
+        bool shown = resourceMgr()->booleanValue( "ObjectBrowser", QString( "visibility_column_id_%1" ).arg( i-1 ), true );
+        ob->treeView()->setColumnHidden( i, !shown );
+      }
+
       // temporary commented
       /*
       for ( int i = SalomeApp_DataObject::ValueIdx; i <= SalomeApp_DataObject::RefEntryIdx; i++ )
@@ -1318,19 +1324,9 @@ CORBA::ORB_var SalomeApp_Application::orb()
   static CORBA::ORB_var _orb;
 
   if ( CORBA::is_nil( _orb ) ) {
-    QStringList args = QApplication::arguments();
-    int argc = args.size();
-    std::vector<std::string> args1(argc);
-    char** argv = new char*[argc];
-    for ( int i = 0; i < argc; ++i ) {
-      args1[i] = args[i].toStdString();
-      argv[i]  = const_cast<char*>( args1[i].c_str() );
-    }
-
+    Qtx::CmdLineArgs args;
     ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-    _orb = init( argc, argv );
-
-    delete [] argv;
+    _orb = init( args.argc(), args.argv() );
   }
 
   return _orb;

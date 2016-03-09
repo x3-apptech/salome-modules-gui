@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-#  -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 # Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
@@ -19,17 +18,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import os, re
+QT_SALOME_VERSION=@QT_SALOME_VERSION@
 
-# -----------------------------------------------------------------------------
-
-def set_env( args ):
-    """Add environment required for GUI module"""
-    vtk_overloads_dir = os.path.join( os.getenv( "GUI_ROOT_DIR" ), "lib", "paraview" )
-    dirs = re.split( ":|;", os.getenv( 'VTK_AUTOLOAD_PATH', vtk_overloads_dir ) )
-    if vtk_overloads_dir not in dirs: dirs[0:0] = [vtk_overloads_dir]
-    os.environ['VTK_AUTOLOAD_PATH'] = os.pathsep.join(dirs)
-    os.environ['QT_PLUGIN_PATH'] = ''
-    return
-
-
+try:
+    from PyQt@QT_SALOME_VERSION@.Qt import *
+except:
+    pass
