@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(UseQtExt)
+INCLUDE(UseQt4Ext)
 
 # --- options ---
 
@@ -68,7 +68,7 @@ SET(_ts_RESOURCES
 )
 
 # sources / moc wrappings
-QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES
@@ -87,4 +87,4 @@ TARGET_LINK_LIBRARIES(SalomePyConsole ${_link_LIBRARIES})
 INSTALL(TARGETS SalomePyConsole EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 INSTALL(FILES ${SalomePyConsole_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+QT4_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
