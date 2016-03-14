@@ -22,7 +22,7 @@
 #ifndef PYCONSOLE_ENHEDITORBASE_H_
 #define PYCONSOLE_ENHEDITORBASE_H_
 
-#include "PyConsoleBase.h"
+#include "PyConsole.h"
 #include "PyConsole_EditorBase.h"
 
 #include <QObject>
@@ -31,7 +31,7 @@
 /**
  * Enhanced Python editor handling tab completion.
  */
-class PYCONSOLEBASE_EXPORT PyConsole_EnhEditorBase : public PyConsole_EditorBase
+class PYCONSOLE_EXPORT PyConsole_EnhEditorBase : public PyConsole_EditorBase
 {
   Q_OBJECT;
 

@@ -89,7 +89,7 @@
 */
 
 #include "PyConsole_Interp.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
-#include "PyConsole_Editor.h"
+#include "SalomePyConsole_Editor.h"
 #include "PyConsole_Event.h"
 #include "PyInterp_Event.h"
 #include "PyInterp_Dispatcher.h"
@@ -140,8 +140,8 @@ bool DumpCommandsFileValidator::canSave(const QString& file, bool permissions)
   \param theInterp python interper
   \param theParent parent widget
 */
-PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp, 
-                                    QWidget*          theParent )
+SalomePyConsole_Editor::SalomePyConsole_Editor( PyConsole_Interp* theInterp, 
+                                                QWidget*          theParent )
   : PyConsole_EditorBase(theInterp,theParent)
 {
 }
@@ -149,12 +149,12 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
 /*!
   \brief Destructor.
 */
-PyConsole_Editor::~PyConsole_Editor()
+SalomePyConsole_Editor::~SalomePyConsole_Editor()
 {
 }
 
 
-void PyConsole_Editor::StaticDumpSlot(PyConsole_EditorBase *base)
+void SalomePyConsole_Editor::StaticDumpSlot(PyConsole_EditorBase *base)
 {
   QStringList aFilters;
   aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
@@ -168,12 +168,12 @@ void PyConsole_Editor::StaticDumpSlot(PyConsole_EditorBase *base)
 /*!
   \brief "Dump commands" operation.
  */
-void PyConsole_Editor::dumpSlot()
+void SalomePyConsole_Editor::dumpSlot()
 {
-  PyConsole_Editor::StaticDumpSlot(this);
+  SalomePyConsole_Editor::StaticDumpSlot(this);
 }
 
-void PyConsole_Editor::StaticStartLogSlot(PyConsole_EditorBase *base)
+void SalomePyConsole_Editor::StaticStartLogSlot(PyConsole_EditorBase *base)
 {
   QStringList aFilters;
   aFilters.append( tr( "LOG_FILES_FILTER" ) );
@@ -201,7 +201,7 @@ void PyConsole_Editor::StaticStartLogSlot(PyConsole_EditorBase *base)
 /*!
   \brief "Start log" operation.
  */
-void PyConsole_Editor::startLogSlot()
+void SalomePyConsole_Editor::startLogSlot()
 {
   StaticStartLogSlot(this);
 }

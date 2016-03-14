@@ -1,8 +1,5 @@
 // Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -19,31 +16,30 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
+// Author : Adrien Bruneton (CEA/DEN)
+// Created on: 4 avr. 2013
 
-#ifndef PYCONSOLE_INTERP_H
-#define PYCONSOLE_INTERP_H
+#ifndef SALOMEPYCONSOLE_ENHEDITOR_H_
+#define SALOMEPYCONSOLE_ENHEDITOR_H_
 
-#include "PyConsoleBase.h"
-#include "PyInterp_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include "SalomePyConsole.h"
+#include "PyConsole_EnhEditorBase.h"
 
-#include <QStringList>
+#include <QObject>
+#include <queue>
 
-class PYCONSOLEBASE_EXPORT PyConsole_Interp : public PyInterp_Interp
+/**
+ * Enhanced Python editor handling tab completion.
+ */
+class PYCONSOLE_EXPORT SalomePyConsole_EnhEditor : public PyConsole_EnhEditorBase
 {
+  Q_OBJECT;
 public:
-  PyConsole_Interp();
-  ~PyConsole_Interp();
-
-  virtual int afterRun();
-  virtual int beforeRun();
-
-  virtual QStringList getLastMatches() const;
-  virtual QString getDocStr() const;
-
-  virtual int runDirCommand(const QString&, const QString&);
-  virtual void clearCompletion();
+  SalomePyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent = 0);
+  virtual ~SalomePyConsole_EnhEditor() {}
+protected:
+  virtual void dumpSlot();
+  virtual void startLogSlot();
 };
 
-#endif // PYCONSOLE_INTERP_H
+#endif /* PYCONSOLE_ENHEDITOR_H_ */

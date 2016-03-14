@@ -36,7 +36,7 @@
 
 #ifndef DISABLE_PYCONSOLE
   #include "LightApp_PyInterp.h" // WARNING! This include must be the first!
-  #include <PyConsole_Console.h>
+  #include <SalomePyConsole_Console.h>
 #endif
 
 #include "LightApp_Application.h"
@@ -1372,13 +1372,13 @@ LogWindow* LightApp_Application::logWindow()
   \param force - if true, the pythonConsole is created if it does not exist yet
   \return Python Console
 */
-PyConsole_Console* LightApp_Application::pythonConsole(const bool force)
+SalomePyConsole_Console* LightApp_Application::pythonConsole(const bool force)
 {
   QWidget* wid = dockWindow( WT_PyConsole );
   if ( !wid && force==true) {
     wid = getWindow(WT_PyConsole);
   }
-  return qobject_cast<PyConsole_Console*>( wid );
+  return qobject_cast<SalomePyConsole_Console*>( wid );
 }
 #endif
 
@@ -2035,7 +2035,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else  if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), getPyInterp() );
+    SalomePyConsole_Console* pyCons = new SalomePyConsole_EnhConsole( desktop(), getPyInterp() );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));

@@ -81,8 +81,8 @@ ENDIF()
 IF(SALOME_USE_PYCONSOLE)
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/src/SalomePyConsole
     ${PROJECT_SOURCE_DIR}/src/PyConsole
-    ${PROJECT_SOURCE_DIR}/src/PyConsoleBase
     ${PROJECT_SOURCE_DIR}/src/PyInterp
     ${PROJECT_SOURCE_DIR}/src/SUITApp
   )
@@ -142,7 +142,7 @@ IF(SALOME_USE_PVVIEWER)
   LIST(APPEND _link_LIBRARIES PVViewer)
 ENDIF()
 IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _link_LIBRARIES PyInterp PyConsole SUITApp)
+  LIST(APPEND _link_LIBRARIES PyInterp SalomePyConsole SUITApp)
 ENDIF()
 
 # --- headers ---

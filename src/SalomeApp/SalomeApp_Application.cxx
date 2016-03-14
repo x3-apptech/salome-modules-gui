@@ -36,7 +36,7 @@
 
 #ifndef DISABLE_PYCONSOLE
   #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
-  #include <PyConsole_Console.h>
+  #include <SalomePyConsole_Console.h>
   #include "SalomeApp_NoteBook.h"
 #endif
 #include "SalomeApp_Application.h"
@@ -253,7 +253,7 @@ void SalomeApp_Application::start()
     // import/execute python scripts
     if ( pyfiles.count() > 0 && activeStudy() ) {
       SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-      PyConsole_Console* pyConsole = pythonConsole();
+      SalomePyConsole_Console* pyConsole = pythonConsole();
       if ( appStudy && pyConsole ) {
         _PTR(Study) aStudy = appStudy->studyDS();
         if ( !aStudy->GetProperties()->IsLocked() ) {
@@ -505,7 +505,7 @@ void SalomeApp_Application::onNewWithScript()
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
-    PyConsole_Console* pyConsole = pythonConsole();
+    SalomePyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
@@ -956,7 +956,7 @@ void SalomeApp_Application::onLoadScript( )
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
-    PyConsole_Console* pyConsole = pythonConsole();
+    SalomePyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
@@ -1076,7 +1076,7 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else if ( flag == WT_PyConsole )
   {
-    PyConsole_Console* pyCons = new PyConsole_EnhConsole( desktop(), getPyInterp() );
+    SalomePyConsole_Console* pyCons = new SalomePyConsole_EnhConsole( desktop(), getPyInterp() );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
@@ -2028,7 +2028,7 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   QString command = QString( "execfile(r\"%1\")" ).arg( theDumpScript );
 
 #ifndef DISABLE_PYCONSOLE
-  PyConsole_Console* pyConsole = app->pythonConsole();
+  SalomePyConsole_Console* pyConsole = app->pythonConsole();
   if ( pyConsole )
     pyConsole->execAndWait( command );
 #endif

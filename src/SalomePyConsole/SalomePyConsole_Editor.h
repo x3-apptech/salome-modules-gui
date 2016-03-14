@@ -24,10 +24,10 @@
 // File   : PyConsole_Editor.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
-#ifndef PYCONSOLE_EDITOR_H
-#define PYCONSOLE_EDITOR_H
+#ifndef SALOMEPYCONSOLE_EDITOR_H
+#define SALOMEPYCONSOLE_EDITOR_H
 
-#include "PyConsole.h"
+#include "SalomePyConsole.h"
 #include "PyConsole_EditorBase.h"
 
 #include <QTextEdit>
@@ -36,12 +36,12 @@ class PyConsole_Interp;
 class PyInterp_Request;
 class QEventLoop;
 
-class PYCONSOLE_EXPORT PyConsole_Editor : public PyConsole_EditorBase
+class PYCONSOLE_EXPORT SalomePyConsole_Editor : public PyConsole_EditorBase
 {
   Q_OBJECT;
 public:
-  PyConsole_Editor( PyConsole_Interp* theInterp, QWidget *theParent = 0 );
-  ~PyConsole_Editor();
+  SalomePyConsole_Editor( PyConsole_Interp* theInterp, QWidget *theParent = 0 );
+  ~SalomePyConsole_Editor();
   static void StaticDumpSlot(PyConsole_EditorBase *base);
   static void StaticStartLogSlot(PyConsole_EditorBase *base);
 protected:
@@ -49,4 +49,4 @@ protected:
   virtual void startLogSlot();
 };
 
-#endif // PYCONSOLE_EDITOR_H
+#endif // SALOMEPYCONSOLE_EDITOR_H
