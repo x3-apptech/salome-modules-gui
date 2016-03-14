@@ -29,9 +29,9 @@
 */  
 
 #include "PyConsole_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
-#include "PyConsole_Console.h"
-#include "PyConsole_Editor.h"
-#include "PyConsole_EnhEditor.h"
+#include "SalomePyConsole_Console.h"
+#include "SalomePyConsole_Editor.h"
+#include "SalomePyConsole_EnhEditor.h"
 #include "PyConsole_EnhInterp.h"
 
 #include <Qtx.h>
@@ -43,10 +43,10 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
-PyConsole_EditorBase *PyConsole_Console::PyConsole_Interp_Creator::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
-{ return new PyConsole_Editor(interp,console); }
+PyConsole_EditorBase *SalomePyConsole_Console::SalomePyConsole_Interp_Creator::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
+{ return new SalomePyConsole_Editor(interp,console); }
 
-PyConsole_Interp *PyConsole_Console::PyConsole_Interp_Creator::createInterp( ) const
+PyConsole_Interp *SalomePyConsole_Console::SalomePyConsole_Interp_Creator::createInterp( ) const
 { return new PyConsole_Interp; }
 
 /*!
@@ -56,17 +56,17 @@ PyConsole_Interp *PyConsole_Console::PyConsole_Interp_Creator::createInterp( ) c
   \param parent parent widget
   \param interp python interpreter
 */
-PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* interp )
+SalomePyConsole_Console::SalomePyConsole_Console( QWidget* parent, PyConsole_Interp* interp )
   : PyConsole_ConsoleBase( parent, interp, 0 )
 {
-  PyConsole_Interp_Creator crea;
+  SalomePyConsole_Interp_Creator crea;
   defaultConstructor(interp,crea);
 }
 
 /**
  * Protected constructor.
  */
-PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* i,  PyConsole_Editor* e )
+SalomePyConsole_Console::SalomePyConsole_Console( QWidget* parent, PyConsole_Interp* i,  SalomePyConsole_Editor* e )
   : PyConsole_ConsoleBase(parent,i,e)
 {  
 }
@@ -76,7 +76,7 @@ PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Interp* i,  PyC
 
   Does nothing for the moment.
 */
-PyConsole_Console::~PyConsole_Console()
+SalomePyConsole_Console::~SalomePyConsole_Console()
 {
 }
 
@@ -87,7 +87,7 @@ PyConsole_Console::~PyConsole_Console()
 
   \param menu context popup menu
 */
-void PyConsole_Console::contextMenuPopup( QMenu *menu )
+void SalomePyConsole_Console::contextMenuPopup( QMenu *menu )
 {
   PyConsole_ConsoleBase::contextMenuPopup(menu);
 }
@@ -101,7 +101,7 @@ void PyConsole_Console::contextMenuPopup( QMenu *menu )
   \param e event
   \return True if the event is processed and further processing should be stopped
 */
-bool PyConsole_Console::eventFilter( QObject* o, QEvent* e )
+bool SalomePyConsole_Console::eventFilter( QObject* o, QEvent* e )
 {
   if ( o == myEditor->viewport() && e->type() == QEvent::ContextMenu )
   {
@@ -111,10 +111,10 @@ bool PyConsole_Console::eventFilter( QObject* o, QEvent* e )
   return QWidget::eventFilter( o, e );
 }
 
-PyConsole_EditorBase *PyConsole_EnhConsole::PyConsole_Interp_EnhCreator::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
-{ return new PyConsole_EnhEditor(interp,console); }
+PyConsole_EditorBase *SalomePyConsole_EnhConsole::SalomePyConsole_Interp_EnhCreator::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
+{ return new SalomePyConsole_EnhEditor(interp,console); }
 
-PyConsole_Interp *PyConsole_EnhConsole::PyConsole_Interp_EnhCreator::createInterp( ) const
+PyConsole_Interp *SalomePyConsole_EnhConsole::SalomePyConsole_Interp_EnhCreator::createInterp( ) const
 { return new PyConsole_EnhInterp; }
 
 /**
@@ -123,9 +123,9 @@ PyConsole_Interp *PyConsole_EnhConsole::PyConsole_Interp_EnhCreator::createInter
  * @param parent
  * @param interp
  */
-PyConsole_EnhConsole::PyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp )
-  : PyConsole_Console( parent, interp, 0 )
+SalomePyConsole_EnhConsole::SalomePyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp )
+  : SalomePyConsole_Console( parent, interp, 0 )
 {
-  PyConsole_Interp_EnhCreator crea;
+  SalomePyConsole_Interp_EnhCreator crea;
   defaultConstructor(interp,crea);
 }

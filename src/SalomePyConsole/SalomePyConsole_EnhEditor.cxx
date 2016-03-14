@@ -19,7 +19,7 @@
 // Author : Adrien Bruneton (CEA/DEN)
 // Created on: 4 avr. 2013
 
-#include "PyConsole.h"
+#include "SalomePyConsole.h"
 #include <Python.h>
 
 #include <QKeyEvent>
@@ -29,25 +29,25 @@
 #include <QRegExp>
 #include <QMimeData>
 
-#include "PyConsole_EnhEditor.h"
-#include "PyConsole_Editor.h"
+#include "SalomePyConsole_EnhEditor.h"
+#include "SalomePyConsole_Editor.h"
 
 /**
  * Constructor.
  * @param interp the interpreter linked to the editor
  * @param parent parent widget
  */
-PyConsole_EnhEditor::PyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent) :
+SalomePyConsole_EnhEditor::SalomePyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent) :
      PyConsole_EnhEditorBase(interp, parent)
 {
 }
 
-void PyConsole_EnhEditor::dumpSlot()
+void SalomePyConsole_EnhEditor::dumpSlot()
 {
-  PyConsole_Editor::StaticDumpSlot(this);
+  SalomePyConsole_Editor::StaticDumpSlot(this);
 }
 
-void PyConsole_EnhEditor::startLogSlot()
+void SalomePyConsole_EnhEditor::startLogSlot()
 {
-  PyConsole_Editor::StaticStartLogSlot(this);
+  SalomePyConsole_Editor::StaticStartLogSlot(this);
 }

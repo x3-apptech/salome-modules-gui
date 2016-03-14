@@ -23,38 +23,38 @@
 // File   : PyConsole_Console.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
-#ifndef PYCONSOLE_CONSOLE_H
-#define PYCONSOLE_CONSOLE_H
+#ifndef SALOMEPYCONSOLE_CONSOLE_H
+#define SALOMEPYCONSOLE_CONSOLE_H
 
-#include "PyConsole.h"
+#include "SalomePyConsole.h"
 #include <PyConsole_ConsoleBase.h>
 #include <SUIT_PopupClient.h>
 #include <QWidget>
 #include <QMap>
 
-class PyConsole_Interp;
-class PyConsole_Editor;
+class SalomePyConsole_Interp;
+class SalomePyConsole_Editor;
 
-class PYCONSOLE_EXPORT PyConsole_Console : public PyConsole_ConsoleBase, public SUIT_PopupClient
+class SALOMEPYCONSOLE_EXPORT SalomePyConsole_Console : public PyConsole_ConsoleBase, public SUIT_PopupClient
 {
   Q_OBJECT
 public:
 
-  struct PyConsole_Interp_Creator : public PyConsole_Interp_CreatorBase
+  struct SalomePyConsole_Interp_Creator : public PyConsole_Interp_CreatorBase
   {
     virtual PyConsole_EditorBase *createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const;
     virtual PyConsole_Interp *createInterp( ) const;
   };
 
 public:
-  PyConsole_Console( QWidget* parent, PyConsole_Interp* interp = 0 );
-  virtual ~PyConsole_Console();
+  SalomePyConsole_Console( QWidget* parent, PyConsole_Interp* interp = 0 );
+  virtual ~SalomePyConsole_Console();
   //! \brief Get popup client symbolic name
   virtual QString     popupClientType() const { return QString( "PyConsole" ); }
   virtual void        contextMenuPopup( QMenu* );
   virtual bool        eventFilter( QObject*, QEvent* );
 protected:
-  PyConsole_Console( QWidget* parent, PyConsole_Interp*,  PyConsole_Editor*);
+  SalomePyConsole_Console( QWidget* parent, PyConsole_Interp*,  SalomePyConsole_Editor*);
 };
 
 /**
@@ -62,20 +62,20 @@ protected:
  * Similar to PyConsole_Console except that an enhanced interpreter and enhanced editor
  * are encapsulated.
  */
-class PYCONSOLE_EXPORT PyConsole_EnhConsole : public PyConsole_Console
+class PYCONSOLE_EXPORT SalomePyConsole_EnhConsole : public SalomePyConsole_Console
 {
   Q_OBJECT
 public:
 
-  struct PyConsole_Interp_EnhCreator : public PyConsole_Interp_CreatorBase
+  struct SalomePyConsole_Interp_EnhCreator : public PyConsole_Interp_CreatorBase
   {
     virtual PyConsole_EditorBase *createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const;
     virtual PyConsole_Interp *createInterp( ) const;
   };
 
 public:
-  PyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp = 0 );
-  virtual ~PyConsole_EnhConsole() {}
+  SalomePyConsole_EnhConsole( QWidget* parent, PyConsole_Interp* interp = 0 );
+  virtual ~SalomePyConsole_EnhConsole() {}
 };
 
-#endif // PYCONSOLE_CONSOLE_H
+#endif // SALOMEPYCONSOLE_CONSOLE_H

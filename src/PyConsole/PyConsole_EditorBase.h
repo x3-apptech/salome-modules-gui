@@ -27,7 +27,7 @@
 #ifndef PYCONSOLE_EDITORBASE_H
 #define PYCONSOLE_EDITORBASE_H
 
-#include "PyConsoleBase.h"
+#include "PyConsole.h"
 
 #include <QTextEdit>
 
@@ -35,7 +35,7 @@ class PyConsole_Interp;
 class PyInterp_Request;
 class QEventLoop;
 
-class PYCONSOLEBASE_EXPORT PyConsole_EditorBase : public QTextEdit
+class PYCONSOLE_EXPORT PyConsole_EditorBase : public QTextEdit
 {
   Q_OBJECT;
 

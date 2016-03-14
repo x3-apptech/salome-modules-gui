@@ -1,5 +1,8 @@
 // Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
 //
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
 // License as published by the Free Software Foundation; either
@@ -16,30 +19,30 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Adrien Bruneton (CEA/DEN)
-// Created on: 4 avr. 2013
 
-#ifndef PYCONSOLE_ENHEDITOR_H_
-#define PYCONSOLE_ENHEDITOR_H_
+// File   : PyConsole.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
+//
+#if !defined ( SALOMEPYCONSOLE_H )
+#define SALOMEPYCONSOLE_H
 
-#include "PyConsole.h"
-#include "PyConsole_EnhEditorBase.h"
+// ========================================================
+// set dllexport type for Win platform 
+#ifdef WIN32
+#  if defined SALOMEPYCONSOLE_EXPORTS || defined SalomePyConsole_EXPORTS
+#    define SALOMEPYCONSOLE_EXPORT __declspec(dllexport)
+#  else
+#    define SALOMEPYCONSOLE_EXPORT __declspec(dllimport)
+#  endif
+#else   // WIN32
+#  define SALOMEPYCONSOLE_EXPORT
+#endif  // WIN32
 
-#include <QObject>
-#include <queue>
+// ========================================================
+// avoid warning messages
+#ifdef WIN32
+#pragma warning (disable : 4786)
+#pragma warning (disable : 4251)
+#endif
 
-/**
- * Enhanced Python editor handling tab completion.
- */
-class PYCONSOLE_EXPORT PyConsole_EnhEditor : public PyConsole_EnhEditorBase
-{
-  Q_OBJECT;
-public:
-  PyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent = 0);
-  virtual ~PyConsole_EnhEditor() {}
-protected:
-  virtual void dumpSlot();
-  virtual void startLogSlot();
-};
-
-#endif /* PYCONSOLE_ENHEDITOR_H_ */
+#endif // SALOMEPYCONSOLE_H

@@ -26,7 +26,7 @@
 #ifndef PYCONSOLE_CONSOLEBASE_H
 #define PYCONSOLE_CONSOLEBASE_H
 
-#include "PyConsoleBase.h"
+#include "PyConsole.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -35,7 +35,7 @@
 class PyConsole_Interp;
 class PyConsole_EditorBase;
 
-class PYCONSOLEBASE_EXPORT PyConsole_ConsoleBase : public QWidget
+class PYCONSOLE_EXPORT PyConsole_ConsoleBase : public QWidget
 {
   Q_OBJECT
 
@@ -106,7 +106,7 @@ protected:
  * Similar to PyConsole_Console except that an enhanced interpreter and enhanced editor
  * are encapsulated.
  */
-class PYCONSOLEBASE_EXPORT PyConsole_EnhConsoleBase : public PyConsole_ConsoleBase
+class PYCONSOLE_EXPORT PyConsole_EnhConsoleBase : public PyConsole_ConsoleBase
 {
   Q_OBJECT
 public:

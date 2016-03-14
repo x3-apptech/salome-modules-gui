@@ -377,7 +377,7 @@ ENDIF()
 # Python-based packages specific targets:
 IF(SALOME_USE_PYCONSOLE)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       PyInterp PyConsoleBase PyConsole SalomePyQtGUILight)
+       PyInterp PyConsole SalomePyConsole SalomePyQtGUILight)
   IF(SALOME_USE_PLOT2DVIEWER)
     LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomePyQt)
   ENDIF()

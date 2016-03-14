@@ -73,7 +73,7 @@
     <parameter name="PyEditor"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="PyViewer"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="PyConsole"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="PyConsoleBase" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="SalomePyConsole" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SalomeApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OB"            value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="CAM"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>

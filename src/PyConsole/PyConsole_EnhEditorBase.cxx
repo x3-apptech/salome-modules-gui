@@ -19,7 +19,7 @@
 // Author : Adrien Bruneton (CEA/DEN)
 // Created on: 4 avr. 2013
 
-#include "PyConsoleBase.h"
+#include "PyConsole.h"
 #include <Python.h>
 
 #include <QKeyEvent>
