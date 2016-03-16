@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2016  CEA/DEN, EDF R&D
+// Copyright (C) 2010-2015  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,9 +52,6 @@ public:
   QMenu* getFiltersMenu() { return filtersMenu; }
   QMenu* getSourcesMenu() { return sourcesMenu; }
   QMenu* getMacrosMenu()  { return macrosMenu; }
-#ifdef PVCATALYST_ENABLED
-  QMenu* getCatalystMenu()  { return catalystMenu; }
-#endif
 
   pqVCRToolbar* getVCRToolbar() { return vcrToolbar; }
   pqAnimationTimeToolbar* getTimeToolbar() { return timeToolbar; }
@@ -79,9 +76,6 @@ private:
   QMenu* sourcesMenu;
   QMenu* filtersMenu;
   QMenu* macrosMenu;
-#ifdef PVCATALYST_ENABLED
-  QMenu* catalystMenu;
-#endif
 
   // Toolbars also need to be instanciated early:
   QToolBar* mainToolBar;
