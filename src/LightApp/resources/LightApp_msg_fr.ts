@@ -70,6 +70,19 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>APPCLOSE_CANCEL</source>
         <translation>&amp;Annuler</translation>
     </message>
+    <message>
+        <source>WRN_PYTHON_FILE_NAME_BAD</source>
+        <translation>Indiquez un nom de fichier correct.
+Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas et doit commencer avec une lettre ou un tiret bas.</translation>
+    </message>
+    <message>
+        <source>PYTHON_FILES_FILTER</source>
+        <translation>Fichiers Python (*.py)</translation>
+    </message>
+    <message>
+        <source>LOG_FILES_FILTER</source>
+        <translation>Fichiers de trace (*.log *.txt)</translation>
+    </message>
 </context>
 <context>
     <name>LightApp_Application</name>
@@ -410,6 +423,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
     <message>
         <source>PREF_SHOW_BANNER</source>
         <translation>Afficher la bannière</translation>
+    </message>
+    <message>
+        <source>PREF_AUTO_COMPLETION</source>
+        <translation type="unfinished">Command auto-completion</translation>
     </message>
     <message>
         <source>PREF_GROUP_STYLE</source>
@@ -1167,6 +1184,17 @@ Le fichier n&apos;existe pas</translation>
     <message>
         <source>ACTIVATE_MODULE_TOP</source>
         <translation>Activer/désactiver le module %1</translation>
+    </message>
+</context>
+<context>
+    <name>LightApp_PyEditor</name>
+    <message>
+        <source>TOT_DUMP_PYCOMMANDS</source>
+        <translation>&amp;Générer le script des commandes</translation>
+    </message>
+    <message>
+        <source>TOT_SAVE_PYLOG</source>
+        <translation>Sauver la trace</translation>
     </message>
 </context>
 </TS>

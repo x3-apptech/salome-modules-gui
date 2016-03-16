@@ -4,10 +4,6 @@
   <context>
     <name>@default</name>
     <message>
-      <source>WRN_FILE_NAME_BAD</source>
-      <translation>有効なファイル名を入力してください。Pythonのファイル名は、文字、数字、およびアンダー スコアで構成され、文字かアンダー スコアで始まる必要があります。</translation>
-    </message>
-    <message>
       <source>WRN_FILE_NOT_EXIST</source>
       <translation>ファイル %1 は存在しません。</translation>
     </message>
@@ -244,10 +240,6 @@
     <message>
       <source>PRP_DESK_REGISTRY_DISPLAY</source>
       <translation>CORBAサーバーの登録内容を表示</translation>
-    </message>
-    <message>
-      <source>PYTHON_FILES_FILTER</source>
-      <translation>ファイル (*.py) PYTHON</translation>
     </message>
     <message>
       <source>APPCLOSE_DESCRIPTION</source>

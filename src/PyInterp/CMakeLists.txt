@@ -25,25 +25,24 @@ INCLUDE(UseQt4Ext)
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${PYTHON_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/src/Event
 )
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES} Event)
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES})
 
 # --- headers ---
 
-# header files / to be processed by moc / internal
-# TODO: check for MSVS project
-SET(_moc_internal_HEADERS PyInterp_Watcher.h)
+# header files / to be processed by moc
+SET(_moc_HEADERS
+  PyInterp_Dispatcher.h
+)
 
 # header files / no moc processing
 SET(_other_HEADERS
   PyInterp.h
-  PyInterp_Dispatcher.h
   PyInterp_Event.h
   PyInterp_Interp.h
   PyInterp_Request.h
@@ -51,12 +50,12 @@ SET(_other_HEADERS
 )
 
 # header files / to install
-SET(PyInterp_HEADERS ${_other_HEADERS})
+SET(PyInterp_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 
 # --- sources ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_internal_HEADERS})
+QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES

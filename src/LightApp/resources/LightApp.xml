@@ -73,7 +73,6 @@
     <parameter name="PyEditor"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="PyViewer"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="PyConsole"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
-    <parameter name="SalomePyConsole" value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="SalomeApp"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="OB"            value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="CAM"           value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
@@ -89,6 +88,7 @@
   </section>
   <section name="PyConsole">
     <!-- Python console preferences -->
+    <parameter name="auto_completion"     value="true" />
     <parameter name="show_banner"         value="false" />
     <parameter name="font"                value="Sans Serif,12" />
     <parameter name="additional_families" value="Helvetic;Helvetica;Helvetica[Adobe];Times;Times[Adobe];Sans Serif;Serif;Monospace;Lucida"/>

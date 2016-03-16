@@ -61,7 +61,7 @@
 #include "SUIT_Tools.h"
 #include "SUIT_ViewManager.h"
 #include "SUIT_ViewWindow.h"
-#include "SalomePyConsole_Console.h"
+#include "PyConsole_Console.h"
 
 #include <QAction>
 #include <QApplication>
@@ -4001,7 +4001,7 @@ void SalomePyQt::startPyLog( const QString& theFileName )
     virtual void Execute() 
     {
       if ( getApplication() ) {
-	SalomePyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
+	PyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
 	if ( pyConsole ) pyConsole->startLog( myFileName );
       }
     }
@@ -4021,7 +4021,7 @@ void SalomePyQt::stopPyLog()
     virtual void Execute() 
     {
       if ( getApplication() ) {
-	SalomePyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
+	PyConsole_Console* pyConsole = getApplication()->pythonConsole( false );
 	if ( pyConsole ) pyConsole->stopLog();
       }
     }

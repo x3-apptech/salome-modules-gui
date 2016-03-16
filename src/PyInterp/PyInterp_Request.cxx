@@ -20,11 +20,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 //  File   : PyInterp_Request.h
-//  Author : Sergey Anikin, OCC, Adrien Bruneton (CEA/DEN)
-//  Module : GUI
+//  Author : Sergey Anikin (OPEN CASCADE S.A.S.), Adrien Bruneton (CEA/DEN)
 
 #include "PyInterp_Request.h"
 #include "PyInterp_Utils.h"
+
 #include <QCoreApplication>
 
 void PyInterp_Request::process()
@@ -45,7 +45,6 @@ void PyInterp_Request::process()
 
 void PyInterp_Request::safeExecute()
 {
-  //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
   execute();
 }
 
@@ -89,9 +88,6 @@ void PyInterp_Request::setListener( QObject* o )
 
 void PyInterp_LockRequest::safeExecute()
 {
-  //if ( getInterp() ){  // No need to have an interpreter now! we can simply run in a empty context
-    PyLockWrapper aLock; // Acquire GIL
-    //ProcessVoidEvent( new PyInterp_ExecuteEvent( this ) );
-    execute();
-  //}
+  PyLockWrapper aLock; // Acquire GIL
+  execute();
 }

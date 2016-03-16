@@ -16,54 +16,27 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Adrien Bruneton (CEA/DEN)
-// Created on: 3 avr. 2013
+// File   : PyConsole_Request.h
+// Author : Vadim SANDLER (OPEN CASCADE), Adrien Bruneton (CEA/DEN)
 
-
-#ifndef PYCONSOLE_REQUEST_H_
-#define PYCONSOLE_REQUEST_H_
+#ifndef PYCONSOLE_REQUEST_H
+#define PYCONSOLE_REQUEST_H
 
 #include "PyInterp_Request.h"
 
-#include <vector>
 #include <QString>
-#include <QEvent>
+#include <QStringList>
 
+class QEvent;
 class PyInterp_Interp;
 
-/*!
-  \class ExecCommand
-  \brief Python command execution request.
-  \internal
-*/
-class ExecCommand : public PyInterp_LockRequest
+class PyConsole_ExecCommand : public PyInterp_LockRequest
 {
 public:
-  /*!
-    \brief Constructor.
-
-    Creates new python command execution request.
-    \param theInterp   python interpreter
-    \param theCommand  python command
-    \param theListener widget to get the notification messages
-    \param sync        if True the request is processed synchronously
-  */
-  ExecCommand( PyInterp_Interp*        theInterp,
-               const QString&          theCommand,
-               QObject*                theListener,
-               bool                    theSync = false );
+  PyConsole_ExecCommand( PyInterp_Interp*, const QString&, QObject*, bool = false );
 
 protected:
-  /*!
-    \brief Execute the python command in the interpreter and
-           get its execution status.
-  */
   virtual void execute();
-
-  /*!
-    \brief Create and return a notification event.
-    \return new notification event
-  */
   virtual QEvent* createEvent();
 
 private:
@@ -71,29 +44,21 @@ private:
   int     myState;     //!< Python command execution status
 };
 
-class CompletionCommand : public PyInterp_LockRequest
+class PyConsole_CompletionCommand : public PyInterp_LockRequest
 {
 public:
-  CompletionCommand( PyInterp_Interp*     theInterp,
-		     const QString&       theInput,
-		     const QString&       theStartMatch,
-		     QObject*             theListener,
-		     bool                 theSync = false );
-
+  PyConsole_CompletionCommand( PyInterp_Interp*, const QString&, const QString&, QObject*, bool = false );
 
 protected:
-  /** List of separators identifying the last parsable token for completion */
-  static const std::vector<QString> SEPARATORS;
-
-  /** String to be passed to the dir() command */
-  QString _dirArg;
-  /** Begining of the command (as typed by the user) */
-  QString _startMatch;
-  /** was the completion command successful */
-  bool _tabSuccess;
-
   virtual void execute();
   virtual QEvent* createEvent();
+
+private:
+  QString     myDirArg;       //!< String to be passed to the dir() comman
+  QString     myStartMatch;   //!< Begining of the command (as typed by the user)
+  bool        myStatus;       //!< Status of completion command execution
+  QStringList myMatches;      //!< Matches
+  QString     myDoc;          //!< Docstring of single match
 };
 
-#endif /* PYCONSOLE_REQUEST_H_ */
+#endif // PYCONSOLE_REQUEST_H

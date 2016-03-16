@@ -16,37 +16,26 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// File   : LightApp_PyEditor.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-//  Author : Roman NIKOLAEV, Open CASCADE S.A.S. (roman.nikolaev@opencascade.com)
-//  Date   : 22/06/2007
-//
-#include "LightApp_PyInterp.h"
+#ifndef LIGHTAPP_PYEDITOR_H
+#define LIGHTAPP_PYEDITOR_H
 
-/*!
- * constructor : Python interpreter.
- */
-LightApp_PyInterp::LightApp_PyInterp(): PyConsole_EnhInterp()
+#include "LightApp.h"
+#include "PyConsole_Editor.h"
+
+class LIGHTAPP_EXPORT LightApp_PyEditor : public PyConsole_Editor
 {
-}
+  Q_OBJECT
 
-/*!
- * Destructor.
- */
-LightApp_PyInterp::~LightApp_PyInterp()
-{
-}
- 
-/*!\class LightApp_PyInterp
- * [ABN] : there is now a single Python interpreter for the whole SALOME run.
- * Different execution environment are provided to emulate independent
- * "virtual" Python interpreters.
- */
+public:
+  LightApp_PyEditor( PyConsole_Interp*, QWidget* = 0 );
+  ~LightApp_PyEditor();
 
+protected:
+  virtual QString getDumpFileName();
+  virtual QString getLogFileName();
+};
 
-/*!
-  Do nothing
-  The initialization has been done in main - see SUITApp/SUITApp.cxx - main()
- */
-void LightApp_PyInterp::initPython()
-{
-}
+#endif // LIGHTAPP_PYEDITOR_H

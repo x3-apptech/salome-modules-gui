@@ -22,7 +22,7 @@
 // Module : GUI
 //
 #include "PyConsole_Interp.h" // this include must be first (see PyInterp_base.h)!
-#include "SalomePyConsole_Console.h"
+#include "PyConsole_Console.h"
 
 #include "SalomeApp_NoteBook.h"
 #include "SalomeApp_Application.h"
@@ -284,7 +284,7 @@ bool NoteBook_TableRow::IsValidStringValue(const QString theValue)
                          myParentTable->myRows[ aNumRows - 1 ]->GetValue().isEmpty();
 
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  SalomePyConsole_Console* pyConsole = app->pythonConsole();
+  PyConsole_Console* pyConsole = app->pythonConsole();
   PyConsole_Interp* pyInterp = app->getPyInterp();
   PyLockWrapper aLock; // Acquire GIL
   std::string command = "import salome_notebook ; ";
@@ -458,7 +458,7 @@ bool NoteBook_Table::IsValid() const
       return false;
 
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  SalomePyConsole_Console* pyConsole = app->pythonConsole();
+  PyConsole_Console* pyConsole = app->pythonConsole();
   PyConsole_Interp* pyInterp = app->getPyInterp();
   PyLockWrapper aLock; // Acquire GIL
   std::string command = "import salome_notebook ; ";

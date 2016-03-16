@@ -19,14 +19,14 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  Author : Adrien BRUNETON
-//
+//  File   : PyInterp_Utils.h
+//  Author : Christian CAREMOLI, Paul RASCLE, Adrien BRUNETON
 
 #ifndef PYINTERP_UTILS_H
 #define PYINTERP_UTILS_H
 
 #include "PyInterp.h"
-#include <Python.h>
+
 #ifdef _DEBUG_
   #include <iostream>
 #endif
@@ -43,7 +43,6 @@
  */
 class PYINTERP_EXPORT PyLockWrapper
 {
-
 public:
   /**
    * \brief Constructor. Automatically acquires GIL.
@@ -80,7 +79,6 @@ private:
   const PyLockWrapper & operator=(const PyLockWrapper & another);
 };
 
-
 /**
  * \class PyObjWrapper
  * \brief Utility class to properly handle the reference counting required on Python objects.
@@ -107,5 +105,4 @@ public:
   }
 };
 
-#endif
-
+#endif // PYINTERP_UTILS_H

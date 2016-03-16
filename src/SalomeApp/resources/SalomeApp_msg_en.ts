@@ -4,11 +4,6 @@
 <context>
     <name>@default</name>
     <message>
-        <source>WRN_FILE_NAME_BAD</source>
-        <translation>Please enter correct file name.
-Python file must include only letters, digits and underscores and start from letter or underscore.</translation>
-    </message>
-    <message>
         <source>WRN_FILE_NOT_EXIST</source>
         <translation>The file %1 does not exist.</translation>
     </message>
@@ -245,10 +240,6 @@ Do you want to reload it ?</translation>
     <message>
         <source>PRP_DESK_REGISTRY_DISPLAY</source>
         <translation>Displays content of the Registry CORBA server</translation>
-    </message>
-    <message>
-        <source>PYTHON_FILES_FILTER</source>
-        <translation>PYTHON Files (*.py)</translation>
     </message>
     <message>
         <source>APPCLOSE_DESCRIPTION</source>

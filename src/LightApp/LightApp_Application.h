@@ -41,7 +41,7 @@
 
 class LogWindow;
 #ifndef DISABLE_PYCONSOLE
-class SalomePyConsole_Console;
+class PyConsole_Console;
 class PyConsole_Interp;
 #endif
 class LightApp_WidgetContainer;
@@ -111,7 +111,7 @@ public:
   LogWindow*                          logWindow();
   SUIT_DataBrowser*                   objectBrowser();
 #ifndef DISABLE_PYCONSOLE
-  SalomePyConsole_Console*            pythonConsole(const bool force = false);
+  PyConsole_Console*                  pythonConsole(const bool force = false);
 #endif
 
   virtual void                        updateObjectBrowser( const bool = true );

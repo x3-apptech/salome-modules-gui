@@ -19,24 +19,21 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SalomeApp_PyInterp.h
 //  Author : Nicolas REJNERI
 
-#ifndef _SalomeApp_PYINTERP_H_
-#define _SalomeApp_PYINTERP_H_
+#ifndef SALOMEAPP_PYINTERP_H
+#define SALOMEAPP_PYINTERP_H
 
-#include <PyConsole_EnhInterp.h> // this include must be first (see PyInterp_base.h)!
+#include <PyConsole_Interp.h>
 
-class SalomeApp_PyInterp : public PyConsole_EnhInterp
+class SalomeApp_PyInterp : public PyConsole_Interp
 {
   friend class SalomeApp_Application;
 
 public:
   virtual ~SalomeApp_PyInterp();
 
-  virtual void initPython();
   virtual void initStudy();
   virtual void closeContext();
 
@@ -49,4 +46,4 @@ private:
   bool myFirstInitStudy;
 };
 
-#endif
+#endif // SALOMEAPP_PYINTERP_H

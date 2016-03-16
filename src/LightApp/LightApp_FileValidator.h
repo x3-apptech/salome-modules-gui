@@ -16,25 +16,21 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// File   : LightApp_FileValidator.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-//  Author : Roman NIKOLAEV, Open CASCADE S.A.S. (roman.nikolaev@opencascade.com)
-//  Date   : 22/06/2007
-//
-#ifndef _LIGHTAPP_PYINTERP_H_
-#define _LIGHTAPP_PYINTERP_H_
+#ifndef LIGHTAPP_FILEVALIDATOR_H
+#define LIGHTAPP_FILEVALIDATOR_H
 
-#include <PyConsole_EnhInterp.h> // this include must be first (see PyInterp_base.h)!
+#include "LightApp.h"
+#include "SUIT_FileValidator.h"
 
-class LightApp_PyInterp : public PyConsole_EnhInterp
+class LIGHTAPP_EXPORT LightApp_PyFileValidator : public SUIT_FileValidator
 {
-  friend class LightApp_Application;
-
 public:
-  virtual ~LightApp_PyInterp();
-  
-protected:
-  LightApp_PyInterp();
-  virtual void initPython();
+  LightApp_PyFileValidator( QWidget* );
+
+  virtual bool canSave( const QString&, bool );
 };
 
-#endif //_LIGHTAPP_PYINTERP_H_
+#endif // LIGHTAPP_FILEVALIDATOR_H

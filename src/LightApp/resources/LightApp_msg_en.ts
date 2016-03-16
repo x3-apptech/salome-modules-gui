@@ -70,6 +70,19 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <source>APPCLOSE_CANCEL</source>
         <translation>&amp;Cancel</translation>
     </message>
+    <message>
+        <source>WRN_PYTHON_FILE_NAME_BAD</source>
+        <translation>Please enter correct file name.
+Python file must include only letters, digits and underscores and start from letter or underscore.</translation>
+    </message>
+    <message>
+        <source>PYTHON_FILES_FILTER</source>
+        <translation>Python Files (*.py)</translation>
+    </message>
+    <message>
+        <source>LOG_FILES_FILTER</source>
+        <translation>Log files (*.log *.txt)</translation>
+    </message>
 </context>
 <context>
     <name>LightApp_Application</name>
@@ -410,6 +423,10 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_SHOW_BANNER</source>
         <translation>Show banner</translation>
+    </message>
+    <message>
+        <source>PREF_AUTO_COMPLETION</source>
+        <translation>Command auto-completion</translation>
     </message>
     <message>
         <source>PREF_GROUP_STYLE</source>
@@ -1167,6 +1184,17 @@ File does not exist</translation>
     <message>
         <source>ACTIVATE_MODULE_TOP</source>
         <translation>Activate/deactivate %1 module</translation>
+    </message>
+</context>
+<context>
+    <name>LightApp_PyEditor</name>
+    <message>
+        <source>TOT_DUMP_PYCOMMANDS</source>
+        <translation>Dump commands</translation>
+    </message>
+    <message>
+        <source>TOT_SAVE_PYLOG</source>
+        <translation>Save log</translation>
     </message>
 </context>
 </TS>

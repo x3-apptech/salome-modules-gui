@@ -19,47 +19,28 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SalomeApp_PyInterp.cxx
 //  Author : Nicolas REJNERI
 
 #include "SalomeApp_PyInterp.h"
 
-#include <utilities.h>
-#include <Container_init_python.hxx>
-
-#include "PyInterp.h" // this include must be first (see PyInterp_base.h)!
-
 /*!
- * constructor : multi Python interpreter, one per SALOME study.
- * calls initialize method defined in base class, which calls virtual methods
- * initstate & initcontext redefined here.
- */
-SalomeApp_PyInterp::SalomeApp_PyInterp(): 
-  PyConsole_EnhInterp(), myFirstRun( true ), myFirstInitStudy( false )
+  \brief Constructor
+*/
+SalomeApp_PyInterp::SalomeApp_PyInterp()
+  : PyConsole_Interp(), myFirstRun( true ), myFirstInitStudy( false )
 {
 }
 
 /*!
- * Destructor.
- */
+  \brief Destructor.
+*/
 SalomeApp_PyInterp::~SalomeApp_PyInterp()
 {
 }
  
 /*!
-  Do nothing (we could rely on the test done in the implementation of this method in the super
-  class PyInterp_Interp, but in this context we are sure the initialization has been done in main()
-  of SALOME_Session_Server)
- */
-void SalomeApp_PyInterp::initPython()
-{
-  MESSAGE("SalomeApp_PyInterp::initPython - does nothing");
-}
-
-/*!
-  Called before each Python command running.
+  \brief Called before each Python command running.
 */
 int SalomeApp_PyInterp::beforeRun()
 {
@@ -69,23 +50,29 @@ int SalomeApp_PyInterp::beforeRun()
     if ( ret )
       return ret;
   }
-  if( myFirstInitStudy ) {
+  if ( myFirstInitStudy ) {
     myFirstInitStudy = false;
     int ret = simpleRun( "import salome", false );
-    if (ret)
+    if ( ret )
       return ret;
     ret = simpleRun( "salome.salome_init(0,1)", false );
-    if (ret)
+    if ( ret )
       return ret;
   }
-  return PyConsole_EnhInterp::beforeRun();
+  return PyConsole_Interp::beforeRun();
 }
 
+/*!
+  \brief Called when study is initialized
+ */
 void SalomeApp_PyInterp::initStudy()
 {
   myFirstInitStudy = true;
 }
 
+/*!
+  \brief Called when study is closed
+*/
 void SalomeApp_PyInterp::closeContext()
 {
   myFirstInitStudy = false;
