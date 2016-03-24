@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,18 +19,15 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 //  File   : PyInterp_Interp.cxx
 //  Author : Christian CAREMOLI, Paul RASCLE, Adrien BRUNETON
-//  Module : SALOME
-//
+
 #include "PyInterp_Interp.h"  // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
 #include "PyInterp_Utils.h"
-#include <pythread.h>
 
+#include <pythread.h>
 #include <cStringIO.h>
 #include <structmember.h>
-
 #include <string>
 #include <vector>
 #include <map>
@@ -170,11 +167,9 @@ char* PyInterp_Interp::_argv[] = {(char*)""};
   must call virtual method initalize().
 */
 PyInterp_Interp::PyInterp_Interp():
-  _vout(0), _verr(0), _local_context(0), _global_context(0)
+  _vout(0), _verr(0), _local_context(0), _global_context(0), _initialized(false)
 {
 }
-
-
 
 /*!
   \brief Destructor.
@@ -197,12 +192,15 @@ PyInterp_Interp::~PyInterp_Interp()
 */
 void PyInterp_Interp::initialize()
 {
+  if ( initialized() )
+    return; // prevent repeating intitialization
+
+  _initialized = true;
+
   _history.clear();       // start a new list of user's commands
   _ith = _history.begin();
 
   initPython();  // This also inits the multi-threading for Python (but w/o acquiring GIL)
-
-  //initState(); // [ABN] OBSOLETE
 
   // ---- The rest of the initialisation process is done hodling the GIL
   PyLockWrapper lck;
@@ -257,7 +255,7 @@ void PyInterp_Interp::initPython()
   \brief Get embedded Python interpreter banner.
   \return banner string
  */
-std::string PyInterp_Interp::getbanner() const
+std::string PyInterp_Interp::getBanner() const
 {
   PyLockWrapper lck;
   std::string aBanner("Python ");
@@ -308,8 +306,9 @@ bool PyInterp_Interp::initContext()
 void PyInterp_Interp::closeContext()
 {
   Py_XDECREF(_global_context);
-  // both _global and _local point to the same Python object:
-  // Py_XDECREF(_local_context);
+  // both _global_context and _local_context may point to the same Python object
+  if ( _global_context != _local_context)
+    Py_XDECREF(_local_context);
 }
 
 /*!
@@ -324,12 +323,12 @@ void PyInterp_Interp::closeContext()
 static int run_command(const char *command, PyObject * global_ctxt, PyObject * local_ctxt)
 {
   PyObject *m = PyImport_AddModule("codeop");
-  if(!m) { // Fatal error. No way to go on.
+  if(!m) {
+    // Fatal error. No way to go on.
     PyErr_Print();
     return -1;
   }
 
-//  PyObjWrapper v(Py_CompileString(command, "<salome_input>", Py_file_input));
   PyObjWrapper v(PyObject_CallMethod(m,(char*)"compile_command",(char*)"s",command));
   if(!v) {
     // Error encountered. It should be SyntaxError,
@@ -596,4 +595,13 @@ void PyInterp_Interp::setverrcb(PyOutChanged* cb, void* data)
 {
   ((PyStdOut*)_verr)->_cb=cb;
   ((PyStdOut*)_verr)->_data=data;
+}
+
+/*!
+  \bried Check if the interpreter is initialized
+  \internal
+*/
+bool PyInterp_Interp::initialized() const
+{
+  return _initialized;
 }

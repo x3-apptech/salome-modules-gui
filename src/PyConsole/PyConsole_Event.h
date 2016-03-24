@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,51 +19,49 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  Author : Vadim SANDLER (Open CASCADE S.A.S), Adrien Bruneton (CEA/DEN)
+// File   : PyConsole_Event.h
+// Author : Vadim SANDLER (Open CASCADE S.A.S), Adrien Bruneton (CEA/DEN)
 
 #ifndef PYCONSOLE_EVENT_H
 #define PYCONSOLE_EVENT_H
 
 #include "PyConsole.h"
+#include "PyInterp_Event.h"
 
 #include <QEvent>
 #include <QString>
+#include <QStringList>
 
-/*!
-  \class PrintEvent
-  \brief Python command output backend event.
-  \internal
-*/
-class PrintEvent : public QEvent
+class PyConsole_PrintEvent : public QEvent
 {
 public:
   static const int EVENT_ID = 65432;
 
-  /*!
-    \brief Constructor
-    \param c message text (python trace)
-    \param isError default to false - if true indicates that an error is being printed.
-  */
-  PrintEvent( const QString& c, bool isError = false) :
-    QEvent( (QEvent::Type)EVENT_ID ), myText( c ), errorFlag(isError)
-  {}
+  PyConsole_PrintEvent( const QString&, bool = false );
 
-  /*!
-    \brief Get message
-    \return message text (python trace)
-  */
-  QString text() const { return myText; }
+  QString text() const;
+  bool isError() const;
 
-  /**
-   * @return true if this is an error message
-   */
-  bool isError() const { return errorFlag; }
+private:
+  QString myText;  //!< Event message (python trace)
+  bool    myError; //!< Set to \c true if an error msg is to be displayed
+};
+
+class PyConsole_CompletionEvent : public PyInterp_Event
+{
+public:
+  static const int EVENT_ID = 65433;
+  
+  PyConsole_CompletionEvent( PyInterp_Request*, bool, const QStringList&, const QString& );
+
+  bool status() const;
+  QStringList matches() const;
+  QString doc() const;
 
 protected:
-  QString myText; //!< Event message (python trace)
-
-  /** Set to true if an error msg is to be displayed */
-  bool errorFlag;
+  bool        myStatus;  //!< Status of execution
+  QStringList myMatches; //!< Command matches (completions)
+  QString     myDoc;     //!< Docstring of the match (in case if there is sinlge match)
 };
 
 #endif // PYCONSOLE_EVENT_H

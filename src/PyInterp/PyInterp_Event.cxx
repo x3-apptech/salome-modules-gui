@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,12 +19,22 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : PyInterp_Request.h
-//  Author : Sergey Anikin, OCC, Adrien Bruneton (CEA/DEN)
-//  Module : GUI
+//  File   : PyInterp_Event.cxx
+//  Author : Sergey Anikin (OPEN CASCADE S.A.S.), Adrien Bruneton (CEA/DEN)
 
 #include "PyInterp_Event.h"
 #include "PyInterp_Request.h"
+
+/**
+   \class PyInterp_Event
+   \brief Events thrown by the interpreter having executed a command and indicating
+   the return status.
+*/
+
+PyInterp_Event::PyInterp_Event( int type, PyInterp_Request* request )
+  : QEvent( (QEvent::Type)type ), myRequest( request )
+{
+}
 
 PyInterp_Event::~PyInterp_Event()
 {
@@ -32,7 +42,12 @@ PyInterp_Event::~PyInterp_Event()
   myRequest = 0;
 }
 
-void PyInterp_ExecuteEvent::Execute()
+PyInterp_Request* PyInterp_Event::GetRequest() const
 {
-  myRequest->execute();
+  return myRequest;
+}
+
+PyInterp_Event::operator PyInterp_Request*() const
+{
+  return myRequest;
 }

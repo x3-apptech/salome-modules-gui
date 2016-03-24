@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,35 +19,39 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-// File   : PyConsole_ConsoleBase.cxx
+// File   : PyConsole_Console.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
-/*!
-  \class PyConsole_Console
-  \brief Python console widget.
-*/  
 
-#include "PyConsole_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
-#include "PyConsole_ConsoleBase.h"
-#include "PyConsole_EnhEditorBase.h"
-#include "PyConsole_EnhInterp.h"
-
-#include "Qtx.h"
+#include "PyConsole_Console.h"
+#include "PyConsole_Interp.h"
+#include "PyConsole_Editor.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
-#include <QEvent>
-#include <QMenu>
 #include <QContextMenuEvent>
+#include <QMenu>
 #include <QVBoxLayout>
 
-PyConsole_EditorBase *PyConsole_ConsoleBase::PyConsole_Interp_CreatorBase::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
-{ return new PyConsole_EditorBase(interp,console); }
+/*!
+  \class PyConsole_Console
+  \brief Python console widget.
 
-PyConsole_Interp *PyConsole_ConsoleBase::PyConsole_Interp_CreatorBase::createInterp( ) const
-{ return new PyConsole_Interp; }
+  To create a Python console, just use default contstructor, specifying only a parent widget:
+  \code
+  PyConsole_Console c(myWindow);
+  \endcode
+
+  This will create a console with default editor and interpreter.
+
+  To use custom editor and/or interpreter class with the console, you can use additional parameter
+  of the constructor; in this case you have to ensure that Python interpeter is initialized properly:
+  \code
+  PyConsole_Interp* interp = new PyConsole_Interp();
+  interp->initialize();
+  PyConsole_Console c(myWindow, new MyEditor(interp));
+  \endcode
+*/  
 
 /*!
   \brief Constructor.
@@ -56,64 +60,50 @@ PyConsole_Interp *PyConsole_ConsoleBase::PyConsole_Interp_CreatorBase::createInt
   \param parent parent widget
   \param interp python interpreter
 */
-PyConsole_ConsoleBase::PyConsole_ConsoleBase( QWidget* parent, PyConsole_Interp* interp )
+PyConsole_Console::PyConsole_Console( QWidget* parent, PyConsole_Editor* editor )
 : QWidget( parent )
 {
-  PyConsole_ConsoleBase::PyConsole_Interp_CreatorBase crea;
-  defaultConstructor(interp,crea);
-}
-
-/*!
- * MUST BE NON VIRTUAL ! (called from constructor !!!!)
- */
-void PyConsole_ConsoleBase::defaultConstructor( PyConsole_Interp* interp, const PyConsole_Interp_CreatorBase& crea )
-{
-  PyConsole_Interp *anInterp = interp ? interp : crea.createInterp();
-  
   // initialize Python interpretator
-  anInterp->initialize();
+  PyConsole_Interp* interp = editor ? editor->getInterp() : new PyConsole_Interp();
+  interp->initialize();
   
   // create editor console
   QVBoxLayout* lay = new QVBoxLayout( this );
   lay->setMargin( 0 );
-  myEditor = crea.createEditor( anInterp, this );
-  char* synchronous = getenv("PYTHON_CONSOLE_SYNC");
-  if (synchronous && atoi(synchronous))
-  {
-      myEditor->setIsSync(true);
-  }
-  myEditor->viewport()->installEventFilter( this );
+  myEditor = editor ? editor : new PyConsole_Editor( interp, this );
+  myEditor->setContextMenuPolicy( Qt::NoContextMenu );
   lay->addWidget( myEditor );
 
+  // force synchronous mode
+  QString synchronous = qgetenv( "PYTHON_CONSOLE_SYNC" );
+  if ( !synchronous.isEmpty() && synchronous.toInt() > 0 )
+    setIsSync( true );
+
+  // create actions
   createActions();
 }
 
-/**
- * Protected constructor.
- */
-PyConsole_ConsoleBase::PyConsole_ConsoleBase( QWidget* parent, PyConsole_Interp* /*i*/,  PyConsole_EditorBase* e )
-  : QWidget (parent), myEditor(e)
-{}
-
 /*!
   \brief Destructor.
-
-  Does nothing for the moment.
 */
-PyConsole_ConsoleBase::~PyConsole_ConsoleBase()
+PyConsole_Console::~PyConsole_Console()
 {
 }
 
-PyConsole_Interp* PyConsole_ConsoleBase::getInterp() const
+/*!
+  \brief Get Python interpreter
+  \return pointer to Python interpreter
+*/
+PyConsole_Interp* PyConsole_Console::getInterp() const
 {
   return myEditor ? myEditor->getInterp() : 0;
-} 
+}
 
 /*!
   \brief Execute python command in the interpreter.
   \param command string with command and arguments
 */
-void PyConsole_ConsoleBase::exec( const QString& command )
+void PyConsole_Console::exec( const QString& command )
 {
   if ( myEditor )
     myEditor->exec( command );
@@ -126,7 +116,7 @@ void PyConsole_ConsoleBase::exec( const QString& command )
   Block execution of main application until the python command is executed.
   \param command string with command and arguments
 */
-void PyConsole_ConsoleBase::execAndWait( const QString& command )
+void PyConsole_Console::execAndWait( const QString& command )
 {
   if ( myEditor )
     myEditor->execAndWait( command );
@@ -136,11 +126,11 @@ void PyConsole_ConsoleBase::execAndWait( const QString& command )
   \brief Get synchronous mode flag value.
   
   \sa setIsSync()
-  \return True if python console works in synchronous mode
+  \return \c true if python console works in synchronous mode
 */
-bool PyConsole_ConsoleBase::isSync() const
+bool PyConsole_Console::isSync() const
 {
-  return myEditor->isSync();
+  return myEditor ? myEditor->isSync() : false;
 }
 
 /*!
@@ -153,33 +143,35 @@ bool PyConsole_ConsoleBase::isSync() const
 
   \param on synhronous mode flag
 */
-void PyConsole_ConsoleBase::setIsSync( const bool on )
+void PyConsole_Console::setIsSync( const bool on )
 {
-  myEditor->setIsSync( on );
+  if ( myEditor ) 
+    myEditor->setIsSync( on );
 }
 
 /*!
   \brief Get suppress output flag value.
   
   \sa setIsSuppressOutput()
-  \return True if python console output is suppressed.
+  \return \c true if python console output is suppressed.
 */
-bool PyConsole_ConsoleBase::isSuppressOutput() const
+bool PyConsole_Console::isSuppressOutput() const
 {
-  return myEditor->isSuppressOutput();
+  return myEditor ? myEditor->isSuppressOutput() : false;
 }
 
 /*!
   \brief Set suppress output flag value.
 
-  In case if suppress output flag is true, the python 
+  In case if suppress output flag is \c true, the python 
   console output suppressed.
 
   \param on suppress output flag
 */
-void PyConsole_ConsoleBase::setIsSuppressOutput( const bool on )
+void PyConsole_Console::setIsSuppressOutput( const bool on )
 {
-  myEditor->setIsSuppressOutput(on);
+  if ( myEditor )
+    myEditor->setIsSuppressOutput( on );
 }
 
 /*!
@@ -188,9 +180,9 @@ void PyConsole_ConsoleBase::setIsSuppressOutput( const bool on )
   \sa setIsShowBanner()
   \return \c true if python console shows banner
 */
-bool PyConsole_ConsoleBase::isShowBanner() const
+bool PyConsole_Console::isShowBanner() const
 {
-  return myEditor->isShowBanner();
+  return myEditor ? myEditor->isShowBanner() : false;
 }
 
 /*!
@@ -201,31 +193,49 @@ bool PyConsole_ConsoleBase::isShowBanner() const
   \sa isShowBanner()
   \param on 'show banner' flag
 */
-void PyConsole_ConsoleBase::setIsShowBanner( const bool on )
+void PyConsole_Console::setIsShowBanner( const bool on )
 {
-  myEditor->setIsShowBanner( on );
+  if ( myEditor )
+    myEditor->setIsShowBanner( on );
+}
+
+/*!
+  \brief Returns \c true if auto-completion feature is switched on
+  or \c false otherwise
+  \sa setAutoCompletion()
+*/
+bool PyConsole_Console::autoCompletion() const
+{
+  return myEditor ? myEditor->autoCompletion() : false;
+}
+
+/*!
+  \brief Switch on/off commands auto-completion feature
+  \sa autoCompletion()
+*/
+void PyConsole_Console::setAutoCompletion( const bool on )
+{
+  if ( myEditor )
+    myEditor->setAutoCompletion( on );
 }
 
 /*!
   \brief Change the python console's font.
   \param f new font
 */
-void PyConsole_ConsoleBase::setFont( const QFont& f )
+void PyConsole_Console::setFont( const QFont& f )
 {
-  if( myEditor )
+  if ( myEditor )
     myEditor->setFont( f );
 }
 
 /*!
   \brief Get python console font.
-  \return current python console's font
+  \return current python console font
 */
-QFont PyConsole_ConsoleBase::font() const
+QFont PyConsole_Console::font() const
 {
-  QFont res;
-  if( myEditor )
-    res = myEditor->font();
-  return res;
+  return myEditor ? myEditor->font() : QFont();
 }
 
 /*!
@@ -236,7 +246,7 @@ QFont PyConsole_ConsoleBase::font() const
 
   \param flags ORed together actions flags
 */
-void PyConsole_ConsoleBase::setMenuActions( const int flags )
+void PyConsole_Console::setMenuActions( const int flags )
 {
   myActions[CopyId]->setVisible( flags & CopyId );
   myActions[PasteId]->setVisible( flags & PasteId );
@@ -252,7 +262,7 @@ void PyConsole_ConsoleBase::setMenuActions( const int flags )
   \return ORed together actions flags
   \sa setMenuActions()
 */
-int PyConsole_ConsoleBase::menuActions() const
+int PyConsole_Console::menuActions() const
 {
   int ret = 0;
   ret = ret | ( myActions[CopyId]->isVisible() ? CopyId : 0 );
@@ -270,7 +280,7 @@ int PyConsole_ConsoleBase::menuActions() const
 
   Create context popup menu actions.
 */
-void PyConsole_ConsoleBase::createActions()
+void PyConsole_Console::createActions()
 {
   QAction* a = new QAction( tr( "EDIT_COPY_CMD" ), this );
   a->setStatusTip( tr( "EDIT_COPY_CMD" ) );
@@ -313,42 +323,46 @@ void PyConsole_ConsoleBase::createActions()
 
   Update context popup menu action state.
 */
-void PyConsole_ConsoleBase::updateActions()
+void PyConsole_Console::updateActions()
 {
-  myActions[CopyId]->setEnabled( myEditor->textCursor().hasSelection() );
-  myActions[PasteId]->setEnabled( !myEditor->isReadOnly() && !QApplication::clipboard()->text().isEmpty() );
-  myActions[SelectAllId]->setEnabled( !myEditor->document()->isEmpty() );
+  myActions[CopyId]->setEnabled( myEditor && myEditor->textCursor().hasSelection() );
+  myActions[PasteId]->setEnabled( myEditor && !myEditor->isReadOnly() && !QApplication::clipboard()->text().isEmpty() );
+  myActions[SelectAllId]->setEnabled( myEditor && !myEditor->document()->isEmpty() );
 }
 
 /*!
   \brief Start python trace logging
   \param fileName the path to the log file
 */
-void PyConsole_ConsoleBase::startLog( const QString& fileName )
+void PyConsole_Console::startLog( const QString& fileName )
 {
-  myEditor->startLog( fileName );
+  if ( myEditor ) 
+    myEditor->startLog( fileName );
 }
 
 /*!
   \brief Stop python trace logging
 */
-void PyConsole_ConsoleBase::stopLog()
+void PyConsole_Console::stopLog()
 {
-  myEditor->stopLog();
+  if ( myEditor ) 
+    myEditor->stopLog();
 }
 
 /*!
-  \brief Create the context popup menu.
+  \brief Process context popup menu request
 
-  Fill in the popup menu with the commands.
+  Show the context popup menu.
 
-  \param menu context popup menu
+  \param event context popup menu event
 */
-void PyConsole_ConsoleBase::contextMenuPopup( QMenu *menu )
+void PyConsole_Console::contextMenuEvent( QContextMenuEvent* event )
 {
-  if ( myEditor->isReadOnly() )
+  if ( !myEditor || myEditor->isReadOnly() )
     return;
 
+  QMenu* menu = new QMenu( this );
+ 
   menu->addAction( myActions[CopyId] );
   menu->addAction( myActions[PasteId] );
   menu->addAction( myActions[ClearId] );
@@ -361,53 +375,9 @@ void PyConsole_ConsoleBase::contextMenuPopup( QMenu *menu )
   else
     menu->addAction( myActions[StopLogId] );
 
-  Qtx::simplifySeparators( menu );
-
   updateActions();
-}
 
-PyConsole_EditorBase *PyConsole_EnhConsoleBase::PyConsole_Interp_EnhCreatorBase::createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const
-{ return new PyConsole_EnhEditorBase(interp,console); }
+  menu->exec( event->globalPos());
 
-PyConsole_Interp *PyConsole_EnhConsoleBase::PyConsole_Interp_EnhCreatorBase::createInterp( ) const
-{ return new PyConsole_EnhInterp; }
-
-/**
- * Similar to constructor of the base class but using enhanced objects.
- * TODO: this should really be done in a factory to avoid code duplication.
- * @param parent
- * @param interp
- */
-PyConsole_EnhConsoleBase::PyConsole_EnhConsoleBase( QWidget* parent, PyConsole_Interp* interp )
-  : PyConsole_ConsoleBase( parent, interp, 0 )
-{
-  PyConsole_Interp_EnhCreatorBase crea;
-  defaultConstructor(interp,crea);
-}
-
-/*!
-  \brief Event handler.
-
-  Handles context menu request event.
-
-  \param o object
-  \param e event
-  \return True if the event is processed and further processing should be stopped
-*/
-bool PyConsole_EnhConsoleBase::eventFilter( QObject* o, QEvent* e )
-{
-  if ( o == myEditor->viewport() && e->type() == QEvent::ContextMenu )
-  {
-    contextMenuRequest( (QContextMenuEvent*)e );
-    return true;
-  }
-  return QWidget::eventFilter( o, e );
-}
-
-void PyConsole_EnhConsoleBase::contextMenuRequest( QContextMenuEvent * e )
-{
-  QMenu *menu(new QMenu(this));
-  contextMenuPopup(menu);
-  menu->move(e->globalPos());
-  menu->show();
+  delete menu;
 }

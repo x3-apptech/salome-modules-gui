@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,39 +16,46 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Adrien Bruneton (CEA/DEN)
-// Created on: 3 avr. 2013
+// File   : PyConsole_Request.cxx
+// Author : Vadim SANDLER (OPEN CASCADE), Adrien Bruneton (CEA/DEN)
 
 #include "PyConsole_Request.h"
 #include "PyConsole_Interp.h"
 #include "PyConsole_Event.h"
-#include "PyInterp_Event.h"
 
 #include <QCoreApplication>
 
-/**
- * Constructor.
- * @param theInterp interpreter that will execute the command
- * @param theCommand command text
- * @param theListener editor object that will receive the response events after execution
- * of the request
- * @param sync
- */
-ExecCommand::ExecCommand( PyInterp_Interp*        theInterp,
-			  const QString&          theCommand,
-			  QObject*                theListener,
-			  bool                    theSync )
+/*!
+  \class PyConsole_ExecCommand
+  \brief Python command execution request.
+  \internal
+*/
+
+/*!
+  \brief Constructor.
+  
+  Creates new python command execution request.
+
+  \param theInterp   python interpreter
+  \param theCommand  python command
+  \param theListener widget to get the notification messages
+  \param theSync     if \c true, the request is processed synchronously
+*/
+PyConsole_ExecCommand::PyConsole_ExecCommand( PyInterp_Interp*        theInterp,
+                                              const QString&          theCommand,
+                                              QObject*                theListener,
+                                              bool                    theSync )
   : PyInterp_LockRequest( theInterp, theListener, theSync ),
     myCommand( theCommand ), myState( PyInterp_Event::ES_OK )
 {}
 
-/**
- * Execute the command by calling the run() method of the embedded interpreter.
- */
-void ExecCommand::execute()
+/*!
+  \brief Execute the python command in the interpreter and
+  get its execution status.
+*/
+void PyConsole_ExecCommand::execute()
 {
-  if ( myCommand != "" )
-  {
+  if ( myCommand != "" ) {
     int ret = getInterp()->run( myCommand.toLatin1().data() );
     if ( ret < 0 )
       myState = PyInterp_Event::ES_ERROR;
@@ -57,52 +64,57 @@ void ExecCommand::execute()
   }
 }
 
-/**
- * Create the event indicating the status of the request execution.
- * @return a QEvent
- */
-QEvent* ExecCommand::createEvent()
+/*!
+  \brief Create and return a notification event.
+  \return new notification event
+*/
+QEvent* PyConsole_ExecCommand::createEvent()
 {
   if ( IsSync() )
-    QCoreApplication::sendPostedEvents( listener(), PrintEvent::EVENT_ID );
+    QCoreApplication::sendPostedEvents( listener(), PyConsole_PrintEvent::EVENT_ID );
   return new PyInterp_Event( myState, this );
 }
 
+/*!
+  \class PyConsole_CompletionCommand
+  \brief Python command completion request.
+  \internal
+*/
 
 /*!
-  Constructor.
+  \brief Constructor.
+
   Creates a new python completion request.
-  \param theInterp   python interpreter
-  \param input  string containing the dir() command to be executed
-  \param startMatch  part to be matched with the results of the dir() command
+
+  \param theInterp python interpreter
+  \param theInput  string containing the dir() command to be executed
+  \param theStartMatch part to be matched with the results of the dir() command
   \param theListener widget to get the notification messages
-  \param sync        if True the request is processed synchronously
+  \param theSync if \c true the request is processed synchronously
 */
-CompletionCommand::CompletionCommand( PyInterp_Interp*   theInterp,
-				      const QString&     theInput,
-				      const QString&     theStartMatch,
-				      QObject*           theListener,
-				      bool               theSync )
+PyConsole_CompletionCommand::PyConsole_CompletionCommand( PyInterp_Interp*   theInterp,
+                                                          const QString&     theInput,
+                                                          const QString&     theStartMatch,
+                                                          QObject*           theListener,
+                                                          bool               theSync )
   : PyInterp_LockRequest( theInterp, theListener, theSync ),
-    _tabSuccess(false), _dirArg(theInput), _startMatch(theStartMatch)
+    myDirArg( theInput ), myStartMatch( theStartMatch ), myStatus( false )
 {}
 
-/**
- * Execute the completion command by wrapping the runDirCommand() of the
- * embedded enhanced interpreter.
- */
-void CompletionCommand::execute()
+/*!
+  \brief Execute the completion command by invoking runDirCommand() function
+  of interpreter.
+*/
+void PyConsole_CompletionCommand::execute()
 {
-  int ret = static_cast<PyConsole_Interp*>(getInterp())->runDirCommand( _dirArg,  _startMatch );
-  _tabSuccess = ret == 0;
+  myStatus = static_cast<PyConsole_Interp*>( getInterp() )->runDirCommand( myDirArg,  myStartMatch, myMatches, myDoc );
 }
 
-/**
- * Create the event indicating the return value of the completion command.
- * @return
+/*!
+ \brief Create and return completion event
+  \return new completion event
  */
-QEvent* CompletionCommand::createEvent()
+QEvent* PyConsole_CompletionCommand::createEvent()
 {
-  int typ = _tabSuccess ? PyInterp_Event::ES_TAB_COMPLETE_OK : PyInterp_Event::ES_TAB_COMPLETE_ERR;
-  return new PyInterp_Event( typ, this);
+  return new PyConsole_CompletionEvent( this, myStatus, myMatches, myDoc );
 }

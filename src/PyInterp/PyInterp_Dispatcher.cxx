@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,18 +19,15 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 //  File   : PyInterp_Dispatcher.cxx
-//  Author : Sergey ANIKIN, OCC
-//  Module : GUI
-//
-#include "PyInterp_Dispatcher.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
-#include "PyInterp_Interp.h"
-#include "PyInterp_Watcher.h"
-#include "PyInterp_Request.h"
+//  Author : Sergey Anikin (OPEN CASCADE S.A.S.)
 
-#include <QObject>
-#include <QCoreApplication>
+#include "PyInterp_Dispatcher.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
+
+/**
+   \class PyInterp_Dispatcher
+   \brief Dispatcher of Python events; used to serialize requests to Python interpreter.
+*/
 
 PyInterp_Dispatcher* PyInterp_Dispatcher::myInstance = 0;
 
@@ -44,7 +41,6 @@ PyInterp_Dispatcher* PyInterp_Dispatcher::Get()
 PyInterp_Dispatcher::PyInterp_Dispatcher() 
 : QThread()
 {
-  myWatcher = new PyInterp_Watcher();
 }
 
 PyInterp_Dispatcher::~PyInterp_Dispatcher()
@@ -61,9 +57,6 @@ PyInterp_Dispatcher::~PyInterp_Dispatcher()
 
   // Wait for run() to finish
   wait();
-
-  delete myWatcher;
-  myWatcher = 0;
 }
 
 bool PyInterp_Dispatcher::IsBusy() const
@@ -76,15 +69,22 @@ void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
   if ( !theRequest )
     return;
 
-  //if ( theRequest->IsSync() && !IsBusy() ) // synchronous processing - nothing is done if dispatcher is busy!
-  if ( theRequest->IsSync() ) // synchronous processing
-    processRequest( theRequest );
-  else // asynchronous processing
+  if ( theRequest->IsSync() /*&& !IsBusy()*/)
   {
+    // synchronous processing
+    processRequest( theRequest );
+  }
+  else
+  {
+    // asynchronous processing
     myQueueMutex.lock();
+
     myQueue.enqueue( theRequest );
-    if ( theRequest->listener() )
-      QObject::connect( theRequest->listener(), SIGNAL( destroyed( QObject* ) ), myWatcher, SLOT( onDestroyed( QObject* ) ) );
+    if ( theRequest->listener() ) {
+      connect( theRequest->listener(), SIGNAL( destroyed( QObject* ) ),
+               this, SLOT( objectDestroyed( QObject* ) ) );
+    }
+
     myQueueMutex.unlock();  
 
     if ( !IsBusy() )
@@ -94,14 +94,13 @@ void PyInterp_Dispatcher::Exec( PyInterp_Request* theRequest )
 
 void PyInterp_Dispatcher::run()
 {
-//  MESSAGE("*** PyInterp_Dispatcher::run(): STARTED")
   PyInterp_Request* aRequest;
 
   // prepare for queue size check
   myQueueMutex.lock();
 
-  while( myQueue.size() ) {
-//    MESSAGE("*** PyInterp_Dispatcher::run(): next request taken from the queue")
+  while ( myQueue.size() )
+  {
     aRequest = myQueue.head();
 
     // let other threads append their requests to the end of the queue
@@ -113,15 +112,13 @@ void PyInterp_Dispatcher::run()
 
     // prepare for removal of the first request in the queue
     myQueueMutex.lock();
+  
     // IMPORTANT: the first item could have been removed by objectDestroyed() --> we have to check it
-    if ( myQueue.head() == aRequest ) // It's still here --> remove it
+    if ( myQueue.head() == aRequest ) // if it is still here --> remove it
       myQueue.dequeue();
-
-//    MESSAGE("*** PyInterp_Dispatcher::run(): request processed")
   }
 
   myQueueMutex.unlock();
-//  MESSAGE("*** PyInterp_Dispatcher::run(): FINISHED")
 }
 
 void PyInterp_Dispatcher::processRequest( PyInterp_Request* theRequest )
@@ -129,7 +126,7 @@ void PyInterp_Dispatcher::processRequest( PyInterp_Request* theRequest )
   theRequest->process();
 }
 
-void PyInterp_Dispatcher::objectDestroyed( const QObject* o )
+void PyInterp_Dispatcher::objectDestroyed( QObject* o )
 {
   // prepare for modification of the queue
   myQueueMutex.lock();

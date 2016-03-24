@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -125,7 +125,6 @@ ENDIF(SALOME_USE_PYVIEWER)
 IF(SALOME_USE_PYCONSOLE) 
   ADD_SUBDIRECTORY(PyInterp)
   ADD_SUBDIRECTORY(PyConsole)
-  ADD_SUBDIRECTORY(SalomePyConsole)
   ADD_SUBDIRECTORY(SALOME_PYQT)
 ENDIF(SALOME_USE_PYCONSOLE)
 

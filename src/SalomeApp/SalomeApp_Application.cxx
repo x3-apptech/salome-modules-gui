@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -35,9 +35,10 @@
 #endif
 
 #ifndef DISABLE_PYCONSOLE
-  #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
-  #include <SalomePyConsole_Console.h>
+  #include "SalomeApp_PyInterp.h"
   #include "SalomeApp_NoteBook.h"
+  #include "LightApp_PyEditor.h"
+  #include "PyConsole_Console.h"
 #endif
 #include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
@@ -49,6 +50,7 @@
 #include "SalomeApp_ExitDlg.h"
 
 #include <LightApp_Application.h>
+#include <LightApp_FileValidator.h>
 #include <LightApp_Module.h>
 #include <LightApp_Preferences.h>
 #include <LightApp_SelectionMgr.h>
@@ -62,7 +64,6 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_DataBrowser.h>
 #include <SUIT_FileDlg.h>
-#include <SUIT_FileValidator.h>
 #include <SUIT_MessageBox.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_TreeModel.h>
@@ -253,7 +254,7 @@ void SalomeApp_Application::start()
     // import/execute python scripts
     if ( pyfiles.count() > 0 && activeStudy() ) {
       SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-      SalomePyConsole_Console* pyConsole = pythonConsole();
+      PyConsole_Console* pyConsole = pythonConsole();
       if ( appStudy && pyConsole ) {
         _PTR(Study) aStudy = appStudy->studyDS();
         if ( !aStudy->GetProperties()->IsLocked() ) {
@@ -505,7 +506,7 @@ void SalomeApp_Application::onNewWithScript()
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
-    SalomePyConsole_Console* pyConsole = pythonConsole();
+    PyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
@@ -853,26 +854,6 @@ public:
   QCheckBox* mySaveGUIChk;
 };
 
-class DumpStudyFileValidator : public SUIT_FileValidator
-{
- public:
-  DumpStudyFileValidator( QWidget* parent) : SUIT_FileValidator ( parent ) {};
-  virtual ~DumpStudyFileValidator() {};
-  virtual bool canSave( const QString& file, bool permissions );
-};
-
-bool DumpStudyFileValidator::canSave(const QString& file, bool permissions)
-{
-  QFileInfo fi( file );
-  if ( !QRegExp( "[A-Za-z_][A-Za-z0-9_]*" ).exactMatch( fi.completeBaseName() ) ) {
-    SUIT_MessageBox::critical( parent(),
-                               QObject::tr("WRN_WARNING"),
-                               QObject::tr("WRN_FILE_NAME_BAD") );
-    return false;
-  }
-  return SUIT_FileValidator::canSave( file, permissions);
-}
-
 /*!Private SLOT. On dump study.*/
 void SalomeApp_Application::onDumpStudy( )
 {
@@ -894,7 +875,7 @@ void SalomeApp_Application::onDumpStudy( )
   }
 
   DumpStudyFileDlg fd( desktop() );
-  fd.setValidator( new DumpStudyFileValidator( &fd ) );
+  fd.setValidator( new LightApp_PyFileValidator( &fd ) );
   fd.setWindowTitle( tr( "TOT_DESK_FILE_DUMP_STUDY" ) );
   fd.setNameFilters( aFilters );
   fd.myPublishChk->setChecked( anIsPublish );
@@ -956,7 +937,7 @@ void SalomeApp_Application::onLoadScript( )
     QString command = QString("execfile(r\"%1\")").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
-    SalomePyConsole_Console* pyConsole = pythonConsole();
+    PyConsole_Console* pyConsole = pythonConsole();
 
     if ( pyConsole )
       pyConsole->exec( command );
@@ -1076,15 +1057,14 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else if ( flag == WT_PyConsole )
   {
-    SalomePyConsole_Console* pyCons = new SalomePyConsole_EnhConsole( desktop(), getPyInterp() );
+    PyConsole_Console* pyCons = new PyConsole_Console( desktop(), new LightApp_PyEditor( getPyInterp() ) );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
     pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
     pyCons->setIsShowBanner(resourceMgr()->booleanValue( "PyConsole", "show_banner", true ));
+    pyCons->setAutoCompletion( resMgr->booleanValue( "PyConsole", "auto_completion", true ) );
     pyCons->setProperty( "shortcut", QKeySequence( "Alt+Shift+P" ) );
     wid = pyCons;
-    //pyCons->resize( pyCons->width(), desktop()->height()/4 );
-    pyCons->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
   }
   else if ( flag == WT_NoteBook )
   {
@@ -2028,7 +2008,7 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   QString command = QString( "execfile(r\"%1\")" ).arg( theDumpScript );
 
 #ifndef DISABLE_PYCONSOLE
-  SalomePyConsole_Console* pyConsole = app->pythonConsole();
+  PyConsole_Console* pyConsole = app->pythonConsole();
   if ( pyConsole )
     pyConsole->execAndWait( command );
 #endif

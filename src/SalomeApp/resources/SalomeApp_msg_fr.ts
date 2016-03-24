@@ -4,11 +4,6 @@
 <context>
     <name>@default</name>
     <message>
-        <source>WRN_FILE_NAME_BAD</source>
-        <translation>Indiquez un nom de fichier correct.
-Un fichier Python ne doit être composé que de lettres, chiffres et tirets bas et doit commencer avec une lettre ou un tiret bas.</translation>
-    </message>
-    <message>
         <source>WRN_FILE_NOT_EXIST</source>
         <translation>Le fichier %1 n&apos;existe pas.</translation>
     </message>
@@ -245,10 +240,6 @@ Voulez-vous le recharger ?</translation>
     <message>
         <source>PRP_DESK_REGISTRY_DISPLAY</source>
         <translation>Visualiser le contenu du registre du serveur CORBA</translation>
-    </message>
-    <message>
-        <source>PYTHON_FILES_FILTER</source>
-        <translation>Fichiers PYTHON (*.py)</translation>
     </message>
     <message>
         <source>APPCLOSE_DESCRIPTION</source>

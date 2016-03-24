@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,6 @@ INCLUDE(UseQtExt)
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${PYTHON_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/src/Qtx
-  ${PROJECT_SOURCE_DIR}/src/PyConsole
-  ${PROJECT_SOURCE_DIR}/src/Event
   ${PROJECT_SOURCE_DIR}/src/PyInterp
 )
 
@@ -35,21 +32,19 @@ INCLUDE_DIRECTORIES(
 ADD_DEFINITIONS(${QT_DEFINITIONS} ${PYTHON_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES} PyInterp Event qtx)
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${PYTHON_LIBRARIES} PyInterp)
 
 # --- headers ---
 
 # header files / to be processed by moc
 SET(_moc_HEADERS
-  PyConsole_ConsoleBase.h
-  PyConsole_EditorBase.h
-  PyConsole_EnhEditorBase.h
+  PyConsole_Console.h
+  PyConsole_Editor.h
 )
 
 # header files / no moc processing
 SET(_other_HEADERS
   PyConsole.h
-  PyConsole_EnhInterp.h
   PyConsole_Event.h
   PyConsole_Interp.h
   PyConsole_Request.h
@@ -74,13 +69,11 @@ QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES
-  PyConsole_ConsoleBase.cxx
-  PyConsole_EnhInterp.cxx
+  PyConsole_Console.cxx
   PyConsole_Event.cxx
   PyConsole_Interp.cxx
   PyConsole_Request.cxx
-  PyConsole_EditorBase.cxx
-  PyConsole_EnhEditorBase.cxx
+  PyConsole_Editor.cxx
 )
 
 # sources / to compile
@@ -94,4 +87,3 @@ INSTALL(TARGETS PyConsole EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME
 
 INSTALL(FILES ${PyConsole_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
 QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
-

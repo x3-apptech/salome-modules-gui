@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,11 +19,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 //  File   : PyInterp_Dispatcher.h
-//  Author : Sergey Anikin, OCC
-//  Module : GUI
-//
+//  Author : Sergey Anikin (OPEN CASCADE S.A.S.)
+
 #ifndef PYINTERP_DISPATCHER_H
 #define PYINTERP_DISPATCHER_H
 
@@ -36,13 +34,10 @@
 #include <QThread>
 #include <QQueue>
 
-class QObject;
-class PyInterp_Watcher;
-
 class PYINTERP_EXPORT PyInterp_Dispatcher : protected QThread
 {
   PyInterp_Dispatcher(); // private constructor
-
+  Q_OBJECT
 public:
   static PyInterp_Dispatcher* Get();
 
@@ -54,18 +49,17 @@ public:
 private:
   virtual void                run();
   void                        processRequest( PyInterp_Request* );
-  void                        objectDestroyed( const QObject* );
+
+private slots:
+  void                        objectDestroyed( QObject* );
 
 private:
   typedef PyInterp_Request*   RequestPtr;
 
   QQueue<RequestPtr>          myQueue;
   QMutex                      myQueueMutex;
-  PyInterp_Watcher*           myWatcher;
 
   static PyInterp_Dispatcher* myInstance;
-
-  friend class PyInterp_Watcher;
 };
 
 #endif // PYINTERP_DISPATCHER_H

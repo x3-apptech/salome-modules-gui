@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,30 +16,26 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Adrien Bruneton (CEA/DEN)
-// Created on: 4 avr. 2013
+// File   : LightApp_PyEditor.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-#ifndef SALOMEPYCONSOLE_ENHEDITOR_H_
-#define SALOMEPYCONSOLE_ENHEDITOR_H_
+#ifndef LIGHTAPP_PYEDITOR_H
+#define LIGHTAPP_PYEDITOR_H
 
-#include "SalomePyConsole.h"
-#include "PyConsole_EnhEditorBase.h"
+#include "LightApp.h"
+#include "PyConsole_Editor.h"
 
-#include <QObject>
-#include <queue>
-
-/**
- * Enhanced Python editor handling tab completion.
- */
-class PYCONSOLE_EXPORT SalomePyConsole_EnhEditor : public PyConsole_EnhEditorBase
+class LIGHTAPP_EXPORT LightApp_PyEditor : public PyConsole_Editor
 {
-  Q_OBJECT;
+  Q_OBJECT
+
 public:
-  SalomePyConsole_EnhEditor(PyConsole_Interp* interp, QWidget* parent = 0);
-  virtual ~SalomePyConsole_EnhEditor() {}
+  LightApp_PyEditor( PyConsole_Interp*, QWidget* = 0 );
+  ~LightApp_PyEditor();
+
 protected:
-  virtual void dumpSlot();
-  virtual void startLogSlot();
+  virtual QString getDumpFileName();
+  virtual QString getLogFileName();
 };
 
-#endif /* PYCONSOLE_ENHEDITOR_H_ */
+#endif // LIGHTAPP_PYEDITOR_H

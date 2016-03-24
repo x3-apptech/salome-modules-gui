@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,11 +19,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 //  File   : PyInterp_Interp.h
 //  Author : Christian CAREMOLI, Paul RASCLE, Adrien BRUNETON
-//  Module : SALOME
-//
+
 #ifndef PYINTERP_INTERP_H
 #define PYINTERP_INTERP_H
 
@@ -65,25 +63,22 @@ public:
   void destroy();
 
   virtual int run(const char *command); 
-  virtual void initStudy(){};
+  virtual void initStudy() {};
 
-  // [ABN] - the PyLockWrapper is no more attached to the interpreter
-  // PyLockWrapper GetLockWrapper() const;
+  std::string getBanner() const;
+  void setverrcb(PyOutChanged*, void*);
+  void setvoutcb(PyOutChanged*, void*);
 
-  std::string getbanner() const;
-  void setverrcb(PyOutChanged*,void*);
-  void setvoutcb(PyOutChanged*,void*);
-
-  const char * getPrevious();
-  const char * getNext();
+  const char* getPrevious();
+  const char* getNext();
 
 protected:
   /** Redirection of stdout and stderr */
-  PyObject * _vout;
-  PyObject * _verr;
+  PyObject* _vout;
+  PyObject* _verr;
   /** Execution context (local and global variables) */
-  PyObject * _global_context;
-  PyObject * _local_context;
+  PyObject* _global_context;
+  PyObject* _local_context;
 
   std::list<std::string> _history;
   std::list<std::string>::iterator _ith;
@@ -98,6 +93,11 @@ protected:
   virtual bool initContext();
   virtual bool initRun();
   virtual void closeContext();
+
+  bool initialized() const;
+
+private:
+  bool _initialized;
 };
 
 #endif // PYINTERP_INTERP_H

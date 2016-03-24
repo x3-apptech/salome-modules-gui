@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,19 +19,21 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : PyConsole_Interp.h
-//  Author : Nicolas REJNERI, Adrien BRUNETON
+// File   : PyConsole_Interp.h
+// Author : Nicolas REJNERI (OPEN CASCADE), Adrien BRUNETON (CEA/DEN), Vadim SANDLER (OPEN CASCADE)
 
 #ifndef PYCONSOLE_INTERP_H
 #define PYCONSOLE_INTERP_H
 
 #include "PyConsole.h"
-#include "PyInterp_Interp.h"   /// !!! WARNING !!! THIS INCLUDE MUST BE VERY FIRST !!!
+#include "PyInterp_Interp.h"
 
 #include <QStringList>
 
 class PYCONSOLE_EXPORT PyConsole_Interp : public PyInterp_Interp
 {
+  friend class PyConsole_CompletionCommand;
+
 public:
   PyConsole_Interp();
   ~PyConsole_Interp();
@@ -39,11 +41,9 @@ public:
   virtual int afterRun();
   virtual int beforeRun();
 
-  virtual QStringList getLastMatches() const;
-  virtual QString getDocStr() const;
-
-  virtual int runDirCommand(const QString&, const QString&);
-  virtual void clearCompletion();
+private:
+  bool runDirCommand( const QString&, const QString&, QStringList&, QString& );
+  bool runDirAndExtract( const QString&, const QString&, QStringList&, bool = true ) const;
 };
 
 #endif // PYCONSOLE_INTERP_H

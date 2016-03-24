@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
-      <translation>Copyright (C) 2007-2015 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+      <translation>Copyright (C) 2007-2016 CEA/DEN, EDF R&amp;D, OPEN CASCADE
 
 Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
 CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
@@ -56,8 +56,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>STUDYCLOSE_DESCRIPTION</source>
-      <translation>既存のスタディを閉じる必要があります。閉じますか？
-</translation>
+      <translation>既存のスタディを閉じる必要があります。閉じますか？</translation>
     </message>
     <message>
       <source>APPCLOSE_SAVE</source>
@@ -70,6 +69,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>APPCLOSE_CANCEL</source>
       <translation>キャンセル(&amp;C)</translation>
+    </message>
+    <message>
+      <source>WRN_PYTHON_FILE_NAME_BAD</source>
+      <translation>有効なファイル名を入力してください。Pythonのファイル名は、文字、数字、およびアンダー スコアで構成され、文字かアンダー スコアで始まる必要があります。</translation>
+    </message>
+    <message>
+      <source>PYTHON_FILES_FILTER</source>
+      <translation>ファイル (*.py) Python</translation>
+    </message>
+    <message>
+      <source>LOG_FILES_FILTER</source>
+      <translation>ログファイル (*.log *.txt)</translation>
     </message>
   </context>
   <context>
@@ -410,6 +421,10 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>PREF_SHOW_BANNER</source>
       <translation>バナーの表示</translation>
+    </message>
+    <message>
+      <source>PREF_AUTO_COMPLETION</source>
+      <translation type="unfinished">Command auto-completion</translation>
     </message>
     <message>
       <source>PREF_GROUP_STYLE</source>
@@ -1165,6 +1180,17 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     <message>
       <source>ACTIVATE_MODULE_TOP</source>
       <translation>モジュール %1 の有効/無効にします。</translation>
+    </message>
+  </context>
+  <context>
+    <name>LightApp_PyEditor</name>
+    <message>
+      <source>TOT_DUMP_PYCOMMANDS</source>
+      <translation>スクリプト コマンドを生成します。</translation>
+    </message>
+    <message>
+      <source>TOT_SAVE_PYLOG</source>
+      <translation>ログの保存</translation>
     </message>
   </context>
 </TS>

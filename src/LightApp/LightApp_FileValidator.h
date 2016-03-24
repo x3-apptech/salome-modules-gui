@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,34 +16,21 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
-// File   : PyConsole_Editor.h
+// File   : LightApp_FileValidator.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
-#ifndef SALOMEPYCONSOLE_EDITOR_H
-#define SALOMEPYCONSOLE_EDITOR_H
 
-#include "SalomePyConsole.h"
-#include "PyConsole_EditorBase.h"
+#ifndef LIGHTAPP_FILEVALIDATOR_H
+#define LIGHTAPP_FILEVALIDATOR_H
 
-#include <QTextEdit>
+#include "LightApp.h"
+#include "SUIT_FileValidator.h"
 
-class PyConsole_Interp;
-class PyInterp_Request;
-class QEventLoop;
-
-class PYCONSOLE_EXPORT SalomePyConsole_Editor : public PyConsole_EditorBase
+class LIGHTAPP_EXPORT LightApp_PyFileValidator : public SUIT_FileValidator
 {
-  Q_OBJECT;
 public:
-  SalomePyConsole_Editor( PyConsole_Interp* theInterp, QWidget *theParent = 0 );
-  ~SalomePyConsole_Editor();
-  static void StaticDumpSlot(PyConsole_EditorBase *base);
-  static void StaticStartLogSlot(PyConsole_EditorBase *base);
-protected:
-  virtual void dumpSlot();
-  virtual void startLogSlot();
+  LightApp_PyFileValidator( QWidget* );
+
+  virtual bool canSave( const QString&, bool );
 };
 
-#endif // SALOMEPYCONSOLE_EDITOR_H
+#endif // LIGHTAPP_FILEVALIDATOR_H

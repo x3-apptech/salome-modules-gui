@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -35,8 +35,9 @@
 #endif
 
 #ifndef DISABLE_PYCONSOLE
-  #include "LightApp_PyInterp.h" // WARNING! This include must be the first!
-  #include <SalomePyConsole_Console.h>
+  #include "LightApp_PyEditor.h"
+  #include "PyConsole_Interp.h"
+  #include "PyConsole_Console.h"
 #endif
 
 #include "LightApp_Application.h"
@@ -1372,13 +1373,13 @@ LogWindow* LightApp_Application::logWindow()
   \param force - if true, the pythonConsole is created if it does not exist yet
   \return Python Console
 */
-SalomePyConsole_Console* LightApp_Application::pythonConsole(const bool force)
+PyConsole_Console* LightApp_Application::pythonConsole(const bool force)
 {
   QWidget* wid = dockWindow( WT_PyConsole );
   if ( !wid && force==true) {
     wid = getWindow(WT_PyConsole);
   }
-  return qobject_cast<SalomePyConsole_Console*>( wid );
+  return qobject_cast<PyConsole_Console*>( wid );
 }
 #endif
 
@@ -2035,15 +2036,14 @@ QWidget* LightApp_Application::createWindow( const int flag )
 #ifndef DISABLE_PYCONSOLE
   else  if ( flag == WT_PyConsole )
   {
-    SalomePyConsole_Console* pyCons = new SalomePyConsole_EnhConsole( desktop(), getPyInterp() );
+    PyConsole_Console* pyCons = new PyConsole_Console( desktop(), new LightApp_PyEditor( getPyInterp() ) );
     pyCons->setObjectName( "pythonConsole" );
     pyCons->setWindowTitle( tr( "PYTHON_CONSOLE" ) );
-    pyCons->setFont(resourceMgr()->fontValue( "PyConsole", "font" ));
-    pyCons->setIsShowBanner(resourceMgr()->booleanValue( "PyConsole", "show_banner", true ));
+    pyCons->setFont( resMgr->fontValue( "PyConsole", "font" ) );
+    pyCons->setIsShowBanner( resMgr->booleanValue( "PyConsole", "show_banner", true ) );
+    pyCons->setAutoCompletion( resMgr->booleanValue( "PyConsole", "auto_completion", true ) );
     pyCons->setProperty( "shortcut", QKeySequence( "Alt+Shift+P" ) );
-
     wid = pyCons;
-    pyCons->connectPopupRequest( this, SLOT( onConnectPopupRequest( SUIT_PopupClient*, QContextMenuEvent* ) ) );
   }
 #endif
   else if ( flag == WT_LogWindow )
@@ -2278,10 +2278,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   // ... "Python console properties" group <<start>>
   int pythonConsoleGroup = pref->addPreference( tr( "PREF_GROUP_PY_CONSOLE" ), genTab );
+  pref->setItemProperty( "columns", 2, pythonConsoleGroup );
   // .... -> font
   pref->addPreference( tr( "PREF_FONT" ), pythonConsoleGroup, LightApp_Preferences::Font, "PyConsole", "font" );
   // .... -> show banner
   pref->addPreference( tr( "PREF_SHOW_BANNER" ), pythonConsoleGroup, LightApp_Preferences::Bool, "PyConsole", "show_banner" );
+  // .... -> auto-completion
+  pref->addPreference( tr( "PREF_AUTO_COMPLETION" ), pythonConsoleGroup, LightApp_Preferences::Bool, "PyConsole", "auto_completion" );
   // ... "Python console properties" group <<end>>
 
   // ... "MRU" preferences group <<start>>
@@ -3583,6 +3586,9 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
     else if ( param=="show_banner" ) {
       pythonConsole()->setIsShowBanner( resMgr->booleanValue( "PyConsole", "show_banner", true ) );
+    }
+    else if ( param=="auto_completion" ) {
+      pythonConsole()->setAutoCompletion( resMgr->booleanValue( "PyConsole", "auto_completion", true ) );
     }
   }
 #endif
@@ -5136,14 +5142,16 @@ bool LightApp_Application::checkExistingDoc()
 PyConsole_Interp* LightApp_Application::getPyInterp()
 {
   static PyConsole_Interp* myInterp = 0;
-  if ( !myInterp )
+  if ( !myInterp ) {
     myInterp = createPyInterp();
+    myInterp->initialize();
+  }
   return myInterp;
 }
 
 PyConsole_Interp* LightApp_Application::createPyInterp()
 {
-  return new LightApp_PyInterp();
+  return new PyConsole_Interp();
 }
 
 #endif // DISABLE_PYCONSOLE

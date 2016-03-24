@@ -2,24 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ja" sourcelanguage="en">
   <context>
-    <name>PyConsole_ConsoleBase</name>
+    <name>PyConsole_Console</name>
     <message>
-      <location filename="../PyConsole_ConsoleBase.cxx" line="216"/>
+      <location filename="../PyConsole_Console.cxx" line="216"/>
       <source>EDIT_COPY_CMD</source>
       <translation>コピー(&amp;C)</translation>
     </message>
     <message>
-      <location filename="../PyConsole_ConsoleBase.cxx" line="221"/>
+      <location filename="../PyConsole_Console.cxx" line="221"/>
       <source>EDIT_PASTE_CMD</source>
       <translation>貼り付け(&amp;P)</translation>
     </message>
     <message>
-      <location filename="../PyConsole_ConsoleBase.cxx" line="226"/>
+      <location filename="../PyConsole_Console.cxx" line="226"/>
       <source>EDIT_CLEAR_CMD</source>
       <translation>削除(&amp;r)</translation>
     </message>
     <message>
-      <location filename="../PyConsole_ConsoleBase.cxx" line="231"/>
+      <location filename="../PyConsole_Console.cxx" line="231"/>
       <source>EDIT_SELECTALL_CMD</source>
       <translation>すべて選択します。(&amp;A)</translation>
     </message>
@@ -37,34 +37,38 @@
     </message>
   </context>
   <context>
-    <name>PyConsole_EditorBase</name>
+    <name>PyConsole_Editor</name>
     <message>
-        <source>Choose python file where to store</source>
-        <translation>Choose python file where to store dump</translation>
+      <source>GET_DUMP_COMMANDS_FILENAME</source>
+      <translation type="unfinished">Dump commands to file</translation>
     </message>
     <message>
-        <source>Python scripts ext (*.py)</source>
-        <translation>Python scripts (*.py)</translation>
+      <source>GET_PYTHON_TRACE_FILENAME</source>
+      <translation type="unfinished">Save Python trace to file</translation>
     </message>
     <message>
-        <source>WARNING</source>
-        <translation>WARNING !</translation>
+      <source>PYTHON_SCRIPTS</source>
+      <translation type="unfinished">Python scripts</translation>
     </message>
     <message>
-        <source>Python file has not been written</source>
-        <translation>Python file has not been written !</translation>
+      <source>WARNING</source>
+      <translation type="unfinished">Warning!</translation>
     </message>
     <message>
-        <source>Choose python file where to store log</source>
-        <translation>Choose python file where to store log</translation>
+      <source>LOG_FILES</source>
+      <translation type="unfinished">Log files</translation>
     </message>
     <message>
-        <source>Log files ext (*.log *.txt)</source>
-        <translation>Log files extension (*.log *.txt)</translation>
+      <source>ERR_FILE_NOT_WRITEABLE</source>
+      <translation type="unfinished">File is not writeable!</translation>
     </message>
     <message>
-        <source>Log file is not writable</source>
-        <translation>Log file is not writable !</translation>
+      <source>TOO_MANY_MATCHES</source>
+      <translation type="unfinished">Too many matches! Displaying first ones only...</translation>
     </message>
-</context>
+    <message>
+      <source>NO_DOC_AVAILABLE</source>
+      <translation type="unfinished">no documentation available</translation>
+    </message>
+  </context>
 </TS>

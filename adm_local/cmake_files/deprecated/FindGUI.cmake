@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,6 @@ FIND_LIBRARY(OCCViewer OCCViewer ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(OpenGLUtils OpenGLUtils ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(Plot2d Plot2d ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(PyConsole PyConsole ${GUI_ROOT_DIR}/lib/salome)
-FIND_LIBRARY(SalomePyConsole SalomePyConsole ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(PyInterp PyInterp ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(QDS QDS ${GUI_ROOT_DIR}/lib/salome)
 FIND_LIBRARY(qtx qtx ${GUI_ROOT_DIR}/lib/salome)

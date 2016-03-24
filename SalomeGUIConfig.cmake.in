@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2013-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -199,7 +199,6 @@ SET(GUI_OCCViewer OCCViewer)
 SET(GUI_OpenGLUtils OpenGLUtils)
 SET(GUI_Plot2d Plot2d)
 SET(GUI_PyConsole PyConsole)
-SET(GUI_SalomePyConsole SalomePyConsole)
 SET(GUI_PyInterp PyInterp)
 SET(GUI_PyEditor PyEditor)
 SET(GUI_PyViewer PyViewer)

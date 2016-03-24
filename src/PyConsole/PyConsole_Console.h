@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,33 +19,25 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 // File   : PyConsole_Console.h
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
-#ifndef PYCONSOLE_CONSOLEBASE_H
-#define PYCONSOLE_CONSOLEBASE_H
+
+#ifndef PYCONSOLE_CONSOLE_H
+#define PYCONSOLE_CONSOLE_H
 
 #include "PyConsole.h"
 
 #include <QWidget>
-#include <QMenu>
 #include <QMap>
 
-class PyConsole_Interp;
-class PyConsole_EditorBase;
+class QMenu;
 
-class PYCONSOLE_EXPORT PyConsole_ConsoleBase : public QWidget
+class PyConsole_Interp;
+class PyConsole_Editor;
+
+class PYCONSOLE_EXPORT PyConsole_Console : public QWidget
 {
   Q_OBJECT
-
-public:
-
-  struct PyConsole_Interp_CreatorBase
-  {
-    virtual PyConsole_EditorBase *createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const;
-    virtual PyConsole_Interp *createInterp( ) const;
-  };
 
 public:
   //! Context popup menu actions flags
@@ -62,11 +54,11 @@ public:
   };
 
 public:
-  PyConsole_ConsoleBase( QWidget* parent, PyConsole_Interp* interp = 0 );
-  virtual ~PyConsole_ConsoleBase();
+  PyConsole_Console( QWidget* parent, PyConsole_Editor* editor = 0 );
+  virtual ~PyConsole_Console();
 
-  //! \brief Get python interperter
   PyConsole_Interp*   getInterp() const;
+
   QFont               font() const;
   virtual void        setFont( const QFont& );
 
@@ -79,6 +71,9 @@ public:
   bool                isShowBanner() const;
   void                setIsShowBanner( const bool );
 
+  void                setAutoCompletion( bool );
+  bool                autoCompletion() const;
+
   void                exec( const QString& );
   void                execAndWait( const QString& );
 
@@ -88,40 +83,15 @@ public:
   void                startLog( const QString& );
   void                stopLog();
 
-  virtual void        contextMenuPopup( QMenu* );
-
 protected:
   void                createActions();
   void                updateActions();
-  //!  MUST BE NON VIRTUAL ! (called from constructor !!!!)
-  void defaultConstructor( PyConsole_Interp* interp, const PyConsole_Interp_CreatorBase& crea );
-  PyConsole_ConsoleBase( QWidget* parent, PyConsole_Interp*,  PyConsole_EditorBase*);
 
-  PyConsole_EditorBase*   myEditor;    //!< python console editor widget
+  virtual void        contextMenuEvent( QContextMenuEvent* );
+
+protected:
+  PyConsole_Editor*   myEditor;    //!< python console editor widget
   QMap<int, QAction*> myActions;   //!< menu actions list
 };
 
-/**
- * Enhance console object providing auto-completion.
- * Similar to PyConsole_Console except that an enhanced interpreter and enhanced editor
- * are encapsulated.
- */
-class PYCONSOLE_EXPORT PyConsole_EnhConsoleBase : public PyConsole_ConsoleBase
-{
-  Q_OBJECT
-public:
-
-  struct PyConsole_Interp_EnhCreatorBase : public PyConsole_Interp_CreatorBase
-  {
-    virtual PyConsole_EditorBase *createEditor( PyConsole_Interp *interp, PyConsole_ConsoleBase *console ) const;
-    virtual PyConsole_Interp *createInterp( ) const;
-  };
-
-public:
-  PyConsole_EnhConsoleBase( QWidget* parent, PyConsole_Interp* interp = 0 );
-  virtual ~PyConsole_EnhConsoleBase() {}
-  virtual bool eventFilter( QObject * o, QEvent * e );
-  virtual void contextMenuRequest( QContextMenuEvent * e ) ;
-};
-
-#endif // PYCONSOLE_CONSOLEBASE_H
+#endif // PYCONSOLE_CONSOLE_H

@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -81,7 +81,6 @@ ENDIF()
 IF(SALOME_USE_PYCONSOLE)
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/src/SalomePyConsole
     ${PROJECT_SOURCE_DIR}/src/PyConsole
     ${PROJECT_SOURCE_DIR}/src/PyInterp
     ${PROJECT_SOURCE_DIR}/src/SUITApp
@@ -142,7 +141,7 @@ IF(SALOME_USE_PVVIEWER)
   LIST(APPEND _link_LIBRARIES PVViewer)
 ENDIF()
 IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _link_LIBRARIES PyInterp SalomePyConsole SUITApp)
+  LIST(APPEND _link_LIBRARIES PyInterp PyConsole SUITApp)
 ENDIF()
 
 # --- headers ---
@@ -184,6 +183,9 @@ IF(SALOME_USE_VTKVIEWER)
     LIST(APPEND _moc_HEADERS LightApp_VTKSelector.h)
   ENDIF()
 ENDIF()
+IF(SALOME_USE_PYCONSOLE)
+  LIST(APPEND _moc_HEADERS LightApp_PyEditor.h)
+ENDIF()
 
 # header files / no moc processing
 SET(_other_HEADERS
@@ -194,14 +196,12 @@ SET(_other_HEADERS
   LightApp_Displayer.h
   LightApp_Driver.h
   LightApp_EventFilter.h
+  LightApp_FileValidator.h
   LightApp_FullScreenHelper.h
   LightApp_HDFDriver.h
   LightApp_Selection.h
   LightApp_UpdateFlags.h
 )
-IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _other_HEADERS LightApp_PyInterp.h)
-ENDIF()
 
 # header files / to install
 SET(LightApp_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
@@ -251,6 +251,7 @@ SET(_other_SOURCES
   LightApp_Displayer.cxx
   LightApp_Driver.cxx
   LightApp_EventFilter.cxx
+  LightApp_FileValidator.cxx
   LightApp_FullScreenHelper.cxx
   LightApp_HDFDriver.cxx
   LightApp_Module.cxx
@@ -286,7 +287,7 @@ IF(SALOME_USE_VTKVIEWER)
   ENDIF()
 ENDIF()
 IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _other_SOURCES LightApp_PyInterp.cxx)
+  LIST(APPEND _other_SOURCES LightApp_PyEditor.cxx)
 ENDIF()
 
 # sources / to compile

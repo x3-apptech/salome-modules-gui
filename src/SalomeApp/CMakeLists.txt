@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,6 @@ INCLUDE_DIRECTORIES(
 IF(SALOME_USE_PYCONSOLE)
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/src/SalomePyConsole
     ${PROJECT_SOURCE_DIR}/src/PyConsole
     ${PROJECT_SOURCE_DIR}/src/PyInterp
   )
@@ -90,7 +89,7 @@ IF(SALOME_USE_VTKVIEWER)
 ENDIF()
 
 IF(SALOME_USE_PYCONSOLE)
-  LIST(APPEND _link_LIBRARIES PyInterp SalomePyConsole)
+  LIST(APPEND _link_LIBRARIES PyInterp PyConsole)
 ENDIF()
 
 IF(SALOME_USE_GLVIEWER)

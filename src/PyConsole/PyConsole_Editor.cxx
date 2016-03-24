@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,11 +19,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 // File   : PyConsole_Editor.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
-//
+
 /*!
   \class PyConsole_Editor
   \brief Python command line interpreter front-end GUI widget.
@@ -86,30 +84,28 @@
   - <Ctrl><C>            : copy
   - <Ctrl><X>            : cut
   - <Ctrl><V>            : paste
+  - <Tab>                : performs auto-completion
+  - <Ctrl><Tab>          : undoes auto-completion
 */
 
-#include "PyConsole_Interp.h"   // !!! WARNING !!! THIS INCLUDE MUST BE THE VERY FIRST !!!
-#include "PyConsole_EditorBase.h"
+#include "PyConsole_Editor.h"
+#include "PyConsole_Interp.h"
 #include "PyConsole_Event.h"
-#include "PyInterp_Event.h"
 #include "PyInterp_Dispatcher.h"
 #include "PyConsole_Request.h"
-
-#include <Qtx.h>
 
 #include <QApplication>
 #include <QClipboard>
 #include <QDropEvent>
 #include <QEvent>
 #include <QKeyEvent>
+#include <QMimeData>
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QTextBlock>
 #include <QTextCursor>
-#include <QTextDocument>
 #include <QTextStream>
 #include <QChar>
-#include <QFileInfo>
 #include <QFileDialog>
 #include <QMessageBox>
 
@@ -134,22 +130,19 @@ static QString DOTS_PROMPT  = "... ";
 
 void staticCallbackStdout( void* data, char* c )
 {
-  if(!((PyConsole_EditorBase*)data)->isSuppressOutput()) {
-    PyConsole_EditorBase* e = (PyConsole_EditorBase*)data;
-    e->putLog( fromUtf8(c) );
-    QApplication::postEvent( e, new PrintEvent( fromUtf8(c), false ) );
+  if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
+    PyConsole_Editor* e = (PyConsole_Editor*)data;
+    QApplication::postEvent( e, new PyConsole_PrintEvent( fromUtf8(c), false ) );
   }
 }
 
 void staticCallbackStderr( void* data, char* c )
 {
-  if(!((PyConsole_EditorBase*)data)->isSuppressOutput()) {
-    PyConsole_EditorBase* e = (PyConsole_EditorBase*)data;
-    e->putLog( fromUtf8(c) );
-    QApplication::postEvent( e, new PrintEvent( fromUtf8(c), true ) );
+  if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
+    PyConsole_Editor* e = (PyConsole_Editor*)data;
+    QApplication::postEvent( e, new PyConsole_PrintEvent( fromUtf8(c), true ) );
   }
 }
-
 
 /*!
   \brief Constructor. 
@@ -158,19 +151,21 @@ void staticCallbackStderr( void* data, char* c )
   \param theInterp python interper
   \param theParent parent widget
 */
-PyConsole_EditorBase::PyConsole_EditorBase( PyConsole_Interp* theInterp, 
-                                            QWidget*          theParent )
+PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp, 
+                                    QWidget*          theParent )
 : QTextEdit( theParent ),
-  myInterp( 0 ),
+  myInterp( theInterp ),
   myCmdInHistory( -1 ),
   myEventLoop( 0 ),
   myShowBanner( true ),
   myIsSync( true ),
-  myIsSuppressOutput( false )
+  myIsSuppressOutput( false ),
+  myMultiLinePaste( false ),
+  myAutoCompletion( false ),
+  myTabMode( false ),
+  myComplCursorPos( -1 )
 {
-  QString fntSet( "" );
-  QFont aFont ( Qtx::stringToFont(fntSet) );
-  setFont( aFont );
+  setFont( QFont( "Courier", 11 ) ); // default font
   setUndoRedoEnabled( false );
 
   myPrompt = READY_PROMPT;
@@ -178,17 +173,28 @@ PyConsole_EditorBase::PyConsole_EditorBase( PyConsole_Interp* theInterp,
   setWordWrapMode( QTextOption::WrapAnywhere );
   setAcceptRichText( false );
 
-  theInterp->setvoutcb( staticCallbackStdout, this );
-  theInterp->setverrcb( staticCallbackStderr, this );
-
-  // san - This is necessary for troubleless initialization
-  onPyInterpChanged( theInterp );
+  // set callbacks to interpeter
+  myInterp->setvoutcb( staticCallbackStdout, this );
+  myInterp->setverrcb( staticCallbackStderr, this );
+  // print banner
+  if ( isShowBanner() )
+    addText( banner() );
+  // clear command buffer
+  myCommandBuffer.truncate(0);
+  // unset read-only state
+  setReadOnly( false );
+  // unset history browsing mode
+  myCmdInHistory = -1;
+  // add prompt
+  addText( myPrompt );
+  // unset busy cursor
+  viewport()->unsetCursor();
 }
 
 /*!
   \brief Destructor.
 */
-PyConsole_EditorBase::~PyConsole_EditorBase()
+PyConsole_Editor::~PyConsole_Editor()
 {
   myInterp = 0;
 }
@@ -196,7 +202,7 @@ PyConsole_EditorBase::~PyConsole_EditorBase()
 /*!
   \brief Get Python interpreter
 */
-PyConsole_Interp* PyConsole_EditorBase::getInterp() const
+PyConsole_Interp* PyConsole_Editor::getInterp() const
 {
   return myInterp;
 }
@@ -205,9 +211,9 @@ PyConsole_Interp* PyConsole_EditorBase::getInterp() const
   \brief Get synchronous mode flag value.
   
   \sa setIsSync()
-  \return True if python console works in synchronous mode
+  \return \c true if python console works in synchronous mode
 */
-bool PyConsole_EditorBase::isSync() const
+bool PyConsole_Editor::isSync() const
 {
   return myIsSync;
 }
@@ -222,7 +228,7 @@ bool PyConsole_EditorBase::isSync() const
 
   \param on synhronous mode flag
 */
-void PyConsole_EditorBase::setIsSync( const bool on )
+void PyConsole_Editor::setIsSync( const bool on )
 {
   myIsSync = on;
 }
@@ -233,7 +239,7 @@ void PyConsole_EditorBase::setIsSync( const bool on )
   \sa setIsSuppressOutput()
   \return \c true if python console output is suppressed.
 */
-bool PyConsole_EditorBase::isSuppressOutput() const
+bool PyConsole_Editor::isSuppressOutput() const
 {
   return myIsSuppressOutput;
 }
@@ -241,12 +247,12 @@ bool PyConsole_EditorBase::isSuppressOutput() const
 /*!
   \brief Set suppress output flag value.
 
-  In case if suppress output flag is true, the python 
+  In case if suppress output flag is \c true, the python 
   console output suppressed.
 
   \param on suppress output flag
 */
-void PyConsole_EditorBase::setIsSuppressOutput( const bool on )
+void PyConsole_Editor::setIsSuppressOutput( const bool on )
 {
   myIsSuppressOutput = on;
 }
@@ -257,7 +263,7 @@ void PyConsole_EditorBase::setIsSuppressOutput( const bool on )
   \sa setIsShowBanner()
   \return \c true if python console shows banner
 */
-bool PyConsole_EditorBase::isShowBanner() const
+bool PyConsole_Editor::isShowBanner() const
 {
   return myShowBanner;
 }
@@ -270,7 +276,7 @@ bool PyConsole_EditorBase::isShowBanner() const
   \sa isShowBanner()
   \param on 'show banner' flag
 */
-void PyConsole_EditorBase::setIsShowBanner( const bool on )
+void PyConsole_Editor::setIsShowBanner( const bool on )
 {
   if ( myShowBanner != on ) {
     myShowBanner = on;
@@ -279,12 +285,32 @@ void PyConsole_EditorBase::setIsShowBanner( const bool on )
 }
 
 /*!
+  \brief Switch on/off commands auto-completion feature
+  \sa autoCompletion()
+*/
+void PyConsole_Editor::setAutoCompletion( bool on )
+{
+  myAutoCompletion = on;
+  document()->setUndoRedoEnabled( myAutoCompletion );
+}
+  
+/*!
+  \brief Returns \c true if auto-completion feature is switched on
+  or \c false otherwise
+  \sa setAutoCompletion()
+*/
+bool PyConsole_Editor::autoCompletion() const
+{
+  return myAutoCompletion;
+}
+
+/*!
   \brief Check if trace logging is switched on.
   
   \sa startLog(), stopLog()
   \return \c true if trace logging is switched on
 */
-bool PyConsole_EditorBase::isLogging() const
+bool PyConsole_Editor::isLogging() const
 {
   return !myLogFile.isEmpty();
 }
@@ -293,10 +319,10 @@ bool PyConsole_EditorBase::isLogging() const
   \brief Get size hint for the Python console window
   \return size hint value
 */
-QSize PyConsole_EditorBase::sizeHint() const
+QSize PyConsole_Editor::sizeHint() const
 {
   QFontMetrics fm( font() );
-  int nbLines = ( isShowBanner() ? myBanner.split("\n").count() : 0 ) + 1;
+  int nbLines = ( isShowBanner() ? banner().split("\n").count() : 0 ) + 1;
   QSize s(100, fm.lineSpacing()*nbLines);
   return s;
 }
@@ -304,24 +330,24 @@ QSize PyConsole_EditorBase::sizeHint() const
 /*!
   \brief Put the string \a str to the python editor.
   \param str string to be put in the command line of the editor
-  \param newBlock if True, then the string is printed on a new line
-  \param isError if true, the text is printed in dark red
+  \param newBlock if \c true, then the string is printed on a new line
+  \param isError if \c true, the text is printed in dark red
 */
-void PyConsole_EditorBase::addText( const QString& str, 
+void PyConsole_Editor::addText( const QString& str, 
                                 const bool     newBlock,
-                                const bool    isError)
+                                const bool     isError )
 {
-  QTextCursor theCursor(textCursor());
+  QTextCursor aCursor = textCursor();
   QTextCharFormat cf;
 
   moveCursor( QTextCursor::End );
   if ( newBlock )
-    theCursor.insertBlock();
-  if (isError)
-      cf.setForeground(QBrush(Qt::red));
+    aCursor.insertBlock();
+  if ( isError )
+    cf.setForeground( QBrush( Qt::red ) );
   else
-      cf.setForeground(QBrush(Qt::black));
-  theCursor.insertText( str, cf);
+    cf.setForeground( QBrush( Qt::black ) );
+  aCursor.insertText( str, cf );
   moveCursor( QTextCursor::End );
   ensureCursorVisible();
 }
@@ -333,7 +359,7 @@ void PyConsole_EditorBase::addText( const QString& str,
 
   !!! WARNING: doesn't work properly with multi-line commands. !!!
 */
-void PyConsole_EditorBase::exec( const QString& command )
+void PyConsole_Editor::exec( const QString& command )
 {
   if ( isReadOnly() ) {
     // some interactive command is being executed in this editor...
@@ -341,16 +367,21 @@ void PyConsole_EditorBase::exec( const QString& command )
     myQueue.push_back( command );
     return;
   }
+
   // remove last line
   moveCursor( QTextCursor::End );
   moveCursor( QTextCursor::StartOfBlock, QTextCursor::KeepAnchor );
   textCursor().removeSelectedText();
+
   // set "ready" prompt
   myPrompt = READY_PROMPT;
+
   // clear command buffer
   myCommandBuffer.truncate( 0 );
+
   // unset history browsing mode
   myCmdInHistory = -1;
+
   // print command line by line
   QString cmd = command;
   if ( !cmd.endsWith( "\n" ) ) cmd += "\n";
@@ -361,26 +392,76 @@ void PyConsole_EditorBase::exec( const QString& command )
     addText( ( i == 0 ? READY_PROMPT : DOTS_PROMPT ) + lines[i], i != 0 );
     putLog( QString( "%1%2\n" ).arg( i == 0 ? READY_PROMPT : DOTS_PROMPT ).arg( lines[i] ) );
   }
+
   // IPAL20182
   addText( "", true );
+
   // set read-only mode
   setReadOnly( true );
+
   // set busy cursor
   setCursor( Qt::BusyCursor );
   
   // post a request to execute Python command;
   // editor will be informed via a custom event that execution has been completed
-  PyInterp_Dispatcher::Get()->Exec( createRequest( cmd ) );
+  PyInterp_Dispatcher::Get()->Exec( createCmdRequest( cmd ) );
 }
 
 /*!
   \brief Create request to the python dispatcher for the command execution.
-
   \param command python command to be executed
  */
-PyInterp_Request* PyConsole_EditorBase::createRequest( const QString& command )
+PyInterp_Request* PyConsole_Editor::createCmdRequest( const QString& command )
 {
-  return new ExecCommand( myInterp, command, this, isSync() );
+  return new PyConsole_ExecCommand( myInterp, command, this, isSync() );
+}
+
+/*!
+  \brief Create the Python request that will be posted to the interpreter to
+  get the completions.
+  \param input line entered by the user at the time <TAB> was pressed
+  \return completion command
+  \sa CompletionCommand
+*/
+PyInterp_Request* PyConsole_Editor::createTabRequest( const QString& input )
+{
+  // valid separators
+  static QStringList separators;
+  if ( separators.isEmpty() ) {
+    separators << " " << "(" << "[" << "+" << "-" << "*" << "/" << ";" << "^" << "=";
+  }
+
+  // parse input to extract on what part the dir() has to be executed
+
+  QString input2( input );
+
+  // split up to the last syntaxical separator
+  int lastSp = -1;
+  foreach ( QString separator, separators ) {
+    int j = input2.lastIndexOf( separator );
+    if ( j > lastSp )
+      lastSp = j;
+  }
+  if ( lastSp >= 0 )
+    input2 = input.mid( lastSp + 1 );
+
+  // detect a qualified name (with a point)
+  int lastPt = input2.lastIndexOf( "." );
+
+  if ( lastPt != -1 ) {
+    // split the 2 surrounding parts of the qualified name
+    myComplBeforePoint = input2.left( lastPt );
+    myComplAfterPoint = input2.mid( lastPt+1 );
+  }
+  else {
+    // no point found - do a global matching
+    // (the following will call dir() with an empty string)
+    myComplAfterPoint = input2;
+    myComplBeforePoint = "";
+  }
+
+  return new PyConsole_CompletionCommand( myInterp, myComplBeforePoint,
+                                          myComplAfterPoint, this, isSync() );
 }
 
 /*!
@@ -389,10 +470,10 @@ PyInterp_Request* PyConsole_EditorBase::createRequest( const QString& command )
 
   \param command python command to be executed
  */
-void PyConsole_EditorBase::execAndWait( const QString& command )
+void PyConsole_Editor::execAndWait( const QString& command )
 {
   // already running ?
-  if( myEventLoop )
+  if ( myEventLoop )
     return;
 
   // create new event loop
@@ -414,16 +495,16 @@ void PyConsole_EditorBase::execAndWait( const QString& command )
 }
 
 /*!
-  \brief Process "Enter" key press event. 
+  \brief Process <Enter> key press event. 
   
   Execute the command entered by the user.
 */
-void PyConsole_EditorBase::handleReturn()
+void PyConsole_Editor::handleReturn()
 {
   // Position cursor at the end
-  QTextCursor curs(textCursor());
-  curs.movePosition(QTextCursor::End);
-  setTextCursor(curs);
+  QTextCursor aCursor = textCursor();
+  aCursor.movePosition( QTextCursor::End );
+  setTextCursor( aCursor );
 
   // get last line
   QTextBlock par = document()->end().previous();
@@ -431,8 +512,10 @@ void PyConsole_EditorBase::handleReturn()
 
   // get command
   QString cmd = par.text().remove( 0, promptSize() );
+
   // extend the command buffer with the current command 
   myCommandBuffer.append( cmd );
+
   // add command to the history
   if ( !cmd.trimmed().isEmpty() )
     myHistory.push_back( cmd );
@@ -443,12 +526,78 @@ void PyConsole_EditorBase::handleReturn()
   
   // set read-only mode
   setReadOnly( true );
+
   // set busy cursor
   setCursor( Qt::BusyCursor );
   
   // post a request to execute Python command;
   // editor will be informed via a custom event that execution has been completed
-  PyInterp_Dispatcher::Get()->Exec( createRequest( myCommandBuffer ) );
+  PyInterp_Dispatcher::Get()->Exec( createCmdRequest( myCommandBuffer ) );
+}
+
+/*!
+  \brief Process <Tab> key press event. 
+  
+  Perform auto-completion of the currently entered command, if this feature is enabled
+*/
+void PyConsole_Editor::handleTab()
+{
+  if ( !autoCompletion() )
+    return; // auto-completion feature is disabled
+
+  if ( myTabMode )
+    return; // already in tab mode
+
+  QTextCursor aCursor = textCursor();
+
+  // move cursor to the end of input
+  aCursor.movePosition( QTextCursor::End );
+  setTextCursor( aCursor );
+
+  // save cursor position if needed
+  if ( myComplCursorPos == -1 )
+    myComplCursorPos = textCursor().position();
+
+  // get last line
+  QTextBlock par = document()->end().previous();
+  if ( !par.isValid() ) return; // empty line
+
+  // switch to completion mode
+  myTabMode = true;
+
+  // get currently entered command
+  QString cmd = par.text().mid( promptSize() );
+
+  // post completion request
+  // editor will be informed that completion has been done via a custom event 
+  PyInterp_Dispatcher::Get()->Exec( createTabRequest( cmd ) );
+}
+
+/*!
+  \brief Process <Ctrl><Tab> key press event. 
+  
+  Undoe last auto-completion
+*/
+void PyConsole_Editor::handleBackTab()
+{
+  if ( !autoCompletion() )
+    return; // auto-completion feature is disabled
+
+  QTextCursor aCursor = textCursor();
+
+  if ( myComplCursorPos == -1 )
+    return; // invalid cursor position
+
+  // ensure cursor is at the end of command line
+  aCursor.setPosition( myComplCursorPos );
+  aCursor.movePosition( QTextCursor::EndOfLine );
+  //setCursor( aCursor );
+
+  // delete last completed text
+  int i = aCursor.position() - myComplCursorPos;
+  aCursor.movePosition( QTextCursor::Left, QTextCursor::KeepAnchor, i );
+  aCursor.removeSelectedText();
+  myComplCursorPos = -1;
 }
 
 /*!
@@ -457,16 +606,18 @@ void PyConsole_EditorBase::handleReturn()
   Paste dragged text.
   \param event drop event
 */
-void PyConsole_EditorBase::dropEvent( QDropEvent* event )
+void PyConsole_Editor::dropEvent( QDropEvent* event )
 {
   // get the initial drop position
   QPoint pos = event->pos();
-  QTextCursor cur = cursorForPosition( event->pos() );
+  QTextCursor aCursor = cursorForPosition( event->pos() );
+
   // if the position is not in the last line move it to the end of the command line
-  if ( cur.position() < document()->end().previous().position() + promptSize() ) {
+  if ( aCursor.position() < document()->end().previous().position() + promptSize() ) {
     moveCursor( QTextCursor::End );
     pos = cursorRect().center();
   }
+
   // create new drop event and use it instead of the original
   QDropEvent de( pos,
                  event->possibleActions(),
@@ -475,8 +626,25 @@ void PyConsole_EditorBase::dropEvent( QDropEvent* event )
                  event->keyboardModifiers(),
                  event->type() );
   QTextEdit::dropEvent( &de );
+
   // accept the original event
   event->acceptProposedAction();
+}
+
+/*!
+  \brief Process mouse press event
+
+  Clear the completion when any mouse button is pressed.
+
+  \param e mouse press event
+*/
+void PyConsole_Editor::mousePressEvent( QMouseEvent* event )
+{
+  if ( autoCompletion() ) {
+    clearCompletion();
+    myComplCursorPos = -1;
+  }
+  QTextEdit::mousePressEvent( event );
 }
 
 /*!
@@ -484,22 +652,22 @@ void PyConsole_EditorBase::dropEvent( QDropEvent* event )
 
   Left mouse button: copy selection to the clipboard.
   Middle mouse button: paste clipboard's contents.
+
   \param event mouse event
 */
-void PyConsole_EditorBase::mouseReleaseEvent( QMouseEvent* event )
+void PyConsole_Editor::mouseReleaseEvent( QMouseEvent* event )
 {
   if ( event->button() == Qt::LeftButton ) {
     QTextEdit::mouseReleaseEvent( event );
-    //copy();
   }
   else if ( event->button() == Qt::MidButton ) {
-    QTextCursor cur = cursorForPosition( event->pos() );
+    QTextCursor aCursor = cursorForPosition( event->pos() );
     // if the position is not in the last line move it to the end of the command line
-    if ( cur.position() < document()->end().previous().position() + promptSize() ) {
+    if ( aCursor.position() < document()->end().previous().position() + promptSize() ) {
       moveCursor( QTextCursor::End );
     }
     else {
-      setTextCursor( cur );
+      setTextCursor( aCursor );
     }
     const QMimeData* md = QApplication::clipboard()->mimeData( QApplication::clipboard()->supportsSelection() ? 
 							       QClipboard::Selection : QClipboard::Clipboard );
@@ -514,11 +682,11 @@ void PyConsole_EditorBase::mouseReleaseEvent( QMouseEvent* event )
 /*!
   \brief Check if the string is command.
   
-  Return True if the string \a str is likely to be the command
+  Return \c true if the string \a str is likely to be the command
   (i.e. it is started from the '>>>' or '...').
   \param str string to be checked
 */
-bool PyConsole_EditorBase::isCommand( const QString& str ) const
+bool PyConsole_Editor::isCommand( const QString& str ) const
 {
   return str.startsWith( READY_PROMPT ) || str.startsWith( DOTS_PROMPT );
 }
@@ -528,14 +696,15 @@ bool PyConsole_EditorBase::isCommand( const QString& str ) const
 
   Implement navigation, history browsing, copy/paste and other common
   operations.
+
   \param event keyboard event
 */
-void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
+void PyConsole_Editor::keyPressEvent( QKeyEvent* event )
 {
   // get cursor position
-  QTextCursor cur = textCursor();
-  int curLine = cur.blockNumber();
-  int curCol  = cur.columnNumber();
+  QTextCursor aCursor = textCursor();
+  int curLine = aCursor.blockNumber();
+  int curCol  = aCursor.columnNumber();
 
   // get last edited line
   int endLine = document()->blockCount()-1;
@@ -547,6 +716,32 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
   bool ctrlPressed = event->modifiers() & Qt::ControlModifier;
   // check if <Shift> is pressed
   bool shftPressed = event->modifiers() & Qt::ShiftModifier;
+
+  if ( autoCompletion() ) {
+    // auto-completion support
+    if ( aKey == Qt::Key_Tab && !shftPressed ) {
+      // process <Tab> key
+      if ( !ctrlPressed ) {
+        handleTab();
+      }
+      else {
+        clearCompletion();
+        handleBackTab();
+      }
+      return;
+    }
+
+    // If <Ctrl> is not pressed (or if something else is pressed with <Ctrl>),
+    // or if <Ctrl> is not pressed alone, we have to clear completion
+    if ( !ctrlPressed || ( ctrlPressed && aKey != Qt::Key_Control ) ) {
+      clearCompletion();
+      myComplCursorPos = -1;
+    }
+    
+    // Discard <Ctrl> pressed alone:
+    if ( aKey == Qt::Key_Control )
+      return;
+  }
 
   if ( aKey == Qt::Key_Escape || ( ctrlPressed && aKey == -1 ) ) {
     // process <Ctrl>+<Break> key-binding and <Escape> key: clear current command
@@ -707,15 +902,15 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
       if ( !shftPressed ) {
         if ( curCol < txt.length() ) {
           if ( isCommand( txt ) && curCol < promptSize() ) {
-            cur.setPosition( cur.block().position() + promptSize() );
-            setTextCursor( cur );
+            aCursor.setPosition( aCursor.block().position() + promptSize() );
+            setTextCursor( aCursor );
             break;
           }
         }
         else {
           if ( curLine < endLine && isCommand( textCursor().block().next().text() ) ) {
-            cur.setPosition( cur.position() + promptSize()+1 );
-            setTextCursor( cur );
+            aCursor.setPosition( aCursor.position() + promptSize()+1 );
+            setTextCursor( aCursor );
             horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
             break;
           }
@@ -736,24 +931,24 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
       }
       else if ( shftPressed || ctrlPressed ) {
         bool moved = false;
-        qreal lastY = cursorRect( cur ).top();
+        qreal lastY = cursorRect( aCursor ).top();
         qreal distance = 0;
         // move using movePosition to keep the cursor's x
         do {
-          qreal y = cursorRect( cur ).top();
+          qreal y = cursorRect( aCursor ).top();
           distance += qAbs( y - lastY );
           lastY = y;
-          moved = cur.movePosition( QTextCursor::Up, 
-                                    shftPressed ? QTextCursor::KeepAnchor : 
-                                                  QTextCursor::MoveAnchor );
+          moved = aCursor.movePosition( QTextCursor::Up, 
+                                        shftPressed ? QTextCursor::KeepAnchor : 
+                                        QTextCursor::MoveAnchor );
         } while ( moved && distance < viewport()->height() );
         if ( moved ) {
-          cur.movePosition( QTextCursor::Down, 
-                            shftPressed ? QTextCursor::KeepAnchor : 
-                                          QTextCursor::MoveAnchor );
+          aCursor.movePosition( QTextCursor::Down, 
+                                shftPressed ? QTextCursor::KeepAnchor : 
+                                QTextCursor::MoveAnchor );
           verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepSub );
         }
-        setTextCursor( cur );
+        setTextCursor( aCursor );
       }
       else { 
         if ( myCmdInHistory < 0 && myHistory.count() > 0 ) {
@@ -790,24 +985,24 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
       }
       else if ( shftPressed || ctrlPressed ) {
         bool moved = false;
-        qreal lastY = cursorRect( cur ).top();
+        qreal lastY = cursorRect( aCursor ).top();
         qreal distance = 0;
         // move using movePosition to keep the cursor's x
         do {
-          qreal y = cursorRect( cur ).top();
+          qreal y = cursorRect( aCursor ).top();
           distance += qAbs( y - lastY );
           lastY = y;
-          moved = cur.movePosition( QTextCursor::Down, 
-                                    shftPressed ? QTextCursor::KeepAnchor : 
-                                                  QTextCursor::MoveAnchor );
+          moved = aCursor.movePosition( QTextCursor::Down, 
+                                        shftPressed ? QTextCursor::KeepAnchor : 
+                                        QTextCursor::MoveAnchor );
         } while ( moved && distance < viewport()->height() );
         if ( moved ) {
-          cur.movePosition( QTextCursor::Up, 
-                            shftPressed ? QTextCursor::KeepAnchor : 
-                                          QTextCursor::MoveAnchor );
+          aCursor.movePosition( QTextCursor::Up, 
+                                shftPressed ? QTextCursor::KeepAnchor : 
+                                QTextCursor::MoveAnchor );
           verticalScrollBar()->triggerAction( QAbstractSlider::SliderPageStepSub );
         }
-        setTextCursor( cur );
+        setTextCursor( aCursor );
       }
       else { 
         if ( myCmdInHistory >= 0 ) {
@@ -840,15 +1035,15 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
         if ( isCommand( txt ) ) {
           if ( shftPressed ) {
             if ( curCol > promptSize() ) {
-              cur.movePosition( QTextCursor::StartOfLine, QTextCursor::KeepAnchor );
-              cur.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor, promptSize() );
+              aCursor.movePosition( QTextCursor::StartOfLine, QTextCursor::KeepAnchor );
+              aCursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor, promptSize() );
             }
           }
           else {
-            cur.movePosition( QTextCursor::StartOfLine );
-            cur.movePosition( QTextCursor::Right, QTextCursor::MoveAnchor, promptSize() );
+            aCursor.movePosition( QTextCursor::StartOfLine );
+            aCursor.movePosition( QTextCursor::Right, QTextCursor::MoveAnchor, promptSize() );
           }
-          setTextCursor( cur );
+          setTextCursor( aCursor );
         }
         else {
           moveCursor( QTextCursor::StartOfBlock, 
@@ -876,18 +1071,18 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
     // - with <Ctrl> modifier key pressed: delete text from the cursor to the line beginning
     // works only for last (command) line
     {
-      if ( cur.hasSelection() ) {
+      if ( aCursor.hasSelection() ) {
         cut();
       }
-      else if ( cur.position() > document()->end().previous().position() + promptSize() ) {
+      else if ( aCursor.position() > document()->end().previous().position() + promptSize() ) {
         if ( shftPressed ) {
           moveCursor( QTextCursor::PreviousWord, QTextCursor::KeepAnchor );
           textCursor().removeSelectedText();
         }
         else if ( ctrlPressed ) {
-          cur.setPosition( document()->end().previous().position() + promptSize(),
-                           QTextCursor::KeepAnchor );
-          setTextCursor( cur );
+          aCursor.setPosition( document()->end().previous().position() + promptSize(),
+                               QTextCursor::KeepAnchor );
+          setTextCursor( aCursor );
           textCursor().removeSelectedText();
         }
         else {
@@ -895,8 +1090,8 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
         }
       }
       else {
-        cur.setPosition( document()->end().previous().position() + promptSize() );
-        setTextCursor( cur );
+        aCursor.setPosition( document()->end().previous().position() + promptSize() );
+        setTextCursor( aCursor );
         horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
       }
       break;
@@ -908,10 +1103,10 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
     // - with <Ctrl> modifier key pressed: delete text from the cursor to the end of line
     // works only for last (command) line
     {
-      if ( cur.hasSelection() ) {
+      if ( aCursor.hasSelection() ) {
         cut();
       }
-      else if ( cur.position() > document()->end().previous().position() + promptSize()-1 ) {
+      else if ( aCursor.position() > document()->end().previous().position() + promptSize()-1 ) {
         if ( shftPressed ) {
           moveCursor( QTextCursor::NextWord, QTextCursor::KeepAnchor );
           textCursor().removeSelectedText();
@@ -925,8 +1120,8 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
         }
       }
       else {
-        cur.setPosition( document()->end().previous().position() + promptSize() );
-        setTextCursor( cur );
+        aCursor.setPosition( document()->end().previous().position() + promptSize() );
+        setTextCursor( aCursor );
         horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
       }
       break;
@@ -946,6 +1141,8 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
         QTextEdit::keyPressEvent( event );
       break;
     }
+  default:
+    break;
   }
 }
 
@@ -953,16 +1150,81 @@ void PyConsole_EditorBase::keyPressEvent( QKeyEvent* event )
   \brief Handle notification event coming from Python dispatcher.
   \param event notification event
 */
-void PyConsole_EditorBase::customEvent( QEvent* event )
+void PyConsole_Editor::customEvent( QEvent* event )
 {
   switch( event->type() )
   {
-  case PrintEvent::EVENT_ID:
-    {
-      PrintEvent* pe=(PrintEvent*)event;
-      addText( pe->text(), false, pe->isError());
-      return;
+  case PyConsole_PrintEvent::EVENT_ID:
+  {
+    PyConsole_PrintEvent* pe = (PyConsole_PrintEvent*)event;
+    putLog( pe->text());
+    addText( pe->text(), false, pe->isError() );
+    return;
+  }
+  case PyConsole_CompletionEvent::EVENT_ID:
+  {
+    PyConsole_CompletionEvent* ce = (PyConsole_CompletionEvent*)event;
+    bool status = ce->status();
+    QStringList matches = ce->matches();
+    QString doc = ce->doc();
+
+    if ( status ) {
+      // completion was successful
+      QTextCursor aCursor = textCursor();
+
+      if ( matches.isEmpty() ) {
+	// completion successful but there are no matches.
+        myTabMode = false;
+        myComplCursorPos = -1;
+        return;
+      }
+      
+      if ( matches.size() == 1 ) {
+        // there's only one match - complete directly and update doc string window
+        aCursor.insertText( matches[0].mid( myComplAfterPoint.size() ) );
+        myTabMode = false;
+        if ( doc.isEmpty() )
+          emit updateDoc( formatDocHTML( QString( "(%1)\n" ).arg( tr( "NO_DOC_AVAILABLE" ) ) ) );
+        else
+          emit updateDoc( formatDocHTML( doc ) );
+      }
+      else {
+        // there are several matches
+        
+        // detect if there is a common base to all available completion
+        // in this case append this base to the text
+        QString base = extractCommon( matches );
+        aCursor.insertText( base.mid( myComplAfterPoint.size() ) );
+        
+        // if this happens to match exactly the first completion
+        // also provide doc
+        if ( base == matches[0] )
+          emit updateDoc( formatDocHTML( doc ) );
+        
+        // print all matching completion in a "undo-able" block
+        int cursorPos = aCursor.position();
+        aCursor.insertBlock();
+        aCursor.beginEditBlock();
+        
+        // insert all matches
+        QTextCharFormat cf;
+        cf.setForeground( QBrush( Qt::darkGreen ) );
+        aCursor.setCharFormat( cf );
+        aCursor.insertText( formatCompletion( matches ) );
+        aCursor.endEditBlock();
+        
+        // position cursor where it was before inserting the completion list
+        aCursor.setPosition( cursorPos );
+        setTextCursor( aCursor );
+      }
     }
+    else {
+      // completion failed
+      myTabMode = false;
+      myComplCursorPos = -1;
+    }
+    return;
+  }
   case PyInterp_Event::ES_OK:
   case PyInterp_Event::ES_ERROR:
   {
@@ -983,6 +1245,8 @@ void PyConsole_EditorBase::customEvent( QEvent* event )
     // stop event loop (if running)
     if ( myEventLoop )
       myEventLoop->exit();
+    // if we are in multi_paste_mode, process the next item
+    multiLineProcessNextLine();
     break;
   }
   case PyInterp_Event::ES_INCOMPLETE:
@@ -1004,6 +1268,8 @@ void PyConsole_EditorBase::customEvent( QEvent* event )
     // stop event loop (if running)
     if ( myEventLoop )
       myEventLoop->exit();
+    // if we are in multi_paste_mode, process the next item
+    multiLineProcessNextLine();
     break;
   }
   default:
@@ -1025,68 +1291,26 @@ void PyConsole_EditorBase::customEvent( QEvent* event )
 }
 
 /*!
-  \brief Handle Python interpreter change.
-
-  Perform initialization actions if the interpreter is changed.
-  \param interp python interpreter is being set
-*/
-void PyConsole_EditorBase::onPyInterpChanged( PyConsole_Interp* interp )
-{
-  if ( myInterp != interp 
-       // Force read-only state and wait cursor when myInterp is NULL
-      || !myInterp ) {
-    myInterp = interp;
-    if ( myInterp ) {
-      // print banner
-      myBanner = myInterp->getbanner().c_str();
-      if ( isShowBanner() )
-	addText( myBanner );
-      // clear command buffer
-      myCommandBuffer.truncate(0);
-      // unset read-only state
-      setReadOnly( false );
-      // unset history browsing mode
-      myCmdInHistory = -1;
-      // add prompt
-      addText( myPrompt );
-      // unset busy cursor
-      viewport()->unsetCursor();
-      // stop event loop (if running)
-      if( myEventLoop)
-        myEventLoop->exit();
-    }
-    else {
-      // clear contents
-      clear();
-      // set read-only state
-      setReadOnly( true );
-      // set busy cursor
-      setCursor( Qt::WaitCursor );
-    }
-  }
-}
-
-/*!
   \brief "Copy" operation.
   
   Reimplemented from Qt.
-  Warning! In Qt4 this method is not virtual.
- */
-void PyConsole_EditorBase::cut()
+  Warning! In Qt this method is not virtual.
+*/
+void PyConsole_Editor::cut()
 {
-  QTextCursor cur = textCursor();
-  if ( cur.hasSelection() ) {
-    QApplication::clipboard()->setText( cur.selectedText() );
-    int startSelection = cur.selectionStart();
+  QTextCursor aCursor = textCursor();
+  if ( aCursor.hasSelection() ) {
+    QApplication::clipboard()->setText( aCursor.selectedText() );
+    int startSelection = aCursor.selectionStart();
     if ( startSelection < document()->end().previous().position() + promptSize() )
       startSelection = document()->end().previous().position() + promptSize();
-    int endSelection = cur.selectionEnd();
+    int endSelection = aCursor.selectionEnd();
     if ( endSelection < document()->end().previous().position() + promptSize() )
       endSelection = document()->end().previous().position() + promptSize();
-    cur.setPosition( startSelection );
-    cur.setPosition( endSelection, QTextCursor::KeepAnchor );
+    aCursor.setPosition( startSelection );
+    aCursor.setPosition( endSelection, QTextCursor::KeepAnchor );
     horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
-    setTextCursor( cur );
+    setTextCursor( aCursor );
     textCursor().removeSelectedText();
   }
 }
@@ -1095,22 +1319,22 @@ void PyConsole_EditorBase::cut()
   \brief "Paste" operation.
 
   Reimplemented from Qt.
-  Warning! In Qt4 this method is not virtual.
- */
-void PyConsole_EditorBase::paste()
+  Warning! In Qt this method is not virtual.
+*/
+void PyConsole_Editor::paste()
 {
-  QTextCursor cur = textCursor();
-  if ( cur.hasSelection() ) {
-    int startSelection = cur.selectionStart();
+  QTextCursor aCursor = textCursor();
+  if ( aCursor.hasSelection() ) {
+    int startSelection = aCursor.selectionStart();
     if ( startSelection < document()->end().previous().position() + promptSize() )
       startSelection = document()->end().previous().position() + promptSize();
-    int endSelection = cur.selectionEnd();
+    int endSelection = aCursor.selectionEnd();
     if ( endSelection < document()->end().previous().position() + promptSize() )
       endSelection = document()->end().previous().position() + promptSize();
-    cur.setPosition( startSelection );
-    cur.setPosition( endSelection, QTextCursor::KeepAnchor );
+    aCursor.setPosition( startSelection );
+    aCursor.setPosition( endSelection, QTextCursor::KeepAnchor );
     horizontalScrollBar()->setValue( horizontalScrollBar()->minimum() );
-    setTextCursor( cur );
+    setTextCursor( aCursor );
     textCursor().removeSelectedText();
   }
   if ( textCursor().position() < document()->end().previous().position() + promptSize() )
@@ -1122,68 +1346,105 @@ void PyConsole_EditorBase::paste()
   \brief "Clear" operation.
 
   Reimplemented from Qt.
-  Warning! In Qt4 this method is not virtual.
- */
-void PyConsole_EditorBase::clear()
+  Warning! In Qt this method is not virtual.
+*/
+void PyConsole_Editor::clear()
 {
   QTextEdit::clear();
   if ( isShowBanner() )
-    addText( myBanner );
+    addText( banner() );
   myPrompt = READY_PROMPT;
   addText( myPrompt );
 }
 
 /*!
-  \brief "Dump commands" operation.
- */
-void PyConsole_EditorBase::dumpImpl(const QString& fileName)
+  \brief Dumps recorded Python commands to the file
+  \param fileName path to the dump file
+  \return \c true if dump operation succeeded or \c false otherwise
+*/
+bool PyConsole_Editor::dump( const QString& fileName )
 {
+  bool ok = false;
   if ( !fileName.isEmpty() ) {
     QFile file( fileName ); 
-    if ( !file.open( QFile::WriteOnly ) )
-      return;
-
-    QTextStream out (&file);
-  
-    for ( int i=0; i<myHistory.count(); i++ ) {
-      out << myHistory[i] << endl;
+    if ( file.open( QFile::WriteOnly ) ) {
+      QTextStream out( &file );
+      for ( int i = 0; i < myHistory.count(); i++ ) {
+        out << myHistory[i] << endl;
+      }
+      file.close();
+      ok = true;
     }
-    file.close();
+  }
+  return ok;
+}
+
+/*!
+  \brief Dump menu action slot
+*/
+void PyConsole_Editor::dump()
+{
+  forever {
+    // get file name
+    QString fileName = getDumpFileName();
+
+    if ( fileName.isEmpty() )
+      break; // cancelled
+    
+    if ( dump( fileName ) )
+      break;
+    else
+      QMessageBox::warning( this,
+                            tr( "WARNING" ),
+                            tr( "ERR_FILE_NOT_WRITEABLE" ) );
   }
 }
 
 /*!
-  \brief "Dump commands" operation.
- */
-void PyConsole_EditorBase::dump(const QString& fileName)
+  \brief Get file name for Dump commands operation.
+  
+  This function can be redefined in successor classes to show application
+  specific dialog box.
+
+  \return path to the dump file
+*/
+QString PyConsole_Editor::getDumpFileName()
 {
-  dumpImpl(fileName);
+  return QFileDialog::getSaveFileName( this,
+                                       tr( "GET_DUMP_COMMANDS_FILENAME" ),
+                                       QString(),
+                                       QString( "%1 (*.py)" ).arg( tr( "PYTHON_SCRIPTS" ) ) );
 }
 
 /*!
-  \brief "Dump commands" operation.
- */
-void PyConsole_EditorBase::dump()
-{
-  dumpSlot();
-}
+  \brief Get file name for Log Python trace operation.
+  
+  This function can be redefined in successor classes to show application
+  specific dialog box.
 
-void PyConsole_EditorBase::dumpSlot()
+  \return path to the log file
+*/
+QString PyConsole_Editor::getLogFileName()
 {
-  QString fileName(QFileDialog::getSaveFileName(this,tr("Choose python file where to store"),QString(),tr("Python scripts ext (*.py)")));
-  if ( !fileName.isEmpty() )
-    this->dump( fileName );
-  else
-    QMessageBox::warning(this,tr("WARNING"),tr("Python file has not been written"));
+  return QFileDialog::getSaveFileName( this,
+                                       tr( "GET_PYTHON_TRACE_FILENAME" ),
+                                       QString(),
+                                       QString( "%1 (*.log *.txt)" ).arg( tr( "LOG_FILES" ) ) );
 }
 
 /*!
   \brief Start python trace logging
   \param fileName the path to the log file
+  \return \c true if operation succeeded or \c false otherwise
+          (for example, if file is not writeable)
   \sa stopLog()
  */
-bool PyConsole_EditorBase::startLogImpl( const QString& fileName )
+bool PyConsole_Editor::startLog( const QString& fileName )
 {
+  // stop possibly already running logging
+  if ( isLogging() )
+    stopLog();
+
   bool ok = false;
   if ( !fileName.isEmpty() ) {
     QFile file( fileName );
@@ -1196,65 +1457,244 @@ bool PyConsole_EditorBase::startLogImpl( const QString& fileName )
   return ok;
 }
 
-
 /*!
-  \brief Start python trace logging
-  \param fileName the path to the log file
-  \sa stopLog()
- */
-bool PyConsole_EditorBase::startLog( const QString& fileName )
+  \brief Start log action slot
+*/
+void PyConsole_Editor::startLog()
 {
-  return startLogImpl(fileName);
+  forever {
+    // get file name
+    QString fileName = getLogFileName();
+
+    if ( fileName.isEmpty() )
+      break; // cancelled
+    
+    if ( startLog( fileName ) )
+      break;
+    else
+      QMessageBox::warning( this,
+                            tr( "WARNING" ),
+                            tr( "File is not writable" ) );
+  }
 }
 
 /*!
-  \brief Start python trace logging
-  \sa stopLog()
- */
-void PyConsole_EditorBase::startLog()
-{
-  startLogSlot();
-}
-
-void PyConsole_EditorBase::startLogSlot()
-{
-  while (1)
-    {
-      QString fileName(QFileDialog::getSaveFileName(this,tr("Choose python file where to store log"),QString(),tr("Log files ext (*.log *.txt)")));
-      if ( !fileName.isEmpty() )
-        {
-          if ( startLogImpl( fileName ) )
-            break;
-          else
-            QMessageBox::warning(this,tr("WARNING"),tr("Log file is not writable"));
-        }
-      else
-        break;
-    }
-}
-
-/*!
-  \brief "Stop log" operation.
-  \sa startLog()
- */
-void PyConsole_EditorBase::stopLog()
+  \brief Stop log action slot
+  
+  Stops Python trace logging.
+*/
+void PyConsole_Editor::stopLog()
 {
   myLogFile = QString();
 }
 
 /*!
-  \brief Put string to the log file
- */
-void PyConsole_EditorBase::putLog( const QString& s )
+  \brief Put data to the log file
+*/
+void PyConsole_Editor::putLog( const QString& s )
 {
   if ( !myLogFile.isEmpty() ) {
     QFile file( myLogFile );
     if ( !file.open( QFile::Append ) )
       return;
     
-    QTextStream out (&file);
+    QTextStream out( &file );
     out << s;
     
     file.close();
   }
+}
+
+/*!
+  \brief Handle properly multi-line pasting. Qt documentation recommends overriding this function.
+  If the pasted text doesn't contain a line return, no special treatment is done.
+  \param source
+*/
+void PyConsole_Editor::insertFromMimeData(const QMimeData* source)
+{
+  if ( myMultiLinePaste )
+    return;
+
+  if ( source->hasText() ) {
+    QString s = source->text();
+    if ( s.contains( "\n" ) )
+      multilinePaste( s );
+    else
+      QTextEdit::insertFromMimeData( source );
+  }
+  else {
+    QTextEdit::insertFromMimeData( source );
+  }
+}
+
+/*!
+  Start multi-line paste operation
+  \internal
+*/
+void PyConsole_Editor::multilinePaste( const QString& s )
+{
+  // Turn on multi line pasting mode
+  myMultiLinePaste = true;
+
+  // Split string data to lines
+  QString s2 = s;
+  s2.replace( "\r", "" ); // Windows string format converted to Unix style
+  QStringList lst = s2.split( QChar('\n'), QString::KeepEmptyParts );
+
+  // Perform the proper paste operation for the first line to handle the case where
+  // something was already there
+  QMimeData source;
+  source.setText( lst[0] );
+  QTextEdit::insertFromMimeData( &source );
+
+  // Prepare what will have to be executed after the first line
+  myMultiLineContent.clear();
+  for ( int i = 1; i < lst.size(); ++i )
+    myMultiLineContent.enqueue( lst[i] );
+
+  // Trigger the execution of the first (mixed) line
+  handleReturn();
+
+  // See customEvent() and multiLineProcessNext() for the rest of the handling.
+}
+
+/*!
+  \brief Process the next line in the queue of multi-line paste operation; called
+  from customEvent() function
+  \internal
+*/
+void PyConsole_Editor::multiLineProcessNextLine()
+{
+  // not in multi-line paste mode
+  if ( !myMultiLinePaste || myMultiLineContent.isEmpty() )
+    return;
+
+  QString line = myMultiLineContent.dequeue();
+  if ( myMultiLineContent.empty() )
+  {
+    // this isa last line in the queue, just paste it
+    addText( line, false, false );
+    myMultiLinePaste = false;
+  }
+  else
+  {
+    // paste the line and simulate a <RETURN> key stroke
+    addText( line, false, false );
+    handleReturn();
+  }
+}
+
+/*!
+  \brief Clear results of completion
+*/
+void PyConsole_Editor::clearCompletion()
+{
+  // delete completion text if present
+  if ( myTabMode ) {
+    // remove completion display
+    document()->undo();
+    // remove trailing line return:
+    QTextCursor tc( textCursor() );
+    tc.setPosition( document()->characterCount()-1 );
+    setTextCursor( tc );
+    textCursor().deletePreviousChar();
+    // TODO: before wait for any <Tab> event to be completed
+  }
+  myTabMode = false;
+}
+
+/*!
+ \brief Format completion results - this is where we should create 3 columns etc ...
+ \param matches list of possible completions
+ \return result string
+*/
+QString PyConsole_Editor::formatCompletion( const QStringList& matches ) const
+{
+  static const int MAX_COMPLETIONS = 70;
+
+  QStringList result;
+  int sz = matches.size();
+
+  if ( sz > MAX_COMPLETIONS )
+    result.append( QString( "[%1]" ).arg( tr( "TOO_MANY_MATCHES" ) ) );
+
+  for ( int i = 0; i < qMin( sz, MAX_COMPLETIONS); ++i )
+    result.append( matches[i] );
+
+  return result.join( "\n" );
+}
+
+/*!
+  \brief Format the doc string in HTML format with the first line in bold blue
+  \param doc initial doc string
+  \return HTML string
+*/
+QString PyConsole_Editor::formatDocHTML( const QString& doc ) const
+{
+  static const char* templ = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" " \
+    "\"http://www.w3.org/TR/REC-html40/strict.dtd\">\n" \
+    "<html><head><meta name=\"qrichtext\" content=\"1\" /> " \
+    "<style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style> " \
+    "</head><body style=\" font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;\">\n" \
+    "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> " \
+    "<span style=\" font-weight:600; color:#0000ff;\">%1</span></p> " \
+    "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">%2</p> " \
+    "</body></html>";
+  
+  QString fst, rest("");
+
+  // Extract first line of doc
+  int idx = doc.indexOf( "\n" );
+  if ( idx > 0 ) {
+    fst = doc.left( idx );
+    rest = doc.mid( idx+1 );
+  }
+  else {
+    fst = doc;
+  }
+
+  fst = fst.replace( "\n", " " );
+  rest = rest.replace(" \n", " " );
+  return QString( templ ).arg( fst ).arg( rest );
+}
+
+/*!
+  \fn void PyConsole_Editor::updateDoc( const QString& doc);
+  \brief Signal emitted by the editor widget when the doc string should be updated.
+  \param doc a HTML block with the formatted doc string.
+  \todo currently this signal is left uncaught.
+*/
+
+/*!
+ \brief Extract the common leading part of all strings in matches.
+ \param matches
+ \param result
+*/
+QString PyConsole_Editor::extractCommon( const QStringList& matches ) const
+{
+  QString result = "";
+  
+  if ( matches.size() > 1 ) {
+    int l = 0;
+    bool ok = true;
+    while ( ok && l+1 < matches[0].size() ) {
+      QString match = matches[0].left( l+1 );
+      for ( int j = 1; j < matches.size() && ok; j++ )
+        ok = matches[j].startsWith( match );
+      if ( ok )
+        l++;
+    }
+    result = matches[0].left( l );
+  }
+
+  return result;
+}
+
+/*!
+  \brief Useful method to get banner from Python interpreter
+  \return banner
+*/
+QString PyConsole_Editor::banner() const
+{
+  return myInterp->getBanner().c_str();
 }

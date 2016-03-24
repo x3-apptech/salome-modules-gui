@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -97,7 +97,8 @@ MARK_AS_ADVANCED(SALOME_USE_SINGLE_DESKTOP)
 ##
 
 # Various
-FIND_PACKAGE(SalomePython REQUIRED)
+FIND_PACKAGE(SalomePythonInterp REQUIRED)
+FIND_PACKAGE(SalomePythonLibs REQUIRED)
 FIND_PACKAGE(SalomePThread REQUIRED)
 FIND_PACKAGE(SalomeSWIG REQUIRED)
 FIND_PACKAGE(SalomeBoost REQUIRED)
@@ -389,7 +390,7 @@ ENDIF()
 # Python-based packages specific targets:
 IF(SALOME_USE_PYCONSOLE)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       PyInterp PyConsole SalomePyConsole SalomePyQtGUILight)
+       PyInterp PyConsole SalomePyQtGUILight)
   IF(SALOME_USE_PLOT2DVIEWER)
     LIST(APPEND _${PROJECT_NAME}_exposed_targets SalomePyQt)
   ENDIF()

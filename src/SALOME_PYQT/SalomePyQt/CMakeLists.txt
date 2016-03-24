@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2015  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2012-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,6 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ObjBrowser
   ${PROJECT_SOURCE_DIR}/src/PyInterp
   ${PROJECT_SOURCE_DIR}/src/PyConsole
-  ${PROJECT_SOURCE_DIR}/src/SalomePyConsole
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SALOME_PYQT/SALOME_PYQT_GUILight
   ${PROJECT_SOURCE_DIR}/src/STD
