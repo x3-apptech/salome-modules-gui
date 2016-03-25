@@ -52,7 +52,9 @@ std::string PVServer_ServiceLoader::findOrLoadService(const char * containerName
 
 std::string PVServer_ServiceLoader::findService(const char * containerName)
 {
-  std::string path = std::string(containerName) + "/PVSERVER";
+  std::string path = "/Containers";
+  path += containerName;
+  path += "/PVSERVER";
   CORBA::Object_ptr obj = _ns->Resolve(path.c_str());
   if(!CORBA::is_nil(obj))
     {
