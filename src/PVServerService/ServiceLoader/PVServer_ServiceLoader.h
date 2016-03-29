@@ -22,11 +22,11 @@
 #define PVSERVERSERVICELOADER_H_
 
 #include "PVServerServiceLoader.h"
-
-#include <SALOME_ContainerManager.hxx>
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOME_Component)
+#include <string>
 
 class SALOME_LifeCycleCORBA;
-class SALOME_NamingService;
 
 class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader
 {
@@ -35,16 +35,16 @@ public:
   virtual ~PVServer_ServiceLoader();
 
   //! Get the IOR of the CORBA service handling the PVServer
-  std::string findOrLoadService(const char * containerName);
+  std::string findOrLoadService( const std::string& );
 
 private:
-  std::string findService(const char * containerName);
-  std::string loadService(const char * containerName);
+  SALOME_LifeCycleCORBA* lcc();
+  std::string findService( const std::string& );
+  std::string loadService( const std::string& );
+  Engines::Container_ptr getContainer( const std::string&, const std::string& );
 
-  SALOME_LifeCycleCORBA * _lcc;
-  CORBA::ORB_ptr _orb;
-  SALOME_NamingService * _ns;
-  Engines::ContainerManager_ptr _cm;
+private:
+  SALOME_LifeCycleCORBA* myLcc;
 };
 
 #endif /* PVSERVERSERVICELOADER_H_ */

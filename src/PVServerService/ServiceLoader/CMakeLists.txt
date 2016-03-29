@@ -21,7 +21,6 @@ INCLUDE(${SWIG_USE_FILE})
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/..
   ${OMNIORB_INCLUDE_DIR}
   ${KERNEL_INCLUDE_DIRS}
   )
@@ -33,9 +32,9 @@ ADD_DEFINITIONS(
 
 SET(_link_LIBRARIES 
   ${KERNEL_OpUtil}        # class SALOME_Exception
-  ${KERNEL_SalomeContainer} 
   ${KERNEL_SalomeNS}
   ${KERNEL_SalomeLifeCycleCORBA}
+  ${KERNEL_SalomeIDLKernel}
   )
 
 # --- headers ---
@@ -45,12 +44,12 @@ SET(_HEADERS
 
 # --- sources ---
 SET(_SOURCES
-    PVServer_ServiceLoader.cxx
-  )
+ PVServer_ServiceLoader.cxx
+)
   
 SET(_SWIG
-    PVServer_ServiceLoader.i
-   )
+  PVServer_ServiceLoader.i
+)
   
 # --- rules ---
 ADD_LIBRARY(PVServerServiceLoader ${_SOURCES})
