@@ -23,11 +23,7 @@
 #ifndef SUITAPP_APPLICATION_H
 #define SUITAPP_APPLICATION_H
 
-#ifdef ENABLE_TESTRECORDER
-  #include <TestApplication.h>
-#else
-  #include <QApplication>
-#endif
+#include <QApplication>
 
 class SUIT_ExceptionHandler;
 
@@ -41,22 +37,18 @@ class SUIT_ExceptionHandler;
 #  define SUITAPP_EXPORT
 #endif
 
-#ifdef ENABLE_TESTRECORDER
-  class SUITAPP_EXPORT SUITApp_Application : public TestApplication
-#else
-  class SUITAPP_EXPORT SUITApp_Application : public QApplication
-#endif
+class SUITAPP_EXPORT SUITApp_Application : public QApplication
 {
   Q_OBJECT
 
 public:
-  SUITApp_Application( int& argc, char** argv, SUIT_ExceptionHandler* = 0 );
-  SUITApp_Application( int& argc, char** argv, Type type, SUIT_ExceptionHandler* = 0 );
+  SUITApp_Application( int&, char**, SUIT_ExceptionHandler* = 0 );
+  SUITApp_Application( int&, char**, Type, SUIT_ExceptionHandler* = 0 );
 
   virtual bool notify( QObject* receiver, QEvent* e );
 
-        SUIT_ExceptionHandler* handler() const;
-        void                   setHandler( SUIT_ExceptionHandler* );
+  SUIT_ExceptionHandler* handler() const;
+  void                   setHandler( SUIT_ExceptionHandler* );
 
 private:
   SUIT_ExceptionHandler* myExceptHandler;

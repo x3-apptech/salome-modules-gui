@@ -40,16 +40,12 @@
   Constructor
 */
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, SUIT_ExceptionHandler* hand )
-#ifdef ENABLE_TESTRECORDER
-  : TestApplication( argc, argv ),
-#else
 #ifndef WIN32
   // san: Opening an X display and choosing a visual most suitable for 3D visualization
   // in order to make SALOME viewers work with non-native X servers
   : QApplication( (Display*)Qtx::getDisplay(), argc, argv, Qtx::getVisual() ),
 #else
   : QApplication( argc, argv ), 
-#endif
 #endif
 myExceptHandler( hand )
 {
@@ -59,11 +55,7 @@ myExceptHandler( hand )
   Constructor
 */
 SUITApp_Application::SUITApp_Application( int& argc, char** argv, Type type, SUIT_ExceptionHandler* hand )
-#ifdef ENABLE_TESTRECORDER
-  : TestApplication( argc, argv ),
-#else
   : QApplication( argc, argv, type ),
-#endif
 myExceptHandler( hand )
 {
 }
@@ -77,11 +69,7 @@ myExceptHandler( hand )
 bool SUITApp_Application::notify( QObject* receiver, QEvent* e )
 {
   return myExceptHandler ? myExceptHandler->handle( receiver, e ) :
-#ifdef ENABLE_TESTRECORDER
-                           TestApplication::notify( receiver, e );
-#else
                            QApplication::notify( receiver, e );
-#endif
 }
 
 /*!

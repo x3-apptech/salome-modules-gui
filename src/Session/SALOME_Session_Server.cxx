@@ -34,10 +34,6 @@
 #include <ConnectionManager_i.hxx>
 #include <RegistryService.hxx>
 
-#ifdef ENABLE_TESTRECORDER
-  #include <TestApplication.h>
-#endif
-
 #include <OpUtil.hxx>
 #include <Utils_ORB_INIT.hxx>
 #include <Utils_SINGLETON.hxx>
@@ -242,16 +238,9 @@ public:
   }
 };
 
-#ifdef ENABLE_TESTRECORDER
-  class SALOME_QApplication : public TestApplication
-#else
-  class SALOME_QApplication : public QApplication
-#endif
+class SALOME_QApplication : public QApplication
 {
 public:
-#ifdef ENABLE_TESTRECORDER
-  SALOME_QApplication( int& argc, char** argv ) : TestApplication( argc, argv ), myHandler ( 0 ) {}
-#else
   SALOME_QApplication( int& argc, char** argv )
 #ifndef WIN32
   // san: Opening an X display and choosing a visual most suitable for 3D visualization
@@ -261,15 +250,10 @@ public:
   : QApplication( argc, argv ), 
 #endif
     myHandler ( 0 ) {}
-#endif
 
   virtual bool notify( QObject* receiver, QEvent* e )
   {
 
-#ifdef ENABLE_TESTRECORDER
-    return myHandler ? myHandler->handle( receiver, e ) :
-      TestApplication::notify( receiver, e );
-#else
     try {
       return myHandler ? myHandler->handle( receiver, e ) : QApplication::notify( receiver, e );
     }
@@ -288,7 +272,6 @@ public:
       std::cerr << "Unknown exception caught in Qt handler: it's probably a bug in SALOME platform" << std::endl;
     }
     return false;  // return false when exception is caught
-#endif
   }
   SUIT_ExceptionHandler* handler() const { return myHandler; }
   void setHandler( SUIT_ExceptionHandler* h ) { myHandler = h; }
