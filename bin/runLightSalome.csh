@@ -154,4 +154,4 @@ if ( "${PYTHONPATH}" != "" ) setenv PYTHONPATH ${MY_PYTHONPATH}:${PYTHONPATH}
 # start application
 ###
 
-SUITApp LightApp $* &
+suitexe LightApp $* &
