@@ -132,7 +132,6 @@ ENDIF(SALOME_USE_PYCONSOLE)
 # Light SALOME packages
 ##
 ADD_SUBDIRECTORY(LightApp)
-ADD_SUBDIRECTORY(ResExporter)
 
 ##
 # Python-based packages, part 2 (LightApp-dependent)
