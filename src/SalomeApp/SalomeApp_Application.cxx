@@ -1536,6 +1536,7 @@ void SalomeApp_Application::onDblClick( SUIT_DataObject* theObj )
     if ( !aSelectedIndexes.isEmpty() )
       ob->treeView()->scrollTo( aSelectedIndexes.first() );
   }
+  emit objectDoubleClicked( theObj );
 }
 
 /*!

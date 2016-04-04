@@ -201,7 +201,7 @@ signals:
                                                          const QString& theStudyName,
                                                          bool theIsStudySaved );
   void                                notebookVarUpdated( QString theVarName );
-
+  void                                objectDoubleClicked( SUIT_DataObject* );
 };
 
 #ifdef WIN32

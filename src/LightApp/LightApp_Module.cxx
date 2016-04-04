@@ -157,6 +157,8 @@ void LightApp_Module::contextMenuPopup( const QString& client, QMenu* menu, QStr
 void LightApp_Module::updateObjBrowser( bool theIsUpdateDataModel, 
                                         SUIT_DataObject* theDataObject )
 {
+  if (!getApp()->objectBrowser())
+    return;
   bool upd = getApp()->objectBrowser()->autoUpdate();
   getApp()->objectBrowser()->setAutoUpdate( false );
 

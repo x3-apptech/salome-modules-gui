@@ -267,7 +267,7 @@ run_light_salome(){
     # start application
     ###
 
-    SUITApp LightApp --modules=`echo $MODULES | tr " " ","` "${RCFILE}" "$@" &
+    suitexe LightApp --modules=`echo $MODULES | tr " " ","` "${RCFILE}" "$@" &
 }
 
 ###

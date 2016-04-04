@@ -19,88 +19,119 @@
 // Author: Adrien Bruneton (CEA)
 
 #include "PVServer_ServiceLoader.h"
-#include "PVServer_ServiceWrapper.h"
 
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <SALOME_NamingService.hxx>
 #include <utilities.h> // MESSAGE() macro
+#include <SALOMEconfig.h>
+#include CORBA_CLIENT_HEADER(SALOME_ContainerManager)
 
 PVServer_ServiceLoader::PVServer_ServiceLoader():
-     _lcc(0)
+  myLcc( 0 )
 {
-  _lcc = new SALOME_LifeCycleCORBA();
-  _ns = _lcc->namingService();
-  _cm = _lcc->getContainerManager();
-  _orb = _lcc->orb();
-
+  myLcc = new SALOME_LifeCycleCORBA();
 }
 
 PVServer_ServiceLoader::~PVServer_ServiceLoader()
 {
-  if (_lcc)
-    delete _lcc;
-  _lcc = 0;
+  delete myLcc;
 }
 
-std::string PVServer_ServiceLoader::findOrLoadService(const char * containerName)
+SALOME_LifeCycleCORBA* PVServer_ServiceLoader::lcc()
 {
-  std::string ior = findService(containerName);
-  if (ior == "")
-    ior = loadService(containerName);
+  return myLcc;
+}
+
+std::string PVServer_ServiceLoader::findOrLoadService( const std::string& containerName )
+{
+  std::string ior = findService( containerName );
+  if ( ior == "" )
+    ior = loadService( containerName );
   return ior;
 }
 
-std::string PVServer_ServiceLoader::findService(const char * containerName)
+std::string PVServer_ServiceLoader::findService( const std::string& containerName )
 {
-  std::string path = "/Containers";
-  path += containerName;
-  path += "/PVSERVER";
-  CORBA::Object_ptr obj = _ns->Resolve(path.c_str());
-  if(!CORBA::is_nil(obj))
-    {
-      MESSAGE("PVServer_ServiceLoader::findService(): Service found! ");
-      char * ior = _orb->object_to_string(obj);
-      return std::string(ior);
-    }
-  else
-    {
-      MESSAGE("PVServer_ServiceLoader::findService(): Service NOT found! ");
-      return std::string("");
-    }
+  std::string ior = "";
 
+  Engines::Container_var container = getContainer( containerName, "get" );
+
+  if ( !CORBA::is_nil( container ) )
+  {
+    CORBA::String_var hName = container->getHostName();
+    CORBA::Object_var obj = lcc()->namingService()->ResolveComponent( hName.in(),
+                                                                      containerName.c_str(),
+                                                                      "PVSERVER",
+                                                                      0 );
+    if ( !CORBA::is_nil( obj ) )
+    {
+      CORBA::ORB_var orb = lcc()->orb();
+      CORBA::String_var cIor = orb->object_to_string( obj );
+      ior = cIor.in();
+    }
+  }
+
+  if ( ior == "" )
+  {
+    MESSAGE( "PVServer_ServiceLoader::findService(): Service NOT found!" );
+  }
+  else
+  {
+    MESSAGE( "PVServer_ServiceLoader::findService(): Service found!" );
+  }
+
+  return ior;
 }
 
-std::string PVServer_ServiceLoader::loadService(const char * containerName)
+std::string PVServer_ServiceLoader::loadService( const std::string& containerName )
 {
-  // Get the requested container
+  std::string ior = "";
+
+  Engines::Container_var container = getContainer( containerName, "getorstart" );
+
+  if ( !CORBA::is_nil( container ) )
+  {
+    CORBA::String_var cReason;
+    CORBA::String_var cIor = container->create_python_service_instance( "PVSERVER", cReason.out() );
+    std::string reason = cReason.in();
+
+    if ( reason != "" )
+    {
+      MESSAGE( "PVServer_ServiceLoader::loadService(): Python service instance could not be created!" );
+      MESSAGE( "PVServer_ServiceLoader::loadService(): " << reason );
+    }
+    else
+    {
+      MESSAGE( "PVServer_ServiceLoader::loadService(): Container and service loaded!" );
+      ior = cIor.in();
+    }
+  }
+  else
+  {
+    MESSAGE( "PVServer_ServiceLoader::loadService(): Container could not be retrieved!" );
+  }
+  return ior;
+}
+
+Engines::Container_ptr PVServer_ServiceLoader::getContainer( const std::string& containerName,
+                                                             const std::string& mode )
+{
   Engines::ContainerParameters params;
-  params.container_name = CORBA::string_dup(containerName);
   params.isMPI = false;
-  params.mode = "getorstart";
-  Engines::Container_ptr contain = _cm->GiveContainer(params);
+  params.mode = CORBA::string_dup( mode.c_str() );
 
-  if (!CORBA::is_nil(contain))
-    {
-      char * reason;
-      char * ior = contain->create_python_service_instance("PVSERVER", reason);
-      std::string reas(reason);
-      CORBA::string_free(reason);
-      if (reas != "")
-        {
-          MESSAGE("PVServer_ServiceLoader::loadService(): Python service instance could not be created! ");
-          MESSAGE("PVServer_ServiceLoader::loadService(): " << reas);
-          return std::string("");
-        }
-      else
-        {
-          MESSAGE("PVServer_ServiceLoader::loadService(): Container and service loaded! ");
-          return std::string(ior);
-        }
-    }
+  int rg = containerName.find( "/" );
+  if ( rg < 0 )
+  {
+    params.container_name = CORBA::string_dup( containerName.c_str() );
+  }
   else
-    {
-      MESSAGE("PVServer_ServiceLoader::loadService(): Container could not be retrieved! ");
-      return std::string("");
-    }
-}
+  {
+    params.resource_params.hostname = CORBA::string_dup( containerName.substr(0, rg).c_str() );
+    params.container_name           = CORBA::string_dup( containerName.substr(rg+1).c_str() );
+  }
 
+  Engines::ContainerManager_var cm = lcc()->getContainerManager();
+  Engines::Container_var container = cm->GiveContainer( params );
+  return container._retn();
+}
