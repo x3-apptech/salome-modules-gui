@@ -38,22 +38,9 @@
 #endif  // WIN32
 
 // ========================================================
-// little trick - if we do not have debug python libraries
-#ifdef _DEBUG
- #ifndef HAVE_DEBUG_PYTHON
-  #undef _DEBUG
- #endif
-#endif
 
 #include <Python.h>
 
-#ifdef _DEBUG
- #ifndef HAVE_DEBUG_PYTHON
-  #define _DEBUG
- #endif
-#endif
-
-// ========================================================
 // avoid warning messages
 #ifdef WIN32
 #pragma warning (disable : 4786)
