@@ -862,7 +862,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>OCC_TEXTURE_FILES</source>
-        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+        <translation>Fichiers images (*.jpeg *.jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
         <source>PREF_CLIPPING_MODULATE</source>

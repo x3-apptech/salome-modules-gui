@@ -860,7 +860,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>OCC_TEXTURE_FILES</source>
-      <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+      <translation>イメージファイル (*.jpeg *.jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
       <source>PREF_CLIPPING_MODULATE</source>

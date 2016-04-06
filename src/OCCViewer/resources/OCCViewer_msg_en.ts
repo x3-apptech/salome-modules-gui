@@ -7,7 +7,7 @@
         <!-- used in GEOM module: to be moved there? -->
         <source>OCC_TEXTURE_FILES</source>
         <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
-        <translation>Image files (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+        <translation>Image files (*.jpeg *.jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
 </context>
 <context>
