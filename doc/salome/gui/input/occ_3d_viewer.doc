@@ -14,8 +14,8 @@ button.
 
 \image html occ_view_camera_dump.png
 
-<b>Dump View</b> - exports an object from the viewer in bmp, png or
-jpeg image format.
+<b>Dump View</b> - exports an object from the viewer in bmp, png,
+jpeg or another image format.
 <hr>
 
 \image html occ_view_style_switch.png
@@ -23,10 +23,10 @@ jpeg image format.
 <b>Interaction style switch</b> - allows to switch between standard
 and "keyboard free" interaction styles. "Keyboard free" style allows
 to process all view transformations without using keyboard (only by
-mouse) and perform selection in view by pressing "S" key. By default,
-rotation in this mode is performed by left mouse button, panning - by
-middle mouse button, zooming - by left and middle mouse buttons
-pressed simultaneously.
+mouse). By default, rotation in this mode is performed by left mouse
+button, panning - by middle mouse button, zooming - by right mouse 
+button. Selection in view by pressing "s" key works in both
+styles.
 <hr>
 
 \image html occ_view_zooming_style_switch.png
@@ -53,8 +53,8 @@ current cursor position) zooming styles.
 
 \image html occ_view_fitall.png
 
-<b>Fit all</b> - allows to select a point to be the center of a scene
-representing all displayed objects in the visible area.
+<b>Fit all</b> - represents all displayed objects in the
+visible area.
 <hr>
 
 \image html occ_view_fitarea.png
@@ -83,37 +83,42 @@ remote parts.
 
 \image html occ_view_glpan.png
 
-<b>Global panning</b> - represents all displayed objects in the
-visible area.
+<b>Global panning</b> - allows to select a point to be the center of a scene
+representing all displayed objects in the visible area.
 <hr>
 
 \image html occ_view_rotation_point.png
 
-<b>Change rotation point</b> - allows to to choose the point around
+<b>Change rotation point</b> - allows to choose the point around
 which the rotation is performed.
 
 \image html set_rotation_point_dialog1.png
 
 By default the rotation point is located in the Center of the bounding
-box of an object.
+box of represented objects.
 
 \image html set_rotation_point_dialog2.png
 
-Disabling <b>Use Bounding Box Center</b> check-box allows you to
-define the coordinates of the rotation point manually.
+Unchecking <b>Use Bounding Box Center</b> check-box allows you to
+change rotation point:
 
-- <b>Set to Origin</b> button restores the default rotation point
-  coordinates.
+- <b>Set to Origin</b> button sets the rotation point to 
+origin of coordinates: (0, 0, 0).
 
-- <b>Gravity Center of Selected Object</b> button allows using the gravity center of the object selected in the viewer as the center of the rotation point. 
-When you click this button, you should first choose the type of selectable object: Point, Edge, Face or Solid and only then proceed with selection in the viewer.
+- <b>Gravity Center of Selected Object</b> button allows using the 
+gravity center of the object selected in the viewer as the center of 
+the rotation point.
+When you click this button, you should first choose the type of 
+selectable object: Point, Edge, Face or Solid and only then proceed 
+with selection in the viewer.
+
+- Also you can define the coordinates of the rotation point manually.
 
 <hr>
 
 \image html occ_view_rotate.png
 
-<b>Rotation</b> - allows to rotate the selected object using the
-mouse.
+<b>Rotation</b> - allows to rotate the scene using the mouse.
 <hr>
 
 \image html occ_view_front.png
@@ -167,7 +172,7 @@ the scene.
 
 \image html occ_view_shoot.png
 
-<b>Memorise view</b> - saves the current position of objects in the
+<b>Memorize view</b> - saves the current position of objects in the
 scene.
 <hr>
 
@@ -187,7 +192,7 @@ scene.
 \b Clipping allows creating cross-section views (clipping planes)
 of your mesh.
 
-To create a clipping plane, click on the \b New button in the dialog and choose how it is  definition by \b Absolute or \b Relative coordinates.
+To create a clipping plane, click on the \b New button in the dialog and choose how it will be defined by \b Absolute or \b Relative coordinates.
 
 <b>Absolute Coordinates</b>
 
@@ -211,17 +216,21 @@ To create a clipping plane, click on the \b New button in the dialog and choose 
 - \b Orientation ( ||X-Y, ||X-Z or ||Y-Z).
 
 - \b Distance between the opposite extremities of the boundary box of 
-selected objects, if it is set to 0.5 the boundary box is split in two halves.
+represented objects, if it is set to 0.5 the boundary box is split in two halves.
 
 - \b Rotation (in angle degrees) <b>around X</b> (Y to Z) and <b>around 
 Y</b> (X to Z) (depending on the chosen Orientation)
 
 The other parameters are available in both modes : 
+- <b>Active</b> checkbox is used to apply/erase current plane and it's affect to/from view.
+- <b>Delete</b> removes the active clipping plane and discards it's view changes.
+- <b>Disable all</b> deactivates all created clipping planes and clears <b>Auto Apply</b> checkbox.
 - <b>Preview</b> check-box shows the clipping plane in the <b>3D Viewer</b>.
-- <b>Auto Apply</b> check-box shows button is on, you can preview the
-cross-section in the <b>3D Viewer</b>.
+- <b>Auto Apply</b> check-box allows you to see the result of clipping
+in the <b>3D Viewer</b> immediately. Be careful, it is not a preview
+and Close button could not cancel the applied modifications.
 
-It is also possible to interact  with the clipping plane directly in 3D 
+It is also possible to interact with the clipping plane directly in 3D 
 view using the mouse. 
 
 <hr>
@@ -249,7 +258,7 @@ them.
 
   - <b>Number</b> - allows to define the number of labels.
 
-  - <b>Offset</b> - allows to define the distance between labels.
+  - <b>Offset</b> - allows to define the distance between axis and labels.
 
   - <b>Font</b> - allows to define the font color of labels names.
 
@@ -257,7 +266,7 @@ them.
 
   - <b>Length</b> - allows to define the length of tick marks.
 
-- <b>Is visible</b> - if checked the axis is displayed in the viewer.
+- <b>Is visible</b> - if checked the graduated axes are displayed in the viewer.
 
 <hr>
 
@@ -333,7 +342,7 @@ is simulated by OpenGL using a special texture coordinates generation algorithm 
 User can select one of 7 predefined environment texture from the list or define its texture from file by 
 choosing item <b>"Custom..."</b> in a combo box.
 
-\note Note that the environment texture file should normally satisfy the following requirements 
+\note Environment texture file should normally satisfy the following requirements 
 in order to produce good visual result:
 - The image file should have 2:1 width-to-height ratio.
 - It should constitute a 360-degrees panoramic image created using a fish-eye lens. 
