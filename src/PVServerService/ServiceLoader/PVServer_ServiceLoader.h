@@ -25,13 +25,24 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOME_Component)
 #include <string>
+#include <exception>
 
 class SALOME_LifeCycleCORBA;
+
+class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader_Exception: public std::exception
+{
+public:
+  PVServer_ServiceLoader_Exception(const std::string & what):_what(what) {}
+  ~PVServer_ServiceLoader_Exception() throw () {}
+  virtual const char* what() const throw() { return _what.c_str(); }
+private:
+  std::string _what;
+};
 
 class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader
 {
 public:
-  PVServer_ServiceLoader();
+  PVServer_ServiceLoader() throw(PVServer_ServiceLoader_Exception);
   virtual ~PVServer_ServiceLoader();
 
   //! Get the IOR of the CORBA service handling the PVServer

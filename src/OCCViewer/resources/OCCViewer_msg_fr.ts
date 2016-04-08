@@ -6,7 +6,7 @@
     <message>
         <source>OCC_TEXTURE_FILES</source>
         <translatorcomment>Update to new supported format (see OCCT Image_AlienPixMap documentation)</translatorcomment>
-        <translation>Fichiers images (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+        <translation>Fichiers images (*.jpeg *.jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
 </context>
 <context>

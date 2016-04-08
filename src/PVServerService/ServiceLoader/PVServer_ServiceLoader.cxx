@@ -26,10 +26,17 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOME_ContainerManager)
 
-PVServer_ServiceLoader::PVServer_ServiceLoader():
+PVServer_ServiceLoader::PVServer_ServiceLoader() throw(PVServer_ServiceLoader_Exception):
   myLcc( 0 )
 {
-  myLcc = new SALOME_LifeCycleCORBA();
+  try
+  {
+      myLcc = new SALOME_LifeCycleCORBA();
+  }
+  catch(...)
+  {
+      throw PVServer_ServiceLoader_Exception("Unable to instanciate SALOME_LifeCycleCORBA!");
+  }
 }
 
 PVServer_ServiceLoader::~PVServer_ServiceLoader()
