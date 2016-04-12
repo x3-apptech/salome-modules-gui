@@ -589,10 +589,15 @@ int main( int argc, char **argv )
         }
         else {
           // desktop might be closed from:
-          // - StopSesion() /temporarily/ or
-          // - Shutdown() /permanently/
+          // - StopSesion() (temporarily) or
+          // - Shutdown() (permanently)
           stat = session->GetStatSession();
           shutdownSession = stat.state == SALOME::shutdown;
+          // normally "shutdown standalone servers" flag should be false here, if we come from
+          // StopSesion() or from Shutdown();
+          // but we also have to check if somebody explicitly programmatically closed session,
+          // asking to kill servers also
+          shutdownAll = aGUISession->exitFlags();
         }
         if ( shutdownAll || shutdownSession ) {
           _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
