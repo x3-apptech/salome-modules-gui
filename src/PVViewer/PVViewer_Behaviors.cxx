@@ -44,6 +44,7 @@
 #include <pqUndoRedoBehavior.h>
 #include <pqViewStreamingBehavior.h>
 #include <pqCollaborationBehavior.h>
+#include <pqStandardArrayColorMapsBehavior.h>
 #include <pqVerifyRequiredPluginBehavior.h>
 #include <pqPluginSettingsBehavior.h>
 #include <pqFixPathsInStateFilesBehavior.h>
@@ -117,6 +118,7 @@ void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
       new pqObjectPickingBehavior(desk);
       new pqCollaborationBehavior(this);
       new pqViewStreamingBehavior(this);
+      new pqStandardArrayColorMapsBehavior(this);
 
       pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
       foreach (pqPropertiesPanel* ppanel, desk->findChildren<pqPropertiesPanel*>())
