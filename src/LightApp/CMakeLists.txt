@@ -81,8 +81,8 @@ ENDIF()
 IF(SALOME_USE_PYCONSOLE)
   INCLUDE_DIRECTORIES(
     ${PYTHON_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/src/PyConsole
-    ${PROJECT_SOURCE_DIR}/src/PyInterp
+    ${PROJECT_SOURCE_DIR}/tools/PyConsole/src
+    ${PROJECT_SOURCE_DIR}/tools/PyInterp/src
     ${PROJECT_SOURCE_DIR}/src/SUITApp
   )
 ENDIF()

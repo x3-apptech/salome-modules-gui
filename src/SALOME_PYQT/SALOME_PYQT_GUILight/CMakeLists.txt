@@ -39,13 +39,13 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/LightApp
   ${PROJECT_SOURCE_DIR}/src/OCCViewer
   ${PROJECT_SOURCE_DIR}/src/Plot2d
-  ${PROJECT_SOURCE_DIR}/src/PyConsole
-  ${PROJECT_SOURCE_DIR}/src/PyInterp
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/STD
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/SUITApp
   ${PROJECT_SOURCE_DIR}/src/ObjBrowser
+  ${PROJECT_SOURCE_DIR}/tools/PyConsole/src
+  ${PROJECT_SOURCE_DIR}/tools/PyInterp/src
 )
 
 # additional preprocessor / compiler flags
