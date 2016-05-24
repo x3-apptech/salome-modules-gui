@@ -92,7 +92,8 @@ rectangular frame.
 
 To produce a Polyline Selection, press and hold the right mouse button and draw
 the first side of the selection polygon, then change the direction by clicking
-the left mouse button add draw another side, etc. 
+the left mouse button add draw another side, etc. Click twice by left mouse 
+button to finish drawing.
 
 \image html polyselectionvtk11.png
 

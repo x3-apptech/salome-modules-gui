@@ -14,7 +14,7 @@ button.
 
 \image html vtk_view_camera_dump.png
 
-<b>Dump View</b> - exports an object from the viewer in bmp, png or jpeg image format.
+<b>Dump View</b> - exports an object snap-shot from the viewer in bmp, png or jpeg image format.
 <hr>
 
 \image html vtk_view_style_switch.png
@@ -128,12 +128,12 @@ These buttons orientate the scene strictly about coordinate axes:
 
 \image html vtk_view_anticlockwise.png
 
-<b>Rotate counter-clockwise</b> - rotates view 90� counter-clockwise.
+<b>Rotate counter-clockwise</b> - rotates view 90 @htmlonly &deg; @endhtmlonly counter-clockwise.
 <hr>
 
 \image html vtk_view_clockwise.png
 
-<b>Rotate clockwise</b> - rotates view 90� clockwise.
+<b>Rotate clockwise</b> - rotates view 90 @htmlonly &deg; @endhtmlonly clockwise.
 <hr>
 
 \image html vtk_view_reset.png
