@@ -93,9 +93,11 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
         free(argv[i]);
       delete[] argv;
   }
-  // Initialize GUI elements if needed:
-  PVViewer_GUIElements::GetInstance(aDesktop);
-  return true;
+   // Initialization of ParaView GUI widgets will be done when these widgets are
+   // really needed.
+   // PVViewer_GUIElements* inst = PVViewer_GUIElements::GetInstance(aDesktop);
+   // inst->getPropertiesPanel();
+   return true;
 }
 
 void PVViewer_Core::ParaviewInitBehaviors(bool fullSetup, QMainWindow* aDesktop)

@@ -120,11 +120,15 @@ void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
       new pqViewStreamingBehavior(this);
       new pqStandardArrayColorMapsBehavior(this);
 
+      // Move instantiation of the pqApplyBehavior to the PVViewer_GUIElements::buildPVWidgets(),
+      // because without pqPropertiesPanel it doesn't make sense.      
+      /*
       pqApplyBehavior* applyBehavior = new pqApplyBehavior(this);
       foreach (pqPropertiesPanel* ppanel, desk->findChildren<pqPropertiesPanel*>())
       {
         applyBehavior->registerPanel(ppanel);
       }
+      */
       BehaviorLoadingLevel = 2;
     }
 }

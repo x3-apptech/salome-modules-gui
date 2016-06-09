@@ -46,18 +46,16 @@ class PVVIEWER_EXPORT PVViewer_GUIElements: public QObject
 public:
   static PVViewer_GUIElements * GetInstance(QMainWindow * desk);
 
-  pqPropertiesPanel * getPropertiesPanel() { return propertiesPanel; }
-  pqPipelineBrowserWidget * getPipelineBrowserWidget() { return pipelineBrowserWidget; }
+  pqPropertiesPanel * getPropertiesPanel();
+  pqPipelineBrowserWidget * getPipelineBrowserWidget();
 
-  QMenu* getFiltersMenu() { return filtersMenu; }
-  QMenu* getSourcesMenu() { return sourcesMenu; }
-  QMenu* getMacrosMenu()  { return macrosMenu; }
+  QMenu* getFiltersMenu();
+  QMenu* getSourcesMenu();
+  QMenu* getMacrosMenu();
 
-  pqVCRToolbar* getVCRToolbar() { return vcrToolbar; }
-  pqAnimationTimeToolbar* getTimeToolbar() { return timeToolbar; }
+  pqVCRToolbar* getVCRToolbar();
+  pqAnimationTimeToolbar* getTimeToolbar();
 
-  void myBuildToolbars(QMainWindow* desk);
-  void addToolbars(QMainWindow* desk);
   void setToolBarVisible(bool show);
   void setToolBarEnabled(bool enabled);
   QList<QToolBar*> getToolbars();
@@ -67,6 +65,8 @@ private:
   virtual ~PVViewer_GUIElements() {}
 
   static PVViewer_GUIElements* theInstance;
+
+  void buildPVWidgets();
 
   // Widgets
   pqPropertiesPanel* propertiesPanel;
@@ -88,6 +88,9 @@ private:
   QToolBar* macrosToolbar;
   QToolBar* commonToolbar;
   QToolBar* dataToolbar;
+  
+  QMainWindow* myDesktop;
+  bool    myPVWidgetsFlag;
 
 public:
   QAction* mainAction;
