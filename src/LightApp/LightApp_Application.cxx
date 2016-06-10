@@ -457,9 +457,10 @@ void LightApp_Application::start()
 /*!Closeapplication.*/
 void LightApp_Application::closeApplication()
 {
+#ifndef DISABLE_QTXWEBBROWSER
   QProcess::startDetached( "HelpBrowser",
                            QStringList() << QString( "--remove=%1" ).arg( QApplication::instance()->applicationPid() ) );
-
+#endif  
   CAM_Application::closeApplication();
 }
 
@@ -1148,8 +1149,12 @@ void LightApp_Application::onHelpContentsModule()
   anApp.append( quote );
 #endif
   QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
+#if DISABLE_QTXWEBBROWSER
+  bool useExtBrowser = true;
+#else  
   bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
-
+#endif
+  
   if( useExtBrowser ) {
     if ( !anApp.isEmpty() ) {
       RunBrowser* rs = new RunBrowser( this, anApp, aParams, helpFile );
@@ -2283,7 +2288,12 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // ... "Study properties" group <<end>>
 
   // ... "Help browser" group <<start>>
+#ifndef DISABLE_QTXWEBBROWSER
   int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab, LightApp_Preferences::Auto, "ExternalBrowser", "use_external_browser");
+#else
+  int extgroup = pref->addPreference( tr( "PREF_GROUP_EXT_BROWSER" ), genTab );
+#endif
+
 #ifdef WIN32
   QString platform = "winapplication";
 #else

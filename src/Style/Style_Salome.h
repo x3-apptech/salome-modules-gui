@@ -23,12 +23,14 @@
 #ifndef STYLE_SALOME_H
 #define STYLE_SALOME_H
 
-#include "Style.h"
 #include <QtGlobal>
+#include "Style.h"
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #include <QWindowsStyle>
+#define BaseStyle QWindowsStyle
 #else
 #include <QCommonStyle>
+#define BaseStyle QCommonStyle
 #endif
 class Style_Model;
 
@@ -37,12 +39,7 @@ class QWidget;
 class QPainter;
 class QtxResourceMgr;
 
-class STYLE_SALOME_EXPORT Style_Salome
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-: public QWindowsStyle
-#else
-: public QCommonStyle
-#endif
+class STYLE_SALOME_EXPORT Style_Salome : public BaseStyle
 {
   Q_OBJECT
 
