@@ -29,9 +29,9 @@ Then creates the mesh model:
 In this example, the end user has to write:
 
 -# the python script that creates the mesh from the parameters, using
-   the GEOM and SMESH python interface, as in a clasic use case.
--# the dialog box in PyQt to input the parameters
--# the file salome_plugins.py that declares the plugins
+   the GEOM and SMESH python interface, as in a classic use case,
+-# the dialog box in PyQt to input the parameters,
+-# the file salome_plugins.py that declares the plugins.
 
 This page explains only the last point.
 
@@ -67,7 +67,7 @@ installed in the standard SALOME python directories.
 
 In this code, the variable "context" is automatically transmitted by
 the pluginmanager when you request the plugin. This context provides
-you with at at least the following attributes:
+you with at least the following attributes:
 
 \code
 activeStudy = context.study
@@ -175,7 +175,7 @@ except:
   print "The selection is not a mesh"
 \endcode
 
-A example of those methods is available with the demo examples.
+An example of those methods is available with the demo examples.
 See the next chapter \ref S5_SALOMEPLUGINS.
 
 \section S5_SALOMEPLUGINS Other examples
