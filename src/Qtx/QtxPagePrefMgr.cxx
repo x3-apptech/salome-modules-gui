@@ -51,6 +51,30 @@
 
 #include <stdio.h>
 
+namespace
+{
+  bool toStringList(const QVariant& value, QStringList& result)
+  {
+    bool ok = false;
+    if ( value.type() == QVariant::StringList )
+    {
+      result = value.toStringList();
+      ok = true;
+    }
+    else if ( value.type() == QVariant::List )
+    {
+      QList<QVariant> valueList = value.toList();
+      for ( QList<QVariant>::const_iterator it = valueList.begin(); it != valueList.end(); ++it )
+      {
+        if ( (*it).canConvert( QVariant::String ) )
+          result.append( (*it).toString() );
+      }
+      ok = true;
+    }
+    return ok;
+  }
+}
+
 /*!
   \class QtxPagePrefMgr
   \brief GUI implementation of the QtxPreferenceMgr class: preferences manager.
@@ -2701,7 +2725,7 @@ void QtxPagePrefSelectItem::setInputType( const int type )
 QStringList QtxPagePrefSelectItem::strings() const
 {
   QStringList res;
-  for ( uint i = 0; i < mySelector->count(); i++ )
+  for ( int i = 0; i < mySelector->count(); i++ )
     res.append( mySelector->itemText( i ) );
   return res;
 }
@@ -2714,7 +2738,7 @@ QStringList QtxPagePrefSelectItem::strings() const
 QList<int> QtxPagePrefSelectItem::numbers() const
 {
   QList<int> res;
-  for ( uint i = 0; i < mySelector->count(); i++ )
+  for ( int i = 0; i < mySelector->count(); i++ )
   {
     if ( mySelector->hasId( i ) )
       res.append( mySelector->id( i ) );
@@ -2730,7 +2754,7 @@ QList<int> QtxPagePrefSelectItem::numbers() const
 QList<QIcon> QtxPagePrefSelectItem::icons() const
 {
   QList<QIcon> res;
-  for ( uint i = 0; i < mySelector->count(); i++ )
+  for ( int i = 0; i < mySelector->count(); i++ )
     res.append( mySelector->itemIcon( i ) );
   return res;
 }
@@ -2753,7 +2777,7 @@ void QtxPagePrefSelectItem::setStrings( const QStringList& lst )
 */
 void QtxPagePrefSelectItem::setNumbers( const QList<int>& ids )
 {
-  uint i = 0;
+  int i = 0;
   for ( QList<int>::const_iterator it = ids.begin(); it != ids.end(); ++it, i++ ) {
     if ( i >= mySelector->count() )
       mySelector->addItem(QString("") );
@@ -2772,7 +2796,7 @@ void QtxPagePrefSelectItem::setNumbers( const QList<int>& ids )
 */
 void QtxPagePrefSelectItem::setIcons( const QList<QIcon>& icns )
 {
-  uint i = 0;
+  int i = 0;
   for ( QList<QIcon>::const_iterator it = icns.begin(); it != icns.end() && i < mySelector->count(); ++it, i++ )
     mySelector->setItemIcon( i, *it );
 }
@@ -2810,7 +2834,7 @@ void QtxPagePrefSelectItem::retrieve()
     idx = mySelector->index( num );
   else
   {
-    for ( uint i = 0; i < mySelector->count() && idx == -1; i++ )
+    for ( int i = 0; i < mySelector->count() && idx == -1; i++ )
     {
       if ( mySelector->itemText( i ) == txt )
         idx = i;
@@ -2896,10 +2920,9 @@ void QtxPagePrefSelectItem::setOptionValue( const QString& name, const QVariant&
 */
 void QtxPagePrefSelectItem::setStrings( const QVariant& var )
 {
-  if ( var.type() != QVariant::StringList )
-    return;
-
-  setStrings( var.toStringList() );
+  QStringList values;
+  if ( toStringList( var, values ) )
+    setStrings( values );
 }
 
 /*!
@@ -3815,8 +3838,9 @@ void QtxPagePrefFontItem::setOptionValue( const QString& name, const QVariant& v
   }
   else if ( name == "fonts" || name == "families" )
   {
-    if ( val.canConvert( QVariant::StringList ) )
-      setFonts( val.toStringList() );
+    QStringList values;
+    if ( toStringList( val, values ) )
+      setFonts( values );
   }
   else if ( name == "sizes" )
   {
@@ -4795,8 +4819,9 @@ void QtxPagePrefBackgroundItem::setOptionValue( const QString& name, const QVari
       setImageFormats( val.toString() );
   }
   else if ( name == "gradient_names" ) {
-    if ( val.canConvert( QVariant::StringList ) )
-      setGradients( val.toStringList() );
+    QStringList values;
+    if ( toStringList( val, values ) )
+      setGradients( values );
   }
   else if ( name == "gradient_ids" ) {
     if ( val.canConvert( QVariant::List ) ) {
