@@ -186,17 +186,31 @@ void PVViewer_GUIElements::buildPVWidgets()
         applyBehavior->registerPanel(ppanel);
       }
     
-    emit pqActiveObjects::instance().portChanged(pqActiveObjects::instance().activePort());
-    emit pqActiveObjects::instance().viewChanged(pqActiveObjects::instance().activeView()); 
+    QMetaObject::invokeMethod( &pqActiveObjects::instance(),
+			       "portChanged",
+			       Qt::AutoConnection,
+			       Q_ARG( pqOutputPort*, pqActiveObjects::instance().activePort() ) );
+    
+    QMetaObject::invokeMethod( &pqActiveObjects::instance(),
+			       "viewChanged",
+			       Qt::AutoConnection,
+			       Q_ARG( pqView*, pqActiveObjects::instance().activeView() ) ); 
 
     pqServerManagerModel *smModel = pqApplicationCore::instance()->getServerManagerModel();
     pqServer* serv = pqActiveObjects::instance().activeServer();    
 
     if (serv) {
-      emit smModel->serverAdded(serv);
-      emit serv->nameChanged(NULL);
+      QMetaObject::invokeMethod( smModel,
+				 "serverAdded",
+				 Qt::AutoConnection,
+				 Q_ARG( pqServer*, serv ) );
+      
+      QMetaObject::invokeMethod( serv,
+				 "nameChanged",
+				 Qt::AutoConnection,
+				 Q_ARG( pqServerManagerModelItem* , NULL ) );
     }
-
+    
     myPVWidgetsFlag = true;
   }
 }
