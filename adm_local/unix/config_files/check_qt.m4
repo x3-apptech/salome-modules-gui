@@ -55,6 +55,11 @@ qt_ok=yes
 
 QTDIR=$(echo $QTDIR | sed 's%[/]\+$%%')
 
+if test -z $QTDIR ; then
+dnl Trying to search Qt5
+  QTDIR=$(echo $QT5_ROOT_DIR | sed 's%[/]\+$%%')
+fi
+
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 
@@ -185,6 +190,7 @@ then
   if test "x$qt_inc_ok" = "xyes" -o "x$QT_USING_PKGCONFIG" = "xyes"
   then
      QT_VERSION_ID=`echo $QT_VERSION | awk -F. '{v=$[1]*10000+$[2]*100+$[3];print v}'`
+     QT_VERSION_MAJ=`echo $QT_VERSION | awk -F. '{v=$[1];print v}'`     
      if test $QT_VERSION_ID -ge 40000
      then
        AC_MSG_RESULT(yes)
@@ -229,14 +235,19 @@ then
   then
     dnl check moc version
     AC_MSG_CHECKING( equality Qt and moc tool version)
-    MOC_VERSION=`$MOC -v 2>&1 | awk 'BEGIN{FS="[[ ()]]"};{print $(NF-1)}'`
+    dnl Qt4 or Qt5
+    if  test "x$QT_VERSION_MAJ" = "x5"
+    then
+      MOC_VERSION=`$MOC -v 2>&1 | awk 'BEGIN{FS=" "};{print $(NF)}'`
+    else
+      MOC_VERSION=`$MOC -v 2>&1 | awk 'BEGIN{FS="[[ ()]]"};{print $(NF-1)}'`
+    fi
     if test "x$QT_VERSION" = "x$MOC_VERSION"
     then
       AC_MSG_RESULT(yes)
       qt_ok=yes
     else
       AC_MSG_RESULT(moc tool and Qt product are incompatible $MOC_VERSION)
-      QT_VERSION_MAJ=`echo $QT_VERSION | awk -F. '{v=$[1];print v}'`
       AC_MSG_CHECKING(for moc-qt$QT_VERSION_MAJ compatible version)
       if test -f ${QTDIR}/bin/moc-qt$QT_VERSION_MAJ
       then
@@ -420,7 +431,7 @@ then
   CPPFLAGS_old=$CPPFLAGS
   if test "x$QT_USING_PKGCONFIG" != "xyes"
   then
-    CPPFLAGS="$CPPFLAGS -I${QTDIR}/include${QTINC} -I${QTDIR}/include${QTINC}/QtCore"
+    CPPFLAGS="$CPPFLAGS -I${QTDIR}/include${QTINC} -I${QTDIR}/include${QTINC}/QtCore -fPIC"
   else
     CPPFLAGS="$CPPFLAGS $QTCORE_CPPFLAGS"
   fi
@@ -439,6 +450,7 @@ then
        # user header files
        QTCORE_CPPFLAGS="${QT_BASE}/QtCore"
        QTGUI_CPPFLAGS="${QT_BASE}/QtGui"
+       QTWIDGETS_CPPFLAGS="${QT_BASE}/QtWidgets"
        QTOPENGL_CPPFLAGS="${QT_BASE}/QtOpenGL"
        QTWEBKIT_CPPFLAGS="${QT_BASE}/QtWebKit"
        QTXML_CPPFLAGS="${QT_BASE}/QtXml"
@@ -448,6 +460,12 @@ then
      fi
 
      QT_INCLUDES="$QT_BASE $QTCORE_CPPFLAGS $QTGUI_CPPFLAGS $QTOPENGL_CPPFLAGS $QTXML_CPPFLAGS $QTWEBKIT_CPPFLAGS"
+
+     # Qt5
+     if  test "x$QT_VERSION_MAJ" = "x5"
+     then
+       QT_INCLUDES="$QT_INCLUDES  $QTWIDGETS_CPPFLAGS"
+     fi     
 
      QT_ASSISTANT_INCLUDES="$QTASSISTANT_CPPFLAGS $QTNETWORK_CPPFLAGS"
      QT_MT_INCLUDES="${QT_INCLUDES}"
@@ -461,8 +479,15 @@ if  test "x$qt_ok" = "xyes"
 then
   AC_MSG_CHECKING(linking against Qt library)
 
+     # Qt4
+     QT_LIB_SUFF=""
+     # Qt5
+     if  test "x$QT_VERSION_MAJ" = "x5"
+     then
+       QT_LIB_SUFF="5"
+     fi     
   CXXFLAGS_old=$CXXFLAGS
-  CXXFLAGS="$CXXFLAGS $QT_INCLUDES"
+  CXXFLAGS="$CXXFLAGS $QT_INCLUDES -fPIC"
 
   LIBS_old=$LIBS
   if test "x$QT_USING_PKGCONFIG" = "xyes"
@@ -481,7 +506,7 @@ then
       AC_MSG_ERROR(Can't detect Qt library directory )  #'
       qt_ok=no
     fi
-    LIBS="$LIBS $QT_LIB_DIR -lQtCore"
+    LIBS="$LIBS $QT_LIB_DIR -lQt${QT_LIB_SUFF}Core"
   fi
 
   AC_CACHE_VAL(salome_cv_lib_qt,[
@@ -499,7 +524,7 @@ then
   if  test "x$qt_ok" = "xno"
   then
     QT_LIB_DIR="-L$QTDIR/lib"
-    LIBS="$LIBS_old $QT_LIB_DIR -lQtCore"
+    LIBS="$LIBS_old $QT_LIB_DIR -lQt${QT_LIB_SUFF}Core"
 
     AC_CACHE_VAL(salome_cv_lib_qt,[
       AC_TRY_LINK(
@@ -528,14 +553,19 @@ then
       QT_GUI_LIBS="$QTGUI_LDFLAGS $QTOPENGL_LDFLAGS $QTWEBKIT_LDFLAGS"
       QT_ASSISTANT_LIBS="$QTASSISTANT_LDFLAGS $QTNETWORK_LDFLAGS"
     else
-      QT_CORE_LIBS="$QT_LIB_DIR -lQtCore -lQtXml"
+      QT_CORE_LIBS="$QT_LIB_DIR -lQt${QT_LIB_SUFF}Core -lQt${QT_LIB_SUFF}Xml"
       # gui libs
-      QT_GUI_LIBS="$QT_LIB_DIR -lQtGui -lQtOpenGL -lQtWebKit"
+      QT_GUI_LIBS="$QT_LIB_DIR -lQt${QT_LIB_SUFF}Gui -lQt${QT_LIB_SUFF}OpenGL -lQt${QT_LIB_SUFF}WebKit"
+      if  test "x$QT_VERSION_MAJ" = "x5"
+      then
+        QT_GUI_LIBS="$QT_GUI_LIBS -lQt5Widgets"
+      fi     
+
       # other libs (currently not used)
       QT_OTHER_LIBS="$QT_LIB_DIR"
       # other libs (can be used if necessary)
       #QT_OTHER_LIBS="$QT_LIB_DIR -lQt3Support -lQtAssistantClient -lQtDesigner -lQtNetwork -lQtSql -lQtSvg -lQtTest -ltQtUiTools"
-      QT_ASSISTANT_LIBS="$QT_LIB_DIR -lQtAssistantClient -lQtNetwork"
+      QT_ASSISTANT_LIBS="$QT_LIB_DIR -lQt${QT_LIB_SUFF}AssistantClient -lQt${QT_LIB_SUFF}Network"
     fi
     # all libs
     QT_LIBS="$QT_CORE_LIBS $QT_GUI_LIBS $QT_OTHER_LIBS"
