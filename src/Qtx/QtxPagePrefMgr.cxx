@@ -2735,9 +2735,9 @@ QStringList QtxPagePrefSelectItem::strings() const
   \return list of values IDs
   \sa strings(), icons(), setNumbers()
 */
-QList<int> QtxPagePrefSelectItem::numbers() const
+QList<QVariant> QtxPagePrefSelectItem::numbers() const
 {
-  QList<int> res;
+  QList<QVariant> res;
   for ( int i = 0; i < mySelector->count(); i++ )
   {
     if ( mySelector->hasId( i ) )
@@ -2775,10 +2775,10 @@ void QtxPagePrefSelectItem::setStrings( const QStringList& lst )
   \param ids new list of values IDs
   \sa numbers(), setStrings(), setIcons()
 */
-void QtxPagePrefSelectItem::setNumbers( const QList<int>& ids )
+void QtxPagePrefSelectItem::setNumbers( const QList<QVariant>& ids )
 {
   int i = 0;
-  for ( QList<int>::const_iterator it = ids.begin(); it != ids.end(); ++it, i++ ) {
+  for ( QList<QVariant>::const_iterator it = ids.begin(); it != ids.end(); ++it, i++ ) {
     if ( i >= mySelector->count() )
       mySelector->addItem(QString("") );
     
@@ -2812,10 +2812,16 @@ void QtxPagePrefSelectItem::store()
 
   int idx = mySelector->currentIndex();
 
-  if ( mySelector->hasId( idx ) )
-    setInteger( mySelector->id( idx ) );
-  else if ( idx >= 0 )
+  if ( mySelector->hasId( idx ) ) {
+    QVariant id = mySelector->id( idx );
+    if ( id.type() == QVariant::Int )
+      setInteger( id.toInt() );
+    else if ( id.type() == QVariant::String )
+      setString( id.toString() );
+  }
+  else if ( idx >= 0 ) {
     setString( mySelector->itemText( idx ) );
+  }
 }
 
 /*!
@@ -2825,14 +2831,10 @@ void QtxPagePrefSelectItem::store()
 void QtxPagePrefSelectItem::retrieve()
 {
   QString txt = getString();
-
-  int idx = -1;
-
-  bool ok = false;
-  int num = txt.toInt( &ok );
-  if ( ok )
-    idx = mySelector->index( num );
-  else
+  
+  // try to find via the id
+  int idx = mySelector->index( txt );
+  if ( idx < 0 )
   {
     for ( int i = 0; i < mySelector->count() && idx == -1; i++ )
     {
@@ -2872,11 +2874,7 @@ QVariant QtxPagePrefSelectItem::optionValue( const QString& name ) const
     return strings();
   else if ( name == "numbers" || name == "ids" || name == "indexes" )
   {
-    QList<QVariant> lst;
-    QList<int> nums = numbers();
-    for ( QList<int>::const_iterator it = nums.begin(); it != nums.end(); ++it )
-      lst.append( *it );
-    return lst;
+    return numbers();
   }
   else if ( name == "icons" || name == "pixmaps" )
   {
@@ -2935,14 +2933,7 @@ void QtxPagePrefSelectItem::setNumbers( const QVariant& var )
   if ( var.type() != QVariant::List )
     return;
 
-  QList<int> lst;
-  QList<QVariant> varList = var.toList();
-  for ( QList<QVariant>::const_iterator it = varList.begin(); it != varList.end(); ++it )
-  {
-    if ( (*it).canConvert( QVariant::Int ) )
-      lst.append( (*it).toInt() );
-  }
-  setNumbers( lst );
+  setNumbers( var.toList() );
 }
 
 /*!

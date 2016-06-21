@@ -487,11 +487,11 @@ public:
   void             setInputType( const int );
 
   QStringList      strings() const;
-  QList<int>       numbers() const;
+  QList<QVariant>  numbers() const;
   QList<QIcon>     icons() const;
 
   void             setStrings( const QStringList& );
-  void             setNumbers( const QList<int>& );
+  void             setNumbers( const QList<QVariant>& );
   void             setIcons( const QList<QIcon>& );
 
   virtual void     store();
