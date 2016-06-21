@@ -49,17 +49,17 @@ public:
   bool         isCleared() const;
   void         setCleared( const bool );
 
-  int          currentId() const;
-  void         setCurrentId( int );
+  QVariant     currentId() const;
+  void         setCurrentId( const QVariant& );
 
-  int          id( const int ) const;
-  int          index( const int ) const;
+  QVariant     id( const int ) const;
+  int          index( const QVariant& ) const;
 
   bool         hasId( const int ) const;
-  void         setId( const int, const int );
+  void         setId( const int, const QVariant& );
 
 signals:
-  void         activatedId( int );
+  void         activatedId( QVariant );
 
 private slots:
   void         onCurrentChanged( int );

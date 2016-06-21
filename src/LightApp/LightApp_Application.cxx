@@ -245,21 +245,23 @@ int LightApp_Application::lastStudyId = 0;
 //since the 'toolbar marker' is not unique, find index of first occurrence of the
 //'toolbar marker' in the array and check that next string is name of the toolbar
 
-int getToolbarMarkerIndex(QByteArray input, const QStringList& aFlags) {
-  int aResult = -1,tmp = 0;
-  int inputLen = input.length();
-  QDataStream anInputData(&input, QIODevice::ReadOnly);
-  while(tmp < inputLen) {
-      tmp = input.indexOf(QToolBarMarker, tmp + 1);
-      if(tmp < 0 )
+namespace
+{
+  int getToolbarMarkerIndex( QByteArray input, const QStringList& aFlags ) {
+    int aResult = -1,tmp = 0;
+    int inputLen = input.length();
+    QDataStream anInputData( &input, QIODevice::ReadOnly );
+    while ( tmp < inputLen ) {
+      tmp = input.indexOf( QToolBarMarker, tmp + 1 );
+      if ( tmp < 0 )
 	break;
-      anInputData.device()->seek(tmp);
+      anInputData.device()->seek( tmp );
       uchar mark;
-      anInputData>>mark;
+      anInputData >> mark;
       int lines;
       anInputData >> lines;
 
-      if(lines == 0 && anInputData.atEnd()){
+      if ( lines == 0 && anInputData.atEnd() ) {
 	//Case then array doesn't contain information about toolbars,
 	aResult = tmp;
 	break;
@@ -270,13 +272,26 @@ int getToolbarMarkerIndex(QByteArray input, const QStringList& aFlags) {
       int cnt;
       anInputData >> cnt;
       QString str;
-      anInputData>>str;
-      if(aFlags.contains(str)) {
+      anInputData >> str;
+      if ( aFlags.contains( str ) ) {
 	aResult = tmp;
 	break;
       }
     }        
-  return aResult;
+    return aResult;
+  }
+
+  QString langToName( const QString& lang )
+  {
+    // special processing for English language to avoid such result as "American English"
+    // as Qt cannot just say "English"
+    QString result;
+    if ( lang == "en" )
+      result = "English";
+    else
+      result = QLocale( lang ).nativeLanguageName();
+    return result;
+  }
 }
 
 /*!
@@ -2219,10 +2234,15 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
                                           LightApp_Preferences::Selector, "language", "language" );
   QStringList aLangs = SUIT_Session::session()->resourceMgr()->stringValue( "language", "languages", "en" ).split( "," );
   QList<QVariant> aIcons;
+  QList<QVariant> aNumbers;
+  QStringList aTitles;
   foreach ( QString aLang, aLangs ) {
     aIcons << QPixmap( QString( ":/images/%1" ).arg( aLang ) );
+    aNumbers << aLang;
+    aTitles << langToName( aLang );
   }
-  pref->setItemProperty( "strings", aLangs, curLang );
+  pref->setItemProperty( "strings", aTitles, curLang );
+  pref->setItemProperty( "ids",     aNumbers, curLang );
   pref->setItemProperty( "icons",   aIcons, curLang );
   pref->setItemProperty( "restart",  true, curLang );
 
