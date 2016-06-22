@@ -60,6 +60,8 @@ public:
 
 signals:
   void         activatedId( QVariant );
+  void         activatedId( int );
+  void         activatedId( QString );
 
 private slots:
   void         onCurrentChanged( int );

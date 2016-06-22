@@ -241,7 +241,12 @@ void QtxComboBox::onCurrentChanged( int idx )
   if ( idx != -1 )
   {
     resetClear();
+    QVariant ident = id( idx );
     emit activatedId( id( idx ) );
+    if ( ident.type() == QVariant::Int )
+      emit activatedId( ident.toInt() );
+    else if ( ident.type() == QVariant::String )
+      emit activatedId( ident.toString() );
   }
 }
 
@@ -291,7 +296,19 @@ bool QtxComboBox::hasId( const int idx ) const
 }
 
 /*!
-  \fn void QtxComboBox::activatedId( int ident )
+  \fn void QtxComboBox::activatedId( QVariant ident )
   \brief Emitted when item with identificator \a ident is activated.
+  \param ident item's identifier
+*/
+
+/*!
+  \fn void QtxComboBox::activatedId( int ident )
+  \brief Emitted when item with integer identificator \a ident is activated.
+  \param ident item's identifier
+*/
+
+/*!
+  \fn void QtxComboBox::activatedId( QString ident )
+  \brief Emitted when item with string identificator \a ident is activated.
   \param ident item's identifier
 */
