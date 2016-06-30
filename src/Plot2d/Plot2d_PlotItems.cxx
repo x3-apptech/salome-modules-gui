@@ -104,6 +104,7 @@ Plot2d_QwtLegendLabel::Plot2d_QwtLegendLabel( QWidget* parent ) :
 */
 Plot2d_QwtLegendLabel::~Plot2d_QwtLegendLabel()
 {
+  delete mySymbol;
 }
 
 /*!
@@ -204,6 +205,7 @@ void  Plot2d_QwtLegendLabel::drawText( QPainter * painter, const QRectF &rect ) 
 */
 void Plot2d_QwtLegendLabel::setSymbol( const QwtSymbol* theSymbol )
 {
+  delete mySymbol;
   mySymbol = new QwtSymbol( theSymbol->style(), theSymbol->brush(),
                             theSymbol->pen(), theSymbol->size() );
 }
@@ -252,7 +254,7 @@ void Plot2d_QwtLegendLabel::paintEvent( QPaintEvent *e )
     if ( itemMode() != QwtLegendData::ReadOnly )
       iconRect.setX( iconRect.x() + ButtonFrame );
       iconRect.setSize( QSize( icon().size().width() + spacing() ,
-    		                   icon().size().height() + spacing() ) );
+                                   icon().size().height() + spacing() ) );
       iconRect.moveCenter( QPoint( iconRect.center().x(), cr.center().y() ) );
   }
 
@@ -356,21 +358,21 @@ void Plot2d_QwtPlotCurve::updateLegend( const QwtPlotItem* thePlotItem,
     if( QWidget* widget = legend->legendWidget( itemInfo ) ) {
       QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
       if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)label ) {
-	int aMode = Plot2d_QwtLegendLabel::IM_None;
-	if( myYAxisIdentifierEnabled )
-	  aMode = myYAxis == QwtPlot::yRight ?
-	    Plot2d_QwtLegendLabel::IM_Right :
-	    Plot2d_QwtLegendLabel::IM_Left;
-	anItem->setYAxisIdentifierMode( aMode );
-	
-	anItem->setSymbol( legendSymbol() );
-	if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
-	  anItem->setSymbolType( plot->getLegendSymbolType() );
-	anItem->setPen( legendPen() );
-	
-	anItem->setSelected( isSelected() );
-	anItem->updateHighlit();
-	anItem->repaint();
+        int aMode = Plot2d_QwtLegendLabel::IM_None;
+        if( myYAxisIdentifierEnabled )
+          aMode = myYAxis == QwtPlot::yRight ?
+            Plot2d_QwtLegendLabel::IM_Right :
+            Plot2d_QwtLegendLabel::IM_Left;
+        anItem->setYAxisIdentifierMode( aMode );
+        
+        anItem->setSymbol( legendSymbol() );
+        if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
+          anItem->setSymbolType( plot->getLegendSymbolType() );
+        anItem->setPen( legendPen() );
+        
+        anItem->setSelected( isSelected() );
+        anItem->updateHighlit();
+        anItem->repaint();
       }
     }
   }
@@ -424,7 +426,7 @@ void Plot2d_QwtPlotCurve::drawSeries( QPainter *painter,
       painter->drawLine(xp,ytop,xp,ybtm);
       painter->drawLine(tickl,ybtm,tickr,ybtm);
     }
-	  painter->restore();
+          painter->restore();
   }
 }
 
@@ -690,7 +692,7 @@ int Plot2d_HistogramQwtItem::rtti() const
   Sets histogram attributes
 */
 void Plot2d_HistogramQwtItem::setHistogramAttribute( HistogramAttribute theAttr,
-						     bool isOn )
+                                                     bool isOn )
 {
   if ( testHistogramAttribute( theAttr ) != isOn ) {
     if ( isOn )
@@ -714,9 +716,9 @@ bool Plot2d_HistogramQwtItem::testHistogramAttribute( HistogramAttribute theAttr
   Draws histogram object
 */
 void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
-				    const QwtScaleMap& theXMap,
-				    const QwtScaleMap& theYMap,
-				    const QRectF& ) const
+                                    const QwtScaleMap& theXMap,
+                                    const QwtScaleMap& theYMap,
+                                    const QRectF& ) const
 {
   thePainter->setPen( QPen( myColor ) );
 
@@ -777,8 +779,8 @@ void Plot2d_HistogramQwtItem::draw( QPainter* thePainter,
   Draws single bar of histogram
 */
 void Plot2d_HistogramQwtItem::drawBar( QPainter* thePainter,
-				       Qt::Orientation,
-				       const QRect& theRect ) const
+                                       Qt::Orientation,
+                                       const QRect& theRect ) const
 {
   thePainter->save();
 
@@ -889,9 +891,9 @@ void Plot2d_HistogramItem::updateLegend( QwtPlotItem* thePlotItem,
   Draws histogram object
 */
 void Plot2d_HistogramItem::draw( QPainter* thePainter,
-				 const QwtScaleMap& theXMap,
-				 const QwtScaleMap& theYMap,
-				 const QRectF& ) const
+                                 const QwtScaleMap& theXMap,
+                                 const QwtScaleMap& theYMap,
+                                 const QRectF& ) const
 {
   // nds: clear list of bar items
   Plot2d_HistogramItem* anItem = (Plot2d_HistogramItem*)this;
@@ -979,8 +981,8 @@ bool Plot2d_HistogramItem::isCrossItems() const
   Draws bar of histogram and on it bars of histograms with lower height.
 */
 void Plot2d_HistogramItem::drawRectAndLowers( QPainter* thePainter,
-					      Qt::Orientation theOr,
-					      const QRect& theRect ) const
+                                              Qt::Orientation theOr,
+                                              const QRect& theRect ) const
 {
   QRect aRect = theRect;
   // theRect has inversed coordinates on Y axis.
@@ -1020,7 +1022,7 @@ int Plot2d_HistogramItem::getCrossedTop( const QRect& theRect ) const
              qMin( theRect.left(), aRects[i].left() ) ) {
           if ( theRect.bottom() < aRects[i].bottom() )
             if ( aRects[i].bottom() < aRes )
-	      aRes = aRects[i].bottom();
+              aRes = aRects[i].bottom();
         }
       }
     }
