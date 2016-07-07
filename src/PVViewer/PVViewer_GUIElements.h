@@ -60,6 +60,8 @@ public:
   void setToolBarEnabled(bool enabled);
   QList<QToolBar*> getToolbars();
 
+  void setVCRTimeToolBarVisible(bool show);
+
 private:
   PVViewer_GUIElements(QMainWindow* desk);
   virtual ~PVViewer_GUIElements() {}

@@ -224,12 +224,9 @@ void PVViewer_GUIElements::setToolBarVisible(bool show)
   mainAction->setChecked(!show);
   mainAction->setVisible(show);
   mainAction->trigger();
-  vcrAction->setChecked(!show);
-  vcrAction->setVisible(show);
-  vcrAction->trigger();
-  timeAction->setChecked(!show);
-  timeAction->setVisible(show);
-  timeAction->trigger();
+
+  setVCRTimeToolBarVisible(show);
+
   colorAction->setChecked(!show);
   colorAction->setVisible(show);
   colorAction->trigger();
@@ -251,6 +248,16 @@ void PVViewer_GUIElements::setToolBarVisible(bool show)
   dataAction->setChecked(!show);
   dataAction->setVisible(show);
   dataAction->trigger();
+}
+
+void PVViewer_GUIElements::setVCRTimeToolBarVisible(bool show)
+{
+  vcrAction->setChecked(!show);
+  vcrAction->setVisible(show);
+  vcrAction->trigger();
+  timeAction->setChecked(!show);
+  timeAction->setVisible(show);
+  timeAction->trigger();
 }
 
 QList<QToolBar*> PVViewer_GUIElements::getToolbars()
