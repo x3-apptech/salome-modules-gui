@@ -44,6 +44,10 @@
 #include <pqServerResource.h>
 #include <pqSetName.h>
 #include <pqVCRToolbar.h>
+#include <pqPipelineSource.h>
+
+#include <vtkSMSessionProxyManager.h>
+#include <vtkSMProxyIterator.h>
 
 #include <QAction>
 #include <QCoreApplication>
@@ -211,6 +215,7 @@ void PVViewer_GUIElements::buildPVWidgets()
 				 Q_ARG( pqServerManagerModelItem* , NULL ) );
     }
     
+    publishExistingSources();
     myPVWidgetsFlag = true;
   }
 }
@@ -325,4 +330,23 @@ QMenu* PVViewer_GUIElements::getSourcesMenu() {
 QMenu* PVViewer_GUIElements::getMacrosMenu()  {
   buildPVWidgets();
   return macrosMenu;
+}
+
+void PVViewer_GUIElements::publishExistingSources() {
+  vtkSMSessionProxyManager* pxm = pqActiveObjects::instance().proxyManager();
+  pqServerManagerModel* smmodel = pqApplicationCore::instance()->getServerManagerModel();
+  if( !pxm || !smmodel )
+    return;
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  iter->SetModeToOneGroup();
+  iter->SetSessionProxyManager( pxm );
+  for ( iter->Begin( "sources" ); !iter->IsAtEnd(); iter->Next() ) {
+    if ( pqProxy* item = smmodel->findItem<pqProxy*>( iter->GetProxy() ) ) {
+      pqPipelineSource* source = qobject_cast<pqPipelineSource*>( item );
+      QMetaObject::invokeMethod( smmodel,
+				 "sourceAdded",
+				 Qt::AutoConnection,
+				 Q_ARG( pqPipelineSource* , source ) );
+    }
+  }
 }

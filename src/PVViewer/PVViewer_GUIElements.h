@@ -70,6 +70,8 @@ private:
 
   void buildPVWidgets();
 
+  void publishExistingSources();
+
   // Widgets
   pqPropertiesPanel* propertiesPanel;
   pqPipelineBrowserWidget* pipelineBrowserWidget;
