@@ -134,7 +134,7 @@ class SVTK_Selector;
 class SVTK_GenericRenderWindowInteractor;
 class SVTK_Actor;
 
-class QRubberBand;
+class QtxRectRubberBand;
 
 #define VTK_INTERACTOR_STYLE_CAMERA_NONE    0
 #define VTK_INTERACTOR_STYLE_CAMERA_ROTATE  1
@@ -371,7 +371,7 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
   double                          myBBCenter[3];
   bool                            myBBFirstCheck;
 
-  QRubberBand*                    myRectBand; //!< selection rectangle rubber band
+  QtxRectRubberBand*              myRectBand; //!< selection rectangle rubber band
   QtxPolyRubberBand*              myPolygonBand; //!< polygonal selection
   QVector<QPoint>                 myPolygonPoints;
   PolygonState                    myPoligonState;

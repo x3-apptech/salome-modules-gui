@@ -57,9 +57,10 @@
 #include <vtkPerspectiveTransform.h> 
 #include <vtkMatrix4x4.h>
 
+#include <QtxRubberBand.h>
+
 #include <QPixmap>
 #include <QWidget>
-#include <QRubberBand>
 #include <QPolygon>
 
 #include <algorithm>
@@ -1616,17 +1617,28 @@ void SVTK_InteractorStyle::DominantCombinedSwitch()
 */
 void SVTK_InteractorStyle::drawRect()
 {
-  if ( !myRectBand ) {
-    myRectBand = new QRubberBand( QRubberBand::Rectangle, GetRenderWidget() );
-    QPalette palette;
-    palette.setColor(myRectBand->foregroundRole(), Qt::white);
-    myRectBand->setPalette(palette);
-  }
-  myRectBand->hide();
+  if ( !myRectBand )
+    myRectBand = new QtxRectRubberBand( GetRenderWidget() );
 
+  myRectBand->setUpdatesEnabled ( false );
   QRect aRect = SUIT_Tools::makeRect(myPoint.x(), myPoint.y(), myOtherPoint.x(), myOtherPoint.y());
-  myRectBand->setGeometry( aRect );
-  myRectBand->setVisible( aRect.isValid() );
+  myRectBand->initGeometry( aRect );
+
+  if ( !myRectBand->isVisible() )
+    myRectBand->show();
+
+  myRectBand->setUpdatesEnabled ( true );
+}
+
+/*!
+  \brief Delete rubber band on the end on the dragging operation.
+*/
+void SVTK_InteractorStyle::endDrawRect()
+{
+  if ( myRectBand ) {
+    myRectBand->clearGeometry();
+    myRectBand->hide();
+  }
 }
 
 bool isIntersect( const QPoint& theStart1, const QPoint& theEnd1,
@@ -1752,17 +1764,6 @@ void SVTK_InteractorStyle::drawPolygon()
   if ( myPolygonPoints.size() > 1 ) {
     myPolygonPoints.remove( myPolygonPoints.size() - 1 );
   }
-}
-
-/*!
-  \brief Delete rubber band on the end on the dragging operation.
-*/
-void SVTK_InteractorStyle::endDrawRect()
-{
-  if ( myRectBand ) myRectBand->hide();
-
-  delete myRectBand;
-  myRectBand = 0;
 }
 
 /*!
