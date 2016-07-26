@@ -53,7 +53,7 @@
     <parameter name="opacity"           value="0.85" />
     <parameter name="font"              value="Tahoma,12,normal" />
     <parameter name="alignment"         value="top,left" />
-    <parameter name="progress_colors"   value="#ffffff,#ff0000,v" />
+    <parameter name="progress_colors"   value="#0f9ee1|#081e70|h" />
   </section>
   <section name="resources">
     <!-- Resource directories (resource manager)-->
