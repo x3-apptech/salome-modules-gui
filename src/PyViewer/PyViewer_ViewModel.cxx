@@ -21,8 +21,11 @@
 //
 
 #include "PyViewer_ViewModel.h"
-
 #include "PyViewer_ViewWindow.h"
+#include "PyViewer_Settings.h"
+
+#include "SUIT_ResourceMgr.h"
+#include "SUIT_Session.h"
 
 /*!
   \class PyViewer_Viewer
@@ -34,6 +37,8 @@
 */
 PyViewer_Viewer::PyViewer_Viewer() : SUIT_ViewModel()
 {
+  if ( !PyEditor_Settings::settings() )
+    PyEditor_Settings::setSettings( new PyViewer_Settings( SUIT_Session::session()->resourceMgr(),  "PyEditor" ) );
 }
 
 /*!
@@ -49,17 +54,5 @@ PyViewer_Viewer::~PyViewer_Viewer()
 */
 SUIT_ViewWindow* PyViewer_Viewer::createView( SUIT_Desktop* theDesktop )
 {
-  PyViewer_ViewWindow* aPyViewer = new PyViewer_ViewWindow( theDesktop, this );
-  initView( aPyViewer );
-  return aPyViewer;
-}
-
-/*!
-  Start initialization of view window
-  \param view - view window to be initialized
-*/
-void PyViewer_Viewer::initView( PyViewer_ViewWindow* theViewModel )
-{
-  if ( theViewModel )
-    theViewModel->initLayout();
+  return new PyViewer_ViewWindow( theDesktop );
 }

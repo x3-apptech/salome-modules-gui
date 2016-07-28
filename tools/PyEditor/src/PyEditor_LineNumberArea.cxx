@@ -36,16 +36,16 @@
 PyEditor_LineNumberArea::PyEditor_LineNumberArea( PyEditor_Editor* theCodeEditor ) :
   QWidget( theCodeEditor )
 {
-  my_CodeEditor = theCodeEditor;
+  myCodeEditor = theCodeEditor;
 }
 
 QSize PyEditor_LineNumberArea::sizeHint() const
 {
-  return QSize( my_CodeEditor->lineNumberAreaWidth(), 0 );
+  return QSize( myCodeEditor->lineNumberAreaWidth(), 0 );
 }
 
 void PyEditor_LineNumberArea::paintEvent( QPaintEvent* theEvent )
 {
-  my_CodeEditor->lineNumberAreaPaintEvent( theEvent );
+  myCodeEditor->lineNumberAreaPaintEvent( theEvent );
   QWidget::paintEvent( theEvent );
 }

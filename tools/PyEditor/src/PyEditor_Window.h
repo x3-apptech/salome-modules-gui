@@ -16,30 +16,32 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : PyViewer_ViewWindow.h
-// Author : Maxim GLIBIN, Open CASCADE S.A.S. (maxim.glibin@opencascade.com)
+// File   : PyEditor_Window.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 
-#ifndef PYVIEWER_VIEWWINDOW_H
-#define PYVIEWER_VIEWWINDOW_H
+#ifndef PYEDITOR_WINDOW_H
+#define PYEDITOR_WINDOW_H
 
-#include "PyViewer.h"
+#include "PyEditor.h"
 
-#include <SUIT_ViewWindow.h>
+#include <QMainWindow>
+#include <QMap>
 
+class QAction;
 class PyEditor_Editor;
 
-class PYVIEWER_EXPORT PyViewer_ViewWindow : public SUIT_ViewWindow
+class PYEDITOR_EXPORT PyEditor_Window : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  enum { NewId, OpenId, SaveId, SaveAsId,
+  enum { NewId, OpenId, SaveId, SaveAsId, ExitId,
          UndoId, RedoId, CutId, CopyId, PasteId, DeleteId, SelectAllId,
          PreferencesId, HelpId };
 
-  PyViewer_ViewWindow( SUIT_Desktop* = 0 );
-  ~PyViewer_ViewWindow();
+  PyEditor_Window( QWidget* = 0 );
+  ~PyEditor_Window();
 
 protected:
   virtual void closeEvent( QCloseEvent* );
@@ -61,8 +63,9 @@ private:
   QString     defaultName() const;
 
 private:
-  PyEditor_Editor*  myTextEditor;
-  QString           myURL;
+  PyEditor_Editor*    myTextEditor;
+  QString             myURL;
+  QMap<int, QAction*> myActions;
 };
 
-#endif // PYVIEWER_VIEWWINDOW_H
+#endif // PYEDITOR_WINDOW_H

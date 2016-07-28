@@ -21,12 +21,14 @@
 
 INCLUDE(UseQtExt)
 
+# --- options ---
+
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SUIT
-  ${PROJECT_SOURCE_DIR}/src/PyEditor
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src
 )
 
 # additional preprocessor / compiler flags
@@ -34,6 +36,8 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES ${PLATFORM_LIBS} ${QT_LIBRARIES} qtx suit PyEditor)
+
+# --- headers ---
 
 # header files / to be processed by moc
 SET(_moc_HEADERS
@@ -45,33 +49,46 @@ SET(_moc_HEADERS
 # header files / no moc processing
 SET(_other_HEADERS
   PyViewer.h
+  PyViewer_Settings.h
 )
 
 # header files / to install
 SET(PyViewer_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 
-# resource files / to be processed by lrelease
-SET(RESOURCES_PATH resources)
+# --- resources ---
 
 SET(_ts_RESOURCES
-  ${RESOURCES_PATH}/translations/PyViewer_msg_en.ts
-  ${RESOURCES_PATH}/translations/PyViewer_msg_fr.ts
-  ${RESOURCES_PATH}/translations/PyViewer_msg_ja.ts
+  resources/PyViewer_msg_en.ts
+  resources/PyViewer_msg_fr.ts
+  resources/PyViewer_msg_ja.ts
+  resources/PyViewer_images.ts
 )
 
-# resource files / to be processed by rcc
-SET(_rcc_RESOURCES ${RESOURCES_PATH}/PyEditor.qrc)
+# resource files / static
+SET(_other_RESOURCES
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_copy.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_cut.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_delete.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_help.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_new.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_open.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_paste.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_preferences.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_redo.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_save.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_save_as.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_select_all.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_undo.png
+)
 
 # --- sources ---
 
 # sources / moc wrappings
 QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
-# sources / rcc wrappings
-QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
-
 # sources / static
 SET(_other_SOURCES
+  PyViewer_Settings.cxx
   PyViewer_ViewManager.cxx
   PyViewer_ViewModel.cxx
   PyViewer_ViewWindow.cxx
@@ -81,14 +98,11 @@ SET(_other_SOURCES
 SET(PyViewer_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
 
 # --- rules ---
-ADD_LIBRARY(PyViewer ${PyViewer_SOURCES} ${_rcc_SOURCES})
+
+ADD_LIBRARY(PyViewer ${PyViewer_SOURCES})
 TARGET_LINK_LIBRARIES(PyViewer ${_link_LIBRARIES})
 INSTALL(TARGETS PyViewer EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
-ADD_EXECUTABLE(DummyPyEditor PyViewer.cxx)
-SET_TARGET_PROPERTIES(DummyPyEditor PROPERTIES OUTPUT_NAME "PyEditor")
-TARGET_LINK_LIBRARIES(DummyPyEditor ${_link_LIBRARIES} PyEditor PyViewer)
-INSTALL(TARGETS DummyPyEditor EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_BINS})
-
 INSTALL(FILES ${PyViewer_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
 QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})

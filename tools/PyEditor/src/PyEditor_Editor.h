@@ -23,31 +23,30 @@
 #ifndef PYEDITOR_EDITOR_H
 #define PYEDITOR_EDITOR_H
 
-#include <QPlainTextEdit>
 #include "PyEditor.h"
+#include "PyEditor_Settings.h"
+
+#include <QPlainTextEdit>
 
 class PyEditor_PyHighlighter;
-class PyEditor_Settings;
-class QtxResourceMgr;
 
 class PYEDITOR_EXPORT PyEditor_Editor : public QPlainTextEdit
 {
   Q_OBJECT
 
 public:
-  PyEditor_Editor( bool isSingle = false, QtxResourceMgr* = 0,  QWidget* = 0 );
+  PyEditor_Editor( QWidget* = 0 );
   virtual ~PyEditor_Editor();
   
-  void lineNumberAreaPaintEvent( QPaintEvent* );
-  int  lineNumberAreaWidth();
-
-  void updateStatement();
-  PyEditor_Settings* settings();
+  void setSettings( const PyEditor_Settings& );
+  const PyEditor_Settings& settings() const;
+  QString text() const;
 
 public Q_SLOTS:
   void deleteSelected();
-  void append ( const QString & );  
-  void setText ( const QString & text );
+  void append( const QString& );  
+  void setText( const QString& text );
+
 protected:
   virtual void keyPressEvent( QKeyEvent* );
   virtual void resizeEvent( QResizeEvent* );
@@ -66,7 +65,9 @@ private:
   void createParenthesisSelection( int );
   bool isLeftBrackets( QChar );
   bool isRightBrackets( QChar );
-  
+  void lineNumberAreaPaintEvent( QPaintEvent* );
+  int  lineNumberAreaWidth();
+
   void handleHome( bool );
   int  lineIndent();
   void tabIndentation( bool );
@@ -74,9 +75,11 @@ private:
   
   int findFirstNonSpace( const QString& );
   
-  QWidget*                my_LineNumberArea;
-  PyEditor_PyHighlighter* my_SyntaxHighlighter;
-  PyEditor_Settings*      my_Settings;
+  QWidget*                myLineNumberArea;
+  PyEditor_PyHighlighter* mySyntaxHighlighter;
+  PyEditor_Settings       mySettings;
+
+  friend class PyEditor_LineNumberArea;
 };
 
 #endif // PYEDITOR_EDITOR_H

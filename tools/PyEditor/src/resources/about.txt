@@ -1,0 +1,36 @@
+<b>Python Editor</b>
+<hr>
+
+Python Editor is a simple program for writing Python scripts.
+Program provides standard editing operations like copy/cut/paste, undo/redo, select all, delete, etc.
+Also it supports syntax highlighting and auto-indentation of Python code.
+
+Most often used editing operations are available via the toolbar:
+<ul>
+<li><b>New</b>: creates new document.</li>
+<li><b>Open</b>: opens existing Python script for editing.</li>
+<li><b>Save</b>: saves current document to a file.</li>
+<li><b>Save As</b>: allows saving current document with a new name.</li>
+<li><b>Exit</b>: quits application.</li>
+<li><b>Undo</b>: undoes the last operation.</li>
+<li><b>Redo</b>: redoes the previously undone operation.</li>
+<li><b>Cut</b>: cuts selected text into the clipboard.</li>
+<li><b>Copy</b>: copies selected text into the clipboard.</li>
+<li><b>Paste</b>: pastes text from the clipboard into the current cursor position.</li>
+<li><b>Delete</b>: removes selected text.</li>
+<li><b>Select All</b>: selects the whole text in the editor.</li>
+<li><b>Preferences</b>: opens Preferences dialog that allows specifying advanced parameters for the program.</li>
+<li><b>Help</b>: shows this help information.</li>
+</ul>
+
+The behavior of the editor can be customized via the <b>Preferences</b> dialog. The following options can be customized:
+<ul>
+<li><b>Font settings</b>: choose the font.</li>
+<li><b>Enable current line highlight</b>: switches on background coloring of the line under the cursor.</li>
+<li><b>Enable text wrapping</b>: allows wrapping text at the border of the editor's window.</li>
+<li><b>Center cursor on scroll</b>: allows scrolling the script vertically to make the cursor visible at the center of the viewer.</li>
+<li><b>Display line numbers area</b>: shows line numbers at the left border of the editor.</li>
+<li><b>Vertical edge settings</b>: draws vertical line at the specified column of the viewer.</li>
+<li><b>Display tab white spaces</b>: displays tab indentations at a given number of white spaces.</li>
+<li><b>Save settings as default</b>: saves chosen options as a default ones. These settings will be restored after application restart.</li>
+</ul>

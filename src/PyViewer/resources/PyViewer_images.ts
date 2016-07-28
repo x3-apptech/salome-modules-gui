@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.0" language="en_US">
+<context>
+    <name>PyViewer_ViewWindow</name>
+    <message>
+        <source>ICON_NEW</source>
+        <translation>py_new.png</translation>
+    </message>
+    <message>
+        <source>ICON_OPEN</source>
+        <translation>py_open.png</translation>
+    </message>
+    <message>
+        <source>ICON_SAVE</source>
+        <translation>py_save.png</translation>
+    </message>
+    <message>
+        <source>ICON_SAVEAS</source>
+        <translation>py_save_as.png</translation>
+    </message>
+    <message>
+        <source>ICON_UNDO</source>
+        <translation>py_undo.png</translation>
+    </message>
+    <message>
+        <source>ICON_REDO</source>
+        <translation>py_redo.png</translation>
+    </message>
+    <message>
+        <source>ICON_CUT</source>
+        <translation>py_cut.png</translation>
+    </message>
+    <message>
+        <source>ICON_COPY</source>
+        <translation>py_copy.png</translation>
+    </message>
+    <message>
+        <source>ICON_PASTE</source>
+        <translation>py_paste.png</translation>
+    </message>
+    <message>
+        <source>ICON_DELETE</source>
+        <translation>py_delete.png</translation>
+    </message>
+    <message>
+        <source>ICON_SELECT_ALL</source>
+        <translation>py_select_all.png</translation>
+    </message>
+    <message>
+        <source>ICON_PREFERENCES</source>
+        <translation>py_preferences.png</translation>
+    </message>
+    <message>
+        <source>ICON_HELP</source>
+        <translation>py_help.png</translation>
+    </message>
+</context>
+</TS>

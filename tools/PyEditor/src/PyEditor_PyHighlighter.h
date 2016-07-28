@@ -48,7 +48,7 @@ public:
     void insert( ParenthesisInfo* );
 
   private:
-    QVector<ParenthesisInfo*> my_Parentheses;
+    QVector<ParenthesisInfo*> myParentheses;
   };
 
 public:

@@ -21,19 +21,22 @@
 
 INCLUDE(UseQtExt)
 
+IF(PYEDITOR_BUILD_PYTHON)
+  ADD_SUBDIRECTORY(python)
+ENDIF(PYEDITOR_BUILD_PYTHON)
+
 # --- options ---
 
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${PROJECT_SOURCE_DIR}/src/Qtx
 )
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${PLATFORM_LIBS} ${QT_LIBRARIES} qtx)
+SET(_link_LIBRARIES ${PLATFORM_LIBS} ${QT_LIBRARIES})
 
 # --- headers ---
 
@@ -43,12 +46,14 @@ SET(_moc_HEADERS
   PyEditor_LineNumberArea.h
   PyEditor_PyHighlighter.h
   PyEditor_SettingsDlg.h
+  PyEditor_Window.h
 )
 
 # header files / no moc processing
 SET(_other_HEADERS
   PyEditor.h
   PyEditor_Settings.h
+  PyEditor_StdSettings.h
 )
 
 # header files / to install
@@ -57,16 +62,22 @@ SET(PyEditor_HEADERS ${_moc_HEADERS} ${_other_HEADERS})
 # --- resources ---
 
 # resource files / to be processed by lrelease
-SET(RESOURCES_PATH resources)
-
 SET(_ts_RESOURCES
-  ${RESOURCES_PATH}/translations/PyEditor_msg_en.ts
-  ${RESOURCES_PATH}/translations/PyEditor_msg_fr.ts
-  ${RESOURCES_PATH}/translations/PyEditor_msg_ja.ts
+  resources/translations/PyEditor_msg_en.ts
+  resources/translations/PyEditor_msg_fr.ts
+  resources/translations/PyEditor_msg_ja.ts
 )
+
+# resource files / to be processed by rcc
+SET(_rcc_RESOURCES resources/PyEditor.qrc)
+
+# --- sources ---
 
 # sources / moc wrappings
 QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
+
+# sources / rcc wrappings
+QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / static
 SET(_other_SOURCES
@@ -75,15 +86,28 @@ SET(_other_SOURCES
   PyEditor_PyHighlighter.cxx
   PyEditor_Settings.cxx
   PyEditor_SettingsDlg.cxx
+  PyEditor_StdSettings.cxx
+  PyEditor_Window.cxx
 )
 
 # sources / to compile
-SET(PyEditor_SOURCES ${_other_SOURCES} ${_moc_SOURCES})
+# - for library
+SET(PyEditor_SOURCES ${_other_SOURCES} ${_moc_SOURCES} ${_rcc_SOURCES})
+# - for executable
+SET(pyeditorexe_SOURCES ${PyEditor_SOURCES} PyEditor.cxx)
 
 # --- rules ---
+
 ADD_LIBRARY(PyEditor ${PyEditor_SOURCES})
 TARGET_LINK_LIBRARIES(PyEditor ${_link_LIBRARIES})
-INSTALL(TARGETS PyEditor EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+INSTALL(TARGETS PyEditor EXPORT ${TOOLS_EXPORT_NAME}TargetGroup DESTINATION ${PYEDITOR_INSTALL_LIBS})
 
-INSTALL(FILES ${PyEditor_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
-QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
+IF(PYEDITOR_BUILD_EXE)
+  ADD_EXECUTABLE(pyeditorexe ${pyeditorexe_SOURCES})
+  SET_TARGET_PROPERTIES(pyeditorexe PROPERTIES OUTPUT_NAME "pyeditor")
+  TARGET_LINK_LIBRARIES(pyeditorexe ${_link_LIBRARIES})
+  INSTALL(TARGETS pyeditorexe EXPORT ${TOOLS_EXPORT_NAME}TargetGroup DESTINATION ${PYEDITOR_INSTALL_BINS})
+ENDIF(PYEDITOR_BUILD_EXE)
+
+INSTALL(FILES ${PyEditor_HEADERS} DESTINATION ${PYEDITOR_INSTALL_HEADERS})
+QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${PYEDITOR_INSTALL_RES}")

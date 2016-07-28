@@ -16,31 +16,30 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : PyEditor_LineNumberArea.h
-// Author : Maxim GLIBIN, Open CASCADE S.A.S. (maxim.glibin@opencascade.com)
+// File   : PyViewer_Settings.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 
-#ifndef PYEDITOR_LINENUMBERAREA_H
-#define PYEDITOR_LINENUMBERAREA_H
+#ifndef PYVIEWER_SETTINGS_H
+#define PYVIEWER_SETTINGS_H
 
-#include <QWidget>
+#include "PyViewer.h"
+#include "PyEditor_Settings.h"
 
-class PyEditor_Editor;
+class QtxResourceMgr;
 
-class PyEditor_LineNumberArea : public QWidget
+class PYVIEWER_EXPORT PyViewer_Settings : public PyEditor_Settings
 {
-  Q_OBJECT
-
 public:
-  explicit PyEditor_LineNumberArea( PyEditor_Editor* );
+  PyViewer_Settings( QtxResourceMgr* );
+  PyViewer_Settings( QtxResourceMgr*, const QString& );
 
-  QSize sizeHint() const;
-  
-protected:
-  void paintEvent( QPaintEvent* );
-  
+  void load();
+  void save();
+
 private:
-  PyEditor_Editor* my_CodeEditor;
+  QtxResourceMgr* myResMgr;
+  QString myGroup;
 };
 
-#endif // PYEDITOR_LINENUMBERAREA_H
+#endif // PYVIEWER_SETTINGS_H

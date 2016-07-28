@@ -28,54 +28,52 @@
 
 class PyEditor_Editor;
 class QCheckBox;
+class QComboBox;
+class QFontComboBox;
 class QLabel;
-class QPushButton;
 class QSpinBox;
-class QtxFontEdit;
 
 class PYEDITOR_EXPORT PyEditor_SettingsDlg : public QDialog
 {
   Q_OBJECT
 
 public:
-  PyEditor_SettingsDlg( PyEditor_Editor*, QWidget* = 0 );
-
-  bool    isSetAsDefault();
+  PyEditor_SettingsDlg( PyEditor_Editor*, bool = false, QWidget* = 0 );
+  ~PyEditor_SettingsDlg();
 
 private Q_SLOTS:
-  void onVerticalEdgeChecked( bool );
+  void onVerticalEdgeChecked();
+  void onFontChanged();
   void onOk();
+  void onDefault();
   void onHelp();
 
 Q_SIGNALS:
-  void onHelpClicked();
+  void help();
 
 private:
   void settingsToGui();
   void settingsFromGui();
-  void setSettings();
+  void setFontSize( const QString& );
   
-  QCheckBox*        w_HighlightCurrentLine;
-  QCheckBox*        w_TextWrapping;
-  QCheckBox*        w_CenterCursorOnScroll;
-  QCheckBox*        w_LineNumberArea;
+  QCheckBox*        myHighlightCurrentLine;
+  QCheckBox*        myTextWrapping;
+  QCheckBox*        myCenterCursorOnScroll;
+  QCheckBox*        myLineNumberArea;
 
-  QCheckBox*        w_TabSpaceVisible;
-  QSpinBox*         w_TabSize;
+  QCheckBox*        myTabSpaceVisible;
+  QSpinBox*         myTabSize;
 
-  QCheckBox*        w_VerticalEdge;
-  QSpinBox*         w_NumberColumns;
-  QLabel*           lbl_NumColumns;
+  QCheckBox*        myVerticalEdge;
+  QSpinBox*         myNumberColumns;
+  QLabel*           myNumberColumnsLbl;
 
-  QtxFontEdit*      w_FontWidget;
+  QFontComboBox*    myFontFamily;
+  QComboBox*        myFontSize;
 
-  QCheckBox*        w_DefaultCheck;
+  QCheckBox*        myDefaultCheck;
 
-  QPushButton*      myOkBtn;
-  QPushButton*      myCancelBtn;
-  QPushButton*      myHelpBtn;
-
-  PyEditor_Editor*  my_Editor;
+  PyEditor_Editor*  myEditor;
 };
 
 #endif // PYEDITOR_SETTINGSDLG_H

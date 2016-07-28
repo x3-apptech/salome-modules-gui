@@ -37,16 +37,16 @@ PyEditor_PyHighlighter::TextBlockData::TextBlockData()
 
 QVector<PyEditor_PyHighlighter::ParenthesisInfo*> PyEditor_PyHighlighter::TextBlockData::parentheses()
 {
-  return my_Parentheses;
+  return myParentheses;
 }
 
 void PyEditor_PyHighlighter::TextBlockData::insert( PyEditor_PyHighlighter::ParenthesisInfo* theInfo )
 {
   int i = 0;
-  while ( i < my_Parentheses.size() && theInfo->position > my_Parentheses.at(i)->position )
+  while ( i < myParentheses.size() && theInfo->position > myParentheses.at(i)->position )
     ++i;
 
-  my_Parentheses.insert( i, theInfo );
+  myParentheses.insert( i, theInfo );
 }
 
 /*!
@@ -61,7 +61,7 @@ PyEditor_PyHighlighter::PyEditor_PyHighlighter( QTextDocument* theDocument )
 
 /*!
   \brief Initialization rules.
- */
+*/
 void PyEditor_PyHighlighter::initialize()
 {
   HighlightingRule aRule;
@@ -69,7 +69,7 @@ void PyEditor_PyHighlighter::initialize()
   // Keywords
   keywordFormat.setForeground( Qt::blue );
   QStringList aKeywords = keywords();
-  foreach ( const QString &keyword, aKeywords )
+  foreach ( const QString& keyword, aKeywords )
   {
     aRule.pattern = QRegExp( QString( "\\b%1\\b" ).arg( keyword ) );
     aRule.format = keywordFormat;
@@ -80,7 +80,7 @@ void PyEditor_PyHighlighter::initialize()
   // Special keywords
   specialFromat.setForeground( Qt::magenta );
   QStringList aSpecialKeywords = specialKeywords();
-  foreach ( const QString &keyword, aSpecialKeywords )
+  foreach ( const QString& keyword, aSpecialKeywords )
   {
     aRule.pattern = QRegExp( QString( "\\b%1\\b" ).arg( keyword ) );
     aRule.format = specialFromat;
@@ -190,7 +190,7 @@ QStringList PyEditor_PyHighlighter::keywords()
 
 /*!
   \return string list of special Python keywords.
- */
+*/
 QStringList PyEditor_PyHighlighter::specialKeywords()
 {
   QStringList aSpecialKeywords;

@@ -16,34 +16,35 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : PyViewer_ViewModel.h
-// Author : Maxim GLIBIN, Open CASCADE S.A.S. (maxim.glibin@opencascade.com)
+// File   : PyEditor_StdSettings.h
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 
-#ifndef PYVIEWER_VIEWMODEL_H
-#define PYVIEWER_VIEWMODEL_H
+#ifndef PYEDITOR_STDSETTINGS_H
+#define PYEDITOR_STDSETTINGS_H
 
-#include "PyViewer.h"
+#include "PyEditor.h"
+#include "PyEditor_Settings.h"
 
-#include <SUIT_ViewModel.h>
+#include <QSettings>
 
-class PyViewer_ViewWindow;
-class SUIT_ViewWindow;
-class SUIT_Desktop;
-
-class PYVIEWER_EXPORT PyViewer_Viewer : public SUIT_ViewModel
+class PYEDITOR_EXPORT PyEditor_StdSettings : public PyEditor_Settings
 {
-  Q_OBJECT
-
 public:
-  PyViewer_Viewer();
-  virtual ~PyViewer_Viewer();
+  PyEditor_StdSettings();
+  PyEditor_StdSettings( const QString& );
+  PyEditor_StdSettings( const QString&, const QString&, QSettings::Format = QSettings::IniFormat );
 
-  virtual SUIT_ViewWindow* createView( SUIT_Desktop* theDesktop );
+  void setLanguage( const QString& );
+  QString language() const;
 
-  virtual QString getType() const { return Type(); }
-  static  QString Type() { return "PyViewer"; }
+  void load();
+  void save();
+
+private:
+  QSettings mySettings;
+  QString myGroup;
+  QString myLanguage;
 };
 
-#endif // PYVIEWER_VIEWMODEL_H
-
+#endif // PYEDITOR_STDSETTINGS_H

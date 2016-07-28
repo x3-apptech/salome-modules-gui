@@ -16,207 +16,251 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// File   : PyViewer_ViewWindow.cxx
-// Author : Maxim GLIBIN, Open CASCADE S.A.S. (maxim.glibin@opencascade.com)
+// File   : PyEditor_Window.cxx
+// Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 
-#include "PyViewer_ViewWindow.h"
-
+#include "PyEditor_Window.h"
 #include "PyEditor_Editor.h"
+#include "PyEditor_Settings.h"
 #include "PyEditor_SettingsDlg.h"
 
-#include "SUIT_Session.h"
-#include "SUIT_ResourceMgr.h"
-
-#include "QtxAction.h"
-#include "QtxActionToolMgr.h"
-
+#include <QAction>
 #include <QApplication>
 #include <QFileDialog>
+#include <QMenuBar>
 #include <QMessageBox>
+#include <QStatusBar>
 #include <QTextStream>
+#include <QToolBar>
 
 /*!
-  \class PyViewer_ViewWindow
+  \class PyEditor_Window
   \brief Python view window.
 */
 
 /*!
   \brief Constructor.
-  \param desktop SALOME desktop window
+  \param parent parent widget
 */
-PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
-  SUIT_ViewWindow( desktop )
+PyEditor_Window::PyEditor_Window( QWidget* parent ) :
+  QMainWindow( parent )
 {
+  Q_INIT_RESOURCE( PyEditor );
+
   // Create editor and set it as a central widget.
   myTextEditor = new PyEditor_Editor( this );
   setCentralWidget( myTextEditor );
 
   // Create actions.
-  SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-  QtxAction* action;
+  QAction* action;
 
   // . New
-  action = new QtxAction( tr( "TTP_NEW" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_NEW" ) ),
-                          tr( "ACT_NEW" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_new.png" ),
+                        tr( "ACT_NEW" ), this );
+  action->setToolTip( tr( "TTP_NEW" ) );
   action->setStatusTip( tr( "DSC_NEW" ) );
   action->setShortcut( QKeySequence::New );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onNew() ) );
-  toolMgr()->registerAction( action, NewId );
-  
+  myActions[ NewId ] = action;
+
   // . Open
-  action = new QtxAction( tr( "TTP_OPEN" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_OPEN" ) ),
-                          tr( "ACT_OPEN" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_open.png" ),
+                        tr( "ACT_OPEN" ), this );
+  action->setToolTip( tr( "TTP_OPEN" ) );
   action->setStatusTip( tr( "DSC_OPEN" ) );
   action->setShortcut( QKeySequence::Open );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onOpen() ) );
-  toolMgr()->registerAction( action, OpenId );
-  
+  myActions[ OpenId ] = action;
+
   // . Save
-  action = new QtxAction( tr( "TTP_SAVE" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_SAVE" ) ),
-                          tr( "ACT_SAVE" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_save.png" ),
+                        tr( "ACT_SAVE" ), this );
+  action->setToolTip( tr( "TTP_SAVE" ) );
   action->setStatusTip( tr( "DSC_SAVE" ) );
   action->setShortcut( QKeySequence::Save );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onSave() ) );
   action->setEnabled( false );
   connect( myTextEditor->document(), SIGNAL( modificationChanged( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, SaveId );
-  
+  myActions[ SaveId ] = action;
+
   // . SaveAs
-  action = new QtxAction( tr( "TTP_SAVEAS" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_SAVEAS" ) ),
-                          tr( "ACT_SAVEAS" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_save_as.png" ),
+                        tr( "ACT_SAVEAS" ), this );
+  action->setToolTip( tr( "TTP_SAVEAS" ) );
   action->setStatusTip( tr( "DSC_SAVEAS" ) );
   action->setShortcut( QKeySequence::SaveAs );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onSaveAs() ) );
-  toolMgr()->registerAction( action, SaveAsId );
+  myActions[ SaveAsId ] = action;
+
+  // . Exit
+  action = new QAction( QIcon( ":/images/py_exit.png" ),
+                        tr( "ACT_EXIT" ), this );
+  action->setToolTip( tr( "TTP_EXIT" ) );
+  action->setStatusTip( tr( "DSC_EXIT" ) );
+  action->setShortcut( QKeySequence::Quit );
+  connect( action, SIGNAL( triggered( bool ) ), this, SLOT( close() ) );
+  myActions[ ExitId ] = action;
 
   // . Undo
-  action = new QtxAction( tr( "TTP_UNDO" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_UNDO" ) ),
-                          tr( "ACT_UNDO" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_undo.png" ),
+                        tr( "ACT_UNDO" ), this );
+  action->setToolTip( tr( "TTP_UNDO" ) );
   action->setStatusTip( tr( "DSC_UNDO" ) );
   action->setShortcut( QKeySequence::Undo );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( undo() ) );
   action->setEnabled( false );
   connect( myTextEditor->document(), SIGNAL( undoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, UndoId );
+  myActions[ UndoId ] = action;
 
   // . Redo
-  action = new QtxAction( tr( "TTP_REDO" ), 
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_REDO" ) ),
-                          tr( "ACT_REDO" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_redo.png" ),
+                        tr( "ACT_REDO" ), this );
+  action->setToolTip( tr( "TTP_REDO" ) );
   action->setStatusTip( tr( "DSC_REDO" ) );
   action->setShortcut( QKeySequence::Redo );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( redo() ) );
   action->setEnabled( false );
   connect( myTextEditor->document(), SIGNAL( redoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, RedoId );
+  myActions[ RedoId ] = action;
 
   // . Cut
-  action = new QtxAction( tr( "TTP_CUT" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_CUT" ) ),
-                          tr( "ACT_CUT" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_cut.png" ),
+                        tr( "ACT_CUT" ), this );
+  action->setToolTip( tr( "TTP_CUT" ) );
   action->setStatusTip( tr( "DSC_CUT" ) );
   action->setShortcut( QKeySequence::Cut );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( cut() ) );
   action->setEnabled( false );
   connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, CutId );
+  myActions[ CutId ] = action;
 
   // . Copy
-  action = new QtxAction( tr( "TTP_COPY" ), 
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_COPY" ) ),
-                          tr( "ACT_COPY" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_copy.png" ),
+                        tr( "ACT_COPY" ), this );
+  action->setToolTip( tr( "TTP_COPY" ) );
   action->setStatusTip( tr( "DSC_COPY" ) );
   action->setShortcut( QKeySequence::Copy );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( copy() ) );
   action->setEnabled( false );
   connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, CopyId );
+  myActions[ CopyId ] = action;
 
   // . Paste
-  action = new QtxAction( tr( "TTP_PASTE" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_PASTE" ) ),
-                          tr( "ACT_PASTE" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_paste.png" ),
+                        tr( "ACT_PASTE" ), this );
+  action->setToolTip( tr( "TTP_PASTE" ) );
   action->setStatusTip( tr( "DSC_PASTE" ) );
   action->setShortcut( QKeySequence::Paste );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( paste() ) );
-  toolMgr()->registerAction( action, PasteId );
+  myActions[ PasteId ] = action;
 
   // . Delete
-  action = new QtxAction( tr( "TTP_DELETE" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_DELETE" ) ),
-                          tr( "ACT_DELETE" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_delete.png" ),
+                        tr( "ACT_DELETE" ), this );
+  action->setToolTip( tr( "TTP_DELETE" ) );
   action->setStatusTip( tr( "DSC_DELETE" ) );
   action->setShortcut( QKeySequence::Delete );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( deleteSelected() ) );
   action->setEnabled( false );
   connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
-  toolMgr()->registerAction( action, DeleteId );
+  myActions[ DeleteId ] = action;
 
   // . SelectAll
-  action = new QtxAction( tr( "TTP_SELECT_ALL" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_SELECT_ALL" ) ),
-                          tr( "ACT_SELECT_ALL" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_select_all.png" ),
+                        tr( "ACT_SELECT_ALL" ), this );
+  action->setToolTip( tr( "TTP_SELECT_ALL" ) );
   action->setStatusTip( tr( "DSC_SELECT_ALL" ) );
   action->setShortcut( QKeySequence::SelectAll );
   connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( selectAll() ) );
-  toolMgr()->registerAction( action, SelectAllId );
+  myActions[ SelectAllId ] = action;
 
   // . Preferences
-  action = new QtxAction( tr( "TTP_PREFERENCES" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_PREFERENCES" ) ),
-                          tr( "ACT_PREFERENCES" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_preferences.png" ),
+                        tr( "ACT_PREFERENCES" ), this );
+  action->setToolTip( tr( "TTP_PREFERENCES" ) );
   action->setStatusTip( tr( "DSC_PREFERENCES" ) );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onPreferences() ) );
-  toolMgr()->registerAction( action, PreferencesId );
+  myActions[ PreferencesId ] = action;
 
   // . Help
-  action = new QtxAction( tr( "TTP_HELP" ),
-                          resMgr->loadPixmap( "PyViewer", tr( "ICON_HELP" ) ),
-                          tr( "ACT_HELP" ), 0, this );
+  action = new QAction( QIcon( ":/images/py_help.png" ),
+                        tr( "ACT_HELP" ), this );
+  action->setToolTip( tr( "TTP_HELP" ) );
   action->setStatusTip( tr( "DSC_HELP" ) );
   connect( action, SIGNAL( triggered() ), this, SLOT( onHelp() ) );
-  toolMgr()->registerAction( action, HelpId );
+  myActions[ HelpId ] = action;
+
+  // Create menu.
+  QMenu* menu = menuBar()->addMenu( tr( "MNU_FILE" ) );
+  menu->addAction( myActions[ NewId ] );
+  menu->addAction( myActions[ OpenId ] );
+  menu->addSeparator();
+  menu->addAction( myActions[ SaveId ] );
+  menu->addAction( myActions[ SaveAsId ] );
+  menu->addSeparator();
+  menu->addAction( myActions[ ExitId ] );
+
+  menu = menuBar()->addMenu( tr( "MNU_EDIT" ) );
+  menu->addAction( myActions[ UndoId ] );
+  menu->addAction( myActions[ RedoId ] );
+  menu->addSeparator();
+  menu->addAction( myActions[ CutId ] );
+  menu->addAction( myActions[ CopyId ] );
+  menu->addAction( myActions[ PasteId ] );
+  menu->addAction( myActions[ DeleteId ] );
+  menu->addSeparator();
+  menu->addAction( myActions[ SelectAllId ] );
+  menu->addSeparator();
+  menu->addAction( myActions[ PreferencesId ] );
+
+  menu = menuBar()->addMenu( tr( "MNU_HELP" ) );
+  menu->addAction( myActions[ HelpId ] );
 
   // Create toolbar.
-  int idTB = toolMgr()->createToolBar( tr("TOOLBAR_LABEL"), QString( "PythonEditor" ), false );
-  toolMgr()->append( NewId, idTB );
-  toolMgr()->append( OpenId, idTB );
-  toolMgr()->append( SaveId, idTB );
-  toolMgr()->append( SaveAsId, idTB );
-  toolMgr()->append( toolMgr()->separator(), idTB );
-  toolMgr()->append( UndoId, idTB );
-  toolMgr()->append( RedoId, idTB );
-  toolMgr()->append( toolMgr()->separator(), idTB );
-  toolMgr()->append( CutId, idTB );
-  toolMgr()->append( CopyId, idTB );
-  toolMgr()->append( PasteId, idTB );
-  toolMgr()->append( DeleteId, idTB );
-  toolMgr()->append( SelectAllId, idTB );
-  toolMgr()->append( toolMgr()->separator(), idTB );
-  toolMgr()->append( PreferencesId, idTB );
-  toolMgr()->append( toolMgr()->separator(), idTB );
-  toolMgr()->append( HelpId, idTB );
+  QToolBar* toolbar = addToolBar( tr( "TOOLBAR_LABEL" ) );
+  toolbar->setObjectName("PythonEditor");
+  toolbar->addAction( myActions[ NewId ] );
+  toolbar->addAction( myActions[ OpenId ] );
+  toolbar->addAction( myActions[ SaveId ] );
+  toolbar->addAction( myActions[ SaveAsId ] );
+  toolbar->addSeparator();
+  toolbar->addAction( myActions[ ExitId ] );
+  toolbar->addSeparator();
+  toolbar->addAction( myActions[ UndoId ] );
+  toolbar->addAction( myActions[ RedoId ] );
+  toolbar->addSeparator();
+  toolbar->addAction( myActions[ CutId ] );
+  toolbar->addAction( myActions[ CopyId ] );
+  toolbar->addAction( myActions[ PasteId ] );
+  toolbar->addAction( myActions[ DeleteId ] );
+  toolbar->addAction( myActions[ SelectAllId ] );
+  toolbar->addSeparator();
+  toolbar->addAction( myActions[ PreferencesId ] );
+  toolbar->addSeparator();
+  toolbar->addAction( myActions[ HelpId ] );
 
   // Set current file.
   setCurrentFile( QString() );
+
+  // Additional set-up for main window.
+  connect( myTextEditor->document(), SIGNAL( modificationChanged( bool ) ),
+           this, SLOT( setWindowModified( bool ) ) );
+
+  // Initialize status bar.
+  statusBar()->showMessage( tr( "STS_READY" ) );
 }
 
 /*!
   \brief Destructor.
 */
-PyViewer_ViewWindow::~PyViewer_ViewWindow()
+PyEditor_Window::~PyEditor_Window()
 {
 }
 
@@ -224,7 +268,7 @@ PyViewer_ViewWindow::~PyViewer_ViewWindow()
   \brief Manage window close request.
   \param event close event
 */
-void PyViewer_ViewWindow::closeEvent( QCloseEvent* event )
+void PyEditor_Window::closeEvent( QCloseEvent* event )
 {
   if ( whetherSave() )
     event->accept();
@@ -235,7 +279,7 @@ void PyViewer_ViewWindow::closeEvent( QCloseEvent* event )
 /*!
   SLOT: Create new document
 */
-void PyViewer_ViewWindow::onNew()
+void PyEditor_Window::onNew()
 {
   if ( whetherSave() )
   {
@@ -247,7 +291,7 @@ void PyViewer_ViewWindow::onNew()
 /*!
   SLOT: Open existing Python file
 */
-void PyViewer_ViewWindow::onOpen()
+void PyEditor_Window::onOpen()
 {
   if ( whetherSave() )
   {
@@ -266,7 +310,7 @@ void PyViewer_ViewWindow::onOpen()
 /*!
   SLOT: Save current document
 */
-bool PyViewer_ViewWindow::onSave()
+bool PyEditor_Window::onSave()
 {
   if ( myURL.isEmpty() )
     return onSaveAs();
@@ -278,7 +322,7 @@ bool PyViewer_ViewWindow::onSave()
 /*!
   SLOT: Save current document under a new name
 */
-bool PyViewer_ViewWindow::onSaveAs()
+bool PyEditor_Window::onSaveAs()
 {
   QString filter = tr( "TIT_PY_FILES" );
   filter += " (*.py)";
@@ -297,7 +341,7 @@ bool PyViewer_ViewWindow::onSaveAs()
 /*!
   SLOT: Open preferences dialog
 */
-void PyViewer_ViewWindow::onPreferences()
+void PyEditor_Window::onPreferences()
 {
   PyEditor_SettingsDlg dlg( myTextEditor, true, this );
   connect( &dlg, SIGNAL( help() ), this, SLOT( onHelp() ) );
@@ -308,10 +352,14 @@ void PyViewer_ViewWindow::onPreferences()
   \brief Associate \a filePath with the current document
   \param filePath document's file path
 */
-void PyViewer_ViewWindow::setCurrentFile( const QString& filePath )
+void PyEditor_Window::setCurrentFile( const QString& filePath )
 {
   myURL = filePath;
   myTextEditor->document()->setModified( false );
+
+  setWindowModified( false );
+
+  setWindowFilePath( myURL.isEmpty() ? defaultName() : myURL );
 }
 
 /*!
@@ -319,7 +367,7 @@ void PyViewer_ViewWindow::setCurrentFile( const QString& filePath )
   If it has the modifications then ask the user to save it.
   \return true if the document is saved.
 */
-bool PyViewer_ViewWindow::whetherSave()
+bool PyEditor_Window::whetherSave()
 {
   if ( myTextEditor->document()->isModified() )
   {
@@ -346,7 +394,7 @@ bool PyViewer_ViewWindow::whetherSave()
   \brief Open file.
   \param filePath file path
 */
-void PyViewer_ViewWindow::loadFile( const QString& filePath )
+void PyEditor_Window::loadFile( const QString& filePath )
 {
   QFile aFile( filePath );
   if ( !aFile.open(QFile::ReadOnly | QFile::Text) )
@@ -364,13 +412,14 @@ void PyViewer_ViewWindow::loadFile( const QString& filePath )
   setCurrentFile( filePath );
   aFile.close();
 
+  statusBar()->showMessage( tr( "STS_F_LOADED" ), 2000 );
 }
 
 /*!
-  \brief Saves file.
-  \param theFilePath file path
+  \brief Save file.
+  \param filePath file path
 */
-bool PyViewer_ViewWindow::saveFile( const QString& filePath )
+bool PyEditor_Window::saveFile( const QString& filePath )
 {
   QFile aFile( filePath );
   if ( !aFile.open( QFile::WriteOnly | QFile::Text ) )
@@ -388,28 +437,31 @@ bool PyViewer_ViewWindow::saveFile( const QString& filePath )
   setCurrentFile( filePath );
   aFile.close();
 
+  statusBar()->showMessage( tr( "STS_F_SAVED" ), 2000 );
+
   return true;
 }
 
 /*!
   Slot, called when user clicks "Help" button in "Preferences" dialog box.
 */
-void PyViewer_ViewWindow::onHelp()
+void PyEditor_Window::onHelp()
 {
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if ( app ) {
-    QString page = "python_viewer_page.html";
-    if ( qobject_cast<QWidget*>( sender() ) )
-      page += "#custom_python_preferences";
-    app->onHelpContextModule( "GUI", page );
-  }
+  QWidget* w = qobject_cast<QWidget*>( sender() );
+  if ( !w ) w = this;
+  QFile file(":/about.txt");
+  file.open(QFile::ReadOnly | QFile::Text);
+  QTextStream stream( &file );
+  QString about = stream.readAll();
+  file.close();
+  QMessageBox::about( w, tr( "NAME_PYEDITOR" ), about );
 }
 
 /*!
   Get default name for Python file 
   \return default name
 */
-QString PyViewer_ViewWindow::defaultName() const
+QString PyEditor_Window::defaultName() const
 {
   return tr( "NONAME" );
 }

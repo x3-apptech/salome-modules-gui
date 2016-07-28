@@ -85,6 +85,7 @@
 #include <SUIT_ViewWindow.h>
 
 #include <Qtx.h>
+#include <QtxFontEdit.h>
 #include <QtxToolBar.h>
 #include <QtxTreeView.h>
 #include <QtxMRUAction.h>
@@ -2898,8 +2899,9 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int pyeditTab = pref->addPreference( tr( "PREF_TAB_PYEDITOR" ), salomeCat );
   // ... "Font settings" group <<start>>
   int pyFontGroup = pref->addPreference( tr( "PREF_GROUP_PY_FONT" ), pyeditTab );
-  pref->addPreference( tr( "PREF_PY_FONT" ), pyFontGroup,
-    LightApp_Preferences::Font, "PyEditor", "Font" );
+  int pyFont = pref->addPreference( tr( "PREF_PY_FONT" ), pyFontGroup,
+                                    LightApp_Preferences::Font, "PyEditor", "Font" );
+  pref->setItemProperty( "features", QtxFontEdit::Family | QtxFontEdit::Size | QtxFontEdit::UserSize, pyFont );
   // ... "Font settings" group <<end>>
   // ... "Display settings" group <<start>>
   int pyDispGroup = pref->addPreference( tr( "PREF_GROUP_PY_DISPLAY" ), pyeditTab );
@@ -3683,39 +3685,6 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     if( wnd ) {
       Plot2d_ViewFrame* frame = wnd->getViewFrame();
       frame->SetPreference();
-    }
-  }
-#endif
-
-#ifndef DISABLE_PYVIEWER
-  if ( sec == QString( "PyViewer" ) && ( param == QString( "HighlightCurrentLine" ) ||
-                                         param == QString( "LineNumberArea" ) ||
-                                         param == QString( "TextWrapping" ) ||
-                                         param == QString( "CenterCursorOnScroll" ) ||
-                                         param == QString( "TabSpaceVisible" ) ||
-                                         param == QString( "TabSize" ) ||
-                                         param == QString( "VerticalEdge" ) ||
-                                         param == QString( "NumberColumns" ) ||
-                                         param == QString( "Font" ) ) )
-  {
-    QList<SUIT_ViewManager*> lst;
-    viewManagers( PyViewer_Viewer::Type(), lst );
-    QListIterator<SUIT_ViewManager*> itPy( lst );
-    while ( itPy.hasNext() )
-    {
-      SUIT_ViewManager* viewMgr = itPy.next();
-      SUIT_ViewModel* vm = viewMgr->getViewModel();
-      if ( !vm || !vm->inherits( "PyViewer_Viewer" ) )
-        continue;
-
-      PyViewer_Viewer* pyEditVM = dynamic_cast<PyViewer_Viewer*>( vm );
-
-      viewMgr->setViewModel( vm );
-      PyViewer_ViewWindow* pyView = dynamic_cast<PyViewer_ViewWindow*>( viewMgr->getActiveView() );
-      if( pyView )
-      {
-        pyView->setPreferences();
-      }
     }
   }
 #endif

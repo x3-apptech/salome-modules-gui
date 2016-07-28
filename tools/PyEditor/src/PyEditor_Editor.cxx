@@ -20,47 +20,43 @@
 // Author : Maxim GLIBIN, Open CASCADE S.A.S. (maxim.glibin@opencascade.com)
 //
 
-//Local includes
 #include "PyEditor_Editor.h"
 #include "PyEditor_LineNumberArea.h"
 #include "PyEditor_PyHighlighter.h"
 #include "PyEditor_Settings.h"
 
-//Qtx includes
-#include <QtxResourceMgr.h>
-
-//Qt includes
 #include <QPainter>
 #include <QTextBlock>
 
 /*!
   \class PyEditor_Editor
-  \brief Viewer/Editor is used to edit and show advanced plain text.
+  \brief Widget to show / edit Python scripts.
 */
 
 /*!
   \brief Constructor.
-  \param isSingle flag determined single application or reccesed.
-  \param theParent parent widget
+  \param parent parent widget
 */
-PyEditor_Editor::PyEditor_Editor( bool isSingle, QtxResourceMgr* theMgr, QWidget* theParent )
-  : QPlainTextEdit( theParent )
+PyEditor_Editor::PyEditor_Editor( QWidget* parent )
+  : QPlainTextEdit( parent )
 {
-  my_Settings = new PyEditor_Settings( theMgr, isSingle );
+  // Set up line number area
+  myLineNumberArea = new PyEditor_LineNumberArea( this );
+  myLineNumberArea->setMouseTracking( true );
 
-  // Create line number area
-  my_LineNumberArea = new PyEditor_LineNumberArea( this );
-  my_LineNumberArea->setMouseTracking( true );
+  // Set up syntax highighter
+  mySyntaxHighlighter = new PyEditor_PyHighlighter( this->document() );
 
-  my_SyntaxHighlighter = new PyEditor_PyHighlighter( this->document() );
+  // Set-up settings
+  PyEditor_Settings* settings = PyEditor_Settings::settings();
+  if ( settings )
+    setSettings( *settings );
 
-  // Signals and slots
+  // Connect signals
   connect( this, SIGNAL( blockCountChanged( int ) ), this, SLOT( updateLineNumberAreaWidth( int ) ) );
   connect( this, SIGNAL( updateRequest( QRect, int ) ), this, SLOT( updateLineNumberArea( QRect, int ) ) );
   connect( this, SIGNAL( cursorPositionChanged() ), this, SLOT( updateHighlightCurrentLine() ) );
   connect( this, SIGNAL( cursorPositionChanged() ), this, SLOT( matchParentheses() ) );
-
-  updateStatement();
 }
 
 /*!
@@ -71,24 +67,36 @@ PyEditor_Editor::~PyEditor_Editor()
 }
 
 /*!
-  Updates editor.
- */
-void PyEditor_Editor::updateStatement()
+  \brief Get editor settings.
+  \return settings object
+*/
+const PyEditor_Settings& PyEditor_Editor::settings() const
 {
-  //Set font size
+  return mySettings;
+}
+
+/*!
+  \brief Set editor settings.
+  \param settings new settings
+*/
+void PyEditor_Editor::setSettings( const PyEditor_Settings& settings )
+{
+  mySettings.copyFrom( settings );
+
+  // Set font size
   QFont aFont = font();
-  aFont.setFamily( settings()->p_Font.family() );
-  aFont.setPointSize( settings()->p_Font.pointSize() );
+  aFont.setFamily( mySettings.font().family() );
+  aFont.setPointSize( mySettings.font().pointSize() );
   setFont( aFont );
 
   // Set line wrap mode
-  setLineWrapMode( settings()->p_TextWrapping ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap );
+  setLineWrapMode( mySettings.textWrapping() ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap );
 
   // Center the cursor on screen
-  setCenterOnScroll( settings()->p_CenterCursorOnScroll );
+  setCenterOnScroll( mySettings.centerCursorOnScroll() );
 
   // Set size white spaces
-  setTabStopWidth( settings()->p_TabSize * 10 );
+  setTabStopWidth( mySettings.tabSize() * 10 );
 
   // Update current line highlight
   updateHighlightCurrentLine();
@@ -96,13 +104,13 @@ void PyEditor_Editor::updateStatement()
   // Update line numbers area
   updateLineNumberAreaWidth( 0 );
 
-  my_SyntaxHighlighter->rehighlight();
+  mySyntaxHighlighter->rehighlight();
   viewport()->update();
 }
 
 /*!
-  SLOT: Delete the current selection's contents
- */
+  Delete current selection contents.
+*/
 void PyEditor_Editor::deleteSelected()
 {
   QTextCursor aCursor = textCursor();
@@ -112,16 +120,17 @@ void PyEditor_Editor::deleteSelected()
 }
 
 /*!
-  \brief Reimplemented calss is to receive key press events for the plain text widget.
-  \param theEvent event
- */
-void PyEditor_Editor::keyPressEvent( QKeyEvent* theEvent )
+  \brief Process key press event.
+  Reimplemented from QPlainTextEdit.
+  \param event key press event
+*/
+void PyEditor_Editor::keyPressEvent( QKeyEvent* event )
 {
-  if ( theEvent->type() == QEvent::KeyPress )
+  if ( event->type() == QEvent::KeyPress )
   {
-    int aKey = theEvent->key();
-    Qt::KeyboardModifiers aCtrl = theEvent->modifiers() & Qt::ControlModifier;
-    Qt::KeyboardModifiers aShift = theEvent->modifiers() & Qt::ShiftModifier;
+    int aKey = event->key();
+    Qt::KeyboardModifiers aCtrl = event->modifiers() & Qt::ControlModifier;
+    Qt::KeyboardModifiers aShift = event->modifiers() & Qt::ShiftModifier;
     
     if ( aKey == Qt::Key_Tab || ( aKey == Qt::Key_Backtab || ( aKey == Qt::Key_Tab && aShift ) ) )
     {
@@ -129,7 +138,7 @@ void PyEditor_Editor::keyPressEvent( QKeyEvent* theEvent )
       aCursor.beginEditBlock();
       tabIndentation( aKey == Qt::Key_Backtab );
       aCursor.endEditBlock();
-      theEvent->accept();
+      event->accept();
     }
     else if ( aKey == Qt::Key_Enter || aKey == Qt::Key_Return )
     {
@@ -137,19 +146,19 @@ void PyEditor_Editor::keyPressEvent( QKeyEvent* theEvent )
       aCursor.beginEditBlock();
       if ( lineIndent() == 0 )
       {
-        QPlainTextEdit::keyPressEvent( theEvent );
+        QPlainTextEdit::keyPressEvent( event );
       }
       aCursor.endEditBlock();
-      theEvent->accept();
+      event->accept();
     }
-    else if ( theEvent == QKeySequence::MoveToStartOfLine || theEvent == QKeySequence::SelectStartOfLine )
+    else if ( event == QKeySequence::MoveToStartOfLine || event == QKeySequence::SelectStartOfLine )
     {
       QTextCursor aCursor = this->textCursor();
       if ( QTextLayout* aLayout = aCursor.block().layout() )
       {
         if ( aLayout->lineForTextPosition( aCursor.position() - aCursor.block().position() ).lineNumber() == 0 )
         {
-          handleHome( theEvent == QKeySequence::SelectStartOfLine );
+          handleHome( event == QKeySequence::SelectStartOfLine );
         }
       }
     }
@@ -187,40 +196,40 @@ void PyEditor_Editor::keyPressEvent( QKeyEvent* theEvent )
           setTextCursor( aCursor );
         }
       }
-      QPlainTextEdit::keyPressEvent( theEvent );
+      QPlainTextEdit::keyPressEvent( event );
     }
     else
     {
-      QPlainTextEdit::keyPressEvent( theEvent );
+      QPlainTextEdit::keyPressEvent( event );
     }
   }
 }
 
 /*!
-  \brief Reimplemented calss is to receive plain text widget resize events
-  which are passed in the event parameter.
-  \param theEvent event
- */
-void PyEditor_Editor::resizeEvent( QResizeEvent* theEvent )
+  \brief Handle resize event.
+  Reimplemented from QPlainTextEdit.
+  \param event resize event
+*/
+void PyEditor_Editor::resizeEvent( QResizeEvent* event )
 {
-  QPlainTextEdit::resizeEvent( theEvent );
+  QPlainTextEdit::resizeEvent( event );
 
   // Change size geometry of line number area
   QRect aContentsRect = contentsRect();
-  my_LineNumberArea->setGeometry(
-    QRect( aContentsRect.left(),
-           aContentsRect.top(),
-           lineNumberAreaWidth(),
-           aContentsRect.height() ) );
+  myLineNumberArea->setGeometry( QRect( aContentsRect.left(),
+                                        aContentsRect.top(),
+                                        lineNumberAreaWidth(),
+                                        aContentsRect.height() ) );
 }
 
 /*!
-  \brief Reimplemented calss is to receive paint events passed in theEvent.
-  \param theEvent event
- */
-void PyEditor_Editor::paintEvent( QPaintEvent* theEvent )
+  \brief Paint event.
+  Reimplemented from QPlainTextEdit.
+  \param event paint event
+*/
+void PyEditor_Editor::paintEvent( QPaintEvent* event )
 {
-  QPlainTextEdit::paintEvent( theEvent );
+  QPlainTextEdit::paintEvent( event );
 
   QTextBlock aBlock( firstVisibleBlock() );
   QPointF anOffset( contentOffset() );
@@ -229,12 +238,12 @@ void PyEditor_Editor::paintEvent( QPaintEvent* theEvent )
   int aTabSpaces = this->tabStopWidth() / 10;
 
   // Visualization tab spaces
-  if ( settings()->p_TabSpaceVisible )
+  if ( mySettings.tabSpaceVisible() )
   {
     qreal aTop = blockBoundingGeometry( aBlock ).translated( anOffset ).top();
-    while ( aBlock.isValid() && aTop <= theEvent->rect().bottom() )
+    while ( aBlock.isValid() && aTop <= event->rect().bottom() )
     {
-      if ( aBlock.isVisible() && blockBoundingGeometry( aBlock ).translated( anOffset ).toRect().intersects( theEvent->rect() ) )
+      if ( aBlock.isVisible() && blockBoundingGeometry( aBlock ).translated( anOffset ).toRect().intersects( event->rect() ) )
       {
         QString aText = aBlock.text();
         if ( aText.contains( QRegExp( "\\w+" ) ) )
@@ -267,28 +276,20 @@ void PyEditor_Editor::paintEvent( QPaintEvent* theEvent )
   }
   
   // Vertical edge line
-  if ( settings()->p_VerticalEdge )
+  if ( mySettings.verticalEdge() )
   {
-    const QRect aRect = theEvent->rect();
+    const QRect aRect = event->rect();
     const QFont aFont = currentCharFormat().font();
-    int aNumberColumn =  QFontMetrics( aFont ).averageCharWidth() * settings()->p_NumberColumns + anOffset.x() + document()->documentMargin();
+    int aNumberColumn =  QFontMetrics( aFont ).averageCharWidth() * mySettings.numberColumns() + anOffset.x() + document()->documentMargin();
     aPainter.setPen( QPen( Qt::lightGray, 1, Qt::SolidLine ) );
     aPainter.drawLine( aNumberColumn, aRect.top(), aNumberColumn, aRect.bottom() );
   }
 }
 
 /*!
-  \return manager of setting values.
- */
-PyEditor_Settings* PyEditor_Editor::settings()
-{
-  return my_Settings;
-}
-
-/*!
-  \brief Indenting and tabbing of the text
-  \param isShift flag defines reverse tab
- */
+  \brief Indent and tab text.
+  \param isShift flag defines reverse tab direction
+*/
 void PyEditor_Editor::tabIndentation( bool isShift )
 {
   QTextCursor aCursor = textCursor();
@@ -329,9 +330,9 @@ void PyEditor_Editor::tabIndentation( bool isShift )
 }
 
 /*!
-  \brief Indenting and tabbing of the selected text
-  \param isShift flag defines reverse tab
- */
+  \brief Indent and tab selected text.
+  \param isShift flag defines reverse tab direction
+*/
 void PyEditor_Editor::indentSelection( bool isShift )
 {
   QTextCursor aCursor = this->textCursor();
@@ -378,16 +379,16 @@ void PyEditor_Editor::indentSelection( bool isShift )
 }
 
 /*!
-  \brief Finds the first non-white sapce in theText.
-  \param theText string
-  \return index of the first non-white space
- */
-int PyEditor_Editor::findFirstNonSpace( const QString& theText )
+  \brief Find first non white-space symbol in text.
+  \param text input text
+  \return index of first non white-space symbol
+*/
+int PyEditor_Editor::findFirstNonSpace( const QString& text )
 {
   int i = 0;
-  while ( i < theText.size() )
+  while ( i < text.size() )
   {
-    if ( !theText.at(i).isSpace() )
+    if ( !text.at(i).isSpace() )
       return i;
     ++i;
   }
@@ -395,9 +396,9 @@ int PyEditor_Editor::findFirstNonSpace( const QString& theText )
 }
 
 /*!
-  \brief Auto line indenting
+  \brief Indent line.
   \return error code
- */
+*/
 int PyEditor_Editor::lineIndent()
 {
   int aTabSpaces = this->tabStopWidth() / 10;
@@ -481,7 +482,8 @@ int PyEditor_Editor::lineIndent()
 
 /*!
   \brief Set text cursor on home position.
- */
+  \param isExtendLine \c true to keep current anchor position
+*/
 void PyEditor_Editor::handleHome( bool isExtendLine )
 {
   QTextCursor aCursor = textCursor();
@@ -510,12 +512,12 @@ void PyEditor_Editor::handleHome( bool isExtendLine )
 }
 
 /*!
-  SLOT: Updates the highlight current line.
- */
+  \brief Update current line highlighting.
+*/
 void PyEditor_Editor::updateHighlightCurrentLine()
 {
   QList<QTextEdit::ExtraSelection> anExtraSelections;
-  if ( !isReadOnly() && settings()->p_HighlightCurrentLine )
+  if ( !isReadOnly() && mySettings.highlightCurrentLine() )
   {
     QTextEdit::ExtraSelection selection;
     
@@ -531,13 +533,13 @@ void PyEditor_Editor::updateHighlightCurrentLine()
 }
 
 /*!
-  \brief Creates line number area.
-  \param theEvent event for paint events.
- */
-void PyEditor_Editor::lineNumberAreaPaintEvent( QPaintEvent* theEvent )
+  \brief Draw linne number area.
+  \param event paint event
+*/
+void PyEditor_Editor::lineNumberAreaPaintEvent( QPaintEvent* event )
 {
-  QPainter aPainter( my_LineNumberArea );
-  aPainter.fillRect( theEvent->rect(), QColor( Qt::lightGray ).lighter( 125 ) );
+  QPainter aPainter( myLineNumberArea );
+  aPainter.fillRect( event->rect(), QColor( Qt::lightGray ).lighter( 125 ) );
 
   QTextBlock aBlock = firstVisibleBlock();
   int aBlockNumber = aBlock.blockNumber();
@@ -548,9 +550,9 @@ void PyEditor_Editor::lineNumberAreaPaintEvent( QPaintEvent* theEvent )
   QFont aFont = aPainter.font();
   aPainter.setPen( this->palette().color( QPalette::Text ) );
 
-  while ( aBlock.isValid() && aTop <= theEvent->rect().bottom() )
+  while ( aBlock.isValid() && aTop <= event->rect().bottom() )
   {
-    if ( aBlock.isVisible() && aBottom >= theEvent->rect().top() )
+    if ( aBlock.isVisible() && aBottom >= event->rect().top() )
     {
       if ( aBlockNumber == aCurrentLine )
       {
@@ -565,7 +567,7 @@ void PyEditor_Editor::lineNumberAreaPaintEvent( QPaintEvent* theEvent )
         aPainter.setFont( aFont );
       }
       QString aNumber = QString::number( aBlockNumber + 1 );
-      aPainter.drawText( 0, aTop, my_LineNumberArea->width(), fontMetrics().height(), Qt::AlignRight, aNumber );
+      aPainter.drawText( 0, aTop, myLineNumberArea->width(), fontMetrics().height(), Qt::AlignRight, aNumber );
     }
 
     aBlock = aBlock.next();
@@ -576,8 +578,9 @@ void PyEditor_Editor::lineNumberAreaPaintEvent( QPaintEvent* theEvent )
 }
 
 /*!
+  \brief Get with of line number area.
   \return width of line number area
- */
+*/
 int PyEditor_Editor::lineNumberAreaWidth()
 {
   int aSpace = 0;
@@ -590,38 +593,40 @@ int PyEditor_Editor::lineNumberAreaWidth()
     ++aDigits;
   }
 
-  if ( settings()->p_LineNumberArea )
+  if ( mySettings.lineNumberArea() )
     aSpace += 5 + fontMetrics().width( QLatin1Char( '9' ) ) * aDigits;
   
   return aSpace;
 }
 
 /*!
-  SLOT: Updates the width of line number area.
- */
-void PyEditor_Editor::updateLineNumberAreaWidth( int /*theNewBlockCount*/ )
+  \brief Update width of the line number area.
+  \param newBlockCount (not used)
+*/
+void PyEditor_Editor::updateLineNumberAreaWidth( int /*newBlockCount*/ )
 {
   setViewportMargins( lineNumberAreaWidth(), 0, 0, 0 );
 }
 
 /*!
-  SLOT: When the editor viewport has been scrolled.
- */
-void PyEditor_Editor::updateLineNumberArea( const QRect& theRect, int theDY )
+  \brief Update line number area (when editor viewport is scrolled).
+  \param rect area being updated
+  \param dy scroll factor
+*/
+void PyEditor_Editor::updateLineNumberArea( const QRect& rect, int dy )
 {
-  if ( theDY )
-    my_LineNumberArea->scroll( 0, theDY );
+  if ( dy )
+    myLineNumberArea->scroll( 0, dy );
   else
-    my_LineNumberArea->update( 0, theRect.y(), my_LineNumberArea->width(), theRect.height() );
+    myLineNumberArea->update( 0, rect.y(), myLineNumberArea->width(), rect.height() );
 
-  if ( theRect.contains( viewport()->rect() ) )
+  if ( rect.contains( viewport()->rect() ) )
     updateLineNumberAreaWidth( 0 );
 }
 
 /*!
-  \brief Parenthesis management.
-  SLOT: Walk through and check that we don't exceed 80 chars per line.
- */
+  \brief Manage parentheses.
+*/
 void PyEditor_Editor::matchParentheses()
 {
   PyEditor_PyHighlighter::TextBlockData* data =
@@ -667,93 +672,93 @@ void PyEditor_Editor::matchParentheses()
 }
 
 /*!
-  \brief Matches the left brackets.
-  \param theCurrentBlock text block
-  \param theI index
-  \param theNumLeftParentheses number of left parentheses
+  \brief Match left brackets.
+  \param currentBlock text block
+  \param idx index
+  \param numLeftParentheses number of left parentheses
   \return \c true if the left match
- */
-bool PyEditor_Editor::matchLeftParenthesis(
-  const QTextBlock& theCurrentBlock, int theI, int theNumLeftParentheses )
+*/
+bool PyEditor_Editor::matchLeftParenthesis( const QTextBlock& currentBlock,
+                                            int idx, int numLeftParentheses )
 {
   PyEditor_PyHighlighter::TextBlockData* data =
-    static_cast<PyEditor_PyHighlighter::TextBlockData*>( theCurrentBlock.userData() );
+    static_cast<PyEditor_PyHighlighter::TextBlockData*>( currentBlock.userData() );
   QVector<PyEditor_PyHighlighter::ParenthesisInfo*> infos = data->parentheses();
 
-  int docPos = theCurrentBlock.position();
-  for ( ; theI < infos.size(); ++theI )
+  int docPos = currentBlock.position();
+  for ( ; idx < infos.size(); ++idx )
   {
-    PyEditor_PyHighlighter::ParenthesisInfo* info = infos.at(theI);
+    PyEditor_PyHighlighter::ParenthesisInfo* info = infos.at( idx );
 
     if ( isLeftBrackets( info->character ) )
     {
-      ++theNumLeftParentheses;
+      ++numLeftParentheses;
       continue;
     }
 
-    if ( isRightBrackets( info->character ) && theNumLeftParentheses == 0 )
+    if ( isRightBrackets( info->character ) && numLeftParentheses == 0 )
     {
       createParenthesisSelection( docPos + info->position );
       return true;
     }
     else
-      --theNumLeftParentheses;
+      --numLeftParentheses;
   }
 
-  QTextBlock nextBlock = theCurrentBlock.next();
+  QTextBlock nextBlock = currentBlock.next();
   if ( nextBlock.isValid() )
-    return matchLeftParenthesis( nextBlock, 0, theNumLeftParentheses );
+    return matchLeftParenthesis( nextBlock, 0, numLeftParentheses );
 
   return false;
 }
 
 /*!
-  \brief Matches the right brackets.
-  \param theCurrentBlock text block
-  \param theI index
-  \param theNumRightParentheses number of right parentheses
+  \brief Match right brackets.
+  \param currentBlock text block
+  \param idx index
+  \param numRightParentheses number of right parentheses
   \return \c true if the right match
- */
-bool PyEditor_Editor::matchRightParenthesis( const QTextBlock& theCurrentBlock, int theI, int theNumRightParentheses )
+*/
+bool PyEditor_Editor::matchRightParenthesis( const QTextBlock& currentBlock,
+                                             int idx, int numRightParentheses )
 {
-  PyEditor_PyHighlighter::TextBlockData* data = static_cast<PyEditor_PyHighlighter::TextBlockData*>( theCurrentBlock.userData() );
+  PyEditor_PyHighlighter::TextBlockData* data = static_cast<PyEditor_PyHighlighter::TextBlockData*>( currentBlock.userData() );
   QVector<PyEditor_PyHighlighter::ParenthesisInfo*> parentheses = data->parentheses();
 
-  int docPos = theCurrentBlock.position();
-  for ( ; theI > -1 && parentheses.size() > 0; --theI )
+  int docPos = currentBlock.position();
+  for ( ; idx > -1 && parentheses.size() > 0; --idx )
   {
-    PyEditor_PyHighlighter::ParenthesisInfo* info = parentheses.at(theI);
+    PyEditor_PyHighlighter::ParenthesisInfo* info = parentheses.at( idx );
     if ( isRightBrackets( info->character ) )
     {
-      ++theNumRightParentheses;
+      ++numRightParentheses;
       continue;
     }
-    if ( isLeftBrackets( info->character ) && theNumRightParentheses == 0 )
+    if ( isLeftBrackets( info->character ) && numRightParentheses == 0 )
     {
       createParenthesisSelection( docPos + info->position );
       return true;
     }
     else
-      --theNumRightParentheses;
+      --numRightParentheses;
   }
 
-  QTextBlock prevBlock = theCurrentBlock.previous();
+  QTextBlock prevBlock = currentBlock.previous();
   if ( prevBlock.isValid() )
   {
     PyEditor_PyHighlighter::TextBlockData* data = static_cast<PyEditor_PyHighlighter::TextBlockData*>( prevBlock.userData() );
     QVector<PyEditor_PyHighlighter::ParenthesisInfo*> parentheses = data->parentheses();
-    return matchRightParenthesis( prevBlock, parentheses.size() - 1, theNumRightParentheses );
+    return matchRightParenthesis( prevBlock, parentheses.size() - 1, numRightParentheses );
   }
 
   return false;
 }
 
 /*!
-  \brief Creates brackets selection.
-  \param thePosition position
- */
-// Create brackets
-void PyEditor_Editor::createParenthesisSelection( int thePosition )
+  \brief Create brackets selection.
+  \param position cursor position
+*/
+void PyEditor_Editor::createParenthesisSelection( int position )
 {
   QList<QTextEdit::ExtraSelection> selections = extraSelections();
 
@@ -765,7 +770,7 @@ void PyEditor_Editor::createParenthesisSelection( int thePosition )
   selection.format = format;
 
   QTextCursor cursor = textCursor();
-  cursor.setPosition( thePosition );
+  cursor.setPosition( position );
   cursor.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor );
   selection.cursor = cursor;
 
@@ -774,31 +779,48 @@ void PyEditor_Editor::createParenthesisSelection( int thePosition )
 }
 
 /*!
-  return true whether the left bracket
- */
-bool PyEditor_Editor::isLeftBrackets( QChar theSymbol )
-{
-  return theSymbol == '(' || theSymbol == '{' || theSymbol == '[';
-}
-
-/*!
-  Appends a new paragraph with text to the end of the text edit.
- */
-void PyEditor_Editor::append( const QString & text ) {
-  QPlainTextEdit::appendPlainText(text);
-}
-
-/*!
-  Sets the text edit's text.
+  \brief Check if symbol is a left bracket.
+  \param symbol text symbol
+  \return \c true if symbol is any left bracket
 */
-void PyEditor_Editor::setText( const QString & text ) {
-  QPlainTextEdit::appendPlainText(text);
+bool PyEditor_Editor::isLeftBrackets( QChar symbol )
+{
+  return symbol == '(' || symbol == '{' || symbol == '[';
 }
 
 /*!
-  return true whether the right bracket
- */
-bool PyEditor_Editor::isRightBrackets( QChar theSymbol )
+  \brief Check if symbol is a right bracket.
+  \param symbol text symbol
+  \return \c true if symbol is any right bracket
+*/
+bool PyEditor_Editor::isRightBrackets( QChar symbol )
 {
-  return theSymbol == ')' || theSymbol == '}' || theSymbol == ']';
+  return symbol == ')' || symbol == '}' || symbol == ']';
+}
+
+/*!
+  \brief Append new paragraph to the end of the editor's text.
+  \param text paragraph text
+*/
+void PyEditor_Editor::append( const QString& text )
+{
+  appendPlainText( text );
+}
+
+/*!
+  \brief Set text to the editor.
+  \param text new text
+*/
+void PyEditor_Editor::setText( const QString& text )
+{
+  setPlainText( text );
+}
+
+/*!
+  \brief Get current editor's content.
+  \return current text
+*/
+QString PyEditor_Editor::text() const
+{
+  return toPlainText();
 }
