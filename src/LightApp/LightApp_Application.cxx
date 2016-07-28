@@ -1223,7 +1223,11 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
         anApp.append( quote );
 #endif
 
+#if DISABLE_QTXWEBBROWSER
+  bool useExtBrowser = true;
+#else  
   bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
+#endif
 
   if(useExtBrowser) {
     QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
