@@ -2785,7 +2785,9 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
             aTexture = new Graphic3d_TextureEnv( TCollection_AsciiString( et_paramValue.toStdString().c_str() ) );
           Handle(V3d_View) aView = this->getViewPort()->getView();
           aView->SetTextureEnv( aTexture );
+#if OCC_VERSION_LARGE <= 0x07000000
           aView->SetSurfaceDetail( V3d_TEX_ENVIRONMENT );
+#endif
         }
       }
       else if ( paramName == "lightSource" )

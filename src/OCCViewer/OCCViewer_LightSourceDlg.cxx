@@ -19,12 +19,12 @@
 
 // internal includes
 #include "OCCViewer_LightSourceDlg.h"
+#include "OCCViewer.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewModel.h"
 
 // GUI includes
 #include <SUIT_Session.h>
-#include <CAF_Tools.h>
 #include <QtxDoubleSpinBox.h>
 #include <QtxColorButton.h>
 
@@ -304,7 +304,7 @@ void OCCViewer_LightSourceDlg::initParam( bool theIsDefault )
   double aX, aY, aZ;
   Quantity_Color aColor = aLight->Color();
   if( myDirType->isChecked() ) {
-    myDirColor->setColor( CAF_Tools::color( aColor ) );
+    myDirColor->setColor( OCCViewer::color( aColor ) );
     myDirLight->Direction( aX, aY, aZ );
     myDx->setValue( aX );
     myDy->setValue( aY );
@@ -312,7 +312,7 @@ void OCCViewer_LightSourceDlg::initParam( bool theIsDefault )
     myDirHeadLight->setChecked( myDirLight->Headlight() );
   }
   else if( myPosType->isChecked() ) {
-    myPosColor->setColor( CAF_Tools::color( aColor ) );
+    myPosColor->setColor( OCCViewer::color( aColor ) );
     myPosLight->Position( aX, aY, aZ );
     myX->setValue( aX );
     myY->setValue( aY );
@@ -356,7 +356,7 @@ void OCCViewer_LightSourceDlg::onDirChanged()
   myModel->getViewer3d()->SetLightOff( myDirLight );
   if ( !( myDx->value() == 0 && myDy->value() == 0 && myDz->value() == 0 ) ) {
     myDirLight->SetDirection( myDx->value(), myDy->value(), myDz->value() );
-    myDirLight->SetColor( CAF_Tools::color( myDirColor->color() ) );
+    myDirLight->SetColor( OCCViewer::color( myDirColor->color() ) );
     myDirLight->SetHeadlight( myDirHeadLight->isChecked() );
     myModel->getViewer3d()->SetLightOn( myDirLight );
   }
@@ -372,7 +372,7 @@ void OCCViewer_LightSourceDlg::onPosChanged()
     return;
   myModel->getViewer3d()->SetLightOff( myPosLight );
   myPosLight->SetPosition( myX->value(), myY->value(), myZ->value() );
-  myPosLight->SetColor( CAF_Tools::color( myPosColor->color() ) );
+  myPosLight->SetColor( OCCViewer::color( myPosColor->color() ) );
   myPosLight->SetHeadlight( myPosHeadLight->isChecked() );
   myModel->getViewer3d()->SetLightOn( myPosLight );
   myModel->getViewer3d()->UpdateLights();

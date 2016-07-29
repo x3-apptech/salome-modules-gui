@@ -87,7 +87,13 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
 #endif
   }
 
+#if OCC_VERSION_LARGE > 0x07000000
+  return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
+			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT,
+			 computedMode, defaultComputedMode );
+#else
   return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
 			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT,
 			 computedMode, defaultComputedMode, V3d_TEX_NONE );
+#endif
 }

@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2015-2016  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -20,31 +17,31 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef OCCVIEWER_H
-#define OCCVIEWER_H
+// internal includes
+#include "OCCViewer.h"
 
-#ifdef WIN32
-#if defined OCCVIEWER_EXPORTS || defined OCCViewer_EXPORTS
-#define OCCVIEWER_EXPORT __declspec(dllexport)
-#else
-#define OCCVIEWER_EXPORT __declspec(dllimport)
-#endif
-#else
-#define OCCVIEWER_EXPORT
-#endif
-
-#if defined WIN32
-#pragma warning ( disable: 4251 )
-#endif
-
-#include <Quantity_Color.hxx>
-
-#include <QColor>
-
-namespace OCCViewer
+/*!
+  \brief Convert QColor object to Quantity_Color object.
+  \param c color object in Qt format
+  \return color object in OCC format
+*/
+Quantity_Color OCCViewer::color( const QColor& c )
 {
-  OCCVIEWER_EXPORT Quantity_Color color( const QColor& );
-  OCCVIEWER_EXPORT QColor         color( const Quantity_Color& );
-};
+  Quantity_Color aColor;
+  if ( c.isValid() )
+    aColor = Quantity_Color( c.red()   / 255., c.green() / 255.,
+                             c.blue()  / 255., Quantity_TOC_RGB );
+  return aColor;
+}
 
-#endif //OCCVIEWER_H
+/*!
+  \brief Convert Quantity_Color object to QColor object.
+  \param c color object in OCC format
+  \return color object in Qt format
+*/
+QColor OCCViewer::color( const Quantity_Color& c )
+{
+  return QColor ( int( c.Red()   * 255 ),
+                  int( c.Green() * 255 ),
+                  int( c.Blue()  * 255 ) );
+}

@@ -23,6 +23,7 @@
 #include "OCCViewer.h"
 #include <QDialog>
 #include <V3d_View.hxx>
+#include <Basics_OCCTVersion.hxx>
 
 class OCCViewer_ViewWindow;
 class OCCViewer_ViewFrame;
@@ -50,7 +51,11 @@ private slots:
 
 private:
   void initParam();
+#if OCC_VERSION_LARGE > 0x07000000
+  void setEnvTexture( Handle(Graphic3d_TextureEnv) );
+#else
   void setEnvTexture( Handle(Graphic3d_TextureEnv), V3d_TypeOfSurfaceDetail );
+#endif
 
   OCCViewer_ViewFrame* myViewFrame;
   Handle(V3d_View) myView3d;

@@ -36,7 +36,6 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/ViewerData
   ${PROJECT_SOURCE_DIR}/src/ViewerTools
   ${PROJECT_SOURCE_DIR}/src/OpenGLUtils
-  ${PROJECT_SOURCE_DIR}/src/CAF
 )
 
 # additional preprocessor / compiler flags
@@ -46,7 +45,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
 SET(_link_LIBRARIES
   ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
   ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKOpenGl}
-  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils caf
+  CASCatch qtx suit ViewerTools ViewerData OpenGLUtils
 )
 
 # --- headers ---
@@ -159,6 +158,7 @@ QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 
 # sources / static
 SET(_other_SOURCES
+  OCCViewer.cxx
   OCCViewer_AISSelector.cxx
   OCCViewer_AxialScaleDlg.cxx
   OCCViewer_ClippingDlg.cxx

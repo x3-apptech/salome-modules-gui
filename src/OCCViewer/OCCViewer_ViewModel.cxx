@@ -21,6 +21,7 @@
 //
 
 #include "OCCViewer_ViewModel.h"
+#include "OCCViewer.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_VService.h"
@@ -35,8 +36,6 @@
 #include "SUIT_ResourceMgr.h"
 
 #include "ViewerData_AISShape.hxx"
-
-#include "CAF_Tools.h"
 
 #include <Basics_OCCTVersion.hxx>
 
@@ -263,7 +262,9 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
     {
+#if OCC_VERSION_LARGE <= 0x07000000
       vp3d->getView()->SetSurfaceDetail(V3d_TEX_ALL);
+#endif
       // connect signal from viewport
       connect(vp3d, SIGNAL(vpClosed(OCCViewer_ViewPort3d*)), this, SLOT(onViewClosed(OCCViewer_ViewPort3d*)));
       connect(vp3d, SIGNAL(vpMapped(OCCViewer_ViewPort3d*)), this, SLOT(onViewMapped(OCCViewer_ViewPort3d*)));
@@ -1109,7 +1110,7 @@ void OCCViewer_Viewer::setDefaultLights()
   double aDz = SUIT_Session::session()->resourceMgr()->doubleValue( "OCCViewer", "light_dz", -1.0 );
 
   Handle(V3d_DirectionalLight) aLight =
-    new V3d_DirectionalLight( myV3dViewer, V3d_Zneg, CAF_Tools::color( aColor ).Name(), Standard_True );
+    new V3d_DirectionalLight( myV3dViewer, V3d_Zneg, OCCViewer::color( aColor ).Name(), Standard_True );
   if( !( aDx == 0 && aDy == 0 && aDz == 0 ) )
     aLight->SetDirection( aDx, aDy, aDz );
   myV3dViewer->SetLightOn( aLight );
