@@ -367,6 +367,49 @@ Please, refer to the documentation.</translation>
     </message>
 </context>
 <context>
+    <name>SVTK_PsOptionsDlg</name>
+    <message>
+        <source>DLG_PSOPTIONS_TITLE</source>
+        <translation>Post Script export options</translation>
+    </message>
+    <message>
+        <source>PS_OPTIONS</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>PS_LINE_WIDTH</source>
+        <translation>Line width factor</translation>
+    </message>
+    <message>
+        <source>PS_POINT_SIZE</source>
+        <translation>Point size factor</translation>
+    </message>
+    <message>
+        <source>PS_SORT_METHOD</source>
+        <translation>Sort method</translation>
+    </message>
+    <message>
+        <source>PS_NO_SORTING</source>
+        <translation>No sorting</translation>
+    </message>
+    <message>
+        <source>PS_SIMPLE_SORTING</source>
+        <translation>Simple sorting</translation>
+    </message>
+    <message>
+        <source>PS_BPS_SORTING</source>
+        <translation>BSP sorting</translation>
+    </message>
+    <message>
+        <source>PS_RASTERIZE_3D</source>
+        <translation>Rasterize 3D geometry</translation>
+    </message>
+    <message>
+        <source>PS_USE_SHFILL</source>
+        <translation>Use shfill shading operator</translation>
+    </message>                
+</context>
+<context>
     <name>SVTK_RecorderDlg</name>
     <message>
         <source>ALL_DISLPAYED_FRAMES</source>

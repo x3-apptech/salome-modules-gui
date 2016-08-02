@@ -23,6 +23,7 @@
 #include "SVTK_NonIsometricDlg.h"
 #include "SVTK_UpdateRateDlg.h"
 #include "SVTK_CubeAxesDlg.h"
+#include "SVTK_PsOptionsDlg.h"
 #include "SVTK_SetRotationPointDlg.h"
 #include "SVTK_ViewParameterDlg.h"
 #include "SVTK_ViewModel.h"
@@ -1375,33 +1376,43 @@ bool SVTK_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileNa
   if ( format != "PS" && format != "EPS" && format != "PDF" )
     return SUIT_ViewWindow::dumpViewToFormat( img, fileName, format );
 
-  SUIT_OverrideCursor wc;
+  SVTK_PsOptionsDlg* optionsDlg = new SVTK_PsOptionsDlg(this);
+  if ( optionsDlg->exec() == QDialog::Accepted ) {
+    SUIT_OverrideCursor wc;
 
-  vtkGL2PSExporter *anExporter = vtkGL2PSExporter::New();
-  anExporter->SetRenderWindow(getRenderWindow());
+    vtkGL2PSExporter *anExporter = vtkGL2PSExporter::New();
+    anExporter->SetRenderWindow(getRenderWindow());
 
-  if ( format == "PS" ) {
-    anExporter->SetFileFormatToPS();
-    anExporter->CompressOff();
+    // Set options
+    anExporter->SetLineWidthFactor(optionsDlg->getLineFactor());
+    anExporter->SetPointSizeFactor(optionsDlg->getPointFactor());
+    anExporter->SetSort((vtkGL2PSExporter::SortScheme)optionsDlg->getSortType());
+    anExporter->SetWrite3DPropsAsRasterImage((int)optionsDlg->isRasterize3D());
+    anExporter->SetPS3Shading((int)optionsDlg->isPs3Shading());
+    
+    if ( format == "PS" ) {
+      anExporter->SetFileFormatToPS();
+      anExporter->CompressOff();
+    }
+    
+    if ( format == "EPS" ) {
+      anExporter->SetFileFormatToEPS();
+      anExporter->CompressOff();
+    }
+
+    if ( format == "PDF" ) {
+      anExporter->SetFileFormatToPDF();
+    }
+    
+    QString aFilePrefix(fileName);
+    QString anExtension(SUIT_Tools::extension(fileName));
+    aFilePrefix.truncate(aFilePrefix.length() - 1 - anExtension.length());
+    anExporter->SetFilePrefix(aFilePrefix.toLatin1().data());
+    anExporter->Write();
+    anExporter->Delete();
   }
-
-  if ( format == "EPS" ) {
-    anExporter->SetFileFormatToEPS();
-    anExporter->CompressOff();
-  }
-
-  if ( format == "PDF" ) {
-    anExporter->SetFileFormatToPDF();
-  }
-
-  QString aFilePrefix(fileName);
-  QString anExtension(SUIT_Tools::extension(fileName));
-  aFilePrefix.truncate(aFilePrefix.length() - 1 - anExtension.length());
-  anExporter->SetFilePrefix(aFilePrefix.toLatin1().data());
-  anExporter->Write();
-  anExporter->Delete();
-
-  return true;
+  delete optionsDlg;
+  return true;  
 }
 
 /*!

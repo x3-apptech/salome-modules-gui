@@ -58,6 +58,7 @@ SET(_moc_HEADERS
    SVTK_FontWidget.h
    SVTK_GenericRenderWindowInteractor.h
    SVTK_RecorderDlg.h
+   SVTK_PsOptionsDlg.h	
    SVTK_RenderWindowInteractor.h
    SVTK_SetRotationPointDlg.h
    SVTK_View.h
@@ -169,6 +170,7 @@ SET(_other_SOURCES
   SVTK_Prs.cxx
   SVTK_Recorder.cxx
   SVTK_RecorderDlg.cxx
+  SVTK_PsOptionsDlg.cxx
   SVTK_RenderWindowInteractor.cxx
   SVTK_Renderer.cxx
   SVTK_Selector.cxx
