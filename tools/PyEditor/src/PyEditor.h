@@ -24,6 +24,8 @@
 
 #if defined PYEDITOR_EXPORTS || defined PyEditor_EXPORTS
 #define PYEDITOR_EXPORT __declspec(dllexport)
+#elif defined PYEDITOREXE
+#define PYEDITOR_EXPORT
 #else
 #define PYEDITOR_EXPORT __declspec(dllimport)
 #endif
