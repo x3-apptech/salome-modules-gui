@@ -16,6 +16,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#ifdef VTK_OPENGL2
+#define GL_GLEXT_PROTOTYPES
+#endif
 
 #include "VTKViewer_PolyDataMapper.h"
 #include "VTKViewer_MarkerUtils.h"
@@ -467,8 +470,21 @@ int VTKViewer_PolyDataMapper::GetMarkerTexture()
 //-----------------------------------------------------------------------------
 int VTKViewer_PolyDataMapper::InitExtensions()
 {
-  char* ext = (char*)glGetString( GL_EXTENSIONS );
-  if( !IsBufferExtensionsInitialized ||
+#ifdef VTK_OPENGL2
+  int n = 0;
+  std::ostringstream strm;
+  glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+  for (int i = 0; i < n; i++)
+    {
+      const char *exti = (const char *)glGetStringi(GL_EXTENSIONS, i);
+      strm<< exti <<" ";
+    }
+  std::string s = strm.str();
+  const char* ext = s.c_str();
+#else  
+  const char* ext = (const char*)glGetString( GL_EXTENSIONS );
+#endif  
+  if( !IsBufferExtensionsInitialized || !ext ||
       strstr( ext, "GL_ARB_point_sprite" ) == NULL ||
       strstr( ext, "GL_ARB_vertex_buffer_object" ) == NULL ||
       strstr( ext, "GL_ARB_shader_objects") == NULL )
@@ -598,6 +614,7 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
 
     vglUseProgramObjectARB( this->VertexProgram );
 
+#ifndef VTK_OPENGL2
     //
     // if something has changed regenerate colors and display lists
     // if required
@@ -670,7 +687,12 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     // time so that it is not zero
     if ( this->TimeToDraw == 0.0 )
       this->TimeToDraw = 0.0001;
-
+#else
+    //this->RenderPieceStart(ren, act);
+    this->RenderPieceDraw(ren, act);
+    //    this->RenderEdges(ren,act);
+    //this->RenderPieceFinish(ren, act);
+#endif    
     vglUseProgramObjectARB( 0 );
     this->CleanupPointSprites();
     glBindTexture( GL_TEXTURE_2D, 0 );
@@ -863,16 +885,34 @@ namespace VTK
   }
 } // namespace VTK
 
+#ifndef VTK_OPENGL2
 //-----------------------------------------------------------------------------
 int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
-{  
+{
+  int noAbort = 1;
   if( (!this->MarkerEnabled || this->MarkerType == VTK::MT_NONE || !this->ImageData.GetPointer()) && !this->BallEnabled)
     return MAPPER_SUPERCLASS::Draw( ren, act );
+  
+  void InternalDraw( ren, act );
+    
+  return noAbort;
+}
+#else
+//-----------------------------------------------------------------------------
+void VTKViewer_PolyDataMapper::RenderPieceDraw( vtkRenderer* ren, vtkActor* act ) {
+  int noAbort = 1;
+  if( (!this->MarkerEnabled || this->MarkerType == VTK::MT_NONE || !this->ImageData.GetPointer()) && !this->BallEnabled) {
+    MAPPER_SUPERCLASS::RenderPieceDraw( ren, act );
+    return;
+  }
+  InternalDraw( ren, act );
+}
+#endif
 
+void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
   vtkUnsignedCharArray* colors = NULL;
   vtkPolyData* input  = this->GetInput();
   vtkPoints* points;
-  int noAbort = 1;
   int cellScalars = 0;
   vtkProperty* prop = act->GetProperty();
 
@@ -1019,5 +1059,4 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
   }
 
   this->UpdateProgress(1.0);
-  return noAbort;
 }

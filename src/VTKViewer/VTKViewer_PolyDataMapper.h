@@ -97,9 +97,12 @@ public:
 
   //! Implement superclass render method.
   virtual void RenderPiece( vtkRenderer*, vtkActor* );
-
   //! Draw method for OpenGL.
+#ifndef VTK_OPENGL2
   virtual int Draw( vtkRenderer*, vtkActor* );
+#else
+  virtual void RenderPieceDraw( vtkRenderer*, vtkActor* );
+#endif    
 
 protected:
   VTKViewer_PolyDataMapper();
@@ -119,6 +122,8 @@ protected:
 
   //! Initializing of the Vertex Shader.
   void              InitShader();
+
+  void              InternalDraw(vtkRenderer*, vtkActor*); 
 
 private:
   int               ExtensionsInitialized;

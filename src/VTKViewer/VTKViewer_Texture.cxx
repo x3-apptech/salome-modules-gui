@@ -28,12 +28,17 @@
 #include "vtkOpenGLRenderer.h"
 #include "vtkPointData.h"
 #include "vtkRenderWindow.h"
+#ifndef VTK_OPENGL2
 #include "vtkOpenGLExtensionManager.h"
+#include "vtkgl.h" // vtkgl namespace
+#else
+#include "vtkTextureObject.h"
+#include "vtkOpenGLError.h"
+#endif
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkTransform.h"
 #include "vtkPixelBufferObject.h"
 #include "vtkOpenGL.h"
-#include "vtkgl.h" // vtkgl namespace
 #include <vtkObjectFactory.h>
 
 vtkStandardNewMacro(VTKViewer_Texture);
@@ -56,6 +61,7 @@ VTKViewer_Texture::~VTKViewer_Texture()
 // Implement base class method.
 void VTKViewer_Texture::Load(vtkRenderer *ren)
 {
+#ifndef VTK_OPENGL2  
   GLenum format = GL_LUMINANCE;
   vtkImageData *input = this->GetInput();
 
@@ -464,6 +470,204 @@ void VTKViewer_Texture::Load(vtkRenderer *ren)
     vtkgl::Uniform1i(uTexture,0); // active texture 0
     }
     */
+#else
+    if (!this->ExternalTextureObject)
+    {
+    vtkImageData *input = this->GetInput();
+
+    // Need to reload the texture.
+    // There used to be a check on the render window's mtime, but
+    // this is too broad of a check (e.g. it would cause all textures
+    // to load when only the desired update rate changed).
+    // If a better check is required, check something more specific,
+    // like the graphics context.
+    vtkOpenGLRenderWindow* renWin =
+      static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow());
+
+    // has something changed so that we need to rebuild the texture?
+    if (this->GetMTime() > this->LoadTime.GetMTime() ||
+        input->GetMTime() > this->LoadTime.GetMTime() ||
+        (this->GetLookupTable() && this->GetLookupTable()->GetMTime () >
+         this->LoadTime.GetMTime()) ||
+         renWin != this->RenderWindow.GetPointer() ||
+         renWin->GetContextCreationTime() > this->LoadTime)
+      {
+      int size[3];
+      unsigned char *dataPtr;
+      unsigned char *resultData = 0;
+      int xsize, ysize;
+
+      this->RenderWindow = renWin;
+      if (this->TextureObject == 0)
+        {
+        this->TextureObject = vtkTextureObject::New();
+        }
+      this->TextureObject->ResetFormatAndType();
+      this->TextureObject->SetContext(renWin);
+
+      // Get the scalars the user choose to color with.
+      vtkDataArray* scalars = this->GetInputArrayToProcess(0, input);
+
+      // make sure scalars are non null
+      if (!scalars)
+        {
+        vtkErrorMacro(<< "No scalar values found for texture input!");
+        return;
+        }
+
+      // get some info
+      input->GetDimensions(size);
+
+      if (input->GetNumberOfCells() == scalars->GetNumberOfTuples())
+        {
+        // we are using cell scalars. Adjust image size for cells.
+        for (int kk = 0; kk < 3; kk++)
+          {
+          if (size[kk]>1)
+            {
+            size[kk]--;
+            }
+          }
+        }
+
+      int bytesPerPixel = scalars->GetNumberOfComponents();
+
+      // make sure using unsigned char data of color scalars type
+      if (this->IsDepthTexture != 1 &&
+        (this->MapColorScalarsThroughLookupTable ||
+         scalars->GetDataType() != VTK_UNSIGNED_CHAR ))
+        {
+        dataPtr = this->MapScalarsToColors (scalars);
+        bytesPerPixel = 4;
+        }
+      else
+        {
+        dataPtr = static_cast<vtkUnsignedCharArray *>(scalars)->GetPointer(0);
+        }
+
+      // we only support 2d texture maps right now
+      // so one of the three sizes must be 1, but it
+      // could be any of them, so lets find it
+      if (size[0] == 1)
+        {
+        xsize = size[1]; ysize = size[2];
+        }
+      else
+        {
+        xsize = size[0];
+        if (size[1] == 1)
+          {
+          ysize = size[2];
+          }
+        else
+          {
+          ysize = size[1];
+          if (size[2] != 1)
+            {
+            vtkErrorMacro(<< "3D texture maps currently are not supported!");
+            return;
+            }
+          }
+        }
+
+      // -- decide whether the texture needs to be resampled --
+      GLint maxDimGL;
+      glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxDimGL);
+      vtkOpenGLCheckErrorMacro("failed at glGetIntegerv");
+      // if larger than permitted by the graphics library then must resample
+      bool resampleNeeded = xsize > maxDimGL || ysize > maxDimGL;
+      if(resampleNeeded)
+        {
+        vtkDebugMacro( "Texture too big for gl, maximum is " << maxDimGL);
+        }
+
+      if (resampleNeeded)
+        {
+        vtkDebugMacro(<< "Resampling texture to power of two for OpenGL");
+        resultData = this->ResampleToPowerOfTwo(xsize, ysize, dataPtr,
+                                                bytesPerPixel);
+        }
+
+      if (!resultData)
+        {
+        resultData = dataPtr;
+        }
+
+      // create the texture
+      if (this->IsDepthTexture)
+        {
+        this->TextureObject->CreateDepthFromRaw(
+          xsize, ysize, vtkTextureObject::Float32, scalars->GetDataType(), resultData);
+        }
+      else
+        {
+        this->TextureObject->Create2DFromRaw(
+          xsize, ysize, bytesPerPixel, VTK_UNSIGNED_CHAR, resultData);
+        }
+      myWidth = xsize;
+      myHeight = ysize;
+      // activate a free texture unit for this texture
+      this->TextureObject->Activate();
+
+      // update parameters
+      if (this->Interpolate)
+        {
+        this->TextureObject->SetMinificationFilter(vtkTextureObject::Linear);
+        this->TextureObject->SetMagnificationFilter(vtkTextureObject::Linear);
+        }
+      else
+        {
+        this->TextureObject->SetMinificationFilter(vtkTextureObject::Nearest);
+        this->TextureObject->SetMagnificationFilter(vtkTextureObject::Nearest);
+        }
+      if (this->Repeat)
+        {
+        this->TextureObject->SetWrapS(vtkTextureObject::Repeat);
+        this->TextureObject->SetWrapT(vtkTextureObject::Repeat);
+        this->TextureObject->SetWrapR(vtkTextureObject::Repeat);
+        }
+      else
+        {
+        this->TextureObject->SetWrapS(vtkTextureObject::ClampToEdge);
+        this->TextureObject->SetWrapT(vtkTextureObject::ClampToEdge);
+        this->TextureObject->SetWrapR(vtkTextureObject::ClampToEdge);
+        }
+
+      // modify the load time to the current time
+      this->LoadTime.Modified();
+
+      // free memory
+      if (resultData != dataPtr)
+        {
+        delete [] resultData;
+        resultData = 0;
+        }
+      }
+    }
+  else
+    {
+    vtkOpenGLRenderWindow* renWin =
+      static_cast<vtkOpenGLRenderWindow*>(ren->GetRenderWindow());
+
+      // has something changed so that we need to rebuild the texture?
+      if (this->GetMTime() > this->LoadTime.GetMTime() ||
+         renWin != this->RenderWindow.GetPointer() ||
+         renWin->GetContextCreationTime() > this->LoadTime)
+        {
+        this->RenderWindow = renWin;
+        this->TextureObject->SetContext(renWin);
+        }
+    }        
+  // activate a free texture unit for this texture
+  this->TextureObject->Activate();
+
+  if (this->PremultipliedAlpha)
+    {
+    // make the blend function correct for textures premultiplied by alpha.
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
+  vtkOpenGLCheckErrorMacro("failed after Load");
+#endif  
 }
 
 void VTKViewer_Texture::Initialize(vtkRenderer * vtkNotUsed(ren))

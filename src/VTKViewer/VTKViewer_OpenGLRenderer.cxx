@@ -30,8 +30,10 @@
 #include <vtkOpenGLLight.h>
 #include <vtkOpenGLProperty.h>
 #include <vtkRenderWindow.h>
+#ifndef VTK_OPENGL2
 #include <vtkOpenGLExtensionManager.h>
 #include <vtkgl.h> // vtkgl namespace
+#endif
 #include <vtkImageImport.h>
 #include <vtkPNGWriter.h>
 #include <vtkOpenGLTexture.h>
