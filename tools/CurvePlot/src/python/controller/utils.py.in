@@ -1,0 +1,85 @@
+class Logger(object):
+    """
+    Debug Info.
+    """
+    LOG_LEVEL = 1 # 0 means all, 1 means all but DEBUG, 2 means all but INFO and DEBUG, 3 only FATAL
+
+    @classmethod
+    def Debug(cls, msg):
+        """
+        Prints an information message to the standard output.
+        
+        :param msg: str -- The message to be printed.
+        
+        """
+        if cls.LOG_LEVEL <= 0:
+            cls.__log("[DEBUG]", msg)
+
+
+    @classmethod
+    def Info(cls, msg):
+        """
+        Prints an information message to the standard output.
+        
+        :param msg: str -- The message to be printed.
+        
+        """
+        if cls.LOG_LEVEL <= 1:
+            cls.__log("[INFO]", msg)
+
+    
+    @classmethod
+    def Warning(cls, msg):
+        """
+        Prints a warning message to the standard output.
+        
+        :param msg: str -- The message to be printed.
+        
+        """
+        if cls.LOG_LEVEL <= 2:
+            cls.__log("[WARNING]", msg)
+        
+    
+    @classmethod
+    def FatalError(cls, msg):
+        """
+        Prints an error message to the standard output.
+        
+        :param msg: str -- The message to be printed.
+        :raises: Exception.
+        
+        """
+        if cls.LOG_LEVEL <= 3:
+            cls.__log("[FATAL]", msg)
+            raise Exception(msg)
+
+    @classmethod
+    def __log(cls, typ, msg):
+        print "%s: %s" % (typ, msg)
+      
+def trQ(tag, context="CURVEPLOT"):
+  """ @return a QString read from the translation file """
+  from pyqtside.QtGui import QApplication 
+  return QApplication.translate(context, tag) 
+
+def trU(tag, context="CURVEPLOT"):
+  """ @return same as above, but returns a Python unicode string.  """
+  qs = trQ(tag, context)
+  return unicode(qs, 'utf-8')
+
+def toUnicodeWithWarning(s, method_name):
+  try: 
+    s = unicode(s)
+  except:
+    Logger.Warning("%s - warning, passing non-unicode, non-ASCII string '%s'! Trying to convert myself to UTF-8 ..." % (method_name, s))
+    s = unicode(s, 'utf-8')
+  return s
+
+def completeResPath(fileName):
+  import os
+  subPath = "@SALOME_CURVEPLOT_INSTALL_PYTHON@"
+  rd = os.environ.get("CURVEPLOT_ROOT_DIR", None)
+  if rd is None:
+    raise Exception("CURVEPLOT_ROOT_DIR is not defined!")
+  filePath = os.path.join(rd, subPath, fileName)
+  return filePath
