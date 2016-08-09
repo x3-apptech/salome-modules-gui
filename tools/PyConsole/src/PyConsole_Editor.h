@@ -132,6 +132,8 @@ private:
   QString           myComplAfterPoint;  //!< string on which the results of the dir() are matched
   int               myComplCursorPos;   //!< cursor position when <TAB> is hit
 
+  friend void PyConsole_CallbackStdout( void*, char* );
+  friend void PyConsole_CallbackStderr( void*, char* );
 };
 
 #endif // PYCONSOLE_EDITOR_H
