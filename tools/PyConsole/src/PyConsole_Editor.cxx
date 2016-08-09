@@ -128,18 +128,20 @@ namespace
 static QString READY_PROMPT = ">>> ";
 static QString DOTS_PROMPT  = "... ";
 
-void staticCallbackStdout( void* data, char* c )
+void PyConsole_CallbackStdout( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
     PyConsole_Editor* e = (PyConsole_Editor*)data;
+    e->putLog( fromUtf8(c) );
     QApplication::postEvent( e, new PyConsole_PrintEvent( fromUtf8(c), false ) );
   }
 }
 
-void staticCallbackStderr( void* data, char* c )
+void PyConsole_CallbackStderr( void* data, char* c )
 {
   if(!((PyConsole_Editor*)data)->isSuppressOutput()) {
     PyConsole_Editor* e = (PyConsole_Editor*)data;
+    e->putLog( fromUtf8(c) );
     QApplication::postEvent( e, new PyConsole_PrintEvent( fromUtf8(c), true ) );
   }
 }
@@ -174,8 +176,8 @@ PyConsole_Editor::PyConsole_Editor( PyConsole_Interp* theInterp,
   setAcceptRichText( false );
 
   // set callbacks to interpeter
-  myInterp->setvoutcb( staticCallbackStdout, this );
-  myInterp->setverrcb( staticCallbackStderr, this );
+  myInterp->setvoutcb( PyConsole_CallbackStdout, this );
+  myInterp->setverrcb( PyConsole_CallbackStderr, this );
   // print banner
   if ( isShowBanner() )
     addText( banner() );
@@ -1157,7 +1159,6 @@ void PyConsole_Editor::customEvent( QEvent* event )
   case PyConsole_PrintEvent::EVENT_ID:
   {
     PyConsole_PrintEvent* pe = (PyConsole_PrintEvent*)event;
-    putLog( pe->text());
     addText( pe->text(), false, pe->isError() );
     return;
   }
