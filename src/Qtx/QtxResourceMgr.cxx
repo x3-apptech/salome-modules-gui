@@ -1573,23 +1573,29 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QByteArray
   if ( !value( sect, name, val, true ) )
     return false;
 
-  baVal.clear();
-  QStringList lst = val.split( QRegExp( "[\\s|,]" ), QString::SkipEmptyParts );
-  for ( QStringList::ConstIterator it = lst.begin(); it != lst.end(); ++it )
-  {
-    int base = 10;
-    QString str = *it;
-    if ( str.startsWith( "#" ) )
+  if ( val.startsWith( QLatin1String("@ByteArray(") ) && 
+       val.endsWith( QLatin1Char(')' ) ) ) {
+    baVal = QByteArray( val.midRef( 11, val.size() - 12 ).toLatin1() );
+  }
+  else  {
+    baVal.clear();
+    QStringList lst = val.split( QRegExp( "[\\s|,]" ), QString::SkipEmptyParts );
+    for ( QStringList::ConstIterator it = lst.begin(); it != lst.end(); ++it )
     {
-      base = 16;
-      str = str.mid( 1 );
+      int base = 10;
+      QString str = *it;
+      if ( str.startsWith( "#" ) )
+      {
+        base = 16;
+        str = str.mid( 1 );
+      }
+      bool ok = false;
+      int num = str.toInt( &ok, base );
+      if ( !ok || num < 0 || num > 255 )
+        continue;
+      
+      baVal.append( (char)num );
     }
-    bool ok = false;
-    int num = str.toInt( &ok, base );
-    if ( !ok || num < 0 || num > 255 )
-      continue;
-
-    baVal.append( (char)num );
   }
   return !baVal.isEmpty();
 }
@@ -2052,14 +2058,12 @@ void QtxResourceMgr::setValue( const QString& sect, const QString& name, const Q
   if ( checkExisting() && value( sect, name, res ) && res == val )
     return;
 
-  char buf[8];
-  QStringList lst;
-  for ( int i = 0; i < val.size();  i++ )
-  {
-    ::sprintf( buf, "#%02X", (unsigned char)val.at( i ) );
-    lst.append( QString( buf ) );
-  }
-  setResource( sect, name, lst.join( " " ) );
+  QString result;
+  result = QLatin1String("@ByteArray(");
+  result += QString::fromLatin1(val.constData(), val.size());
+  result += QLatin1Char(')');
+
+  setResource( sect, name, result );
 }
 
 /*!

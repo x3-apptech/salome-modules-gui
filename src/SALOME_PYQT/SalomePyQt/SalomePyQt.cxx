@@ -1153,6 +1153,34 @@ void SalomePyQt::addSetting( const QString& section, const QString& name, const 
 }
 
 /*!
+  \brief Add byte array setting to the application preferences.
+  \param section resources file section name 
+  \param name setting name
+  \param value new setting value
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const QByteArray& value )
+{
+  class TEvent: public SALOME_Event 
+  {
+    QString    mySection;
+    QString    myName;
+    QByteArray myValue;
+  public:
+    TEvent( const QString& section, const QString& name, const QByteArray& value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() 
+    {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+        if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
   \fn int SalomePyQt::integerSetting( const QString& section, 
                                       const QString& name, 
                                       const int def );
@@ -1323,6 +1351,40 @@ QColor SalomePyQt::colorSetting ( const QString& section, const QString& name, c
 }
 
 /*!
+  \fn QByteArray SalomePyQt::byteArraySetting( const QString& section, 
+                                               const QString& name, 
+                                               const QByteArray def );
+  \brief Get byte array setting from the application preferences.
+  \param section resources file section name 
+  \param name setting name
+  \param def default value which is returned if the setting is not found
+  \return setting value
+*/
+
+class TGetByteArraySettingEvent: public SALOME_Event 
+{
+public:
+  typedef QByteArray TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetByteArraySettingEvent( const QString& section, const QString& name, const QByteArray& def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() 
+  {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->byteArrayValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+QByteArray SalomePyQt::byteArraySetting ( const QString& section, const QString& name, const QByteArray& def )
+{
+  return ProcessEvent( new TGetByteArraySettingEvent( section, name, def ) );
+}
+
+/*!
   \brief Remove setting from the application preferences.
   \param section resources file section name 
   \param name setting name
@@ -1355,14 +1417,14 @@ void SalomePyQt::removeSetting( const QString& section, const QString& name )
   \return \c true if setting exists
 */
 
-class THasColorSettingEvent: public SALOME_Event 
+class THasSettingEvent: public SALOME_Event 
 {
 public:
   typedef bool TResult;
   TResult myResult;
   QString mySection;
   QString myName;
-  THasColorSettingEvent( const QString& section, const QString& name ) 
+  THasSettingEvent( const QString& section, const QString& name ) 
     : mySection( section ), myName( name ) {}
   virtual void Execute() 
   {
@@ -1374,7 +1436,7 @@ public:
 };
 bool SalomePyQt::hasSetting( const QString& section, const QString& name )
 {
-  return ProcessEvent( new THasColorSettingEvent( section, name ) );
+  return ProcessEvent( new THasSettingEvent( section, name ) );
 }
 
 /*!

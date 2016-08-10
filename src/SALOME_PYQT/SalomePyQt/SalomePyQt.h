@@ -251,11 +251,13 @@ public:
   static void              addSetting    ( const QString&, const QString&, const bool, const int );
   static void              addSetting    ( const QString&, const QString&, const QString& );
   static void              addSetting    ( const QString&, const QString&, const QColor& );
+  static void              addSetting    ( const QString&, const QString&, const QByteArray& );
   static int               integerSetting( const QString&, const QString&, const int = 0 );
   static double            doubleSetting ( const QString&, const QString&, const double = 0 );
   static bool              boolSetting   ( const QString&, const QString&, const bool = 0 );
   static QString           stringSetting ( const QString&, const QString&, const QString& = QString("") );
   static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
+  static QByteArray        byteArraySetting( const QString&, const QString&, const QByteArray& = QByteArray() );
   static void              removeSetting ( const QString&, const QString& );
   static bool              hasSetting    ( const QString&, const QString& );
 
