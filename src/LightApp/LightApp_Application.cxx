@@ -436,6 +436,7 @@ LightApp_Application::LightApp_Application()
  */
 LightApp_Application::~LightApp_Application()
 {
+  savePreferences();
   delete mySelMgr;
   delete myScreenHelper;
 }
