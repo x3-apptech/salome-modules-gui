@@ -121,9 +121,9 @@ protected:
   void              InitTextures();
 
   //! Initializing of the Vertex Shader.
-  void              InitShader();
+  int               InitShader();
 
-  void              InternalDraw(vtkRenderer*, vtkActor*); 
+  void              InternalDraw(vtkRenderer*, vtkActor*);
 
 private:
   int               ExtensionsInitialized;
@@ -131,11 +131,32 @@ private:
   GLuint            PointSpriteTexture;
 
   vtkSmartPointer<vtkImageData> ImageData;
-  
-  GLhandleARB       VertexProgram;
+
+  GLhandleARB PointProgram;
+#ifdef VTK_OPENGL2
+  GLhandleARB VertexShader;
+  GLhandleARB FragmentShader;
+  GLuint      VertexArrayObject;
+#endif
+
+  struct Locations {
+    static const GLint INVALID_LOCATION = -1;
+
+    GLint ModelViewProjection;
+    GLint GeneralPointSize;
+    GLint PointSprite;
+
+    Locations()
+    : ModelViewProjection (INVALID_LOCATION),
+      GeneralPointSize    (INVALID_LOCATION),
+      PointSprite         (INVALID_LOCATION)
+    {
+          //
+    }
+  } myLocations;
 
   bool              MarkerEnabled;
-  bool              BallEnabled; 
+  bool              BallEnabled;
   double            BallScale;
   VTK::MarkerType   MarkerType;
   VTK::MarkerScale  MarkerScale;
