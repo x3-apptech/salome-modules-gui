@@ -69,6 +69,7 @@ SET(_other_HEADERS
   VTKViewer_InteractorStyle.h
   VTKViewer_MarkerDef.h
   VTKViewer_MarkerUtils.h
+  VTKViewer_OpenGLHelper.h
   VTKViewer_OpenGLRenderer.h
   VTKViewer_PolyDataMapper.h
   VTKViewer_ShrinkFilter.h
@@ -152,6 +153,7 @@ SET(_other_SOURCES
   VTKViewer_MarkerDlg.cxx
   VTKViewer_MarkerUtils.cxx
   VTKViewer_MarkerWidget.cxx
+  VTKViewer_OpenGLHelper.cxx
   VTKViewer_OpenGLRenderer.cxx
   VTKViewer_PolyDataMapper.cxx
   VTKViewer_RenderWindow.cxx

@@ -1,4 +1,4 @@
-#version 330 core
+#version 130
 #if (__VERSION__ >= 130)
   in vec4 Color;
   in vec3 Vertex;

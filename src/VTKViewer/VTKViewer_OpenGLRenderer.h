@@ -25,6 +25,7 @@
 
 #include "VTKViewer.h"
 #include "vtkOpenGLRenderer.h"
+#include "VTKViewer_OpenGLHelper.h"
 
 class VTKVIEWER_EXPORT VTKViewer_OpenGLRenderer : public vtkOpenGLRenderer
 {
@@ -54,6 +55,31 @@ protected:
 
 private:
   int GradientType;
+
+#ifdef VTK_OPENGL2
+  VTKViewer_OpenGLHelper OpenGLHelper;
+  GLhandleARB            BackgroundProgram;
+  GLhandleARB            BackgroundVertexShader;
+  GLhandleARB            BackgroundFragmentShader;
+  GLuint                 VertexArrayObject;
+
+  struct Locations
+  {
+    static const GLint INVALID_LOCATION = -1;
+
+    GLint UseTexture;
+    GLint BackgroundTexture;
+
+    Locations()
+    : UseTexture        (INVALID_LOCATION),
+      BackgroundTexture (INVALID_LOCATION)
+    {
+      //
+    }
+
+  } myLocations;
+#endif
+
 
 private:
   VTKViewer_OpenGLRenderer(const VTKViewer_OpenGLRenderer&);  // Not implemented.
