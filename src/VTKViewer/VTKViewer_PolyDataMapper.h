@@ -141,11 +141,13 @@ private:
     static const GLint INVALID_LOCATION = -1;
 
     GLint ModelViewProjection;
+    GLint Projection;
     GLint GeneralPointSize;
     GLint PointSprite;
 
     Locations()
     : ModelViewProjection (INVALID_LOCATION),
+      Projection          (INVALID_LOCATION),
       GeneralPointSize    (INVALID_LOCATION),
       PointSprite         (INVALID_LOCATION)
     {

@@ -125,6 +125,7 @@ int VTKViewer_PolyDataMapper::InitShader()
   this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
 
   this->myLocations.ModelViewProjection = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uModelViewProjectionMatrix" );
+  this->myLocations.Projection          = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uProjectionMatrix" );
   this->myLocations.GeneralPointSize    = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uGeneralPointSize" );
   this->myLocations.PointSprite         = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uPointSprite" );
 
@@ -883,6 +884,7 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
         {
         	this->OpenGLHelper.SetUniformMatrix( this->myLocations.ModelViewProjection, wcdc );
         }
+        this->OpenGLHelper.SetUniformMatrix( this->myLocations.Projection, vcdc );
 
         this->OpenGLHelper.vglUniform1iARB( this->myLocations.GeneralPointSize, std::max( aSize[0], aSize[1] ) );
 

@@ -9,6 +9,7 @@
   attribute float Diameter;
 #endif
 
+uniform mat4 uProjectionMatrix;
 uniform mat4 uModelViewProjectionMatrix;
 uniform int  uGeneralPointSize;
 
@@ -18,7 +19,7 @@ void main()
   gl_Position  = uModelViewProjectionMatrix * vec4 (Vertex.xyz, 1.0);
 
   if (uGeneralPointSize == -1)
-    gl_PointSize = Diameter;
+    gl_PointSize = 1400 * uProjectionMatrix[1].y * Diameter;
   else
     gl_PointSize = uGeneralPointSize;
 

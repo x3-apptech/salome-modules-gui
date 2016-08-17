@@ -13,10 +13,9 @@ uniform sampler2D uPointSprite;
 in vec4 VSColor;
 void main()
 {
-  outColor = VSColor;
-  vec4 testColor = Texture2D(uPointSprite, gl_PointCoord);
-  if (testColor.r > 0.1)
-    outColor = testColor * outColor;
-  else
+  vec4 aColor = Texture2D(uPointSprite, gl_PointCoord) * VSColor;
+  if (aColor.a < 0.5)
     discard;
+
+  outColor = aColor;
 }
