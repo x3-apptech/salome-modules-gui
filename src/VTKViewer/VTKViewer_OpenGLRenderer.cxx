@@ -306,6 +306,21 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         // below the threshold. Here we have to enable it so that it won't
         // rejects the fragments of the quad as the alpha is set to 0 on it.
         glDisable( GL_ALPHA_TEST );
+
+        GLfloat texX = 1.F; // texture <s> coordinate
+        GLfloat texY = 1.F; // texture <t> coordinate
+
+        int aPosition = aTexture->GetPosition();
+        int aWidth = aTexture->GetWidth();
+        int aHeight = aTexture->GetHeight();
+        int aViewWidth = this->RenderWindow->GetSize()[0];
+        int aViewHeight = this->RenderWindow->GetSize()[1];
+
+        if( aPosition == VTKViewer_Texture::Tiled )
+        {
+          texX = (GLfloat)aViewWidth / (GLfloat)aWidth;
+          texY = (GLfloat)aViewHeight / (GLfloat)aHeight;
+        }
 #ifdef VTK_OPENGL2
         if (this->OpenGLHelper.IsInitialized())
         {
@@ -317,11 +332,15 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
           this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
 
+          GLfloat dx = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aWidth / (GLfloat)aViewWidth )) : 1.0f;
+          GLfloat dy = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aHeight / (GLfloat)aViewHeight )) : 1.0f;
+
+
           // First 4 components of Vertex is TexCoords now.
-          GLfloat data[7 * 4] = { 0.0f, 1.0f, 0.0f, 1.0f,       -1.0f,  1.0f, 0.0f,
-                                  0.0f, 0.0f, 0.0f, 1.0f,       -1.0f, -1.0f, 0.0f,
-                                  1.0f, 0.0f, 0.0f, 1.0f,        1.0f, -1.0f, 0.0f,
-                                  1.0f, 1.0f, 0.0f, 1.0f,        1.0f,  1.0f, 0.0f };
+          GLfloat data[7 * 4] = { 0.0f, texY, 0.0f, 1.0f,       -dx,  dy, 0.0f,
+                                  0.0f, 0.0f, 0.0f, 1.0f,       -dx, -dy, 0.0f,
+                                  texX, 0.0f, 0.0f, 1.0f,        dx, -dy, 0.0f,
+                                  texX, texY, 0.0f, 1.0f,        dx,  dy, 0.0f };
 
           GLuint vertexBuffer;
           this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
@@ -350,10 +369,13 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           this->OpenGLHelper.vglUseProgramObjectARB (0);
         }
 #else
-        GLfloat texX = 1.F; // texture <s> coordinate
-        GLfloat texY = 1.F; // texture <t> coordinate
-        GLfloat x_offset = 0.5, y_offset = 0.5;
-        GLfloat coeff = 0.5;
+        GLfloat x_offset = 0.5f, y_offset = 0.5f;
+        GLfloat coeff = 0.5f;
+        if( aPosition == VTKViewer_Texture::Centered )
+        {
+          x_offset = ( (GLfloat)aWidth / (GLfloat)aViewWidth ) / 2.;
+          y_offset = ( (GLfloat)aHeight / (GLfloat)aViewHeight ) / 2.;
+        }
 
         // OCCT issue 0023102: Change the algorithm of rendering the
         // 3d viewer background using tiled texture
@@ -361,22 +383,6 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         // to the top-left corner of the view (value 1.F corresponds to the
         // initial behaviour - tiling from the bottom-left corner)
         GLfloat aCoef = -1.F;
-
-        int aPosition = aTexture->GetPosition();
-        int aWidth = aTexture->GetWidth();
-        int aHeight = aTexture->GetHeight();
-        int aViewWidth = this->RenderWindow->GetSize()[0];
-        int aViewHeight = this->RenderWindow->GetSize()[1];                    
-        if( aPosition == VTKViewer_Texture::Centered )
-        {
-          x_offset = ( (GLfloat)aWidth / (GLfloat)aViewWidth ) / 2.;
-          y_offset = ( (GLfloat)aHeight / (GLfloat)aViewHeight ) / 2.;
-        }
-        else if( aPosition == VTKViewer_Texture::Tiled )
-        {
-          texX = (GLfloat)aViewWidth / (GLfloat)aWidth;
-          texY = (GLfloat)aViewHeight / (GLfloat)aHeight;
-        }
 
         // Note that texture is mapped using GL_REPEAT wrapping mode so integer part
         // is simply ignored, and negative multiplier is here for convenience only
