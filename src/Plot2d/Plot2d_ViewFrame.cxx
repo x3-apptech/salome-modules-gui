@@ -1900,8 +1900,6 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
   case Plot2d_AnalyticalCurve::ActRemoveFromView:
     item->hide();
     item->detach();
-    myAnalyticalCurves.removeAll(c);
-    delete c;
     break;
   }
 
@@ -1915,8 +1913,19 @@ void Plot2d_ViewFrame::updateAnalyticalCurve(Plot2d_AnalyticalCurve* c, bool upd
 void Plot2d_ViewFrame::updateAnalyticalCurves()
 {
   AnalyticalCurveList::iterator it = myAnalyticalCurves.begin();
+  AnalyticalCurveList toDelete;
   for( ; it != myAnalyticalCurves.end(); it++) {
-    updateAnalyticalCurve(*it);
+    Plot2d_AnalyticalCurve* c = (*it);
+    updateAnalyticalCurve(c);
+    if(c && c->getAction() == Plot2d_AnalyticalCurve::ActRemoveFromView)
+      toDelete.push_back(c);
+  }
+  it = toDelete.begin();
+  for( ; it != toDelete.end(); it++) {
+    Plot2d_AnalyticalCurve* c = (*it);
+    myAnalyticalCurves.removeAll(c);
+    delete c;
+    c = NULL;
   }
   myPlot->replot();
 }
@@ -1926,7 +1935,7 @@ void Plot2d_ViewFrame::updateAnalyticalCurves()
 */
 AnalyticalCurveList Plot2d_ViewFrame::getAnalyticalCurves() const
 {
-  return myAnalyticalCurves;
+  return myAnalyticalCurves  ;
 }
 
 /*!
