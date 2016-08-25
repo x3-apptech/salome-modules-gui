@@ -134,7 +134,11 @@ QFont QtxFontEdit::currentFont() const
 */
 void QtxFontEdit::setCurrentFont( const QFont& fnt )
 {
-  myFamily->blockSignals( true );
+  // VSR 25/08/2016: IPAL53224
+  // blocking signals of QFontComboBox breaks its internal business logic
+  // that prevents correct retrieving of available sizes for the font in case
+  // when some non-existent font is replaced by its closest analogue
+  //myFamily->blockSignals( true );
   myCustomFams->blockSignals( true );
   mySize->blockSignals( true );
   myB->blockSignals( true );
@@ -148,7 +152,7 @@ void QtxFontEdit::setCurrentFont( const QFont& fnt )
                     ( fnt.underline() ? Underline : 0 ) | 
                     ( fnt.overline() ? Shadow : 0 ) );
 
-  myFamily->blockSignals( false );
+  //myFamily->blockSignals( false );
   myCustomFams->blockSignals( false );
   mySize->blockSignals( false );
   myB->blockSignals( false );
