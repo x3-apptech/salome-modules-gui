@@ -2796,9 +2796,12 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
         while ( myModel->getViewer3d()->MoreDefinedLights() )
         {
           Handle(V3d_Light) aLight = myModel->getViewer3d()->DefinedLight();
-          if( aLight->Type() != V3d_AMBIENT )
+          if( aLight->Type() != V3d_AMBIENT ) {
             myModel->getViewer3d()->DelLight( aLight );
-          myModel->getViewer3d()->NextDefinedLights();
+	    myModel->getViewer3d()->InitDefinedLights();
+	  } else {
+	    myModel->getViewer3d()->NextDefinedLights();
+	  }
         }
         double aX, aY, aZ;
         double cR, cG, cB;
