@@ -189,6 +189,15 @@ different locations have the same name.
   - <b>Texture</b> - allows to change the texture of the clipped region (enable if "Use default texture" is switched off).
   - <b>Modulate</b> - controls if "Texture" should be mixed with "Color" parameter or not.
   - <b>Scale factor</b> - sets the scale factor for default and custom textures.
+- <b>Ray tracing</b> - specifies the default GPU ray-tracing parameters.
+  - <b>Depth</b> - defines maximum ray-tracing depth.
+  - <b>Specular reflections</b> - enables/disables specular reflections.
+  - <b>Adaptive anti-aliasing</b> - enables/disables adaptive anti-aliasing.
+  - <b>Shadows rendering</b> - enables/disables shadows rendering.
+  - <b>Transparent shadow</b> - enables/disables light propagation through transparent media.
+- <b>Light source</b> - allows to set default parameters for directional light source.
+  - <b>Color</b> - allows to change the color of light source.
+  - <b>Dx, Dy, Dz</b> - sets direction coordinates.
 
 \anchor vtk_preferences
 <h2>VTK 3D Viewer Preferences</h2>
