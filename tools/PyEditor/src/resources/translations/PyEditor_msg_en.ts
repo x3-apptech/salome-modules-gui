@@ -37,7 +37,7 @@
     </message>
     <message>
       <source>LBL_TAB_SPACES</source>
-      <translation>Display tab white spaces</translation>
+      <translation>Display tab delimiters</translation>
     </message>
     <message>
       <source>LBL_TAB_SIZE</source>

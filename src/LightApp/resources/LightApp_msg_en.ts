@@ -1047,7 +1047,7 @@ File does not exist</translation>
   </message>
   <message>
     <source>PREF_PY_TAB_WHITESPACES</source>
-    <translation>Display tab whitespaces</translation>
+    <translation>Display tab delimiters</translation>
   </message>
   <message>
     <source>PREF_PY_TAB_SIZE</source>
