@@ -38,6 +38,7 @@
 #include <QPaintEvent>
 #include <QResizeEvent>
 #include <QApplication>
+#include <QTimer>
 
 #if OCC_VERSION_MAJOR < 7
   #include <Visual3d_View.hxx>
@@ -622,21 +623,19 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QApplication::syncX();
 #endif
-  if ( !activeView().IsNull() )
-    activeView()->MustBeResized();
+  QTimer::singleShot( 0, this, SLOT( repaintViewAfterMove() ) );
 }
 
 /*!
   Moved the viewport
 */
-/*
 void OCCViewer_ViewPort3d::repaintViewAfterMove( )
 {
   if ( !activeView().IsNull() ){
     activeView()->MustBeResized();
   }
 }
-*/
+
 /*!
   Fits all objects in view. [ virtual protected ]
 */

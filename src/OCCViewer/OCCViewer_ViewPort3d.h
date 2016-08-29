@@ -93,8 +93,6 @@ public:
 
   void                  showStaticTrihedron( bool );
 
-  //void                  repaintViewAfterMove( );
-
   void                  setDefaultCursor( Qt::CursorShape theCursorShape );
   QCursor*              getDefaultCursor() const;
 
@@ -105,6 +103,9 @@ signals:
 
 public slots:
   virtual bool          synchronize( OCCViewer_ViewPort* );
+
+private slots:
+  void                  repaintViewAfterMove();
 
 protected:
     // EVENTS
