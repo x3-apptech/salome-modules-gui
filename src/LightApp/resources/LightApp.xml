@@ -265,10 +265,10 @@
   <section name="shortcuts:Viewers">
     <parameter name="Front view" value="Ctrl+Alt+F"/>
     <parameter name="Back view" value="Ctrl+Alt+B"/>
-    <parameter name="Top view" value="Ctrl+Alt+T"/>
+    <parameter name="Top view" value="Ctrl+Alt+P"/>
     <parameter name="Bottom view" value="Ctrl+Alt+O"/>
-    <parameter name="Left view" value="Ctrl+Alt+K"/>
-    <parameter name="Right view" value="Ctrl+Alt+R"/>
+    <parameter name="Left view" value="Ctrl+Alt+J"/>
+    <parameter name="Right view" value="Ctrl+Alt+G"/>
     <parameter name="Reset view" value="Ctrl+Alt+E"/>
   </section>
   <section name="shortcuts:Geometry">
