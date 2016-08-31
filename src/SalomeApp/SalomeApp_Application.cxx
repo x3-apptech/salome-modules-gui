@@ -2028,7 +2028,8 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   {
 #ifndef DISABLE_PYCONSOLE
     _PTR(Study) aStudyDS = newStudy->studyDS();
-    app->getNoteBook()->Init( aStudyDS );
+    if ( app->getNoteBook() )
+      app->getNoteBook()->Init( aStudyDS );
     newStudy->updateFromNotebook(theStudyName, theIsStudySaved);
     newStudy->Modified();
     updateDesktopTitle();
