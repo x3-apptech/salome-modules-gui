@@ -27,13 +27,14 @@
 class OCCViewer_ViewWindow;
 class QtxDoubleSpinBox;
 class QPushButton;
+class OCCViewer_Viewer;
 
 class OCCVIEWER_EXPORT OCCViewer_AxialScaleDlg : public QDialog
 {
   Q_OBJECT
 
 public:
-  OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* );
+  OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* , OCCViewer_Viewer* );
   ~OCCViewer_AxialScaleDlg();
 
   void Update();
@@ -49,6 +50,7 @@ private:
   QtxDoubleSpinBox*     m_sbYcoeff;
   QtxDoubleSpinBox*     m_sbZcoeff;
   QPushButton*          m_bReset;
+  OCCViewer_Viewer*     myModel;
 };
 
 #endif // OCCVIEWER_AXIALSCALEDLG_H

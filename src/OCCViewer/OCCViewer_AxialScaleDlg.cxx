@@ -20,6 +20,7 @@
 #include "OCCViewer_AxialScaleDlg.h"
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewPort3d.h"
+#include "OCCViewer_ViewModel.h"
 
 #include <QtxDoubleSpinBox.h>
 
@@ -39,9 +40,10 @@
   \param view - view window
   \param parent - parent widget
 */
-OCCViewer_AxialScaleDlg::OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* view )
+OCCViewer_AxialScaleDlg::OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* view, OCCViewer_Viewer* model )
   : QDialog( view ),
-    myView( view )
+    myView( view ),
+    myModel( model )
 {
   setWindowTitle( tr( "DLG_SCALING" ) );
   setModal( false );
@@ -132,6 +134,7 @@ OCCViewer_AxialScaleDlg::OCCViewer_AxialScaleDlg( OCCViewer_ViewWindow* view )
 */
 OCCViewer_AxialScaleDlg::~OCCViewer_AxialScaleDlg()
 {
+  myModel = 0;
 }
 
 /*!
@@ -163,6 +166,11 @@ bool OCCViewer_AxialScaleDlg::apply()
 {
   double aScaleFactor[3] = { m_sbXcoeff->value(), m_sbYcoeff->value(), m_sbZcoeff->value() };
   myView->getViewPort()->setAxialScale( aScaleFactor[0], aScaleFactor[1], aScaleFactor[2] );
+  
+  if( myModel && !myModel->getViewer3d().IsNull() ){
+    myModel->getViewer3d()->Update();
+  }
+  
   return true;
 }
 

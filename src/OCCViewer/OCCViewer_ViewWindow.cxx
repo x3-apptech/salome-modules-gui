@@ -1925,7 +1925,7 @@ void OCCViewer_ViewWindow::onCloneView()
 void OCCViewer_ViewWindow::onAxialScale()
 {
   if ( !myScalingDlg )
-    myScalingDlg = new OCCViewer_AxialScaleDlg( this );
+    myScalingDlg = new OCCViewer_AxialScaleDlg( this , myModel );
 
   if ( !myScalingDlg->isVisible() )
   {
