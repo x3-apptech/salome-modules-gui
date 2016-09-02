@@ -159,7 +159,7 @@ public:
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
 		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW, PROJECTION };
 
-  enum RotationPointType{ GRAVITY, SELECTED };
+  enum RotationPointType{ BBCENTER, SELECTED };
 
   enum SketchingType { NoSketching, Rect, Polygon };
 

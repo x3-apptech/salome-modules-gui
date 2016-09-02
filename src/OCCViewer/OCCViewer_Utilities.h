@@ -63,6 +63,23 @@ public:
    */
   static bool isDialogOpened( OCCViewer_ViewWindow* theView, const QString& theName );
 
+  /*!
+   * Get bounding box of visible objects.
+   * \param theView defined occ view
+   * \param theBounds used to return bounds of the bounding box
+   * \return \c true if the bounding box is computed
+   */
+  static bool computeVisibleBounds( const Handle(V3d_View) theView, double theBounds[6] );
+
+  /*!
+   * Compute the bounding box center of visible objects.
+   * \param theView defined occ view
+   * \param theX used to return X coordinate of the bounding box center
+   * \param theY used to return Y coordinate of the bounding box center
+   * \param theZ used to return Z coordinate of the bounding box center
+   * \return \c true if the bounding box center is computed
+   */
+  static bool computeVisibleBBCenter( const Handle(V3d_View) theView, double& theX, double& theY, double& theZ );
 };
 
 #endif // OCCVIEWER_UTILITIES_H

@@ -498,7 +498,7 @@ void OCCViewer_ViewPort3d::startRotation( int x, int y,
     //activeView()->Gravity(gx,gy,gz);
 
     switch ( theRotationPointType ) {
-    case OCCViewer_ViewWindow::GRAVITY:
+    case OCCViewer_ViewWindow::BBCENTER:
       activeView()->StartRotation( x, y, 0.45 );
       break;
     case OCCViewer_ViewWindow::SELECTED:
@@ -540,7 +540,7 @@ void OCCViewer_ViewPort3d::rotate( int x, int y,
 {
   if ( !activeView().IsNull() ) {
     switch ( theRotationPointType ) {
-    case OCCViewer_ViewWindow::GRAVITY:
+    case OCCViewer_ViewWindow::BBCENTER:
       activeView()->Rotation( x, y );
       break;
     case OCCViewer_ViewWindow::SELECTED:

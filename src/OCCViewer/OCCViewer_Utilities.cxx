@@ -32,6 +32,7 @@
 
 // OCC includes
 #include <V3d_View.hxx>
+#include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
 
 // QT includes
 #include <QImage>
@@ -146,4 +147,85 @@ bool OCCViewer_Utilities::isDialogOpened( OCCViewer_ViewWindow* theView, const Q
     if ( d->objectName() == theName )
       isFound = true;
   return isFound;
+}
+
+bool OCCViewer_Utilities::computeVisibleBounds( const Handle(V3d_View) theView,
+                                                double theBounds[6] )
+{
+  bool isAny = false;
+
+  theBounds[0] = theBounds[2] = theBounds[4] = DBL_MAX;
+  theBounds[1] = theBounds[3] = theBounds[5] = -DBL_MAX;
+
+  Graphic3d_MapOfStructure aSetOfStructures;
+  theView->View()->DisplayedStructures( aSetOfStructures );
+  Graphic3d_MapIteratorOfMapOfStructure aStructureIt( aSetOfStructures );
+
+  for( ; aStructureIt.More(); aStructureIt.Next() ) {
+    const Handle(Graphic3d_Structure)& aStructure = aStructureIt.Key();
+    if ( aStructure->IsEmpty() || !aStructure->IsVisible() ||
+         aStructure->IsInfinite() || aStructure->CStructure()->IsForHighlight )
+      continue;
+    double aBounds[6];
+#if OCC_VERSION_LARGE > 0x06070100
+    Bnd_Box aBox = aStructure->MinMaxValues();
+    aBounds[0] = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
+    aBounds[2] = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
+    aBounds[4] = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Z();
+    aBounds[1] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
+    aBounds[3] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
+    aBounds[5] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
+#else
+    aStructure->MinMaxValues( aBounds[0], aBounds[2], aBounds[4],
+                              aBounds[1], aBounds[3], aBounds[5] );
+#endif
+
+    if ( aBounds[0] > -DBL_MAX && aBounds[1] < DBL_MAX &&
+         aBounds[2] > -DBL_MAX && aBounds[3] < DBL_MAX &&
+         aBounds[4] > -DBL_MAX && aBounds[5] < DBL_MAX )
+    {
+      isAny = true;
+      for ( int i = 0; i < 5; i = i + 2 ) {
+        theBounds[i] = std::min( theBounds[i], aBounds[i] );
+        theBounds[i+1] = std::max( theBounds[i+1], aBounds[i+1] );
+      }
+    }
+  }
+  return isAny;
+}
+
+bool OCCViewer_Utilities::computeVisibleBBCenter( const Handle(V3d_View) theView,
+                                                  double& theX, double& theY, double& theZ )
+{
+  double aBounds[6];
+  if ( !computeVisibleBounds( theView, aBounds ) )
+  {
+    // null bounding box => the center is (0,0,0)
+    theX = 0.0;
+    theY = 0.0;
+    theZ = 0.0;
+    return true;
+  }
+
+  static double aMinDistance = 1.0 / DBL_MAX;
+
+  double aLength = aBounds[1]-aBounds[0];
+  aLength = std::max( ( aBounds[3]-aBounds[2]), aLength );
+  aLength = std::max( ( aBounds[5]-aBounds[4]), aLength );
+
+  if ( aLength < aMinDistance )
+    return false;
+
+  double aWidth = sqrt( ( aBounds[1] - aBounds[0] ) * ( aBounds[1] - aBounds[0] ) +
+                        ( aBounds[3] - aBounds[2] ) * ( aBounds[3] - aBounds[2] ) +
+                        ( aBounds[5] - aBounds[4] ) * ( aBounds[5] - aBounds[4] ) );
+
+  if(aWidth < aMinDistance)
+    return false;
+
+  theX = (aBounds[0] + aBounds[1])/2.0;
+  theY = (aBounds[2] + aBounds[3])/2.0;
+  theZ = (aBounds[4] + aBounds[5])/2.0;
+
+  return true;
 }

@@ -294,8 +294,8 @@ void OCCViewer_ViewWindow::initLayout()
   setCentralWidget(myViewPort);
   myOperation = NOTHING;
 
-  myCurrPointType = GRAVITY;
-  myPrevPointType = GRAVITY;
+  myCurrPointType = BBCENTER;
+  myPrevPointType = BBCENTER;
   mySelectedPoint = gp_Pnt(0.,0.,0.);
   myRotationPointSelection = false;
 
@@ -777,10 +777,10 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
   }
 
   myPrevPointType = myCurrPointType;
-  myCurrPointType = GRAVITY;
+  myCurrPointType = BBCENTER;
 
   Standard_Real Xcenter, Ycenter, Zcenter;
-  if ( computeGravityCenter( Xcenter, Ycenter, Zcenter ) )
+  if ( OCCViewer_Utilities::computeVisibleBBCenter( myViewPort->getView(), Xcenter, Ycenter, Zcenter ) )
     mySetRotationPointDlg->setCoords( Xcenter, Ycenter, Zcenter );
 }
 
@@ -790,10 +790,10 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
 */
 void OCCViewer_ViewWindow::updateGravityCoords()
 {
-  if ( mySetRotationPointDlg && mySetRotationPointDlg->isVisible() && myCurrPointType == GRAVITY )
+  if ( mySetRotationPointDlg && mySetRotationPointDlg->isVisible() && myCurrPointType == BBCENTER )
   {
     Standard_Real Xcenter, Ycenter, Zcenter;
-    if ( computeGravityCenter( Xcenter, Ycenter, Zcenter ) )
+    if ( OCCViewer_Utilities::computeVisibleBBCenter( myViewPort->getView(), Xcenter, Ycenter, Zcenter ) )
       mySetRotationPointDlg->setCoords( Xcenter, Ycenter, Zcenter );
   }
 }
@@ -1893,10 +1893,10 @@ void OCCViewer_ViewWindow::onSetRotationPoint( bool on )
     if (!mySetRotationPointDlg->isVisible())
     {
       //if (mySetRotationPointDlg->IsFirstShown())
-      if (myCurrPointType == GRAVITY)
+      if (myCurrPointType == BBCENTER)
       {
         Standard_Real Xcenter, Ycenter, Zcenter;
-        if (computeGravityCenter(Xcenter, Ycenter, Zcenter))
+        if (OCCViewer_Utilities::computeVisibleBBCenter(myViewPort->getView(), Xcenter, Ycenter, Zcenter))
           mySetRotationPointDlg->setCoords(Xcenter, Ycenter, Zcenter);
       }
       mySetRotationPointDlg->show();
