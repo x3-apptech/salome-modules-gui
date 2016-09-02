@@ -49,7 +49,7 @@
 #include <vtkMapper.h>
 #include <vtkDataSet.h>
 
-static double OFF_UPDATE_RATE = 0.00001;
+static double OFF_UPDATE_RATE = 0.0001;
 static double FLOAT_TOLERANCE = 1.0 / VTK_FLOAT_MAX;
 
 namespace
@@ -332,18 +332,13 @@ SVTK_UpdateRateDlg
 {
   vtkRenderWindowInteractor* aRWI = myRWInteractor->GetDevice();
 
-  double anUpdateRate;
-  if(myIsEnableUpdateRateGroupBox->isChecked()){
-    anUpdateRate = AdjustUpdateRate(myRWInteractor,myDesiredUpdateRateSblSpinBox->value());
-    aRWI->SetDesiredUpdateRate(anUpdateRate);
-    anUpdateRate = AdjustUpdateRate(myRWInteractor,myStillUpdateRateSblSpinBox->value());
-    aRWI->SetStillUpdateRate(anUpdateRate);
-  }else{
-    aRWI->SetDesiredUpdateRate(OFF_UPDATE_RATE);
-    aRWI->SetStillUpdateRate(OFF_UPDATE_RATE);
-  }
+  double aDesirableUpdateRate = aRWI->GetDesiredUpdateRate();
+  double aStillUpdateRate = aRWI->GetStillUpdateRate();
+  bool isUpdateRate = (aDesirableUpdateRate != OFF_UPDATE_RATE) || (aStillUpdateRate != OFF_UPDATE_RATE);
 
-  myRWInteractor->getRenderWindow()->Render();
+  myIsEnableUpdateRateGroupBox->setChecked(isUpdateRate);
+  myDesiredUpdateRateSblSpinBox->setValue(aDesirableUpdateRate);
+  myStillUpdateRateSblSpinBox->setValue(aStillUpdateRate);
 }
 
 /*!
@@ -353,7 +348,7 @@ void
 SVTK_UpdateRateDlg
 ::onClickOk()
 {
-  Update();
+  onClickApply();
   onClickClose();
 }
 
@@ -364,7 +359,20 @@ void
 SVTK_UpdateRateDlg
 ::onClickApply()
 {
-  Update();
+  vtkRenderWindowInteractor* aRWI = myRWInteractor->GetDevice();
+  double anUpdateRate;
+  if (myIsEnableUpdateRateGroupBox->isChecked()) {
+    anUpdateRate = AdjustUpdateRate(myRWInteractor,myDesiredUpdateRateSblSpinBox->value());
+    aRWI->SetDesiredUpdateRate(anUpdateRate);
+    anUpdateRate = AdjustUpdateRate(myRWInteractor,myStillUpdateRateSblSpinBox->value());
+    aRWI->SetStillUpdateRate(anUpdateRate);
+  }
+  else {
+    aRWI->SetDesiredUpdateRate(OFF_UPDATE_RATE);
+    aRWI->SetStillUpdateRate(OFF_UPDATE_RATE);
+  }
+
+  myRWInteractor->getRenderWindow()->Render();
 }
 
 /*!
