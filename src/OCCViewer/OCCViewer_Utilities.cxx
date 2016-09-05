@@ -33,6 +33,9 @@
 // OCC includes
 #include <V3d_View.hxx>
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
+#if OCC_VERSION_LARGE < 0x07000000
+#include <Visual3d_View.hxx>
+#endif
 
 // QT includes
 #include <QImage>
