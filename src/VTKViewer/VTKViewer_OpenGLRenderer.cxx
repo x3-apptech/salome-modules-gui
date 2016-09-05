@@ -30,8 +30,10 @@
 #include <vtkOpenGLLight.h>
 #include <vtkOpenGLProperty.h>
 #include <vtkRenderWindow.h>
+#ifndef VTK_OPENGL2
 #include <vtkOpenGLExtensionManager.h>
 #include <vtkgl.h> // vtkgl namespace
+#endif
 #include <vtkImageImport.h>
 #include <vtkPNGWriter.h>
 #include <vtkOpenGLTexture.h>
@@ -44,6 +46,15 @@ vtkStandardNewMacro(VTKViewer_OpenGLRenderer);
 VTKViewer_OpenGLRenderer::VTKViewer_OpenGLRenderer()
 {
   this->GradientType = HorizontalGradient;
+
+#ifdef VTK_OPENGL2
+  this->BackgroundProgram        = 0;
+  this->BackgroundVertexShader   = 0;
+  this->BackgroundFragmentShader = 0;
+  this->VertexArrayObject        = 0;
+
+  this->OpenGLHelper.Init();
+#endif
 }
 
 VTKViewer_OpenGLRenderer::~VTKViewer_OpenGLRenderer()
@@ -57,6 +68,30 @@ void VTKViewer_OpenGLRenderer::SetGradientType( const int theGradientType )
 
 void VTKViewer_OpenGLRenderer::Clear(void)
 {
+#ifdef VTK_OPENGL2
+  if (this->OpenGLHelper.IsInitialized())
+  {
+    if (this->BackgroundProgram == 0)
+    {
+      std::string filePath = std::string( getenv( "GUI_ROOT_DIR") ) + "/share/salome/resources/gui/Background";
+      if (!this->OpenGLHelper.CreateShaderProgram (filePath,
+                                                   this->BackgroundProgram,
+                                                   this->BackgroundVertexShader,
+                                                   this->BackgroundFragmentShader))
+      {
+        return;
+      }
+      // Get uniform locations.
+      this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
+
+      this->myLocations.UseTexture        = this->OpenGLHelper.vglGetUniformLocationARB (this->BackgroundProgram, "uUseTexture");
+      this->myLocations.BackgroundTexture = this->OpenGLHelper.vglGetUniformLocationARB (this->BackgroundProgram, "uBackgroundTexture");
+
+      this->OpenGLHelper.vglUseProgramObjectARB (0);
+    }
+  }
+#endif
+
   GLbitfield clear_mask = 0;
 
   if( !this->Transparent() )
@@ -90,6 +125,9 @@ void VTKViewer_OpenGLRenderer::Clear(void)
     glDisable( GL_TEXTURE_1D );
     glDisable( GL_TEXTURE_2D );
     glDisable( GL_BLEND );
+
+    GLint oldShadeModel;
+    glGetIntegerv(GL_SHADE_MODEL, &oldShadeModel);
     glShadeModel( GL_SMOOTH ); // color interpolation
 
     glMatrixMode( GL_PROJECTION );
@@ -174,6 +212,62 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           break;
       }
 
+#ifdef VTK_OPENGL2
+  if (this->OpenGLHelper.IsInitialized())
+  {
+    if (this->VertexArrayObject == 0)
+    {
+      this->OpenGLHelper.vglGenVertexArraysARB (1, &this->VertexArrayObject);
+    }
+
+    this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
+    this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
+
+    GLfloat data[7 * 4];
+    if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
+    {
+      const float tmpData[] = { (float)corner1[0], (float)corner1[1], (float)corner1[2], 1.0f,       -1.0f,  1.0f, 0.0f,
+                                (float)corner2[0], (float)corner2[1], (float)corner2[2], 1.0f,       -1.0f, -1.0f, 0.0f,
+                                (float)corner3[0], (float)corner3[1], (float)corner3[2], 1.0f,        1.0f, -1.0f, 0.0f,
+                                (float)corner4[0], (float)corner4[1], (float)corner4[2], 1.0f,        1.0f,  1.0f, 0.0f };
+      memcpy (data, tmpData, sizeof(float) * 7 * 4);
+    }
+    else //if( this->GradientType == FirstCornerGradient || this->GradientType == ThirdCornerGradient )
+    {
+      const float tmpData[] = { (float)corner2[0], (float)corner2[1], (float)corner2[2], 1.0f,       -1.0f, -1.0f, 0.0f,
+                                (float)corner3[0], (float)corner3[1], (float)corner3[2], 1.0f,       -1.0f,  1.0f, 0.0f,
+                                (float)corner4[0], (float)corner4[1], (float)corner4[2], 1.0f,        1.0f,  1.0f, 0.0f,
+                                (float)corner1[0], (float)corner1[1], (float)corner1[2], 1.0f,        1.0f, -1.0f, 0.0f };
+      memcpy (data, tmpData, sizeof(float) * 7 * 4);
+    }
+
+    GLuint vertexBuffer;
+    this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
+    this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, vertexBuffer);
+    this->OpenGLHelper.vglBufferDataARB (GL_ARRAY_BUFFER_ARB, sizeof(data), data, GL_STATIC_DRAW_ARB);
+
+    GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Color");
+    GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Vertex");
+    GLsizei vertexSize = sizeof(GLfloat) * 7;
+
+    this->OpenGLHelper.vglVertexAttribPointerARB (colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0);
+    this->OpenGLHelper.vglEnableVertexAttribArrayARB (colorAttrib);
+
+    this->OpenGLHelper.vglVertexAttribPointerARB (vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4));
+    this->OpenGLHelper.vglEnableVertexAttribArrayARB (vertexAttrib);
+
+    this->OpenGLHelper.vglUniform1iARB (this->myLocations.UseTexture, 0);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    this->OpenGLHelper.vglDisableVertexAttribArrayARB (0);
+    this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+    this->OpenGLHelper.vglDeleteBuffersARB (1, &vertexBuffer);
+    this->OpenGLHelper.vglBindVertexArrayARB (0);
+    this->OpenGLHelper.vglUseProgramObjectARB (0);
+  }
+#else
+
       glBegin( GL_TRIANGLE_FAN );
       if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
       {
@@ -190,6 +284,7 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         glColor3f( corner1[0], corner1[1], corner1[2] ); glVertex2f( 0.F, 0.F );
       }
       glEnd();
+#endif
     }
 
     if( this->TexturedBackground && this->BackgroundTexture )
@@ -214,8 +309,73 @@ void VTKViewer_OpenGLRenderer::Clear(void)
 
         GLfloat texX = 1.F; // texture <s> coordinate
         GLfloat texY = 1.F; // texture <t> coordinate
-        GLfloat x_offset = 0.5, y_offset = 0.5;
-        GLfloat coeff = 0.5;
+
+        int aPosition = aTexture->GetPosition();
+        int aWidth = aTexture->GetWidth();
+        int aHeight = aTexture->GetHeight();
+        int aViewWidth = this->RenderWindow->GetSize()[0];
+        int aViewHeight = this->RenderWindow->GetSize()[1];
+
+        if( aPosition == VTKViewer_Texture::Tiled )
+        {
+          texX = (GLfloat)aViewWidth / (GLfloat)aWidth;
+          texY = (GLfloat)aViewHeight / (GLfloat)aHeight;
+        }
+#ifdef VTK_OPENGL2
+        if (this->OpenGLHelper.IsInitialized())
+        {
+          if (this->VertexArrayObject == 0)
+          {
+            this->OpenGLHelper.vglGenVertexArraysARB (1, &this->VertexArrayObject);
+          }
+
+          this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
+          this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
+
+          GLfloat dx = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aWidth / (GLfloat)aViewWidth )) : 1.0f;
+          GLfloat dy = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aHeight / (GLfloat)aViewHeight )) : 1.0f;
+
+
+          // First 4 components of Vertex is TexCoords now.
+          GLfloat data[7 * 4] = { 0.0f, texY, 0.0f, 1.0f,       -dx,  dy, 0.0f,
+                                  0.0f, 0.0f, 0.0f, 1.0f,       -dx, -dy, 0.0f,
+                                  texX, 0.0f, 0.0f, 1.0f,        dx, -dy, 0.0f,
+                                  texX, texY, 0.0f, 1.0f,        dx,  dy, 0.0f };
+
+          GLuint vertexBuffer;
+          this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
+          this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, vertexBuffer);
+          this->OpenGLHelper.vglBufferDataARB (GL_ARRAY_BUFFER_ARB, sizeof(data), data, GL_STATIC_DRAW_ARB);
+
+          GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Color");
+          GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Vertex");
+          GLsizei vertexSize = sizeof(GLfloat) * 7;
+
+          this->OpenGLHelper.vglVertexAttribPointerARB (colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0);
+          this->OpenGLHelper.vglEnableVertexAttribArrayARB (colorAttrib);
+
+          this->OpenGLHelper.vglVertexAttribPointerARB (vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4));
+          this->OpenGLHelper.vglEnableVertexAttribArrayARB (vertexAttrib);
+
+          this->OpenGLHelper.vglUniform1iARB (this->myLocations.UseTexture, 1);
+          this->OpenGLHelper.vglUniform1iARB (this->myLocations.BackgroundTexture, GL_TEXTURE0);
+
+          glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+          this->OpenGLHelper.vglDisableVertexAttribArrayARB (0);
+          this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+          this->OpenGLHelper.vglDeleteBuffersARB (1, &vertexBuffer);
+          this->OpenGLHelper.vglBindVertexArrayARB (0);
+          this->OpenGLHelper.vglUseProgramObjectARB (0);
+        }
+#else
+        GLfloat x_offset = 0.5f, y_offset = 0.5f;
+        GLfloat coeff = 0.5f;
+        if( aPosition == VTKViewer_Texture::Centered )
+        {
+          x_offset = ( (GLfloat)aWidth / (GLfloat)aViewWidth ) / 2.;
+          y_offset = ( (GLfloat)aHeight / (GLfloat)aViewHeight ) / 2.;
+        }
 
         // OCCT issue 0023102: Change the algorithm of rendering the
         // 3d viewer background using tiled texture
@@ -223,22 +383,6 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         // to the top-left corner of the view (value 1.F corresponds to the
         // initial behaviour - tiling from the bottom-left corner)
         GLfloat aCoef = -1.F;
-
-        int aPosition = aTexture->GetPosition();
-        int aWidth = aTexture->GetWidth();
-        int aHeight = aTexture->GetHeight();
-        int aViewWidth = this->RenderWindow->GetSize()[0];
-        int aViewHeight = this->RenderWindow->GetSize()[1];                    
-        if( aPosition == VTKViewer_Texture::Centered )
-        {
-          x_offset = ( (GLfloat)aWidth / (GLfloat)aViewWidth ) / 2.;
-          y_offset = ( (GLfloat)aHeight / (GLfloat)aViewHeight ) / 2.;
-        }
-        else if( aPosition == VTKViewer_Texture::Tiled )
-        {
-          texX = (GLfloat)aViewWidth / (GLfloat)aWidth;
-          texY = (GLfloat)aViewHeight / (GLfloat)aHeight;
-        }
 
         // Note that texture is mapped using GL_REPEAT wrapping mode so integer part
         // is simply ignored, and negative multiplier is here for convenience only
@@ -249,7 +393,20 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         glTexCoord2f( texX, aCoef * texY ); glVertex2f(  x_offset + coeff,  aCoef * y_offset + coeff );
         glTexCoord2f(  0.F, aCoef * texY ); glVertex2f( -x_offset + coeff,  aCoef * y_offset + coeff );
         glEnd();
+#endif
       }
+    }
+
+    // Restore settings.
+    {
+      glEnable( GL_ALPHA_TEST );
+      glEnable( GL_DEPTH_TEST );
+      glEnable( GL_LIGHTING );
+      glEnable( GL_TEXTURE_1D );
+      glEnable( GL_TEXTURE_2D );
+      glEnable( GL_BLEND );
+
+      glShadeModel( oldShadeModel ); // color interpolation
     }
 
     glPopMatrix();

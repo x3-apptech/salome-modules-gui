@@ -43,10 +43,7 @@ class vtkImageData;
 #define MAPPER_SUPERCLASS vtkMesaPolyDataMapper
 #endif
 
-#ifndef GL_ARB_shader_objects
-typedef GLuint GLhandleARB;
-#endif
-
+#include "VTKViewer_OpenGLHelper.h"
 
 //----------------------------------------------------------------------------
 //! OpenGL Point Sprites PolyData Mapper.
@@ -97,9 +94,12 @@ public:
 
   //! Implement superclass render method.
   virtual void RenderPiece( vtkRenderer*, vtkActor* );
-
   //! Draw method for OpenGL.
+#ifndef VTK_OPENGL2
   virtual int Draw( vtkRenderer*, vtkActor* );
+#else
+  virtual void RenderPieceDraw( vtkRenderer*, vtkActor* );
+#endif    
 
 protected:
   VTKViewer_PolyDataMapper();
@@ -118,7 +118,9 @@ protected:
   void              InitTextures();
 
   //! Initializing of the Vertex Shader.
-  void              InitShader();
+  int               InitShader();
+
+  void              InternalDraw(vtkRenderer*, vtkActor*);
 
 private:
   int               ExtensionsInitialized;
@@ -126,11 +128,35 @@ private:
   GLuint            PointSpriteTexture;
 
   vtkSmartPointer<vtkImageData> ImageData;
-  
-  GLhandleARB       VertexProgram;
+
+  VTKViewer_OpenGLHelper OpenGLHelper;
+  GLhandleARB PointProgram;
+#ifdef VTK_OPENGL2
+  GLhandleARB VertexShader;
+  GLhandleARB FragmentShader;
+  GLuint      VertexArrayObject;
+#endif
+
+  struct Locations {
+    static const GLint INVALID_LOCATION = -1;
+
+    GLint ModelViewProjection;
+    GLint Projection;
+    GLint GeneralPointSize;
+    GLint PointSprite;
+
+    Locations()
+    : ModelViewProjection (INVALID_LOCATION),
+      Projection          (INVALID_LOCATION),
+      GeneralPointSize    (INVALID_LOCATION),
+      PointSprite         (INVALID_LOCATION)
+    {
+          //
+    }
+  } myLocations;
 
   bool              MarkerEnabled;
-  bool              BallEnabled; 
+  bool              BallEnabled;
   double            BallScale;
   VTK::MarkerType   MarkerType;
   VTK::MarkerScale  MarkerScale;

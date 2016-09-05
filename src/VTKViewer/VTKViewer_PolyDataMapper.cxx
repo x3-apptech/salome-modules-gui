@@ -16,6 +16,9 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#ifdef VTK_OPENGL2
+#define GL_GLEXT_PROTOTYPES
+#endif
 
 #include "VTKViewer_PolyDataMapper.h"
 #include "VTKViewer_MarkerUtils.h"
@@ -62,78 +65,7 @@ vtkStandardNewMacro(VTKViewer_PolyDataMapper);
 #define VTK_PDPSM_NORMAL_TYPE_DOUBLE 0x0020
 #define VTK_PDPSM_OPAQUE_COLORS      0x0040
 
-#ifndef APIENTRY
-#define APIENTRY
-#endif
-#ifndef APIENTRYP
-#define APIENTRYP APIENTRY *
-#endif
-
-#ifndef GL_ARB_shader_objects
-typedef char GLcharARB;
-#endif
-
-#ifndef GL_VERTEX_PROGRAM_POINT_SIZE_ARB
-#define GL_VERTEX_PROGRAM_POINT_SIZE_ARB  0x8642
-#endif
-
-#ifndef GL_VERTEX_SHADER_ARB
-#define GL_VERTEX_SHADER_ARB              0x8B31
-#endif
-
-#ifndef GL_ARB_point_sprite
-#define GL_POINT_SPRITE_ARB               0x8861
-#define GL_COORD_REPLACE_ARB              0x8862
-#endif
-
-#ifndef GL_ARB_vertex_buffer_object
-typedef ptrdiff_t GLsizeiptrARB;
-
-#define GL_ARRAY_BUFFER_ARB               0x8892
-#define GL_STATIC_DRAW_ARB                0x88E4
-#endif
-typedef void (APIENTRYP PFNGLSHADERSOURCEARBPROC) (GLhandleARB shaderObj, GLsizei count, const GLcharARB* *string, const GLint *length);
-typedef GLhandleARB (APIENTRYP PFNGLCREATESHADEROBJECTARBPROC) (GLenum shaderType);
-typedef void (APIENTRYP PFNGLBINDBUFFERARBPROC) (GLenum target, GLuint buffer);
-typedef void (APIENTRYP PFNGLDELETEBUFFERSARBPROC) (GLsizei n, const GLuint *buffers);
-typedef void (APIENTRYP PFNGLGENBUFFERSARBPROC) (GLsizei n, GLuint *buffers);
-typedef void (APIENTRYP PFNGLBUFFERDATAARBPROC) (GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
-typedef void (APIENTRYP PFNGLCOMPILESHADERARBPROC) (GLhandleARB shaderObj);
-typedef GLhandleARB (APIENTRYP PFNGLCREATEPROGRAMOBJECTARBPROC) (void);
-typedef void (APIENTRYP PFNGLATTACHOBJECTARBPROC) (GLhandleARB containerObj, GLhandleARB obj);
-typedef void (APIENTRYP PFNGLLINKPROGRAMARBPROC) (GLhandleARB programObj);
-typedef void (APIENTRYP PFNGLUSEPROGRAMOBJECTARBPROC) (GLhandleARB programObj);
-typedef GLint (APIENTRYP PFNGLGETATTRIBLOCATIONARBPROC) (GLhandleARB programObj, const GLcharARB *name);
-typedef void (APIENTRYP PFNGLVERTEXATTRIBPOINTERARBPROC) (GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
-typedef void (APIENTRYP PFNGLENABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
-typedef void (APIENTRYP PFNGLDISABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
-
-typedef GLfloat TBall; 
-
-
-static PFNGLSHADERSOURCEARBPROC             vglShaderSourceARB             = NULL;
-static PFNGLCREATESHADEROBJECTARBPROC       vglCreateShaderObjectARB       = NULL;
-static PFNGLCOMPILESHADERARBPROC            vglCompileShaderARB            = NULL;
-static PFNGLCREATEPROGRAMOBJECTARBPROC      vglCreateProgramObjectARB      = NULL;
-static PFNGLATTACHOBJECTARBPROC             vglAttachObjectARB             = NULL;
-static PFNGLLINKPROGRAMARBPROC              vglLinkProgramARB              = NULL;
-static PFNGLUSEPROGRAMOBJECTARBPROC         vglUseProgramObjectARB         = NULL;
-
-static PFNGLGENBUFFERSARBPROC               vglGenBuffersARB               = NULL;
-static PFNGLBINDBUFFERARBPROC               vglBindBufferARB               = NULL;
-static PFNGLBUFFERDATAARBPROC               vglBufferDataARB               = NULL;
-static PFNGLDELETEBUFFERSARBPROC            vglDeleteBuffersARB            = NULL;
-static PFNGLGETATTRIBLOCATIONARBPROC        vglGetAttribLocationARB        = NULL;
-static PFNGLVERTEXATTRIBPOINTERARBPROC      vglVertexAttribPointerARB      = NULL;
-static PFNGLENABLEVERTEXATTRIBARRAYARBPROC  vglEnableVertexAttribArrayARB  = NULL;
-static PFNGLDISABLEVERTEXATTRIBARRAYARBPROC vglDisableVertexAttribArrayARB = NULL;
-
-
-#ifndef WIN32
-#define GL_GetProcAddress( x )   glXGetProcAddressARB( (const GLubyte*)x )
-#else
-#define GL_GetProcAddress( x )   wglGetProcAddress( (const LPCSTR)x )
-#endif
+typedef GLfloat TBall;
 
 #ifdef WIN32
   #ifdef max
@@ -145,100 +77,6 @@ static PFNGLDISABLEVERTEXATTRIBARRAYARBPROC vglDisableVertexAttribArrayARB = NUL
 // texture id for balls drawing
 #define BallTextureId 0 
 
-bool InitializeBufferExtensions()
-{
-  vglShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)GL_GetProcAddress( "glShaderSourceARB" );
-  if( !vglShaderSourceARB )
-    return false;
-
-  vglCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)GL_GetProcAddress( "glCreateShaderObjectARB" );
-  if( !vglCreateShaderObjectARB )
-    return false;
-
-  vglCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)GL_GetProcAddress( "glCompileShaderARB" );
-  if( !vglCompileShaderARB )
-    return false;
-
-  vglCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)GL_GetProcAddress( "glCreateProgramObjectARB" );
-  if( !vglCreateProgramObjectARB )
-    return false;
-
-  vglAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)GL_GetProcAddress( "glAttachObjectARB" );
-  if( !vglAttachObjectARB )
-    return false;
-
-  vglLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)GL_GetProcAddress( "glLinkProgramARB" );
-  if( !vglLinkProgramARB )
-    return false;
-
-  vglUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)GL_GetProcAddress( "glUseProgramObjectARB" );
-  if( !vglUseProgramObjectARB )
-    return false;
-
-  vglGenBuffersARB = (PFNGLGENBUFFERSARBPROC)GL_GetProcAddress( "glGenBuffersARB" );
-  if( !vglGenBuffersARB )
-    return false;
-
-  vglBindBufferARB = (PFNGLBINDBUFFERARBPROC)GL_GetProcAddress( "glBindBufferARB" );
-  if( !vglBindBufferARB )
-    return false;
-
-  vglBufferDataARB = (PFNGLBUFFERDATAARBPROC)GL_GetProcAddress( "glBufferDataARB" );
-  if( !vglBufferDataARB )
-    return false;
-
-  vglDeleteBuffersARB = (PFNGLDELETEBUFFERSARBPROC)GL_GetProcAddress( "glDeleteBuffersARB" );
-  if( !vglDeleteBuffersARB )
-    return false;
-
-  vglGetAttribLocationARB = (PFNGLGETATTRIBLOCATIONARBPROC)GL_GetProcAddress( "glGetAttribLocation" );
-  if( !vglGetAttribLocationARB )
-    return false;
-
-  vglVertexAttribPointerARB = (PFNGLVERTEXATTRIBPOINTERARBPROC)GL_GetProcAddress( "glVertexAttribPointer" );
-  if( !vglVertexAttribPointerARB )
-    return false;
-
-  vglEnableVertexAttribArrayARB = (PFNGLENABLEVERTEXATTRIBARRAYARBPROC)GL_GetProcAddress( "glEnableVertexAttribArray" );
-  if(!vglEnableVertexAttribArrayARB)
-    return false;
-
-  vglDisableVertexAttribArrayARB = (PFNGLDISABLEVERTEXATTRIBARRAYARBPROC)GL_GetProcAddress( "glDisableVertexAttribArray" );
-
-  if(!vglDisableVertexAttribArrayARB)
-    return false;
-
-  
-  return true;
-};
-
-//-----------------------------------------------------------------------------
-char* readFromFile( std::string fileName )
-{
-  FILE* file = fopen( fileName.c_str(), "r" );
-
-  char* content = NULL;
-  int count = 0;
-
-  if( file != NULL )
-  {
-    fseek( file, 0, SEEK_END );
-    count = ftell( file );
-    rewind( file );
-
-    if( count > 0 )
-    {
-      content = ( char* )malloc( sizeof( char ) * ( count + 1 ) );
-      count = fread( content, sizeof( char ), count, file );
-      content[ count ] = '\0';
-    }
-    fclose( file );
-  }
-
-  return content;
-}
-
-static bool IsBufferExtensionsInitialized = InitializeBufferExtensions();
 
 //-----------------------------------------------------------------------------
 VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
@@ -255,7 +93,13 @@ VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
   this->MarkerId                  = 0;
   this->BallEnabled               = false;
   this->BallScale                 = 1.0;
-  this->VertexProgram             = 0;
+  this->PointProgram              = 0;
+#ifdef VTK_OPENGL2
+  this->VertexShader              = 0;
+  this->FragmentShader            = 0;
+#endif
+
+  this->OpenGLHelper.Init();
 }
 
 //-----------------------------------------------------------------------------
@@ -263,25 +107,49 @@ VTKViewer_PolyDataMapper::~VTKViewer_PolyDataMapper()
 {
   if( PointSpriteTexture > 0 )
     glDeleteTextures( 1, &PointSpriteTexture );
+
+#ifdef VTK_OPENGL2
+  this->OpenGLHelper.DestroyShaderProgram( this->PointProgram, this->VertexShader, this->FragmentShader);
+#endif
 }
 
 //-----------------------------------------------------------------------------
-void VTKViewer_PolyDataMapper::InitShader()
+int VTKViewer_PolyDataMapper::InitShader()
 {
+#ifdef VTK_OPENGL2
+  std::string filePath = std::string( getenv( "GUI_ROOT_DIR") ) + "/share/salome/resources/gui/Point";
+  if( !this->OpenGLHelper.CreateShaderProgram(filePath, this->PointProgram, this->VertexShader, this->FragmentShader) )
+    return false;
+
+  // Get uniform locations.
+  this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
+
+  this->myLocations.ModelViewProjection = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uModelViewProjectionMatrix" );
+  this->myLocations.Projection          = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uProjectionMatrix" );
+  this->myLocations.GeneralPointSize    = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uGeneralPointSize" );
+  this->myLocations.PointSprite         = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uPointSprite" );
+
+  this->OpenGLHelper.vglUseProgramObjectARB( 0 );
+
+  this->OpenGLHelper.vglGenVertexArraysARB(1, &this->VertexArrayObject);
+#else
   std::string fileName = std::string( getenv( "GUI_ROOT_DIR") ) +
                          "/share/salome/resources/gui/Vertex_Program_ARB.txt";
 
   char* shader = readFromFile( fileName );
 
-  GLhandleARB VertexShader = vglCreateShaderObjectARB( GL_VERTEX_SHADER_ARB );
-  vglShaderSourceARB( VertexShader, 1, (const GLcharARB**)&shader, NULL );
-  vglCompileShaderARB( VertexShader );
+  GLhandleARB VertexShader = this->OpenGLHelper.vglCreateShaderObjectARB( GL_VERTEX_SHADER_ARB );
+  this->OpenGLHelper.vglShaderSourceARB( VertexShader, 1, (const GLcharARB**)&shader, NULL );
+  this->OpenGLHelper.vglCompileShaderARB( VertexShader );
 
-  this->VertexProgram = vglCreateProgramObjectARB();
-  vglAttachObjectARB( this->VertexProgram, VertexShader );
+  this->PointProgram = this->OpenGLHelper.vglCreateProgramObjectARB();
+  this->OpenGLHelper.vglAttachObjectARB( this->PointProgram, VertexShader );
 
-  vglLinkProgramARB( this->VertexProgram );
+  this->OpenGLHelper.vglLinkProgramARB( this->PointProgram );
   free( shader );
+#endif
+
+  return ES_Ok;
 }
 
 
@@ -467,8 +335,21 @@ int VTKViewer_PolyDataMapper::GetMarkerTexture()
 //-----------------------------------------------------------------------------
 int VTKViewer_PolyDataMapper::InitExtensions()
 {
-  char* ext = (char*)glGetString( GL_EXTENSIONS );
-  if( !IsBufferExtensionsInitialized ||
+#ifdef VTK_OPENGL2
+  int n = 0;
+  std::ostringstream strm;
+  glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+  for (int i = 0; i < n; i++)
+    {
+      const char *exti = (const char *)glGetStringi(GL_EXTENSIONS, i);
+      strm<< exti <<" ";
+    }
+  std::string s = strm.str();
+  const char* ext = s.c_str();
+#else  
+  const char* ext = (const char*)glGetString( GL_EXTENSIONS );
+#endif
+  if( !this->OpenGLHelper.IsInitialized() || !ext ||
       strstr( ext, "GL_ARB_point_sprite" ) == NULL ||
       strstr( ext, "GL_ARB_vertex_buffer_object" ) == NULL ||
       strstr( ext, "GL_ARB_shader_objects") == NULL )
@@ -477,10 +358,7 @@ int VTKViewer_PolyDataMapper::InitExtensions()
     return ES_Error;
   }
 
-  if( this->BallEnabled )
-    this->InitShader();
-
-  return ES_Ok;
+  return this->InitShader();
 }
 
 //-----------------------------------------------------------------------------
@@ -526,6 +404,9 @@ void VTKViewer_PolyDataMapper::InitTextures()
   if( this->PointSpriteTexture == 0 ) {
     glGenTextures( 1, &this->PointSpriteTexture );
   }
+#ifdef VTK_OPENGL2
+  glActiveTexture( GL_TEXTURE0 );
+#endif
   glBindTexture( GL_TEXTURE_2D, this->PointSpriteTexture );
   glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );
   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
@@ -543,6 +424,11 @@ void VTKViewer_PolyDataMapper::InitTextures()
   unsigned char* dataPtr = (unsigned char*)this->ImageData->GetScalarPointer();
   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, aSize[0], aSize[1], 0,
                 GL_RGBA, GL_UNSIGNED_BYTE, dataPtr );
+
+#ifdef VTK_OPENGL2
+  // Set sampler.
+  this->OpenGLHelper.vglUniform1iARB( this->myLocations.PointSprite, GL_TEXTURE0 );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -552,7 +438,7 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     this->BallEnabled;
   if( isUsePointSprites )
   {
-    if( this->ExtensionsInitialized == ES_None )
+    if( this->ExtensionsInitialized != ES_Ok )
       this->ExtensionsInitialized = this->InitExtensions();
     this->InitPointSprites();
     this->InitTextures();
@@ -596,8 +482,9 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     ren->GetRenderWindow()->MakeCurrent();
 
 
-    vglUseProgramObjectARB( this->VertexProgram );
+    this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
 
+#ifndef VTK_OPENGL2
     //
     // if something has changed regenerate colors and display lists
     // if required
@@ -670,8 +557,13 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     // time so that it is not zero
     if ( this->TimeToDraw == 0.0 )
       this->TimeToDraw = 0.0001;
-
-    vglUseProgramObjectARB( 0 );
+#else
+    //this->RenderPieceStart(ren, act);
+    this->RenderPieceDraw(ren, act);
+    //    this->RenderEdges(ren,act);
+    //this->RenderPieceFinish(ren, act);
+#endif    
+    this->OpenGLHelper.vglUseProgramObjectARB( 0 );
     this->CleanupPointSprites();
     glBindTexture( GL_TEXTURE_2D, 0 );
   }  
@@ -863,16 +755,40 @@ namespace VTK
   }
 } // namespace VTK
 
+#ifndef VTK_OPENGL2
 //-----------------------------------------------------------------------------
 int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
-{  
+{
+  int noAbort = 1;
   if( (!this->MarkerEnabled || this->MarkerType == VTK::MT_NONE || !this->ImageData.GetPointer()) && !this->BallEnabled)
     return MAPPER_SUPERCLASS::Draw( ren, act );
 
+  InternalDraw( ren, act );
+
+  return noAbort;
+}
+#else
+//-----------------------------------------------------------------------------
+void VTKViewer_PolyDataMapper::RenderPieceDraw( vtkRenderer* ren, vtkActor* act ) {
+  int noAbort = 1;
+  if( (!this->MarkerEnabled || this->MarkerType == VTK::MT_NONE || !this->ImageData.GetPointer()) && !this->BallEnabled) {
+    MAPPER_SUPERCLASS::RenderPieceDraw( ren, act );
+    return;
+  }
+  InternalDraw( ren, act );
+}
+#endif
+
+#ifdef VTK_OPENGL2
+#include <vtkCamera.h>
+#include <vtkOpenGLCamera.h>
+#include <vtkOpenGLActor.h>
+#endif
+
+void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
   vtkUnsignedCharArray* colors = NULL;
   vtkPolyData* input  = this->GetInput();
   vtkPoints* points;
-  int noAbort = 1;
   int cellScalars = 0;
   vtkProperty* prop = act->GetProperty();
 
@@ -924,7 +840,7 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
       }
 
       int* aSize = this->ImageData->GetDimensions();
-      glPointSize( std::max( aSize[0], aSize[1] ) );
+      //glPointSize( std::max( aSize[0], aSize[1] ) );
 
       int aMode = 0; // to remove
       {
@@ -946,18 +862,100 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
       }
 
       if( this->ExtensionsInitialized == ES_Ok ) {
+#ifdef VTK_OPENGL2
+        this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
+
+        vtkOpenGLCamera *cam = (vtkOpenGLCamera *)(ren->GetActiveCamera());
+        vtkMatrix4x4 *wcdc;
+        vtkMatrix4x4 *wcvc;
+        vtkMatrix3x3 *norms;
+        vtkMatrix4x4 *vcdc;
+        cam->GetKeyMatrices(ren,wcvc,norms,vcdc,wcdc);
+        if (!act->GetIsIdentity())
+        {
+          vtkMatrix4x4 *mcwc;
+          vtkMatrix3x3 *anorms;
+          ((vtkOpenGLActor *)act)->GetKeyMatrices( mcwc, anorms );
+          vtkMatrix4x4::Multiply4x4( mcwc, wcdc, this->TempMatrix4 );
+
+          this->OpenGLHelper.SetUniformMatrix( this->myLocations.ModelViewProjection, this->TempMatrix4 );
+        }
+        else
+        {
+        	this->OpenGLHelper.SetUniformMatrix( this->myLocations.ModelViewProjection, wcdc );
+        }
+        this->OpenGLHelper.SetUniformMatrix( this->myLocations.Projection, vcdc );
+
+        this->OpenGLHelper.vglUniform1iARB( this->myLocations.GeneralPointSize, std::max( aSize[0], aSize[1] ) );
+
         GLuint aBufferObjectID, aDiamsID = 0;
-	GLint attribute_diams = -1;
-        vglGenBuffersARB( 1, &aBufferObjectID );
-        vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );
+
+        this->OpenGLHelper.vglBindVertexArrayARB( this->VertexArrayObject );
+        this->OpenGLHelper.vglGenBuffersARB( 1, &aBufferObjectID );
+        this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );
         
         int anArrayObjectSize = sizeof( VTK::TVertex ) * aTotalConnectivitySize;
-        vglBufferDataARB( GL_ARRAY_BUFFER_ARB, anArrayObjectSize, aVertexArr, GL_STATIC_DRAW_ARB );
+        this->OpenGLHelper.vglBufferDataARB( GL_ARRAY_BUFFER_ARB, anArrayObjectSize, aVertexArr, GL_STATIC_DRAW_ARB );
         
         delete [] aVertexArr;
         
-        vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-        vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );        
+
+        GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB( this->PointProgram, "Color" );
+        GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB( this->PointProgram, "Vertex" );
+        GLint diamAttrib   = this->OpenGLHelper.vglGetAttribLocationARB( this->PointProgram, "Diameter" );
+
+        GLsizei vertexSize = sizeof(VTK::TVertex);
+
+        this->OpenGLHelper.vglVertexAttribPointerARB( colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0 );
+        this->OpenGLHelper.vglEnableVertexAttribArrayARB( colorAttrib );
+
+        this->OpenGLHelper.vglVertexAttribPointerARB( vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4) );
+        this->OpenGLHelper.vglEnableVertexAttribArrayARB( vertexAttrib );
+
+       if(this->BallEnabled) {
+         // Don't use uniform variable.
+         this->OpenGLHelper.vglUniform1iARB( this->myLocations.GeneralPointSize, -1 );
+         this->OpenGLHelper.vglGenBuffersARB( 1, &aDiamsID);
+         this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID);
+
+         int aDiamsSize = sizeof(TBall)*aNbCells;
+         this->OpenGLHelper.vglBufferDataARB( GL_ARRAY_BUFFER_ARB, aDiamsSize, aBallArray, GL_STATIC_DRAW_ARB);
+
+         delete [] aBallArray;
+
+         this->OpenGLHelper.vglVertexAttribPointerARB( diamAttrib, 1, GL_FLOAT, GL_FALSE, 0, 0 );
+         this->OpenGLHelper.vglEnableVertexAttribArrayARB( diamAttrib );
+       }
+
+       glDrawArrays( GL_POINTS, 0, aTotalConnectivitySize );
+
+       if( this->BallEnabled ) {
+         this->OpenGLHelper.vglDisableVertexAttribArrayARB( diamAttrib );
+         this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+         this->OpenGLHelper.vglDeleteBuffersARB( 1, &aDiamsID );
+       }
+
+       this->OpenGLHelper.vglDisableVertexAttribArrayARB( colorAttrib );
+       this->OpenGLHelper.vglDisableVertexAttribArrayARB( vertexAttrib );
+       this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+       this->OpenGLHelper.vglDeleteBuffersARB( 1, &aBufferObjectID );
+       this->OpenGLHelper.vglBindVertexArrayARB( 0 );
+
+       this->OpenGLHelper.vglUseProgramObjectARB( 0 );
+#else
+       GLuint aBufferObjectID, aDiamsID = 0;
+       GLint attribute_diams = -1;
+
+       this->OpenGLHelper.vglGenBuffersARB( 1, &aBufferObjectID );
+       this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );
+
+       int anArrayObjectSize = sizeof( VTK::TVertex ) * aTotalConnectivitySize;
+       this->OpenGLHelper.vglBufferDataARB( GL_ARRAY_BUFFER_ARB, anArrayObjectSize, aVertexArr, GL_STATIC_DRAW_ARB );
+
+       delete [] aVertexArr;
+
+       this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+       this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );
         
         glColorPointer( 4, GL_FLOAT, sizeof(VTK::TVertex), (void*)0 );
         glVertexPointer( 3, GL_FLOAT, sizeof(VTK::TVertex), (void*)(4*sizeof(GLfloat)) );
@@ -966,20 +964,20 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
         glEnableClientState( GL_COLOR_ARRAY );
 
 	if(this->BallEnabled) {
-	  vglGenBuffersARB( 2, &aDiamsID);
-	  vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID);
+		this->OpenGLHelper.vglGenBuffersARB( 1, &aDiamsID);
+		this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID);
 
 	  int aDiamsSize = sizeof(TBall)*aNbCells;
-	  vglBufferDataARB( GL_ARRAY_BUFFER_ARB, aDiamsSize, aBallArray, GL_STATIC_DRAW_ARB);
+	  this->OpenGLHelper.vglBufferDataARB( GL_ARRAY_BUFFER_ARB, aDiamsSize, aBallArray, GL_STATIC_DRAW_ARB);
 
 	  delete [] aBallArray;
-	  vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-	  vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID );
+	  this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
+	  this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID );
 
-	  attribute_diams = vglGetAttribLocationARB(this->VertexProgram, "diameter");
-	  vglEnableVertexAttribArrayARB(attribute_diams);
-	  vglBindBufferARB(GL_ARRAY_BUFFER_ARB, aDiamsID);
-	  vglVertexAttribPointerARB(
+	  attribute_diams = vglGetAttribLocationARB(this->PointProgram, "diameter");
+	  this->OpenGLHelper.vglEnableVertexAttribArrayARB(attribute_diams);
+	  this->OpenGLHelper.vglBindBufferARB(GL_ARRAY_BUFFER_ARB, aDiamsID);
+	  this->OpenGLHelper.vglVertexAttribPointerARB(
 				    attribute_diams,   // attribute
 				    1,                 // number of elements per vertex, here (diameter)
 				    GL_FLOAT,          // the type of each element
@@ -993,13 +991,14 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
         
         glDisableClientState( GL_COLOR_ARRAY );
         glDisableClientState( GL_VERTEX_ARRAY );       
-        vglDeleteBuffersARB( 1, &aBufferObjectID );
+        this->OpenGLHelper.vglDeleteBuffersARB( 1, &aBufferObjectID );
 
 	if(this->BallEnabled) {
-	  vglDisableVertexAttribArrayARB(attribute_diams);
-	  vglDeleteBuffersARB( 2, &aDiamsID );
+		this->OpenGLHelper.vglDisableVertexAttribArrayARB(attribute_diams);
+		this->OpenGLHelper.vglDeleteBuffersARB( 1, &aDiamsID );
 	}
 
+#endif
 	  } else { // there are no extensions
         glColorPointer( 4, GL_FLOAT, sizeof(VTK::TVertex), aVertexArr );
         glVertexPointer( 3, GL_FLOAT, sizeof(VTK::TVertex), 
@@ -1019,5 +1018,4 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
   }
 
   this->UpdateProgress(1.0);
-  return noAbort;
 }

@@ -69,6 +69,7 @@ SET(_other_HEADERS
   VTKViewer_InteractorStyle.h
   VTKViewer_MarkerDef.h
   VTKViewer_MarkerUtils.h
+  VTKViewer_OpenGLHelper.h
   VTKViewer_OpenGLRenderer.h
   VTKViewer_PolyDataMapper.h
   VTKViewer_ShrinkFilter.h
@@ -152,6 +153,7 @@ SET(_other_SOURCES
   VTKViewer_MarkerDlg.cxx
   VTKViewer_MarkerUtils.cxx
   VTKViewer_MarkerWidget.cxx
+  VTKViewer_OpenGLHelper.cxx
   VTKViewer_OpenGLRenderer.cxx
   VTKViewer_PolyDataMapper.cxx
   VTKViewer_RenderWindow.cxx
@@ -188,3 +190,6 @@ INSTALL(FILES ${GUIVTI_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
 
 FILE(GLOB GUITXT_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.txt")
 INSTALL(FILES ${GUITXT_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+
+FILE(GLOB GUIGLSL_DATA "${CMAKE_CURRENT_SOURCE_DIR}/resources/*.glsl")
+INSTALL(FILES ${GUIGLSL_DATA} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
