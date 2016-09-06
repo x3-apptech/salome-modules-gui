@@ -24,6 +24,7 @@
 // Author :
 
 #include "OCCViewer_ViewWindow.h"
+#include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer_ViewPort3d.h"
 #include "OCCViewer_ViewManager.h"
@@ -1917,6 +1918,10 @@ void OCCViewer_ViewWindow::onCloneView()
   SUIT_ViewWindow* vw = myManager->createViewWindow();
   //vw->show();
   emit viewCloned( vw );
+  OCCViewer_ViewWindow* occVw = dynamic_cast<OCCViewer_ViewWindow*> (vw);
+  if(occVw && occVw->getView(OCCViewer_ViewFrame::MAIN_VIEW)) {
+    occVw->getView(OCCViewer_ViewFrame::MAIN_VIEW)->synchronize(this);
+  }
 }
 
 /*!
