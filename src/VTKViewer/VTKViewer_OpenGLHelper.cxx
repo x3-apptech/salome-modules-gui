@@ -205,7 +205,7 @@ void VTKViewer_OpenGLHelper::Init()
   return;
 }
 
-namespace
+namespace GUI_OPENGL
 {
 	char* readFromFile( std::string fileName )
 	{
@@ -257,7 +257,7 @@ bool VTKViewer_OpenGLHelper::CreateShaderProgram (const std::string& theFilePath
   // Create vertex shader.
   fileName = theFilePath + ".vs.glsl";
 
-  shaderContent = readFromFile (fileName);
+  shaderContent = GUI_OPENGL::readFromFile (fileName);
 
   theVertexShader = vglCreateShaderObjectARB (GL_VERTEX_SHADER_ARB);
   vglShaderSourceARB (theVertexShader, 1, (const GLcharARB**)&shaderContent, NULL);
@@ -281,7 +281,7 @@ bool VTKViewer_OpenGLHelper::CreateShaderProgram (const std::string& theFilePath
   // Create fragment shader.
   fileName = theFilePath + ".fs.glsl";
 
-  shaderContent = readFromFile (fileName);
+  shaderContent = GUI_OPENGL::readFromFile (fileName);
 
   theFragmentShader = vglCreateShaderObjectARB (GL_FRAGMENT_SHADER_ARB);
   vglShaderSourceARB (theFragmentShader, 1, (const GLcharARB**)&shaderContent, NULL);
@@ -349,6 +349,7 @@ void VTKViewer_OpenGLHelper::DestroyShaderProgram (GLhandleARB theProgram,
 // function : SetUniformMatrix
 // purpose  :
 // ============================================================================
+#ifdef VTK_OPENGL2
 void VTKViewer_OpenGLHelper::SetUniformMatrix (const GLint         theLocation,
                                                const vtkMatrix4x4* theMatrix) const
 {
@@ -360,3 +361,4 @@ void VTKViewer_OpenGLHelper::SetUniformMatrix (const GLint         theLocation,
 
   this->vglUniformMatrix4fvARB (theLocation, 1, GL_FALSE, data);
 }
+#endif

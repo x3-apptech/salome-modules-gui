@@ -66,6 +66,11 @@ typedef ptrdiff_t GLsizeiptrARB;
 #define GL_STATIC_DRAW_ARB                0x88E4
 #endif
 
+
+namespace GUI_OPENGL {
+char* readFromFile( std::string fileName );
+}
+
 class VTKVIEWER_EXPORT VTKViewer_OpenGLHelper
 {
 public:
@@ -85,9 +90,10 @@ public:
   void DestroyShaderProgram (GLhandleARB theProgram,
                              GLhandleARB theVertexShader,
                              GLhandleARB theFragmentShader) const;
-
+#ifdef VTK_OPENGL2
   void SetUniformMatrix (const GLint         theLocation,
                          const vtkMatrix4x4* theMatrix) const;
+#endif  
 
 protected:
   typedef void        (APIENTRYP PFNGLSHADERSOURCEARBPROC)             (GLhandleARB shaderObj, GLsizei count, const GLcharARB* *string, const GLint *length);

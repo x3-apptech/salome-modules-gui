@@ -136,7 +136,7 @@ int VTKViewer_PolyDataMapper::InitShader()
   std::string fileName = std::string( getenv( "GUI_ROOT_DIR") ) +
                          "/share/salome/resources/gui/Vertex_Program_ARB.txt";
 
-  char* shader = readFromFile( fileName );
+  char* shader = GUI_OPENGL::readFromFile( fileName );
 
   GLhandleARB VertexShader = this->OpenGLHelper.vglCreateShaderObjectARB( GL_VERTEX_SHADER_ARB );
   this->OpenGLHelper.vglShaderSourceARB( VertexShader, 1, (const GLcharARB**)&shader, NULL );
@@ -974,7 +974,7 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
 	  this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
 	  this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aDiamsID );
 
-	  attribute_diams = vglGetAttribLocationARB(this->PointProgram, "diameter");
+	  attribute_diams = this->OpenGLHelper.vglGetAttribLocationARB(this->PointProgram, "diameter");
 	  this->OpenGLHelper.vglEnableVertexAttribArrayARB(attribute_diams);
 	  this->OpenGLHelper.vglBindBufferARB(GL_ARRAY_BUFFER_ARB, aDiamsID);
 	  this->OpenGLHelper.vglVertexAttribPointerARB(
