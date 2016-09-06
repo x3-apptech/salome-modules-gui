@@ -840,7 +840,6 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
       }
 
       int* aSize = this->ImageData->GetDimensions();
-      //glPointSize( std::max( aSize[0], aSize[1] ) );
 
       int aMode = 0; // to remove
       {
@@ -945,7 +944,7 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
 #else
        GLuint aBufferObjectID, aDiamsID = 0;
        GLint attribute_diams = -1;
-
+       glPointSize( std::max( aSize[0], aSize[1] ) );
        this->OpenGLHelper.vglGenBuffersARB( 1, &aBufferObjectID );
        this->OpenGLHelper.vglBindBufferARB( GL_ARRAY_BUFFER_ARB, aBufferObjectID );
 
