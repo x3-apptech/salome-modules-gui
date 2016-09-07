@@ -1011,6 +1011,67 @@ QString SalomePyQt::getSetting( const QString& name )
 }
 
 /*!
+  \fn QString SalomePyQt::constant( const QString& name );
+  \brief Get constant's value from application's resource manager.
+
+  \param name name of the constant 
+  \return value of the constant
+
+  \sa setConstant()
+*/
+
+class TGetConstantEvent: public SALOME_Event 
+{
+public:
+  typedef QString TResult;
+  TResult myResult;
+  QString myName;
+  TGetConstantEvent( const QString& name ) : myName( name ) {}
+  virtual void Execute() 
+  {
+    if ( SUIT_Session::session() )
+      myResult = SUIT_Session::session()->resourceMgr()->constant( myName );
+  }
+};
+QString SalomePyQt::constant( const QString& name )
+{
+  return ProcessEvent( new TGetConstantEvent( name ) );
+}
+
+/*!
+  \brief Add constant to the application's resource manager.
+
+  This function is useful to specify programmatically specific
+  variables that are referenced in the resource setting.
+
+  For example, some resource value can be set as "$(myroot)/data/files".
+  Then, "mypath" constant can be set programmatically by the application
+  depending on run-time requirements.
+  
+  \param section resources file section name 
+  \param name name of the constant 
+  \param value value of the constant 
+
+  \sa constant()
+*/
+void SalomePyQt::setConstant( const QString& name, const QString& value )
+{
+  class TEvent: public SALOME_Event 
+  {
+    QString myName, myValue;
+  public:
+    TEvent( const QString& name, const QString& value ) 
+      : myName( name ), myValue( value ) {}
+    virtual void Execute() 
+    {
+      if ( SUIT_Session::session() )
+        SUIT_Session::session()->resourceMgr()->setConstant( myName, myValue );
+    }
+  };
+  ProcessVoidEvent( new TEvent( name, value ) );
+}
+
+/*!
   \brief Add double setting to the application preferences.
   \param section resources file section name 
   \param name setting name
@@ -1285,11 +1346,13 @@ bool SalomePyQt::boolSetting( const QString& section, const QString& name, const
 /*!
   \fn QString SalomePyQt::stringSetting( const QString& section, 
                                          const QString& name, 
-                                         const QString& def );
+                                         const QString& def, 
+                                         const bool subst );
   \brief Get string setting from the application preferences.
   \param section resources file section name 
   \param name setting name
   \param def default value which is returned if the setting is not found
+  \param subst \c true to make substitution, \c false to get "raw" value
   \return setting value
 */
 
@@ -1300,20 +1363,21 @@ public:
   TResult myResult;
   QString mySection;
   QString myName;
+  bool mySubst;
   TResult myDefault;
-  TGetStrSettingEvent( const QString& section, const QString& name, const QString& def ) 
-    : mySection( section ), myName( name ), myDefault( def ) {}
+  TGetStrSettingEvent( const QString& section, const QString& name, const QString& def, const bool subst ) 
+    : mySection( section ), myName( name ), myDefault( def ), mySubst( subst ) {}
   virtual void Execute() 
   {
     if ( SUIT_Session::session() ) {
       SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
-      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->stringValue( mySection, myName, myDefault ) : myDefault;
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->stringValue( mySection, myName, myDefault, mySubst ) : myDefault;
     }
   }
 };
-QString SalomePyQt::stringSetting( const QString& section, const QString& name, const QString& def )
+QString SalomePyQt::stringSetting( const QString& section, const QString& name, const QString& def, const bool subst )
 {
-  return ProcessEvent( new TGetStrSettingEvent( section, name, def ) );
+  return ProcessEvent( new TGetStrSettingEvent( section, name, def, subst ) );
 }
 
 /*!

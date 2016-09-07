@@ -246,6 +246,8 @@ public:
   static QAction*          action( const int );
   static int               actionId( const QAction* );
 
+  static QString           constant      ( const QString& );
+  static void              setConstant   ( const QString&, const QString& );
   static void              addSetting    ( const QString&, const QString&, const double );
   static void              addSetting    ( const QString&, const QString&, const int );
   static void              addSetting    ( const QString&, const QString&, const bool, const int );
@@ -255,7 +257,7 @@ public:
   static int               integerSetting( const QString&, const QString&, const int = 0 );
   static double            doubleSetting ( const QString&, const QString&, const double = 0 );
   static bool              boolSetting   ( const QString&, const QString&, const bool = 0 );
-  static QString           stringSetting ( const QString&, const QString&, const QString& = QString("") );
+  static QString           stringSetting ( const QString&, const QString&, const QString& = QString(""), const bool = true );
   static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() );
   static QByteArray        byteArraySetting( const QString&, const QString&, const QByteArray& = QByteArray() );
   static void              removeSetting ( const QString&, const QString& );

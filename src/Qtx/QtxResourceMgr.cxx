@@ -74,6 +74,10 @@ static const char* pixmap_not_found_xpm[] = {
 
 class QtxResourceMgr::Resources
 {
+private:
+  typedef QMap<QString, Section> SectionMap;
+  typedef QMap<QString, QString> OptionsMap;
+
 public:
   Resources( QtxResourceMgr*, const QString& );
   virtual ~Resources();
@@ -81,7 +85,7 @@ public:
   QString                file() const;
   void                   setFile( const QString& );
 
-  QString                value( const QString&, const QString&, const bool ) const;
+  QString                value( const QString&, const QString&, const bool, const OptionsMap& ) const;
   void                   setValue( const QString&, const QString&, const QString& );
 
   bool                   hasSection( const QString& ) const;
@@ -90,17 +94,15 @@ public:
   void                   removeSection( const QString& );
   void                   removeValue( const QString&, const QString& );
 
-  QPixmap                loadPixmap( const QString&, const QString&, const QString& ) const;
-  QTranslator*           loadTranslator( const QString&, const QString&, const QString& ) const;
-
-  QString                makeSubstitution( const QString&, const QString&, const QString& ) const;
+  QPixmap                loadPixmap( const QString&, const QString&, const QString&, const OptionsMap& ) const;
+  QTranslator*           loadTranslator( const QString&, const QString&, const QString&, const OptionsMap& ) const;
 
   void                   clear();
 
   QStringList            sections() const;
   QStringList            parameters( const QString& ) const;
 
-  QString                path( const QString&, const QString&, const QString& ) const;
+  QString                path( const QString&, const QString&, const QString&, const OptionsMap& ) const;
 
 protected:
   QtxResourceMgr*        resMgr() const;
@@ -109,10 +111,9 @@ private:
   Section                section( const QString& );
   const Section          section( const QString& ) const;
 
-  QString                fileName( const QString&, const QString&, const QString& ) const;
+  QString                makeSubstitution( const QString&, const QString&, const QString&, const OptionsMap& ) const;
 
-private:
-  typedef QMap<QString, Section> SectionMap;
+  QString                fileName( const QString&, const QString&, const QString&, const OptionsMap& ) const;
 
 private:
   QtxResourceMgr*        myMgr;             //!< resources manager
@@ -172,7 +173,7 @@ void QtxResourceMgr::Resources::setFile( const QString& fn )
   \return parameter value or null QString if there is no such parameter
   \sa setValue(), makeSubstitution()
 */
-QString QtxResourceMgr::Resources::value( const QString& sect, const QString& name, const bool subst ) const
+QString QtxResourceMgr::Resources::value( const QString& sect, const QString& name, const bool subst, const OptionsMap& constants ) const
 {
   QString val;
 
@@ -180,7 +181,7 @@ QString QtxResourceMgr::Resources::value( const QString& sect, const QString& na
   {
     val = section( sect )[name];
     if ( subst )
-      val = makeSubstitution( val, sect, name );
+      val = makeSubstitution( val, sect, name, constants );
   }
   return val;
 }
@@ -291,9 +292,9 @@ QStringList QtxResourceMgr::Resources::parameters( const QString& sec ) const
   \return absolute file path or null QString if file does not exist
   \sa fileName(), file(), makeSubstitution()
 */
-QString QtxResourceMgr::Resources::path( const QString& sec, const QString& prefix, const QString& name ) const
+QString QtxResourceMgr::Resources::path( const QString& sec, const QString& prefix, const QString& name, const OptionsMap& constants ) const
 {
-  QString filePath = fileName( sec, prefix, name );
+  QString filePath = fileName( sec, prefix, name, constants );
   if ( !filePath.isEmpty() )
   {
     if ( !QFileInfo( filePath ).exists() )
@@ -354,7 +355,7 @@ const QtxResourceMgr::Section QtxResourceMgr::Resources::section( const QString&
           does not exist in section \sec
   \sa path(), file(), makeSubstitution()
 */
-QString QtxResourceMgr::Resources::fileName( const QString& sect, const QString& prefix, const QString& name ) const
+QString QtxResourceMgr::Resources::fileName( const QString& sect, const QString& prefix, const QString& name, const OptionsMap& constants ) const
 {
   QString path;
   if ( !QFileInfo( name ).isRelative() )
@@ -365,7 +366,7 @@ QString QtxResourceMgr::Resources::fileName( const QString& sect, const QString&
   {
     if ( hasValue( sect, prefix ) )
     {
-      path = value( sect, prefix, true );
+      path = value( sect, prefix, true, constants );
       if ( !path.isEmpty() )
       {
 	if ( QFileInfo( path ).isRelative() )
@@ -397,9 +398,9 @@ QString QtxResourceMgr::Resources::fileName( const QString& sect, const QString&
   \param name pixmap file name
   \return pixmap loaded from file
 */
-QPixmap QtxResourceMgr::Resources::loadPixmap( const QString& sect, const QString& prefix, const QString& name ) const
+QPixmap QtxResourceMgr::Resources::loadPixmap( const QString& sect, const QString& prefix, const QString& name, const OptionsMap& constants ) const
 {
-  QString fname = fileName( sect, prefix, name );
+  QString fname = fileName( sect, prefix, name, constants );
   bool toCache = resMgr() ? resMgr()->isPixmapCached() : false;
   QPixmap p;
   if( toCache && myPixmapCache.contains( fname ) )
@@ -420,10 +421,10 @@ QPixmap QtxResourceMgr::Resources::loadPixmap( const QString& sect, const QStrin
   \param name translation file name
   \return just created and loaded translator or 0 in case of error
 */
-QTranslator* QtxResourceMgr::Resources::loadTranslator( const QString& sect, const QString& prefix, const QString& name ) const
+QTranslator* QtxResourceMgr::Resources::loadTranslator( const QString& sect, const QString& prefix, const QString& name, const OptionsMap& constants ) const
 {
   QTranslator* trans = new QtxTranslator( 0 );
-  QString fname = QDir::toNativeSeparators( fileName( sect, prefix, name ) );
+  QString fname = QDir::toNativeSeparators( fileName( sect, prefix, name, constants ) );
   if ( !trans->load( Qtx::file( fname, false ), Qtx::dir( fname ) ) )
   {
     delete trans;
@@ -443,7 +444,7 @@ QTranslator* QtxResourceMgr::Resources::loadTranslator( const QString& sect, con
   \param name name of variable which must be ignored during substitution
   \return processed string (with all substitutions made)
 */
-QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const QString& sect, const QString& name ) const
+QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const QString& sect, const QString& name, const OptionsMap& constants ) const
 {
   QString res = str;
 
@@ -457,11 +458,14 @@ QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const Q
     if ( envName.isNull() )
       break;
 
-    QString newStr;
-    if ( ::getenv( envName.toLatin1() ) )
+    // First we look in the constants map
+    QString newStr = constants.value( envName, QString() );
+
+    // Then we check for environment variable
+    if ( newStr.isEmpty() && ::getenv( envName.toLatin1() ) )
       newStr = QString( ::getenv( envName.toLatin1() ) );
 
-    if ( newStr.isNull() )
+    if ( newStr.isEmpty() )
     {
       if ( ignoreMap.contains( envName ) )
       {
@@ -470,7 +474,7 @@ QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const Q
       }
 
       if ( hasValue( sect, envName ) )
-        newStr = value( sect, envName, false );
+        newStr = value( sect, envName, false, constants );
       ignoreMap.insert( envName, 0 );
     }
     res.replace( start, len, newStr );
@@ -1694,7 +1698,7 @@ bool QtxResourceMgr::value( const QString& sect, const QString& name, QString& v
   {
     ok = (*it)->hasValue( sect, name );
     if ( ok )
-      val = (*it)->value( sect, name, subst );
+      val = (*it)->value( sect, name, subst, myConstants );
   }
 
   return ok;
@@ -1805,10 +1809,10 @@ QColor QtxResourceMgr::colorValue( const QString& sect, const QString& name, con
   \param def default value
   \return parameter value (or default value if parameter is not found)
 */
-QString QtxResourceMgr::stringValue( const QString& sect, const QString& name, const QString& def ) const
+QString QtxResourceMgr::stringValue( const QString& sect, const QString& name, const QString& def, const bool subst ) const
 {
   QString val;
-  if ( !value( sect, name, val ) )
+  if ( !value( sect, name, val, subst ) )
     val = def;
   return val;
 }
@@ -2273,6 +2277,42 @@ void QtxResourceMgr::setOption( const QString& opt, const QString& val )
 }
 
 /*!
+  \brief Get names of all known constants.
+  \return list of constants names
+  \sa constant(), setConstant
+*/
+QStringList QtxResourceMgr::constants() const
+{
+  return myConstants.keys();
+}
+
+/*!
+  \brief Get the value of the known constant.
+
+  If constant is not set, null QString is returned.
+
+  \param name constant name
+  \return constant value
+  \sa setConstant(), constants()
+*/
+QString QtxResourceMgr::constant( const QString& name ) const
+{
+  return myConstants.value( name, QString() );
+}
+
+/*!
+  \brief Set the value of the constant.
+  \param name constant name
+  \param value constant value
+  \sa constants(), constants()
+*/
+void QtxResourceMgr::setConstant( const QString& name, const QString& value )
+{
+  if ( !name.isEmpty() )
+    myConstants.insert( name, value );
+}
+
+/*!
   \brief Load all resources from all resource files (global and user).
   \return \c true on success and \c false on error
   \sa save()
@@ -2494,7 +2534,7 @@ QString QtxResourceMgr::path( const QString& sect, const QString& prefix, const 
     ++it;
 
   for ( ; it != myResources.end() && res.isEmpty(); ++it )
-    res = (*it)->path( sect, prefix, name );
+    res = (*it)->path( sect, prefix, name, myConstants );
   return res;
 }
 
@@ -2630,7 +2670,7 @@ QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, 
     ++it;
 
   for ( ; it != myResources.end() && pix.isNull(); ++it )
-    pix = (*it)->loadPixmap( resSection(), prefix, name );
+    pix = (*it)->loadPixmap( resSection(), prefix, name, myConstants );
   if ( pix.isNull() )
     pix = defPix;
   return pix;
@@ -2752,7 +2792,7 @@ void QtxResourceMgr::loadTranslators( const QString& prefix, const QStringList& 
   {
     for ( QStringList::ConstIterator itr = translators.begin(); itr != translators.end(); ++itr )
     {
-      trans = (*it)->loadTranslator( resSection(), prefix, *itr );
+      trans = (*it)->loadTranslator( resSection(), prefix, *itr, myConstants );
       if ( trans )
       {
         if ( !myTranslator[prefix].contains( trans ) )
@@ -2784,7 +2824,7 @@ void QtxResourceMgr::loadTranslator( const QString& prefix, const QString& name 
     Resources* r = it.previous();
     if ( r == ur ) break;
 
-    trans = r->loadTranslator( resSection(), prefix, name );
+    trans = r->loadTranslator( resSection(), prefix, name, myConstants );
     if ( trans )
     {
       if ( !myTranslator[prefix].contains( trans ) )

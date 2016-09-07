@@ -651,10 +651,16 @@ QCompleter* Qtx::pathCompleter( const PathType type, const QString& filter )
 /*!
   \brief Parse given string to retrieve environment variable.
 
-  Looks through the string for the patterns: ${name} or $(name) or %name%.
+  Looks through the string for the environment variable patterns.
   If string contains variable satisfying any pattern, the variable name
   is returned, start index of the variable is returned in the \a start parameter,
   and length of the variable is returned in the \a len parameter.
+
+  Supported environment variables definitions:
+  - ${name} or $name : Linux shell variable
+  - $(name)          : GNU make substitution
+  - %name%           : Windows shell variable
+  - %(name)s         : Python substitutions:
 
   \param str string being processed
   \param start if variable is found, this parameter contains its starting 
@@ -667,30 +673,22 @@ QString Qtx::findEnvVar( const QString& str, int& start, int& len )
   QString varName;
   len = 0;
 
-  QRegExp rx( "(^\\$\\{|[^\\$]\\$\\{)([a-zA-Z]+[a-zA-Z0-9_]*)(\\})|(^\\$\\(|[^\\$]\\$\\()([a-zA-Z]+[a-zA-Z0-9_]*)(\\))|(^\\$|[^\\$]\\$)([a-zA-Z]+[a-zA-Z0-9_]*)|(^%|[^%]%)([a-zA-Z]+[a-zA-Z0-9_]*)(%[^%]|%$)" );
-
-  int pos = rx.indexIn( str, start );
-  if ( pos != -1 )
+  QStringList rxList;
+  rxList << "\\$\\{([a-zA-Z][a-zA-Z_0-9]*)\\}"; // ${name}
+  rxList << "\\$([a-zA-Z][a-zA-Z_0-9]*)";       // $name
+  rxList << "\\$\\(([a-zA-Z][a-zA-Z_0-9]*)\\)"; // $(name)
+  rxList << "%([a-zA-Z][a-zA-Z0-9_]*)%";        // %name%
+  rxList << "%\\(([a-zA-Z][a-zA-Z_0-9]*)\\)s";  // %(name)s
+  
+  for ( int i = 0; i < rxList.count() && varName.isEmpty(); ++i ) 
   {
-    int i = 1;
-    while ( i <= rx.captureCount() && varName.isEmpty() )
+    QRegExp rx(rxList[i]);
+    int pos = rx.indexIn( str, start );
+    if ( pos != -1 )
     {
-      QString capStr = rx.cap( i );
-      if ( !capStr.contains( "%" ) && !capStr.contains( "$" ) )
-        varName = capStr;
-      i++;
-    }
-
-    if ( !varName.isEmpty() )
-    {
-      int capIdx = i - 1;
-      start = rx.pos( capIdx );
-      int end = start + varName.length();
-      if ( capIdx > 1 && rx.cap( capIdx - 1 ).contains( QRegExp( "\\$|%" ) ) )
-        start = rx.pos( capIdx - 1 ) + rx.cap( capIdx - 1 ).indexOf( QRegExp( "\\$|%" ) );
-      if ( capIdx < rx.captureCount() && !rx.cap( capIdx - 1 ).isEmpty() )
-        end++;
-      len = end - start;
+      varName = rx.cap( 1 );
+      start = pos;
+      len = rx.matchedLength();
     }
   }
   return varName;

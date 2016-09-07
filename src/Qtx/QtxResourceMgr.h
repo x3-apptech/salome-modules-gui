@@ -105,7 +105,7 @@ public:
   bool             booleanValue( const QString&, const QString&, const bool = false ) const;
   QFont            fontValue( const QString&, const QString&, const QFont& = QFont() ) const;
   QColor           colorValue( const QString&, const QString&, const QColor& = QColor() ) const;
-  QString          stringValue( const QString&, const QString&, const QString& = QString() ) const;
+  QString          stringValue( const QString&, const QString&, const QString& = QString(), const bool = true ) const;
   QByteArray       byteArrayValue( const QString&, const QString&, const QByteArray& = QByteArray() ) const;
   QLinearGradient  linearGradientValue( const QString&, const QString&, const QLinearGradient& = QLinearGradient() ) const;
   QRadialGradient  radialGradientValue( const QString&, const QString&, const QRadialGradient& = QRadialGradient() ) const;
@@ -140,6 +140,10 @@ public:
   QStringList      options() const;
   QString          option( const QString& ) const;
   void             setOption( const QString&, const QString& );
+
+  QStringList      constants() const;
+  QString          constant( const QString& ) const;
+  void             setConstant( const QString&, const QString& );
 
   QPixmap          defaultPixmap() const;
   virtual void     setDefaultPixmap( const QPixmap& );
@@ -199,6 +203,7 @@ private:
   QStringList      myDirList;                 //!< list of resources directories
   FormatList       myFormats;                 //!< list of formats
   OptionsMap       myOptions;                 //!< options map
+  OptionsMap       myConstants;               //!< constants map
   ResList          myResources;               //!< resources list
   bool             myCheckExist;              //!< "check existance" flag
   TransListMap     myTranslator;              //!< map of loaded translators
