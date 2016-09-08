@@ -524,7 +524,7 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
   QFont fnt = SpinSliderDistance->font(); fnt.setBold( true ); SpinSliderDistance->setFont( fnt );
   GroupParametersLayout->addWidget( SpinSliderDistance, 1, 1 );
 
-  QString aUnitRot = "\xB0";
+  QString aUnitRot = QString(QChar(0xB0));
 
   TextLabelRotation1 = new QLabel( tr("ROTATION_AROUND_X_Y2Z"), GroupParameters );
   TextLabelRotation1->setObjectName( "TextLabelRotation1" );
