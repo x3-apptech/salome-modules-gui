@@ -51,7 +51,6 @@ public:
 
         const viewAspectList&         parameters() const;
         viewAspect                    currentItem() const;
-        virtual bool                  eventFilter( QObject*, QEvent* );
 
 public slots:
         void                          OKpressed();
@@ -64,7 +63,6 @@ signals:
         void                          dlgOk();
 
 private:
-        int                           myKeyFlag;
         QListWidget*                  myListBox;
         OCCViewer_ViewPort3d*         myCurViewPort;
         viewAspect                    myCurrentItem;

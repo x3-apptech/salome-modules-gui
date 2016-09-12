@@ -40,8 +40,6 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
 
   myParametersMap = theViewWindow->getViewAspects();
 
-  myKeyFlag = 0;
-
   int aQuantityOfItems = myParametersMap.count();
         
   setFixedSize( 400, 300 );
@@ -70,7 +68,7 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
       myListBox->insertItem( i, myParametersMap[ i ].name );
       myListBox->item( i )->setFlags( myListBox->item( i )->flags() | Qt::ItemIsEditable );
     }
-    
+    myListBox->item( 0 )->setSelected( true );
     changeImage( myListBox->item( 0 ) );
   }
   else
@@ -78,8 +76,8 @@ OCCViewer_CreateRestoreViewDlg::OCCViewer_CreateRestoreViewDlg( QWidget* aWin, O
     myListBox->clear();
     myListBox->insertItem( 0, "No Items" );
   }
-
-  connect( myListBox, SIGNAL( itemClicked( QListWidgetItem* ) ), this, SLOT( changeImage( QListWidgetItem* ) ) );
+  myListBox->setSelectionMode( QAbstractItemView::ExtendedSelection );
+  connect( myListBox, SIGNAL( currentItemChanged(QListWidgetItem*, QListWidgetItem *)), this, SLOT( changeImage( QListWidgetItem* ) ) );
   connect( myListBox, SIGNAL( itemChanged( QListWidgetItem* ) ), this, SLOT( editItemText( QListWidgetItem* ) ) );
         
   aLayout->addWidget( myListBox );
@@ -125,33 +123,7 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListWidgetItem* curItem )
   {
     int lowLevel  = -1;
     int highLevel = -1;
-    int index = curItem->listWidget()->row( curItem );
-    if( myKeyFlag == 2 )
-    {
-      for( int i = 0; i < (int)myListBox->count(); i++ )
-      {
-        if( myListBox->item( i )->isSelected() && i != index )
-        {
-          myListBox->clearSelection();
-          if( i > index )
-          {
-            lowLevel  = index;
-            highLevel = i;
-          }
-          else
-          {
-            lowLevel  = i;
-            highLevel = index;
-          }
-          for( int j = lowLevel; j <= highLevel; j++ )
-            myListBox->item( j )->setSelected( true );
-          break;
-        }
-        if( myListBox->item( i )->isSelected() && i == index )
-          myListBox->item( i )->setSelected( true );
-      }
-    }
-    
+    int index = curItem->listWidget()->row( curItem );  
     Handle(V3d_View) aView3d = myCurViewPort->getView();
     myCurrentItem = myParametersMap[ index ];
     
@@ -196,10 +168,10 @@ void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
       //Calculate current index in case if "item" is last selected item.
       if(i == selectedItems.count() - 1)
       {
-	if(position != myListBox->count() - 1)
-	  curIndex = position;
-	else 
-	  curIndex = position - 1;
+        if(position != myListBox->count() - 1)
+          curIndex = position;
+        else 
+          curIndex = position - 1;
       }
 
       //Delete item
@@ -208,16 +180,15 @@ void OCCViewer_CreateRestoreViewDlg::deleteSelectedItems()
       //Shift parameters in the map
       for( int j = position; j < (int)myParametersMap.count(); j++ )
       {
-	if( j != myParametersMap.count() - 1 )
-	  myParametersMap[ j ] = myParametersMap[ j + 1 ];
-	else
-	  myParametersMap.removeAt( j );
+        if( j != myParametersMap.count() - 1 )
+          myParametersMap[ j ] = myParametersMap[ j + 1 ];
+        else
+          myParametersMap.removeAt( j );
       }
     }
     if( curIndex >= 0 )
     {
-      myListBox->setCurrentItem( myListBox->item( curIndex ) );
-      changeImage( myListBox->item( curIndex ) );
+      myListBox->setItemSelected( myListBox->item( curIndex ), true );
     }
   }
   if( !myListBox->count() )
@@ -255,38 +226,6 @@ void OCCViewer_CreateRestoreViewDlg::editItemText( QListWidgetItem* anItem )
 {
   int index = anItem->listWidget()->row( anItem );
   myParametersMap[ index ].name = anItem->text().toLatin1();
-}
-
-/*!
-  Custom event filter
-*/
-bool OCCViewer_CreateRestoreViewDlg::eventFilter( QObject* anObj, QEvent* anEv )
-{
-  if( anEv->type() == QEvent::KeyPress )
-  {
-    QKeyEvent* aKeyEv = ( QKeyEvent* )anEv;
-    if( aKeyEv->key() == Qt::Key_Control )
-    {
-      myKeyFlag = 1;
-      myListBox->setSelectionMode( QAbstractItemView::MultiSelection ); 
-    }
-    else if( aKeyEv->key() == Qt::Key_Shift )
-    {
-      myKeyFlag = 2;
-      myListBox->setSelectionMode( QAbstractItemView::MultiSelection ); 
-    }
-    else
-      myListBox->setSelectionMode( QAbstractItemView::SingleSelection );
-  }
-  if( anEv->type() == QEvent::KeyRelease )
-    myKeyFlag = 0;
-  
-  if( !myKeyFlag )
-  {
-    if( anEv->type() == QEvent::KeyPress || anEv->type() == QEvent::MouseButtonPress )
-      myListBox->setSelectionMode( QAbstractItemView::SingleSelection );
-  }
-  return QWidget::eventFilter( anObj, anEv );
 }
 
 /*!
