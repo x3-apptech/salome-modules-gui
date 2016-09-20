@@ -2329,10 +2329,15 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     gp_Pln pln (gp_Pnt(x, y, z), gp_Dir(dx, dy, dz));
     double a, b, c, d;
     pln.Coefficients(a, b, c, d);
-
+#if OCC_VERSION_LARGE > 0x07000000 
+    Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
+    Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
+    if(aPlanes->Size() > 0 ) {
+#else
     Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
+    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
     if(aPlanes.Size() > 0 ) {
-      Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
+#endif
       Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetEquation(pln);
       aClipPlane->SetOn(Standard_True);
@@ -2341,8 +2346,13 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     }
   }
   else {
+#if OCC_VERSION_LARGE > 0x07000000 
+    Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
+    Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
+#else
     Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
     Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
+#endif
     for( ;anIter.More();anIter.Next() ){
       Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetOn(Standard_False);
@@ -2369,8 +2379,13 @@ bool OCCViewer_ViewWindow::isCuttingPlane()
 {
   Handle(V3d_View) view = myViewPort->getView();
   bool res = false;
-  Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
-  Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
+#if OCC_VERSION_LARGE > 0x07000000 
+  Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
+  Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
+#else
+    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
+    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
+#endif
   for( ;anIter.More();anIter.Next() ) {
     Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
     if(aClipPlane->IsOn()) {
