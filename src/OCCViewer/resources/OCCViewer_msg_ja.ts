@@ -273,32 +273,32 @@
       <translation>3D に戻る</translation>
     </message>
     <message>
-        <source>MNU_RAY_TRACING</source>
-        <translation type="unfinished">Ray tracing</translation>
-    </message>
-    <message>
-        <source>DSC_RAY_TRACING</source>
-        <translation type="unfinished">Ray tracing</translation>
-    </message>
-    <message>
-        <source>MNU_ENV_TEXTURE</source>
-        <translation type="unfinished">Environment texture</translation>
-    </message>
-    <message>
-        <source>DSC_ENV_TEXTURE</source>
-        <translation type="unfinished">Environment texture</translation>
-    </message>
-    <message>
-        <source>MNU_LIGHT_SOURCE</source>
-        <translation type="unfinished">Light source</translation>
-    </message>
-    <message>
-        <source>DSC_LIGHT_SOURCE</source>
-        <translation type="unfinished">Light source</translation>
-    </message>
-    <message>
       <source>DSC_RETURN_3D_VIEW</source>
       <translation>3D view に戻る</translation>
+    </message>
+    <message>
+      <source>MNU_RAY_TRACING</source>
+      <translation>レイトレース</translation>
+    </message>
+    <message>
+      <source>DSC_RAY_TRACING</source>
+      <translation>レイトレース</translation>
+    </message>
+    <message>
+      <source>MNU_ENV_TEXTURE</source>
+      <translation>環境テキスチャ</translation>
+    </message>
+    <message>
+      <source>DSC_ENV_TEXTURE</source>
+      <translation>環境テキスチャ</translation>
+    </message>
+    <message>
+      <source>MNU_LIGHT_SOURCE</source>
+      <translation>光源</translation>
+    </message>
+    <message>
+      <source>DSC_LIGHT_SOURCE</source>
+      <translation>光源</translation>
     </message>
     <message>
       <source>OCC_IMAGE_FILES</source>
@@ -646,110 +646,110 @@
   <context>
     <name>OCCViewer_RayTracingDlg</name>
     <message>
-        <source>RAY_TRACING</source>
-        <translation type="unfinished">Ray tracing</translation>
+      <source>RAY_TRACING</source>
+      <translation>レイトレース</translation>
     </message>
     <message>
-        <source>DEPTH</source>
-        <translation type="unfinished">Depth</translation>
+      <source>DEPTH</source>
+      <translation>深度</translation>
     </message>
     <message>
-        <source>SHADOW</source>
-        <translation type="unfinished">Shadows rendering</translation>
+      <source>SHADOW</source>
+      <translation>影のレンダリング</translation>
     </message>
     <message>
-        <source>REFLECTION</source>
-        <translation type="unfinished">Specular reflections</translation>
+      <source>REFLECTION</source>
+      <translation>狭反射</translation>
     </message>
     <message>
-        <source>ANTIALIASING</source>
-        <translation type="unfinished">Adaptive anti-aliasing</translation>
+      <source>ANTIALIASING</source>
+      <translation>最適アンチエイリアシング</translation>
     </message>
     <message>
-        <source>TRANSPARENT_SHADOW</source>
-        <translation type="unfinished">Transparent shadow</translation>
+      <source>TRANSPARENT_SHADOW</source>
+      <translation>影の透過</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_EnvTextureDlg</name>
     <message>
-        <source>ENV_TEXTURE</source>
-        <translation type="unfinished">Environment texture</translation>
+      <source>ENV_TEXTURE</source>
+      <translation>環境テキスチャ</translation>
     </message>
     <message>
-        <source>ENV_CLOUDS</source>
-        <translation type="unfinished">Clouds</translation>
+      <source>ENV_CLOUDS</source>
+      <translation>雲</translation>
     </message>
     <message>
-        <source>ENV_CV</source>
-        <translation type="unfinished">Cv</translation>
+      <source>ENV_CV</source>
+      <translation>Cv</translation>
     </message>
     <message>
-        <source>ENV_MEDIT</source>
-        <translation type="unfinished">Medit</translation>
+      <source>ENV_MEDIT</source>
+      <translation>Medit</translation>
     </message>
     <message>
-        <source>ENV_PEARL</source>
-        <translation type="unfinished">Pearl</translation>
+      <source>ENV_PEARL</source>
+      <translation>Pearl</translation>
     </message>
     <message>
-        <source>ENV_SKY1</source>
-        <translation type="unfinished">Sky1</translation>
+      <source>ENV_SKY1</source>
+      <translation>Sky1</translation>
     </message>
     <message>
-        <source>ENV_SKY2</source>
-        <translation type="unfinished">Sky2</translation>
+      <source>ENV_SKY2</source>
+      <translation>Sky2</translation>
     </message>
     <message>
-        <source>ENV_LINES</source>
-        <translation type="unfinished">Lines</translation>
+      <source>ENV_LINES</source>
+      <translation>ライン</translation>
     </message>
     <message>
-        <source>ENV_ROAD</source>
-        <translation type="unfinished">Road</translation>
+      <source>ENV_ROAD</source>
+      <translation>道</translation>
     </message>
     <message>
-        <source>ENV_CUSTOM</source>
-        <translation>Custom...</translation>
+      <source>ENV_CUSTOM</source>
+      <translation>カスタム...</translation>
     </message>
   </context>
   <context>
     <name>OCCViewer_LightSourceDlg</name>
     <message>
-        <source>LIGHT_SOURCE</source>
-        <translation type="unfinished">Light source</translation>
+      <source>LIGHT_SOURCE</source>
+      <translation>光源</translation>
     </message>
     <message>
-        <source>TYPE</source>
-        <translation type="unfinished">Type</translation>
+      <source>TYPE</source>
+      <translation>型</translation>
     </message>
     <message>
-        <source>DIRECTIONAL</source>
-        <translation type="unfinished">Directional</translation>
+      <source>DIRECTIONAL</source>
+      <translation>方向</translation>
     </message>
     <message>
-        <source>DIRECTION</source>
-        <translation type="unfinished">Direction</translation>
+      <source>DIRECTION</source>
+      <translation>方向</translation>
     </message>
     <message>
-        <source>POSITIONAL</source>
-        <translation type="unfinished">Positional</translation>
+      <source>POSITIONAL</source>
+      <translation>位置</translation>
     </message>
     <message>
-        <source>POSITION</source>
-        <translation type="unfinished">Position</translation>
+      <source>POSITION</source>
+      <translation>位置</translation>
     </message>
     <message>
-        <source>COLOR</source>
-        <translation type="unfinished">Color</translation>
+      <source>COLOR</source>
+      <translation>色</translation>
     </message>
     <message>
-        <source>HEADLIGHT</source>
-        <translation type="unfinished">Headlight</translation>
+      <source>HEADLIGHT</source>
+      <translation>ヘッドライト</translation>
     </message>
     <message>
-        <source>BUT_DEFAULT</source>
-        <translation type="unfinished">Default</translation>
+      <source>BUT_DEFAULT</source>
+      <translation>デフォルト</translation>
     </message>
   </context>
 </TS>
