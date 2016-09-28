@@ -37,15 +37,15 @@
     </message>
     <message>
       <source>LBL_TAB_SPACES</source>
-      <translation>タブ空白の表示</translation>
+      <translation>ディスプレイタブの分割記号</translation>
     </message>
     <message>
       <source>LBL_TAB_SIZE</source>
-      <translation>Tab size:</translation>
+      <translation>タブサイズ:</translation>
     </message>
     <message>
       <source>GR_VERT_EDGE_SET</source>
-      <translation>垂直エッジ設定</translation>
+      <translation>垂直エッジの設定</translation>
     </message>
     <message>
       <source>LBL_VERT_EDGE</source>
@@ -61,42 +61,42 @@
     </message>
     <message>
       <source>BUT_OK</source>
-      <translation>&amp;OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>BUT_DEFAULTS</source>
-      <translation>デフォルト(&amp;D)</translation>
+      <translation>デフォルト (&amp;D)</translation>
     </message>
     <message>
       <source>BUT_CANCEL</source>
-      <translation>キャンセル(&amp;C)</translation>
+      <translation>Cancel</translation>
     </message>
     <message>
       <source>BUT_HELP</source>
-      <translation>ヘルプ(&amp;H)</translation>
+      <translation>HELP</translation>
     </message>
   </context>
   <context>
     <name>PyEditor_Window</name>
     <message>
       <source>NAME_PYEDITOR</source>
-      <translation>Python Editor</translation>
+      <translation>Pythonのエディタ</translation>
     </message>
     <message>
       <source>ACT_NEW</source>
-      <translation>新規</translation>
+      <translation>新規 (&amp;N)</translation>
     </message>
     <message>
       <source>TTP_NEW</source>
-      <translation>新規</translation>
+      <translation>New</translation>
     </message>
     <message>
       <source>DSC_NEW</source>
-      <translation>新規 python ファイルの作成</translation>
+      <translation>新規ドキュメントの作成</translation>
     </message>
     <message>
       <source>ACT_OPEN</source>
-      <translation>開く</translation>
+      <translation>開く... (&amp;O)</translation>
     </message>
     <message>
       <source>TTP_OPEN</source>
@@ -104,11 +104,11 @@
     </message>
     <message>
       <source>DSC_OPEN</source>
-      <translation>存在する python ファイルを開く</translation>
+      <translation>ドキュメントを開く</translation>
     </message>
     <message>
       <source>ACT_SAVE</source>
-      <translation>保存</translation>
+      <translation>保存 (&amp;S)</translation>
     </message>
     <message>
       <source>TTP_SAVE</source>
@@ -116,59 +116,59 @@
     </message>
     <message>
       <source>DSC_SAVE</source>
-      <translation>python ドキュメントをディスクに保存</translation>
+      <translation>ドキュメントをファイルへ保存</translation>
     </message>
     <message>
       <source>ACT_SAVEAS</source>
-      <translation>別名保存</translation>
+      <translation>保存... (&amp;A)</translation>
     </message>
     <message>
       <source>TTP_SAVEAS</source>
-      <translation>別名保存</translation>
+      <translation>保存</translation>
     </message>
     <message>
       <source>DSC_SAVEAS</source>
-      <translation>新しい名前で python ドキュメントを保存</translation>
+      <translation>ドキュメントの新規保存</translation>
     </message>
     <message>
       <source>ACT_EXIT</source>
-      <translation>終</translation>
+      <translation>終了 (&amp;x)</translation>
     </message>
     <message>
       <source>TTP_EXIT</source>
-      <translation>終</translation>
+      <translation>終了</translation>
     </message>
     <message>
       <source>DSC_EXIT</source>
-      <translation>アプリケーションを終了</translation>
+      <translation>アプリケーションの終了</translation>
     </message>
     <message>
       <source>ACT_UNDO</source>
-      <translation>元に戻す</translation>
+      <translation>アンドゥ (&amp;U)</translation>
     </message>
     <message>
       <source>TTP_UNDO</source>
-      <translation>元に戻す</translation>
+      <translation>アンドゥ</translation>
     </message>
     <message>
       <source>DSC_UNDO</source>
-      <translation>最後の操作を元に戻す</translation>
+      <translation>直近操作のアンドゥ</translation>
     </message>
     <message>
       <source>ACT_REDO</source>
-      <translation>やり直し</translation>
+      <translation>リドゥ (&amp;R)</translation>
     </message>
     <message>
       <source>TTP_REDO</source>
-      <translation>やり直し</translation>
+      <translation>リドゥ</translation>
     </message>
     <message>
       <source>DSC_REDO</source>
-      <translation>最後の操作をやり直す</translation>
+      <translation>直近アウドゥのリドゥ</translation>
     </message>
     <message>
       <source>ACT_CUT</source>
-      <translation>カット</translation>
+      <translation>カット (&amp;t)</translation>
     </message>
     <message>
       <source>TTP_CUT</source>
@@ -176,11 +176,11 @@
     </message>
     <message>
       <source>DSC_CUT</source>
-      <translation>現在選択中の内容をクリップボードにカット</translation>
+      <translation>選択中のものをカットしクリップボードへ</translation>
     </message>
     <message>
       <source>ACT_COPY</source>
-      <translation>コピー</translation>
+      <translation>コピー (&amp;C)</translation>
     </message>
     <message>
       <source>TTP_COPY</source>
@@ -188,11 +188,11 @@
     </message>
     <message>
       <source>DSC_COPY</source>
-      <translation>現在選択中の内容をクリップボードにコピー</translation>
+      <translation>選択中のものをコピーしクリップボードへ</translation>
     </message>
     <message>
       <source>ACT_PASTE</source>
-      <translation>ペースト</translation>
+      <translation>ペースト (&amp;P)</translation>
     </message>
     <message>
       <source>TTP_PASTE</source>
@@ -200,11 +200,11 @@
     </message>
     <message>
       <source>DSC_PASTE</source>
-      <translation>クリップボードの内容を現在の選択にペースト</translation>
+      <translation>クリップボードのものを選択中のものへペースト</translation>
     </message>
     <message>
       <source>ACT_DELETE</source>
-      <translation>削除</translation>
+      <translation>削除 (&amp;D)</translation>
     </message>
     <message>
       <source>TTP_DELETE</source>
@@ -212,23 +212,23 @@
     </message>
     <message>
       <source>DSC_DELETE</source>
-      <translation>現在選択中の内容を削除</translation>
+      <translation>選択中のものを削除</translation>
     </message>
     <message>
       <source>ACT_SELECT_ALL</source>
-      <translation>すべて選択</translation>
+      <translation>全選択 (&amp;A)</translation>
     </message>
     <message>
       <source>TTP_SELECT_ALL</source>
-      <translation>すべて選択</translation>
+      <translation>全選択</translation>
     </message>
     <message>
       <source>DSC_SELECT_ALL</source>
-      <translation>すべての内容を選択</translation>
+      <translation>全選択</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>
-      <translation>環境設定</translation>
+      <translation>環境設定 (&amp;f)</translation>
     </message>
     <message>
       <source>TTP_PREFERENCES</source>
@@ -236,11 +236,11 @@
     </message>
     <message>
       <source>DSC_PREFERENCES</source>
-      <translation>環境設定ボックスの表示</translation>
+      <translation>環境設定ダイアログの表示</translation>
     </message>
     <message>
       <source>ACT_HELP</source>
-      <translation>ヘルプ</translation>
+      <translation>ヘルプ (&amp;H)</translation>
     </message>
     <message>
       <source>TTP_HELP</source>
@@ -248,47 +248,47 @@
     </message>
     <message>
       <source>DSC_HELP</source>
-      <translation>ヘルプ</translation>
+      <translation>Python エディタ上のヘルプを表示</translation>
     </message>
     <message>
       <source>MNU_FILE</source>
-      <translation>ファイル(&amp;F)</translation>
+      <translation>ファイル (&amp;F)</translation>
     </message>
     <message>
       <source>MNU_EDIT</source>
-      <translation>編集(&amp;E)</translation>
+      <translation>編集 (&amp;E)</translation>
     </message>
     <message>
       <source>MNU_HELP</source>
-      <translation>ヘルプ(&amp;H)</translation>
+      <translation>ヘルプ (&amp;H)</translation>
     </message>
     <message>
       <source>TOOLBAR_LABEL</source>
-      <translation>操作の編集</translation>
+      <translation>エディタ操作</translation>
     </message>
     <message>
       <source>TIT_PY_FILES</source>
-      <translation>ã..ã.¡ã.¤ã.« Python</translation>
+      <translation>Pythonファイル</translation>
     </message>
     <message>
       <source>TIT_DLG_OPEN</source>
-      <translation>ファイルを開く</translation>
+      <translation>ファイルオープン</translation>
     </message>
     <message>
       <source>TIT_DLG_SAVE</source>
-      <translation>ファイルを保存</translation>
+      <translation>ファイルの保存</translation>
     </message>
     <message>
       <source>WRN_SAVE_FILE</source>
-      <translation>ドキュメントは修正済みです。&lt;br&gt;変更を保存しますか？</translation>
+      <translation>ドキュメントが修正された。&lt;br&gt;変更点を保存したいですか？</translation>
     </message>
     <message>
       <source>WRN_READ_FILE</source>
-      <translation>Cannot read file %1:\n%2.</translation>
+      <translation>ファイルが読めません %1:\n%2.</translation>
     </message>
     <message>
       <source>WRN_WRITE_FILE</source>
-      <translation>Cannot write file %1:\n%2.</translation>
+      <translation>ファイルが書き込めません %1:\n%2.</translation>
     </message>
     <message>
       <source>STS_READY</source>
@@ -304,7 +304,7 @@
     </message>
     <message>
       <source>NONAME</source>
-      <translation>Noname.py</translation>
+      <translation>Noname. py</translation>
     </message>
   </context>
 </TS>

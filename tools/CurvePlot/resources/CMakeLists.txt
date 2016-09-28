@@ -21,6 +21,7 @@ INCLUDE(UseQtExt)
 SET(_res
     CURVEPLOT_msg_en.ts
     CURVEPLOT_msg_fr.ts
+    CURVEPLOT_msg_ja.ts
 )
 
 QT_INSTALL_TS_RESOURCES("${_res}" "${SALOME_CURVEPLOT_INSTALL_RES_DATA}")

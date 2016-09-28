@@ -56,7 +56,8 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>STUDYCLOSE_DESCRIPTION</source>
-      <translation>既存のスタディを閉じる必要があります。閉じますか？</translation>
+      <translation>既存のスタディを閉じる必要があります。閉じますか？
+</translation>
     </message>
     <message>
       <source>APPCLOSE_SAVE</source>
@@ -72,11 +73,12 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>WRN_PYTHON_FILE_NAME_BAD</source>
-      <translation>有効なファイル名を入力してください。Pythonのファイル名は、文字、数字、およびアンダー スコアで構成され、文字かアンダー スコアで始まる必要があります。</translation>
+      <translation>正確なファイル名を入力してください。
+Pythonファイルは、文字、数字、アンダースコアが含まれており、文字またはアンダースコアから開始する必要があります。</translation>
     </message>
     <message>
       <source>PYTHON_FILES_FILTER</source>
-      <translation>ファイル (*.py) Python</translation>
+      <translation>ファイル (*.py) PYTHON</translation>
     </message>
     <message>
       <source>LOG_FILES_FILTER</source>
@@ -168,7 +170,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_LOAD_LIGHT</source>
-      <translation>Automatic loading of light modules when opening study</translation>
+      <translation>スタディを開くときにLightモジュールを自動読み込みする</translation>
     </message>
     <message>
       <source>PREF_STORE_POS</source>
@@ -424,7 +426,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>PREF_AUTO_COMPLETION</source>
-      <translation type="unfinished">Command auto-completion</translation>
+      <translation>コマンドオートコンプリート</translation>
     </message>
     <message>
       <source>PREF_GROUP_STYLE</source>
@@ -860,7 +862,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
       <source>OCC_TEXTURE_FILES</source>
-      <translation>イメージファイル (*.jpeg *.jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
+      <translation>イメージファイル (*.jpeg *jpg *.jpe *.png *.bmp *.gif *.ppm *.tif *.tiff* .tga *.exr)</translation>
     </message>
     <message>
       <source>PREF_CLIPPING_MODULATE</source>
@@ -871,36 +873,36 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>スケールファクタ</translation>
     </message>
     <message>
-        <source>PREF_GROUP_RAY_TRACING</source>
-        <translation type="unfinished">Ray tracing</translation>
+      <source>PREF_GROUP_RAY_TRACING</source>
+      <translation>レイトレース</translation>
     </message>
     <message>
-        <source>PREF_RAY_TRACING_DEPTH</source>
-        <translation type="unfinished">Depth</translation>
+      <source>PREF_RAY_TRACING_DEPTH</source>
+      <translation>深度</translation>
     </message>
     <message>
-        <source>PREF_RAY_TRACING_REFLECTION</source>
-        <translation type="unfinished">Specular reflections</translation>
+      <source>PREF_RAY_TRACING_REFLECTION</source>
+      <translation>狭反射</translation>
     </message>
     <message>
-        <source>PREF_RAY_TRACING_ANTIALIASING</source>
-        <translation type="unfinished">Adaptive anti-aliasing</translation>
+      <source>PREF_RAY_TRACING_ANTIALIASING</source>
+      <translation>最適アンチエイリアシング</translation>
     </message>
     <message>
-        <source>PREF_RAY_TRACING_SHADOW</source>
-        <translation type="unfinished">Shadows rendering</translation>
+      <source>PREF_RAY_TRACING_SHADOW</source>
+      <translation>シャドウレンダリング</translation>
     </message>
     <message>
-        <source>PREF_RAY_TRACING_TRANS_SHADOW</source>
-        <translation type="unfinished">Transparent shadow</translation>
+      <source>PREF_RAY_TRACING_TRANS_SHADOW</source>
+      <translation>透過影</translation>
     </message>
     <message>
-        <source>PREF_GROUP_LIGHT</source>
-        <translation type="unfinished">Light source</translation>
+      <source>PREF_GROUP_LIGHT</source>
+      <translation>光源</translation>
     </message>
     <message>
-        <source>PREF_LIGHT_COLOR</source>
-        <translation type="unfinished">Color</translation>
+      <source>PREF_LIGHT_COLOR</source>
+      <translation>色</translation>
     </message>
     <message>
       <source>TOT_CLOSE</source>

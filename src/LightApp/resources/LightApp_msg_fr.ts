@@ -426,7 +426,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_AUTO_COMPLETION</source>
-        <translation type="unfinished">Command auto-completion</translation>
+        <translation>Auto-completion</translation>
     </message>
     <message>
         <source>PREF_GROUP_STYLE</source>
@@ -674,7 +674,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_FOCUS_TYPE</source>
-        <translation> type=&quot;unfinished&quot;Convergence distance type</translation>
+        <translation>Type de la distance de convergence</translation>
     </message>
     <message>
         <source>PREF_FOCUS_VALUE</source>
@@ -874,35 +874,35 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_GROUP_RAY_TRACING</source>
-        <translation type="unfinished">Ray tracing</translation>
+        <translation>Ray tracing</translation>
     </message>
     <message>
         <source>PREF_RAY_TRACING_DEPTH</source>
-        <translation type="unfinished">Depth</translation>
+        <translation>Profondeur</translation>
     </message>
     <message>
         <source>PREF_RAY_TRACING_REFLECTION</source>
-        <translation type="unfinished">Specular reflections</translation>
+        <translation>Réflexions spéculaires</translation>
     </message>
     <message>
         <source>PREF_RAY_TRACING_ANTIALIASING</source>
-        <translation type="unfinished">Adaptive anti-aliasing</translation>
+        <translation>Anti-aliasing adaptatif</translation>
     </message>
     <message>
         <source>PREF_RAY_TRACING_SHADOW</source>
-        <translation type="unfinished">Shadows rendering</translation>
+        <translation>Rendu des ombres</translation>
     </message>
     <message>
         <source>PREF_RAY_TRACING_TRANS_SHADOW</source>
-        <translation type="unfinished">Transparent shadow</translation>
+        <translation>Ombres transparentes</translation>
     </message>
     <message>
         <source>PREF_GROUP_LIGHT</source>
-        <translation type="unfinished">Light source</translation>
+        <translation>Source de lumière</translation>
     </message>
     <message>
         <source>PREF_LIGHT_COLOR</source>
-        <translation type="unfinished">Color</translation>
+        <translation>Couleurr</translation>
     </message>
     <message>
         <source>TOT_CLOSE</source>

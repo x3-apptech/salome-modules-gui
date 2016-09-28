@@ -17,12 +17,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  Author : Roman NIKOLAEV, Open CASCADE S.A.S. (roman.nikolaev@opencascade.com)
-//  Date   : 22/06/2007
-//
-#include "SUITApp_init_python.hxx"
 
-bool SUIT_PYTHON::initialized                       = false;
+#include "SUITApp_init_python.hxx"
+#include <QString>
+
+bool SUIT_PYTHON::initialized = false;
 
 void SUIT_PYTHON::init_python(int argc, char **argv)
 {
@@ -33,11 +32,23 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   Py_SetProgramName(argv[0]);
   Py_Initialize(); // Initialize the interpreter
   PySys_SetArgv(argc, argv);
+  PyRun_SimpleString("import threading\n");
+  // VSR (22/09/2016): This is a workaround to prevent invoking qFatal() from PyQt5
+  // causing application aborting
+  QString script;
+  script += "def _custom_except_hook(exc_type, exc_value, exc_traceback):\n";
+  script += "  import sys\n";
+  script += "  sys.__excepthook__(exc_type, exc_value, exc_traceback)\n";
+  script += "  pass\n";
+  script += "\n";
+  script += "import sys\n";
+  script += "sys.excepthook = _custom_except_hook\n";
+  script += "del _custom_except_hook, sys\n";
+  int res = PyRun_SimpleString(qPrintable(script));
+  // VSR (22/09/2016): end of workaround
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock - can be called many times
-
   // Py_InitThreads acquires the GIL
   PyThreadState *pts = PyGILState_GetThisThreadState(); 
   PyEval_ReleaseThread(pts);
   SUIT_PYTHON::initialized = true;
 }
-

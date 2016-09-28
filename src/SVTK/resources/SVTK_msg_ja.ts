@@ -366,6 +366,49 @@
     </message>
   </context>
   <context>
+    <name>SVTK_PsOptionsDlg</name>
+    <message>
+      <source>DLG_PSOPTIONS_TITLE</source>
+      <translation>ポストスクリプト書き出しオプション</translation>
+    </message>
+    <message>
+      <source>PS_OPTIONS</source>
+      <translation>オプション</translation>
+    </message>
+    <message>
+      <source>PS_LINE_WIDTH</source>
+      <translation>線幅係数</translation>
+    </message>
+    <message>
+      <source>PS_POINT_SIZE</source>
+      <translation>点サイズオプション</translation>
+    </message>
+    <message>
+      <source>PS_SORT_METHOD</source>
+      <translation>ソート法</translation>
+    </message>
+    <message>
+      <source>PS_NO_SORTING</source>
+      <translation>ソートなし</translation>
+    </message>
+    <message>
+      <source>PS_SIMPLE_SORTING</source>
+      <translation>単純ソート</translation>
+    </message>
+    <message>
+      <source>PS_BPS_SORTING</source>
+      <translation>BSP ソート</translation>
+    </message>
+    <message>
+      <source>PS_RASTERIZE_3D</source>
+      <translation>3D ジオメトリのラスタライズ</translation>
+    </message>
+    <message>
+      <source>PS_USE_SHFILL</source>
+      <translation>shfillシェーディング操作の使用</translation>
+    </message>
+  </context>
+  <context>
     <name>SVTK_RecorderDlg</name>
     <message>
       <source>ALL_DISLPAYED_FRAMES</source>
