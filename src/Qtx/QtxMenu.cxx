@@ -359,6 +359,21 @@ void QtxMenu::setTitleAlignment( const Qt::Alignment a )
 }
 
 /*!
+ * \brief Append a title to the and of the menu
+ *  \param [in] text - title text
+ */
+void QtxMenu::appendGroupTitle( const QString& text )
+{
+  Title* aTitle = new Title( this );
+  aTitle->setText( text );
+
+  QWidgetAction* anAction = new QWidgetAction( this );
+  anAction->setDefaultWidget( aTitle );
+
+  addAction( anAction );
+}
+
+/*!
   \brief Customize show/hide menu operation.
   \param on new popup menu visibility state
 */

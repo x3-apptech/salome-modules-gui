@@ -97,10 +97,10 @@ VTKViewer_GeometryFilter
 ::VTKViewer_GeometryFilter():
   myShowInside(0),
   myStoreMapping(0),
-  myAppendCoincident3D(0),
   myIsWireframeMode(0),
-  myIsBuildArc(false),
-  myMaxArcAngle(2)
+  myAppendCoincident3D(0),
+  myMaxArcAngle(2),
+  myIsBuildArc(false)
 {}
 
 
@@ -227,12 +227,39 @@ VTKViewer_GeometryFilter
     cellVis = new char[numCells];
     }
 
-  // Issue 0020115: [CEA 308] Quadratic elements visualization
-  // Fix of remark described in note 0005222 - SIGSEGV
-  vtkPoints* outputPoints = vtkPoints::New();
-  outputPoints->DeepCopy(input->GetPoints());
-  output->SetPoints(outputPoints);
-  outputPoints->Delete();
+  bool buildArcs = false;
+  if ( myIsBuildArc )
+  {
+    // check if there are quadratic 1D or 2D elements
+    bool hasQuad1D2D = false;
+    if ( vtkUnsignedCharArray* types = input->GetCellTypesArray() )
+    {
+      std::set<vtkIdType> quad1D2DTypes;
+      quad1D2DTypes.insert( VTK_QUADRATIC_EDGE );
+      quad1D2DTypes.insert( VTK_QUADRATIC_TRIANGLE );
+      quad1D2DTypes.insert( VTK_BIQUADRATIC_TRIANGLE );
+      quad1D2DTypes.insert( VTK_QUADRATIC_QUAD );
+      quad1D2DTypes.insert( VTK_BIQUADRATIC_QUAD );
+      quad1D2DTypes.insert( VTK_QUADRATIC_POLYGON );
+
+      for ( int i = 0; i < types->GetNumberOfTuples() && !hasQuad1D2D; ++i )
+        hasQuad1D2D = quad1D2DTypes.count( types->GetValue(i) );
+    }
+    buildArcs = hasQuad1D2D;
+  }
+  if ( buildArcs )
+  {
+    // Issue 0020115: [CEA 308] Quadratic elements visualization
+    // Fix of remark described in note 0005222 - SIGSEGV
+    vtkPoints* outputPoints = vtkPoints::New();
+    outputPoints->DeepCopy(input->GetPoints());
+    output->SetPoints(outputPoints);
+    outputPoints->Delete();
+  }
+  else
+  {
+    output->SetPoints(input->GetPoints());
+  }
 
   outputPD->PassData(pd);
 
@@ -242,11 +269,11 @@ VTKViewer_GeometryFilter
 
   // Loop over the cells determining what's visible
   if (!allVisible)
-    {
+  {
     for (cellId=0, Connectivity->InitTraversal();
          Connectivity->GetNextCell(npts,pts);
          cellId++)
-      {
+    {
       cellVis[cellId] = 1;
       if ( ( this->CellClipping && cellId < this->CellMinimum ) ||
            cellId > this->CellMaximum )

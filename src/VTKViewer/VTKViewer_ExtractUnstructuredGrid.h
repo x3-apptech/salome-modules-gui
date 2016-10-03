@@ -98,7 +98,7 @@ public:
   //! Gets the input id by output id.
   vtkIdType GetInputId(int theOutId) const;
   //! Gets the output id by input id.
-  vtkIdType GetOutputId(int theInId) const;
+  //vtkIdType GetOutputId(int theInId) const;
 
   typedef std::vector<vtkIdType> TVectorId;
   typedef std::map<vtkIdType,vtkIdType> TMapId;
@@ -118,7 +118,7 @@ protected:
 
   bool myStoreMapping;
   TVectorId myOut2InId;
-  TMapId myIn2OutId;
+  //TMapId myIn2OutId;
 
 private:
   //! Not implemented.

@@ -59,6 +59,8 @@ public:
   virtual void           setTitleMode( const TitleMode );
   virtual void           setTitleAlignment( const Qt::Alignment );
 
+  virtual void           appendGroupTitle( const QString& );
+
 public slots:
   virtual void           setVisible( bool );
 
