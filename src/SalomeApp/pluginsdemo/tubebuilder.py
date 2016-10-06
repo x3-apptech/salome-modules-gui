@@ -84,7 +84,7 @@ def createMesh(study, shape):
         smesh.SetName(Nb_Segments, 'Nb. Segments_1')
         smesh.SetName(Quadrangle_2D.GetAlgorithm(), 'Quadrangle_2D')
         smesh.SetName(Hexa_3D.GetAlgorithm(), 'Hexa_3D')
-        salome.sg.updateObjBrowser(0)
+        salome.sg.updateObjBrowser(False)
 
     return mesh
 
