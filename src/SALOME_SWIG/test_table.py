@@ -109,7 +109,7 @@ ACmt = myBuilder.FindOrCreateAttribute(myCmtObject, "AttributeComment")
 ACmt.SetValue("Just a comment")
 
 # >>> Updating Object Browser ================================================
-salome.sg.updateObjBrowser(1)
+salome.sg.updateObjBrowser(True)
 
 # ============================================================================
 
