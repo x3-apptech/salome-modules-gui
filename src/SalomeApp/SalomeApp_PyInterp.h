@@ -39,6 +39,7 @@ public:
 
 protected:
   SalomeApp_PyInterp();
+  virtual bool initContext();
   virtual int  beforeRun();
 
 private:

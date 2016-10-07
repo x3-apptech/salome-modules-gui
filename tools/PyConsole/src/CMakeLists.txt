@@ -19,6 +19,10 @@
 
 INCLUDE(UseQtExt)
 
+IF(PYCONSOLE_BUILD_PYTHON)
+  ADD_SUBDIRECTORY(python)
+ENDIF(PYCONSOLE_BUILD_PYTHON)
+
 # --- options ---
 
 # additional include directories

@@ -29,7 +29,7 @@
   \param parent parent widget
 */
 LightApp_PyEditor::LightApp_PyEditor( PyConsole_Interp* interp, QWidget* parent )
-  : PyConsole_Editor( interp, parent )
+  : PyConsole_Editor( parent, interp )
 {
 }
 

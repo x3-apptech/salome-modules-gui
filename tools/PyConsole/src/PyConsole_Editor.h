@@ -39,7 +39,8 @@ class PYCONSOLE_EXPORT PyConsole_Editor : public QTextEdit
   Q_OBJECT;
 
 public:
-  PyConsole_Editor( PyConsole_Interp*, QWidget* = 0 );
+  PyConsole_Editor( QWidget* = 0 );
+  PyConsole_Editor( QWidget*, PyConsole_Interp* );
   ~PyConsole_Editor();
 
   PyConsole_Interp* getInterp() const;
@@ -95,6 +96,8 @@ protected:
   virtual QString getLogFileName();
 
 private:
+  void           init( PyConsole_Interp* );
+
   void           multilinePaste( const QString& );
   void           multiLineProcessNextLine();
 

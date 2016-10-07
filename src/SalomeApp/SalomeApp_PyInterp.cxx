@@ -40,6 +40,23 @@ SalomeApp_PyInterp::~SalomeApp_PyInterp()
 }
  
 /*!
+ * Initialize context dictionaries. GIL is held already.
+ * The code executed in an embedded interpreter is expected to be run at the module
+ * level, in which case local and global context have to be the same dictionary.
+ * See: http://stackoverflow.com/questions/12265756/c-python-running-python-code-within-a-context
+ * for an explanation.
+ */
+bool SalomeApp_PyInterp::initContext()
+{
+  bool ok = PyConsole_Interp::initContext();
+  if ( ok ) {
+    int ret = PyRun_SimpleString( "import salome_iapp; salome_iapp.IN_SALOME_GUI = True" );
+    ok = ok && (ret == 0);
+  }
+  return ok;
+}
+
+/*!
   \brief Called before each Python command running.
 */
 int SalomeApp_PyInterp::beforeRun()
