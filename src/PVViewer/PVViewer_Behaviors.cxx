@@ -44,7 +44,6 @@
 #include <pqUndoRedoBehavior.h>
 #include <pqViewStreamingBehavior.h>
 #include <pqCollaborationBehavior.h>
-#include <pqStandardArrayColorMapsBehavior.h>
 #include <pqVerifyRequiredPluginBehavior.h>
 #include <pqPluginSettingsBehavior.h>
 #include <pqFixPathsInStateFilesBehavior.h>
@@ -118,7 +117,6 @@ void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
       new pqObjectPickingBehavior(desk);
       new pqCollaborationBehavior(this);
       new pqViewStreamingBehavior(this);
-      new pqStandardArrayColorMapsBehavior(this);
 
       // Move instantiation of the pqApplyBehavior to the PVViewer_GUIElements::buildPVWidgets(),
       // because without pqPropertiesPanel it doesn't make sense.      
