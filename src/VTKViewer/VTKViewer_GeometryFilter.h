@@ -107,7 +107,8 @@ public:
   virtual double GetQuadraticArcAngle() const;
 
   typedef std::vector<vtkIdType> TVectorId;
-  typedef std::map<vtkIdType, TVectorId> TMapOfVectorId;
+  //typedef std::map<vtkIdType, TVectorId> TMapOfVectorId;
+  typedef std::vector<TVectorId> TMapOfVectorId;
 
   static void InsertId( const vtkIdType theCellId,
                         const vtkIdType theCellType,

@@ -117,7 +117,7 @@ private:
 private:
   enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
-	 ResetId, TrihedronShowId };
+         ResetId, TrihedronShowId };
   typedef QMap<int, QtxAction*> ActionsMap;
   
   void    createActions();

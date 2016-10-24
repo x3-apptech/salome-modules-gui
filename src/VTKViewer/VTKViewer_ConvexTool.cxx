@@ -81,9 +81,9 @@ namespace
 VTKViewer_Triangulator
 ::VTKViewer_Triangulator():
   myCellIds(vtkIdList::New()),
+  myPointIds(NULL),
   myFaceIds(vtkIdList::New()),
-  myPoints(vtkPoints::New()),
-  myPointIds(NULL)
+  myPoints(vtkPoints::New())
 {}
 
 
@@ -200,7 +200,7 @@ VTKViewer_Triangulator
           vtkCellData* theOutputCD,
           int theStoreMapping,
           std::vector<vtkIdType>& theVTK2ObjIds,
-          std::map< vtkIdType, std::vector<vtkIdType> >& theDimension2VTK2ObjIds,
+          std::vector< std::vector<vtkIdType> >& theDimension2VTK2ObjIds,
           bool theIsCheckConvex)
 {
   vtkPoints *aPoints = InitPoints(theInput, theCellId);
@@ -573,7 +573,7 @@ VTKViewer_Triangulator
       if(DEBUG_TRIA_EXECUTE) cout << "PoilygonId="<<aPolygonId<<" | ";
       TConnectivities& aConnectivities = aPolygon.myConnectivities;
       if(DEBUG_TRIA_EXECUTE) {
-        for(int i=0;i<aConnectivities.size();i++)
+        for(size_t i=0;i<aConnectivities.size();i++)
           cout << aConnectivities[i] << ",";
         cout << endl;
       }

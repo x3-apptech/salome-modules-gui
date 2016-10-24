@@ -111,8 +111,8 @@ SVTK_Actor
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
 
-  vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  SVTK::CopyPoints(GetSource(),aSourceDataSet);
+  vtkUnstructuredGrid * aSourceGrid = (vtkUnstructuredGrid *)theMapActor->GetInput();
+  GetSource()->SetPoints( aSourceGrid->GetPoints() );
 
   int aNbOfParts = theMapIndex.Extent();
   for(int ind = 1; ind <= aNbOfParts; ind++){
@@ -182,8 +182,8 @@ SVTK_Actor
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
 
-  vtkDataSet *aSourceDataSet = theMapActor->GetInput();
-  SVTK::CopyPoints(GetSource(),aSourceDataSet);
+  vtkUnstructuredGrid * aSourceGrid = (vtkUnstructuredGrid *)theMapActor->GetInput();
+  GetSource()->SetPoints( aSourceGrid->GetPoints() );
 
 
   if(theMapIndex.Extent() == 2){

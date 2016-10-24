@@ -53,7 +53,7 @@ public:
   enum EExtraction{ eCells, ePoints};
   //! Sets mode of extraction to \a theExtractionMode
   void SetModeOfExtraction(EExtraction theExtractionMode){
-    myExtractionMode = theExtractionMode; Modified();
+    if ( myExtractionMode != theExtractionMode ) { myExtractionMode = theExtractionMode; Modified(); }
   }
   //! Get Extraction mode (Return: \a myExtractionMode field)
   EExtraction GetModeOfExtraction(){ return myExtractionMode;}
@@ -61,39 +61,36 @@ public:
   enum EChanging{ ePassAll, eAdding, eRemoving};
   //! Sets mode of changing to \a theChangeMode
   void SetModeOfChanging(EChanging theChangeMode){
-    myChangeMode = theChangeMode; 
-    Modified();
+    if ( myChangeMode != theChangeMode ) { myChangeMode = theChangeMode; Modified(); }
   }
   //! Return \a myChangeMode field
-  EChanging GetModeOfChanging(){ return myChangeMode;}
+  EChanging GetModeOfChanging(){ return myChangeMode; }
 
   //! Add cell id to \a myCellIds std::set
   void RegisterCell(vtkIdType theCellId);
   //! Check if myCellIds is empty.
-  int IsCellsRegistered() { return !myCellIds.empty();}
+  int IsCellsRegistered() { return !myCellIds.empty(); }
   //! Remove the cell from the output
-  void ClearRegisteredCells() { 
-    myCellIds.clear();
-    Modified();
+  void ClearRegisteredCells() {
+    if ( !myCellIds.empty() ) { myCellIds.clear(); Modified(); }
   }
-  
+
   //! Add cell type to \a myCellTypes std::set
   void RegisterCellsWithType(vtkIdType theCellType);
   //! Check if myCellTypes is empty.
-  int IsCellsWithTypeRegistered() { return !myCellTypes.empty();}
+  int IsCellsWithTypeRegistered() { return !myCellTypes.empty(); }
   //! Remove every cells with the type from the output
-  void ClearRegisteredCellsWithType() { 
-    myCellTypes.clear();
-    Modified();
+  void ClearRegisteredCellsWithType() {
+    if ( !myCellTypes.empty() ) { myCellTypes.clear(); Modified(); }
   }
 
   //! \brief Do the filter do some real work
-  int IsChanging() { return IsCellsRegistered() || IsCellsWithTypeRegistered();}
+  int IsChanging() { return IsCellsRegistered() || IsCellsWithTypeRegistered(); }
 
   //! \brief Do it keep the mapping between input's and output's UnstructuredGrid
   void SetStoreMapping(int theStoreMapping);
   //! Get \a myStoreMapping
-  int GetStoreMapping(){ return myStoreMapping;}
+  int GetStoreMapping(){ return myStoreMapping; }
 
   //! Gets the input id by output id.
   vtkIdType GetInputId(int theOutId) const;

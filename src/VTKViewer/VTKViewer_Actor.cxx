@@ -61,18 +61,18 @@ vtkStandardNewMacro(VTKViewer_Actor);
 */
 VTKViewer_Actor
 ::VTKViewer_Actor():
-  myOpacity(1.0),
-  myIsHighlighted(false),
-  myIsPreselected(false),
-  myRepresentation(VTKViewer::Representation::Surface),
-  myDisplayMode(1),
-  myProperty(vtkProperty::New()),
-  PreviewProperty(NULL),
-  myIsInfinite(false),
   myIsResolveCoincidentTopology(true),
+  myOpacity(1.0),
+  myDisplayMode(1),
+  myIsInfinite(false),
   myStoreMapping(false),
   myGeomFilter(VTKViewer_GeometryFilter::New()),
-  myTransformFilter(VTKViewer_TransformFilter::New())
+  myTransformFilter(VTKViewer_TransformFilter::New()),
+  myRepresentation(VTKViewer::Representation::Surface),
+  myProperty(vtkProperty::New()),
+  PreviewProperty(NULL),
+  myIsPreselected(false),
+  myIsHighlighted(false)
 {
   vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
                                                                  myPolygonOffsetUnits);

@@ -64,7 +64,7 @@ class VTKVIEWER_EXPORT VTKViewer_Triangulator
           vtkCellData* theOutputCD,
           int theStoreMapping,
           std::vector<vtkIdType>& theVTK2ObjIds,
-          std::map< vtkIdType, std::vector<vtkIdType> >& theDimension2VTK2ObjIds,
+          std::vector< std::vector<vtkIdType> >& theDimension2VTK2ObjIds,
           bool theIsCheckConvex);
 
  private:

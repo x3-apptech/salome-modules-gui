@@ -77,6 +77,7 @@
 
 #include "VTKViewer_Utilities.h"
 #include "VTKViewer_Trihedron.h"
+#include "VTKViewer_Actor.h"
 
 #include "SVTK_View.h"
 #include "SVTK_Selector.h"
@@ -1084,6 +1085,15 @@ void SVTK_ViewWindow::SetSelectionEnabled( bool theEnable )
     dynamic_cast<QtxActionGroup*>( getAction( PreselectionId ) );
   if ( aPreselectionGroup )
     aPreselectionGroup->setEnabled( theEnable );
+
+  // notify actors
+  vtkActorCollection *actors = getRenderer()->GetActors();
+  for (int i = 0; i < actors->GetNumberOfItems(); ++i )
+    if (VTKViewer_Actor *actor = dynamic_cast<VTKViewer_Actor*>(actors->GetItemAsObject(i)))
+    {
+      cout << "actor " << actor << endl;
+      actor->EnableSelection( theEnable );
+    }
 }
 
 /*!

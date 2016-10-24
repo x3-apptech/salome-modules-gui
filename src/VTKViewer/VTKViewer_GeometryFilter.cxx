@@ -108,6 +108,39 @@ VTKViewer_GeometryFilter
 ::~VTKViewer_GeometryFilter()
 {}
 
+/*!
+ * \brief Return true for only one volume including a given edge
+ *  \param [in] id1 - 1st edge end
+ *  \param [in] id2 - second edge end
+ *  \param [in] cellId - volume ID
+ *  \param [in] input - the grid
+ */
+static inline bool toShowEdge( vtkIdType id1, vtkIdType id2, vtkIdType cellId, vtkUnstructuredGrid* input )
+{
+  // return true if the given cell is the 1st among cells including the edge
+  vtkCellLinks * links = input->GetCellLinks();
+  if ( !links ) {
+    input->BuildLinks();
+    links = input->GetCellLinks();
+  }
+  if ( id1 < id2 )
+    std::swap( id1, id2 );
+  vtkIdType *cells = links->GetCells( id1 );
+
+  // among cells, look for a cell including the edge
+  vtkIdType *cellPts, npts, iCell = 0;
+  bool found = false;
+  while ( !found )
+  {
+    if ( cells[iCell] == cellId )
+      return true;
+    input->GetCellPoints( cells[iCell], npts, cellPts );
+    for ( vtkIdType i = 0; i < npts && !found; ++i )
+      found = ( cellPts[i] == id2 );
+    iCell += ( !found );
+  }
+  return ( cells[iCell] == cellId );
+}
 
 int
 VTKViewer_GeometryFilter
@@ -141,14 +174,12 @@ VTKViewer_GeometryFilter
   return 1;
 }
 
-
 int
 VTKViewer_GeometryFilter
 ::UnstructuredGridExecute(vtkDataSet *dataSetInput,
                           vtkPolyData *output,
                           vtkInformation *outInfo)
 {
-
   vtkUnstructuredGrid *input= (vtkUnstructuredGrid *)dataSetInput;
   vtkCellArray *Connectivity = input->GetCells();
   // Check input
@@ -182,7 +213,7 @@ VTKViewer_GeometryFilter
 
   char *cellVis;
   vtkIdType newCellId;
-  int faceId, *faceVerts, numFacePts;
+  int faceId, *faceVerts, *edgeVerts, numFacePts;
   double *x;
   vtkIdType PixelConvert[4];
   // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
@@ -277,13 +308,13 @@ VTKViewer_GeometryFilter
       cellVis[cellId] = 1;
       if ( ( this->CellClipping && cellId < this->CellMinimum ) ||
            cellId > this->CellMaximum )
-        {
+      {
         cellVis[cellId] = 0;
-        }
+      }
       else
-        {
+      {
         for (i=0; i < npts; i++)
-          {
+        {
           x = p->GetPoint(pts[i]);
           if ( ( ( ( this->PointClipping && (pts[i] < this->PointMinimum ) ) ||
                                              pts[i] > this->PointMaximum) ) ||
@@ -291,42 +322,44 @@ VTKViewer_GeometryFilter
                 ( x[0] < this->Extent[0] || x[0] > this->Extent[1] ||
                   x[1] < this->Extent[2] || x[1] > this->Extent[3] ||
                   x[2] < this->Extent[4] || x[2] > this->Extent[5] )) )
-            {
+          {
             cellVis[cellId] = 0;
             break;
-            }//point/extent clipping
-          }//for each point
-        }//if point clipping needs checking
-      }//for all cells
-    }//if not all visible
+          }//point/extent clipping
+        }//for each point
+      }//if point clipping needs checking
+    }//for all cells
+  }//if not all visible
+
+  if ( input->GetCellLinks() )
+    input->BuildLinks();
 
   // Loop over all cells now that visibility is known
   // (Have to compute visibility first for 3D cell boundaries)
   int progressInterval = numCells/20 + 1;
   TMapOfVectorId aDimension2VTK2ObjIds;
-  if(myStoreMapping){
-    myVTK2ObjIds.clear();
-    myVTK2ObjIds.reserve(numCells);
-  }
+  if ( myStoreMapping )
+    aDimension2VTK2ObjIds.resize( 3 ); // max dimension is 2
+
   for (cellId=0, Connectivity->InitTraversal();
        Connectivity->GetNextCell(npts,pts);
        cellId++)
-    {
+  {
     //Progress and abort method support
     if ( !(cellId % progressInterval) )
-      {
+    {
       vtkDebugMacro(<<"Process cell #" << cellId);
       this->UpdateProgress ((float)cellId/numCells);
-      }
+    }
 
     // Handle ghost cells here.  Another option was used cellVis array.
     if (cellGhostLevels && cellGhostLevels[cellId] > updateLevel)
-      { // Do not create surfaces in outer ghost cells.
+    { // Do not create surfaces in outer ghost cells.
       continue;
-      }
+    }
 
     if (allVisible || cellVis[cellId])  //now if visible extract geometry
-      {
+    {
       //special code for nonlinear cells - rarely occurs, so right now it
       //is slow.
       vtkIdType aCellType = input->GetCellType(cellId);
@@ -406,326 +439,431 @@ VTKViewer_GeometryFilter
 
           break;
         }
-        case VTK_TETRA: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 4; faceId++)
-            {
-            faceIds->Reset();
-            faceVerts = vtkTetra::GetFaceArray(faceId);
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
-            aCellType = VTK_TRIANGLE;
-            numFacePts = 3;
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
-#else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
-#endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
-              {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[i]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-              }
-            }
-          break;
-        }
-        case VTK_VOXEL: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 6; faceId++)
-            {
-            faceIds->Reset();
-            faceVerts = vtkVoxel::GetFaceArray(faceId);
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
-            faceIds->InsertNextId(pts[faceVerts[3]]);
-            aCellType = VTK_QUAD;
-            numFacePts = 4;
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
-#else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
-#endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
-              {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[PixelConvert[i]]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-              }
-            }
-          break;
-        }
-        case VTK_HEXAHEDRON: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 6; faceId++)
-            {
-            faceIds->Reset();
-            faceVerts = vtkHexahedron::GetFaceArray(faceId);
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
-            faceIds->InsertNextId(pts[faceVerts[3]]);
-            aCellType = VTK_QUAD;
-            numFacePts = 4;
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
-#else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
-#endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
-              {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[i]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-              }
-            }
-          break;
-        }
-        case VTK_WEDGE: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 5; faceId++)
-            {
-            faceIds->Reset();
-            faceVerts = vtkWedge::GetFaceArray(faceId);
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
-            aCellType = VTK_TRIANGLE;
-            numFacePts = 3;
-            if (faceVerts[3] >= 0)
-              {
-              faceIds->InsertNextId(pts[faceVerts[3]]);
-              aCellType = VTK_QUAD;
-              numFacePts = 4;
-              }
-
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
-#else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
-#endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
-              {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[i]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-              }
-            }
-          break;
-        }
-        case VTK_HEXAGONAL_PRISM: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 8; faceId++)
+        case VTK_TETRA:
+        {
+          if ( myShowInside )
           {
-            faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
-            faceIds->Reset();
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
-            faceIds->InsertNextId(pts[faceVerts[3]]);
-            aCellType = VTK_QUAD;
-            numFacePts = 4;
-            if (faceVerts[5] >= 0)
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 6; ++edgeID )
             {
-              faceIds->InsertNextId(pts[faceVerts[4]]);
-              faceIds->InsertNextId(pts[faceVerts[5]]);
-              aCellType = VTK_POLYGON;
-              numFacePts = 6;
+              edgeVerts = vtkTetra::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
             }
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
+            break;
+          }
+          else
+          {
 #ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
-#else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
 #endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
-            {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[i]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-            }
-            }
-          break;
-        }
-        case VTK_PYRAMID: {
-#ifdef SHOW_COINCIDING_3D_PAL21924
-          faceIdsTmp->Reset();
-          for (int ai=0; ai<npts; ai++)
-            faceIdsTmp->InsertNextId(pts[ai]);
-          input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-          for (faceId = 0; faceId < 5; faceId++)
-            {
-            faceIds->Reset();
-            faceVerts = vtkPyramid::GetFaceArray(faceId);
-            faceIds->InsertNextId(pts[faceVerts[0]]);
-            faceIds->InsertNextId(pts[faceVerts[1]]);
-            faceIds->InsertNextId(pts[faceVerts[2]]);
             aCellType = VTK_TRIANGLE;
             numFacePts = 3;
-            if (faceVerts[3] >= 0)
+            for (faceId = 0; faceId < 4; faceId++)
+            {
+              faceIds->Reset();
+              faceVerts = vtkTetra::GetFaceArray(faceId);
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+#ifdef SHOW_COINCIDING_3D_PAL21924
+              bool process = nbNeighbors <= 0;
+#else
+              bool process = nbNeighbors <= 0 || GetAppendCoincident3D();
+#endif
+              if ( process || ( !allVisible && !cellVis[cellIds->GetId(0)] ))
               {
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[i]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+          }
+          break;
+        }
+        case VTK_VOXEL:
+        {
+          if ( myShowInside )
+          {
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 12; ++edgeID )
+            {
+              edgeVerts = vtkVoxel::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+            break;
+          }
+          else
+          {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+            for (faceId = 0; faceId < 6; faceId++)
+            {
+              faceIds->Reset();
+              faceVerts = vtkVoxel::GetFaceArray(faceId);
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
               faceIds->InsertNextId(pts[faceVerts[3]]);
               aCellType = VTK_QUAD;
               numFacePts = 4;
-              }
-            input->GetCellNeighbors(cellId, faceIds, cellIds);
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
 #ifdef SHOW_COINCIDING_3D_PAL21924
-            int nbNeighbors = 0;
-            for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-              if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-            }
-            bool process = nbNeighbors <= 0;
+              bool process = nbNeighbors <= 0;
 #else
-            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+              bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
 #endif
-            if ( process || myShowInside ||
-                 (!allVisible && !cellVis[cellIds->GetId(0)]) )
+              if ( process || ( !allVisible && !cellVis[cellIds->GetId(0)] ))
               {
-              for ( i=0; i < numFacePts; i++)
-                aNewPts[i] = pts[faceVerts[i]];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[PixelConvert[i]]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
               }
             }
+          }
+          break;
+        }
+        case VTK_HEXAHEDRON:
+        {
+          if ( myShowInside )
+          {
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 12; ++edgeID )
+            {
+              edgeVerts = vtkHexahedron::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+            break;
+          }
+          else
+          {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+            aCellType = VTK_QUAD;
+            numFacePts = 4;
+            for (faceId = 0; faceId < 6; faceId++)
+            {
+              faceIds->Reset();
+              faceVerts = vtkHexahedron::GetFaceArray(faceId);
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
+              faceIds->InsertNextId(pts[faceVerts[3]]);
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+#ifdef SHOW_COINCIDING_3D_PAL21924
+              bool process = nbNeighbors <= 0;
+#else
+              bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
+              if ( process || (!allVisible && !cellVis[cellIds->GetId(0)]) )
+              {
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[i]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+          }
+          break;
+        }
+        case VTK_WEDGE:
+        {
+          if ( myShowInside )
+          {
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 9; ++edgeID )
+            {
+              edgeVerts = vtkWedge::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+            break;
+          }
+          else
+          {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+            for (faceId = 0; faceId < 5; faceId++)
+            {
+              faceIds->Reset();
+              faceVerts = vtkWedge::GetFaceArray(faceId);
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
+              aCellType = VTK_TRIANGLE;
+              numFacePts = 3;
+              if (faceVerts[3] >= 0)
+              {
+                faceIds->InsertNextId(pts[faceVerts[3]]);
+                aCellType = VTK_QUAD;
+                numFacePts = 4;
+              }
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+#ifdef SHOW_COINCIDING_3D_PAL21924
+              bool process = nbNeighbors <= 0;
+#else
+              bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
+              if ( process || ( !allVisible && !cellVis[cellIds->GetId(0)] ))
+              {
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[i]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+          }
+          break;
+        }
+        case VTK_HEXAGONAL_PRISM:
+        {
+          if ( myShowInside )
+          {
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 18; ++edgeID )
+            {
+              edgeVerts = vtkHexagonalPrism::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+            break;
+          }
+          else
+          {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+            for (faceId = 0; faceId < 8; faceId++)
+            {
+              faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
+              faceIds->Reset();
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
+              faceIds->InsertNextId(pts[faceVerts[3]]);
+              aCellType = VTK_QUAD;
+              numFacePts = 4;
+              if (faceVerts[5] >= 0)
+              {
+                faceIds->InsertNextId(pts[faceVerts[4]]);
+                faceIds->InsertNextId(pts[faceVerts[5]]);
+                aCellType = VTK_POLYGON;
+                numFacePts = 6;
+              }
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+#ifdef SHOW_COINCIDING_3D_PAL21924
+              bool process = nbNeighbors <= 0;
+#else
+              bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
+              if ( process || ( !allVisible && !cellVis[cellIds->GetId(0)] ))
+              {
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[i]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+          }
+          break;
+        }
+        case VTK_PYRAMID:
+        {
+          if ( myShowInside )
+          {
+            aCellType = VTK_LINE;
+            for ( int edgeID = 0; edgeID < 8; ++edgeID )
+            {
+              edgeVerts = vtkPyramid::GetEdgeArray( edgeID );
+              if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
+              {
+                aNewPts[0] = pts[edgeVerts[0]];
+                aNewPts[1] = pts[edgeVerts[1]];
+                newCellId = output->InsertNextCell( aCellType, 2, aNewPts );
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+            break;
+          }
+          else
+          {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            faceIdsTmp->SetNumberOfIds( npts );
+            for ( int ai = 0; ai < npts; ai++ )
+              faceIdsTmp->SetId( ai, pts[ai] );
+            input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+            for (faceId = 0; faceId < 5; faceId++)
+            {
+              faceIds->Reset();
+              faceVerts = vtkPyramid::GetFaceArray(faceId);
+              faceIds->InsertNextId(pts[faceVerts[0]]);
+              faceIds->InsertNextId(pts[faceVerts[1]]);
+              faceIds->InsertNextId(pts[faceVerts[2]]);
+              aCellType = VTK_TRIANGLE;
+              numFacePts = 3;
+              if (faceVerts[3] >= 0)
+              {
+                faceIds->InsertNextId(pts[faceVerts[3]]);
+                aCellType = VTK_QUAD;
+                numFacePts = 4;
+              }
+              input->GetCellNeighbors(cellId, faceIds, cellIds);
+              int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+#ifdef SHOW_COINCIDING_3D_PAL21924
+              bool process = nbNeighbors <= 0;
+#else
+              bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
+              if ( process || ( !allVisible && !cellVis[cellIds->GetId(0)] ))
+              {
+                for ( i=0; i < numFacePts; i++)
+                  aNewPts[i] = pts[faceVerts[i]];
+                newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
+                if(myStoreMapping)
+                  InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                outputCD->CopyData(cd,cellId,newCellId);
+              }
+            }
+          }
           break;
         }
 
 #if VTK_XVERSION > 50700
         case VTK_POLYHEDRON:
+        {
+          vtkIdType nFaces = 0;
+          vtkIdType* ptIds = 0;
+          int idp = 0;
+          input->GetFaceStream(cellId, nFaces, ptIds);
+#ifdef SHOW_COINCIDING_3D_PAL21924
+          if ( !myShowInside )
           {
-            //MESSAGE("VTK_POLYHEDRON geometry filter");
-            vtkIdType nFaces = 0;
-            vtkIdType* ptIds = 0;
-            int idp = 0;
-            input->GetFaceStream(cellId, nFaces, ptIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-            faceIdsTmp->Reset();
-            for (int ai=0; ai<npts; ai++)
-              faceIdsTmp->InsertNextId(pts[ai]);
+            faceIdsTmp->Reset(); // use 2 facets
+            numFacePts = ptIds[idp];
+            for (i = 0; i < numFacePts; i++)
+              faceIdsTmp->InsertNextId(ptIds[idp + i]);
+            idp += numFacePts+1;
+            numFacePts = ptIds[idp];
+            for (i = 0; i < numFacePts; i++)
+              faceIdsTmp->InsertNextId(ptIds[idp + i]);
             input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
-#endif
-            for (faceId = 0; faceId < nFaces; faceId++)
-              {
-                faceIds->Reset();
-                numFacePts = ptIds[idp];
-                //MESSAGE("numFacePts="<< numFacePts);
-                int pt0 = ++idp;
-                for (i = 0; i < numFacePts; i++)
-                  {
-                    //MESSAGE("ptIds[" << idp + i << "]=" << ptIds[idp + i]);
-                    faceIds->InsertNextId(ptIds[idp + i]);
-                  }
-                idp += numFacePts;
-                switch (numFacePts)
-                  {
-                  case 3:
-                    aCellType = VTK_TRIANGLE;
-                    break;
-                  case 4:
-                    aCellType = VTK_QUAD;
-                    break;
-                  default:
-                    aCellType = VTK_POLYGON;
-                    break;
-                  }
-                // TODO understand and fix display of several polyhedrons                
-                input->GetCellNeighbors(cellId, faceIds, cellIds);
-#ifdef SHOW_COINCIDING_3D_PAL21924
-                int nbNeighbors = 0;
-                for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-                  if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-                }
-                bool process = nbNeighbors <= 0;
-#else
-                bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
-#endif
-                if (process || myShowInside
-                    || (!allVisible && !cellVis[cellIds->GetId(0)]))
-                  {
-                    for (i = 0; i < numFacePts; i++)
-                      aNewPts[i] = ptIds[pt0 + i];
-                    newCellId = output->InsertNextCell(aCellType, numFacePts, aNewPts);
-                    if (myStoreMapping)
-                      InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-                    outputCD->CopyData(cd, cellId, newCellId);
-                  }
-              }
-            break;
+            idp = 0;
           }
+#endif
+          for (faceId = 0; faceId < nFaces; faceId++)
+          {
+            faceIds->Reset();
+            numFacePts = ptIds[idp];
+            int pt0 = ++idp;
+            for (i = 0; i < numFacePts; i++)
+            {
+              faceIds->InsertNextId(ptIds[idp + i]);
+            }
+            idp += numFacePts;
+            switch (numFacePts)
+            {
+            case 3: aCellType = VTK_TRIANGLE; break;
+            case 4: aCellType = VTK_QUAD;     break;
+            default:aCellType = VTK_POLYGON;
+            }
+            input->GetCellNeighbors(cellId, faceIds, cellIds);
+            int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+            if ( myShowInside && nbNeighbors > 0 && cellId < cellIds->GetId(0) )
+              continue; // don't add twice same internal face in wireframe mode
+#ifdef SHOW_COINCIDING_3D_PAL21924
+            bool process = nbNeighbors <= 0;
+#else
+            bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+#endif
+            if (process || myShowInside
+                || (!allVisible && !cellVis[cellIds->GetId(0)]))
+            {
+              for (i = 0; i < numFacePts; i++)
+                aNewPts[i] = ptIds[pt0 + i];
+              newCellId = output->InsertNextCell(aCellType, numFacePts, aNewPts);
+              if (myStoreMapping)
+                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+              outputCD->CopyData(cd, cellId, newCellId);
+            }
+          }
+          break;
+        }
 #endif
         //Quadratic cells
         case VTK_QUADRATIC_EDGE:
@@ -739,7 +877,9 @@ VTKViewer_GeometryFilter
         case VTK_TRIQUADRATIC_HEXAHEDRON:
         case VTK_QUADRATIC_WEDGE:
         case VTK_QUADRATIC_PYRAMID:
-          if(!myIsWireframeMode) {
+
+          if(!myIsWireframeMode)
+          {
             input->GetCell(cellId,cell);
             vtkIdList *lpts = vtkIdList::New();
             vtkPoints *coords = vtkPoints::New();
@@ -811,17 +951,15 @@ VTKViewer_GeometryFilter
 #endif
               aCellType = VTK_TRIANGLE;
               numFacePts = 3;
-              for (int j=0; j < cell->GetNumberOfFaces(); j++){
+              for (int j=0; j < cell->GetNumberOfFaces(); j++)
+              {
                 vtkCell *face = cell->GetFace(j);
                 input->GetCellNeighbors(cellId, face->PointIds, cellIds);
+                int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
 #ifdef SHOW_COINCIDING_3D_PAL21924
-                int nbNeighbors = 0;
-                for(int ai=0;ai<cellIds->GetNumberOfIds();ai++) {
-                  if (cellIdsTmp->IsId(cellIds->GetId(ai)) == -1) nbNeighbors++;
-                }
                 bool process = nbNeighbors <= 0;
 #else
-                bool process = cellIds->GetNumberOfIds() <= 0 || GetAppendCoincident3D();
+                bool process = nbNeighbors <= 0 || GetAppendCoincident3D();
 #endif
                 if ( process || myShowInside ) {
                   face->Triangulate(0,lpts,coords);
@@ -841,9 +979,11 @@ VTKViewer_GeometryFilter
             coords->Delete();
             lpts->Delete();
             break;
-          } else { // wireframe
+          }
+          else { // wireframe
             switch(aCellType) {
-            case VTK_QUADRATIC_EDGE: {
+            case VTK_QUADRATIC_EDGE:
+            {
               vtkIdType arcResult =-1;
               if(myIsBuildArc) {
                arcResult = Build1DArc(cellId, input, output, pts,myMaxArcAngle);
@@ -867,7 +1007,8 @@ VTKViewer_GeometryFilter
               break;
             }
             case VTK_QUADRATIC_TRIANGLE:
-            case VTK_BIQUADRATIC_TRIANGLE: {
+            case VTK_BIQUADRATIC_TRIANGLE:
+            {
               if(!myIsBuildArc) {
                 aCellType = VTK_POLYGON;
                 numFacePts = 6;
@@ -890,7 +1031,8 @@ VTKViewer_GeometryFilter
               break;
             }
             case VTK_QUADRATIC_QUAD:
-            case VTK_BIQUADRATIC_QUAD: {
+            case VTK_BIQUADRATIC_QUAD:
+            {
               if(!myIsBuildArc) {
                 aCellType = VTK_POLYGON;
                 numFacePts = 8;
@@ -914,7 +1056,8 @@ VTKViewer_GeometryFilter
                 BuildArcedPolygon(cellId,input,output,aDimension2VTK2ObjIds);
               break;
             }
-            case VTK_QUADRATIC_POLYGON: {
+            case VTK_QUADRATIC_POLYGON:
+            {
               if(!myIsBuildArc)
               {
                 aCellType = VTK_POLYGON;
@@ -934,332 +1077,78 @@ VTKViewer_GeometryFilter
                 BuildArcedPolygon(cellId,input,output,aDimension2VTK2ObjIds);
               break;
             }
-            case VTK_QUADRATIC_TETRA: {
-              aCellType = VTK_POLYGON;
-              numFacePts = 6;
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[4];
-              aNewPts[2] = pts[1];
-              aNewPts[3] = pts[5];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[6];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[7];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[8];
-              aNewPts[4] = pts[1];
-              aNewPts[5] = pts[4];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[1];
-              aNewPts[1] = pts[8];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[9];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[5];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[2];
-              aNewPts[1] = pts[9];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[7];
-              aNewPts[4] = pts[0];
-              aNewPts[5] = pts[6];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              break;
-            }
-            case VTK_QUADRATIC_WEDGE: {
-              aCellType = VTK_POLYGON;
-              numFacePts = 6;
-              //---------------------------------------------------------------
-              //Face 1
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[6];
-              aNewPts[2] = pts[1];
-              aNewPts[3] = pts[7];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[8];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              //Face 2
-              aNewPts[0] = pts[3];
-              aNewPts[1] = pts[9];
-              aNewPts[2] = pts[4];
-              aNewPts[3] = pts[10];
-              aNewPts[4] = pts[5];
-              aNewPts[5] = pts[11];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              //Face 3
-              numFacePts = 8;
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[8];
-              aNewPts[2] = pts[2];
-              aNewPts[3] = pts[14];
-              aNewPts[4] = pts[5];
-              aNewPts[5] = pts[11];
-              aNewPts[6] = pts[3];
-              aNewPts[7] = pts[12];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              //Face 4
-              aNewPts[0] = pts[1];
-              aNewPts[1] = pts[13];
-              aNewPts[2] = pts[4];
-              aNewPts[3] = pts[10];
-              aNewPts[4] = pts[5];
-              aNewPts[5] = pts[14];
-              aNewPts[6] = pts[2];
-              aNewPts[7] = pts[7];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              //Face 5
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[12];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[9];
-              aNewPts[4] = pts[4];
-              aNewPts[5] = pts[13];
-              aNewPts[6] = pts[1];
-              aNewPts[7] = pts[6];
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-              outputCD->CopyData(cd,cellId,newCellId);
-              break;
-            }
+            case VTK_QUADRATIC_TETRA:
+            case VTK_QUADRATIC_WEDGE:
             case VTK_TRIQUADRATIC_HEXAHEDRON:
-            case VTK_QUADRATIC_HEXAHEDRON: {
-              aCellType = VTK_POLYGON;
-              numFacePts = 8;
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[8];
-              aNewPts[2] = pts[1];
-              aNewPts[3] = pts[17];
-              aNewPts[4] = pts[5];
-              aNewPts[5] = pts[12];
-              aNewPts[6] = pts[4];
-              aNewPts[7] = pts[16];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[1];
-              aNewPts[1] = pts[9];
-              aNewPts[2] = pts[2];
-              aNewPts[3] = pts[18];
-              aNewPts[4] = pts[6];
-              aNewPts[5] = pts[13];
-              aNewPts[6] = pts[5];
-              aNewPts[7] = pts[17];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[2];
-              aNewPts[1] = pts[10];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[19];
-              aNewPts[4] = pts[7];
-              aNewPts[5] = pts[14];
-              aNewPts[6] = pts[6];
-              aNewPts[7] = pts[18];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[3];
-              aNewPts[1] = pts[11];
-              aNewPts[2] = pts[0];
-              aNewPts[3] = pts[16];
-              aNewPts[4] = pts[4];
-              aNewPts[5] = pts[15];
-              aNewPts[6] = pts[7];
-              aNewPts[7] = pts[19];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[8];
-              aNewPts[2] = pts[1];
-              aNewPts[3] = pts[9];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[10];
-              aNewPts[6] = pts[3];
-              aNewPts[7] = pts[11];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[4];
-              aNewPts[1] = pts[12];
-              aNewPts[2] = pts[5];
-              aNewPts[3] = pts[13];
-              aNewPts[4] = pts[6];
-              aNewPts[5] = pts[14];
-              aNewPts[6] = pts[7];
-              aNewPts[7] = pts[15];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
+            case VTK_QUADRATIC_HEXAHEDRON:
+            case VTK_QUADRATIC_PYRAMID:
+            {
+              aCellType = VTK_POLY_LINE;
+              input->GetCell(cellId,cell);
+              if ( myShowInside )
+              {
+                int nbEdges = cell->GetNumberOfEdges();
+                for ( int edgeId = 0; edgeId < nbEdges; ++edgeId )
+                {
+                  vtkCell * edge = cell->GetEdge( edgeId );
+                  if ( toShowEdge( edge->GetPointId(0), edge->GetPointId(2), cellId, input ))
+                  {
+                    aNewPts[0] = edge->GetPointId(0);
+                    aNewPts[1] = edge->GetPointId(2);
+                    aNewPts[2] = edge->GetPointId(1);
+                    newCellId = output->InsertNextCell( aCellType, 3, aNewPts );
+                    if(myStoreMapping)
+                      InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                    outputCD->CopyData(cd,cellId,newCellId);
+                  }
+                }
+              }
+              else
+              {
+#ifdef SHOW_COINCIDING_3D_PAL21924
+                int nbPnt = npts - cell->GetNumberOfEdges();
+                faceIdsTmp->SetNumberOfIds( nbPnt );
+                for ( int ai = 0; ai < nbPnt; ai++ )
+                  faceIdsTmp->SetId( ai, pts[ai] );
+                input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+#endif
+                int nbFaces = cell->GetNumberOfFaces();
+                for ( faceId = 0; faceId < nbFaces; faceId++ )
+                {
+                  vtkCell * face = cell->GetFace( faceId );
+                  input->GetCellNeighbors( cellId, face->GetPointIds(), cellIds );
+                  int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+                  if ( nbNeighbors <= 0 )
+                  {
+                    int nbEdges = face->GetNumberOfPoints() / 2;
+                    for ( int edgeId = 0; edgeId < nbEdges; ++edgeId )
+                    {
+                      vtkIdType p1 = ( edgeId );
+                      vtkIdType p2 = ( edgeId + nbEdges );
+                      vtkIdType p3 = ( edgeId + 1 ) % nbEdges;
+                      if ( toShowEdge( face->GetPointId(p1), face->GetPointId(p2), cellId, input ))
+                      {
+                        aNewPts[0] = face->GetPointId( p1 );
+                        aNewPts[1] = face->GetPointId( p2 );
+                        aNewPts[2] = face->GetPointId( p3 );
+                        newCellId = output->InsertNextCell( aCellType, 3, aNewPts );
+                        if(myStoreMapping)
+                          InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
+                        outputCD->CopyData(cd,cellId,newCellId);
+                      }
+                    }
+                  }
+                }
+              }
               break;
-            }
-            case VTK_QUADRATIC_PYRAMID: {
-              aCellType = VTK_POLYGON;
-              numFacePts = 6;
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[8];
-              aNewPts[2] = pts[3];
-              aNewPts[3] = pts[12];
-              aNewPts[4] = pts[4];
-              aNewPts[5] = pts[9];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[9];
-              aNewPts[2] = pts[4];
-              aNewPts[3] = pts[10];
-              aNewPts[4] = pts[1];
-              aNewPts[5] = pts[5];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[1];
-              aNewPts[1] = pts[10];
-              aNewPts[2] = pts[4];
-              aNewPts[3] = pts[11];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[6];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              aNewPts[0] = pts[2];
-              aNewPts[1] = pts[11];
-              aNewPts[2] = pts[4];
-              aNewPts[3] = pts[12];
-              aNewPts[4] = pts[3];
-              aNewPts[5] = pts[7];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              //---------------------------------------------------------------
-              numFacePts = 8;
-              aNewPts[0] = pts[0];
-              aNewPts[1] = pts[5];
-              aNewPts[2] = pts[1];
-              aNewPts[3] = pts[6];
-              aNewPts[4] = pts[2];
-              aNewPts[5] = pts[7];
-              aNewPts[6] = pts[3];
-              aNewPts[7] = pts[8];
-
-              newCellId = output->InsertNextCell(aCellType,numFacePts,aNewPts);
-              if(myStoreMapping)
-                InsertId( cellId, aCellType, myVTK2ObjIds, aDimension2VTK2ObjIds );
-
-              outputCD->CopyData(cd,cellId,newCellId);
-
-              break;
-            } // case VTK_QUADRATIC_PYRAMID:
-            } // switch by type
+            } // case of volumes in wireframe
+            } // switch by quadratic type
           } // end WIREFRAME
           break;
-        } //switch
-      } //if visible
-    } //for all cells
+        } //switch by type
+
+    } //if visible
+  } //for all cells
 
   output->Squeeze();
 
@@ -1278,24 +1167,30 @@ VTKViewer_GeometryFilter
     delete [] cellVis;
   }
 
-  // to sort myVTK2ObjIds vector by cell dimension (ascending)
+  if ( input->GetCellLinks() )
+  {
+    input->GetCellLinks()->Initialize(); // free memory
+  }
+
+  // fill myVTK2ObjIds vector in ascending cell dimension order
+  myVTK2ObjIds.clear();
   if( myStoreMapping && !aDimension2VTK2ObjIds.empty() )
   {
-    myVTK2ObjIds.clear();
-    for( vtkIdType aDimension = 0; aDimension <= 2; aDimension++ )
-    {
-      TMapOfVectorId::const_iterator anIter = aDimension2VTK2ObjIds.find( aDimension );
-      if( anIter != aDimension2VTK2ObjIds.end() )
+    size_t nbCells = ( aDimension2VTK2ObjIds[0].size() +
+                       aDimension2VTK2ObjIds[1].size() +
+                       aDimension2VTK2ObjIds[2].size() );
+    if ( myVTK2ObjIds.capacity() > nbCells )
+      TVectorId().swap( myVTK2ObjIds );
+    myVTK2ObjIds.reserve( nbCells );
+
+    for( int aDimension = 0; aDimension <= 2; aDimension++ )
+      if ( !aDimension2VTK2ObjIds[ aDimension ].empty() )
       {
-        const TVectorId& aCellIds = anIter->second;
-        TVectorId::const_iterator anIdIter, anIdIterEnd = aCellIds.end();
-        for( anIdIter = aCellIds.begin(); anIdIter != anIdIterEnd; anIdIter++ )
-        {
-          const vtkIdType aCellId = *anIdIter;
-          myVTK2ObjIds.push_back( aCellId );
-        }
+        myVTK2ObjIds.insert( myVTK2ObjIds.end(),
+                             aDimension2VTK2ObjIds[ aDimension ].begin(),
+                             aDimension2VTK2ObjIds[ aDimension ].end() );
+        TVectorId().swap( aDimension2VTK2ObjIds[ aDimension ]);
       }
-    }
   }
 
   return 1;
@@ -1308,7 +1203,7 @@ VTKViewer_GeometryFilter
             TVectorId& theVTK2ObjIds,
             TMapOfVectorId& theDimension2VTK2ObjIds )
 {
-  theVTK2ObjIds.push_back( theCellId );
+  //theVTK2ObjIds.push_back( theCellId );
 
   int aDimension = 0;
   switch( theCellType )
