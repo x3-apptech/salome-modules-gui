@@ -2677,6 +2677,14 @@ QPixmap QtxResourceMgr::loadPixmap( const QString& prefix, const QString& name, 
 }
 
 /*!
+  \brief Specify default language for the application.
+*/
+QString QtxResourceMgr::defaultLanguage() const
+{
+  return "";
+}
+
+/*!
   \brief Load translation files according to the specified language.
 
   Names of the translation files are calculated according to the pattern specified
@@ -2707,6 +2715,8 @@ void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
   substMap.insert( 'A', appName() );
 
   QString lang = l;
+  if ( lang.isEmpty() )
+    lang = defaultLanguage();
   if ( lang.isEmpty() )
     value( langSection(), "language", lang );
 

@@ -179,6 +179,8 @@ public:
   void             refresh();
 
 protected:
+  virtual QString  defaultLanguage() const;
+
   virtual void     setDirList( const QStringList& );
   virtual void     setResource( const QString&, const QString&, const QString& );
 

@@ -42,6 +42,7 @@ protected:
   virtual QString userFileName( const QString&, const bool = true ) const;
   virtual QString findAppropriateUserFile( const QString& ) const;
   virtual long    userFileId( const QString& ) const;
+  virtual QString defaultLanguage() const;
 
 private:
   QString         myVersion;
