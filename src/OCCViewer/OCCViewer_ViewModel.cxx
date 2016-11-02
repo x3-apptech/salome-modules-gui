@@ -130,7 +130,9 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
 #if OCC_VERSION_LARGE > 0x07000000
-  myAISContext->ChangeSelectionStyle()->SetColor( Quantity_NOC_WHITE );
+    
+  const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
+  sStyle->SetColor( Quantity_NOC_WHITE ); 
 #else  
   myAISContext->SelectionColor( Quantity_NOC_WHITE );
 #endif  
