@@ -51,7 +51,7 @@ vtkStandardNewMacro(VTKViewer_ExtractUnstructuredGrid);
 
 
 VTKViewer_ExtractUnstructuredGrid::VTKViewer_ExtractUnstructuredGrid():
-  myExtractionMode(eCells), myChangeMode(ePassAll)
+  myExtractionMode(eCells), myChangeMode(ePassAll), myStoreMapping( false )
 {}
 
 
