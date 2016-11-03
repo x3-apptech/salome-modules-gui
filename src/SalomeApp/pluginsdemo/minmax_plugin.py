@@ -104,7 +104,6 @@ def minmax(context):
 
     def select(self):
       sg.getObjectBrowser().selectionChanged.disconnect(self.select)
-      self.ui.control.clear()
       self.ui.minvalue.setText("")
       self.ui.maxvalue.setText("")
       objId = salome.sg.getSelected(0)
@@ -136,7 +135,9 @@ def minmax(context):
           if v:
             controls += controls_3d
             pass
-          self.ui.control.addItems(controls)
+          if self.ui.control.count() != len( controls ):
+            self.ui.control.clear()
+            self.ui.control.addItems(controls)
           self.compute_minmax()
       sg.getObjectBrowser().selectionChanged.connect(self.select)
       pass
