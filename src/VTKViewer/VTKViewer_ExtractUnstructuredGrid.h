@@ -92,13 +92,16 @@ public:
   //! Get \a myStoreMapping
   int GetStoreMapping(){ return myStoreMapping; }
 
-  //! Gets the input id by output id.
+  //! Computes a map out IDs to in IDs. Call it before GetInputId()!!!
+  void BuildOut2InMap();
+  //! Gets the input id by output id. Call BuildOut2InMap() before
   vtkIdType GetInputId(int theOutId) const;
   //! Gets the output id by input id.
   //vtkIdType GetOutputId(int theInId) const;
 
-  typedef std::vector<vtkIdType> TVectorId;
+  typedef std::vector<vtkIdType>        TVectorId;
   typedef std::map<vtkIdType,vtkIdType> TMapId;
+  typedef std::set<vtkIdType>           TSetId;
 
 protected:
   VTKViewer_ExtractUnstructuredGrid();
@@ -109,11 +112,10 @@ protected:
   EExtraction myExtractionMode;
   
   EChanging myChangeMode;
-  typedef std::set<vtkIdType> TSetId;
   TSetId myCellIds;
   TSetId myCellTypes;
 
-  bool myStoreMapping;
+  bool myStoreMapping, myPassAll;
   TVectorId myOut2InId;
   //TMapId myIn2OutId;
 
