@@ -210,6 +210,7 @@ VTKViewer_GeometryFilter
   vtkIdList *faceIds = vtkIdList::New();
   vtkIdList *cellIdsTmp = vtkIdList::New();
   vtkIdList *faceIdsTmp = vtkIdList::New();
+  std::set< vtkIdType > midPoints;
 
   char *cellVis;
   vtkIdType newCellId;
@@ -934,28 +935,34 @@ VTKViewer_GeometryFilter
             else //3D nonlinear cell
             {
 #ifdef SHOW_COINCIDING_3D_PAL21924
-              faceIdsTmp->Reset();
-              int npts1 = 0;
-              switch (aCellType ){
-              case VTK_QUADRATIC_TETRA:         npts1 = 4; break;
-              case VTK_QUADRATIC_HEXAHEDRON:    npts1 = 8; break;
-              case VTK_TRIQUADRATIC_HEXAHEDRON: npts1 = 8; break;
-              case VTK_QUADRATIC_WEDGE:         npts1 = 6; break;
-              case VTK_QUADRATIC_PYRAMID:       npts1 = 5; break;
-              }
-              if ( npts1 > 0 ) {
-                for (int ai=0; ai<npts; ai++)
-                  faceIdsTmp->InsertNextId(pts[ai]);
-                input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+              if ( !myShowInside )
+              {
+                int npts1 = 0;
+                switch (aCellType ){
+                case VTK_QUADRATIC_TETRA:         npts1 = 4; break;
+                case VTK_QUADRATIC_HEXAHEDRON:    npts1 = 8; break;
+                case VTK_TRIQUADRATIC_HEXAHEDRON: npts1 = 8; break;
+                case VTK_QUADRATIC_WEDGE:         npts1 = 6; break;
+                case VTK_QUADRATIC_PYRAMID:       npts1 = 5; break;
+                }
+                faceIdsTmp->SetNumberOfIds( npts1 );
+                if ( npts1 > 0 ) {
+                  for (int ai=0; ai<npts1; ai++)
+                    faceIdsTmp->SetId( ai, pts[ai] );
+                  input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+                }
               }
 #endif
               aCellType = VTK_TRIANGLE;
               numFacePts = 3;
+              int nbNeighbors = 0;
               for (int j=0; j < cell->GetNumberOfFaces(); j++)
               {
                 vtkCell *face = cell->GetFace(j);
-                input->GetCellNeighbors(cellId, face->PointIds, cellIds);
-                int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+                if ( !myShowInside ) {
+                  input->GetCellNeighbors(cellId, face->PointIds, cellIds);
+                  nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+                }
 #ifdef SHOW_COINCIDING_3D_PAL21924
                 bool process = nbNeighbors <= 0;
 #else
@@ -1105,28 +1112,45 @@ VTKViewer_GeometryFilter
               }
               else
               {
+                int nbCoincident = 0;
 #ifdef SHOW_COINCIDING_3D_PAL21924
                 int nbPnt = npts - cell->GetNumberOfEdges();
                 faceIdsTmp->SetNumberOfIds( nbPnt );
                 for ( int ai = 0; ai < nbPnt; ai++ )
                   faceIdsTmp->SetId( ai, pts[ai] );
                 input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+                nbCoincident = cellIdsTmp->GetNumberOfIds();
 #endif
+                midPoints.clear();
                 int nbFaces = cell->GetNumberOfFaces();
                 for ( faceId = 0; faceId < nbFaces; faceId++ )
                 {
                   vtkCell * face = cell->GetFace( faceId );
                   input->GetCellNeighbors( cellId, face->GetPointIds(), cellIds );
-                  int nbNeighbors = cellIds->GetNumberOfIds() - cellIdsTmp->GetNumberOfIds();
+                  int nbNeighbors = cellIds->GetNumberOfIds() - nbCoincident;
                   if ( nbNeighbors <= 0 )
                   {
                     int nbEdges = face->GetNumberOfPoints() / 2;
                     for ( int edgeId = 0; edgeId < nbEdges; ++edgeId )
                     {
-                      vtkIdType p1 = ( edgeId );
-                      vtkIdType p2 = ( edgeId + nbEdges );
-                      vtkIdType p3 = ( edgeId + 1 ) % nbEdges;
-                      if ( toShowEdge( face->GetPointId(p1), face->GetPointId(p2), cellId, input ))
+                      vtkIdType p1 = ( edgeId );               // corner
+                      vtkIdType p2 = ( edgeId + nbEdges );     // medium
+                      vtkIdType p3 = ( edgeId + 1 ) % nbEdges; // next corner
+                      faceIdsTmp->SetNumberOfIds( 2 );
+                      faceIdsTmp->SetId( 0, face->GetPointId(p2) );
+                      faceIdsTmp->SetId( 1, face->GetPointId(p1) );
+                      input->GetCellNeighbors(cellId, faceIdsTmp, cellIdsTmp);
+                      bool process;
+                      switch ( cellIdsTmp->GetNumberOfIds() ) {
+                      case 0: // the edge belong to this cell only
+                        // avoid adding it when treating another face
+                        process = midPoints.insert( face->GetPointId(p2) ).second; break;
+                      case 1: // the edge is shared by two cells
+                        process = ( cellIdsTmp->GetId(0) == cellId ); break;
+                      default: // the edge is shared by >2 cells
+                        process = ( cellIdsTmp->GetId(0) != cellId ); break;
+                      }
+                      if ( process )
                       {
                         aNewPts[0] = face->GetPointId( p1 );
                         aNewPts[1] = face->GetPointId( p2 );
