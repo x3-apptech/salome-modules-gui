@@ -64,6 +64,7 @@ PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desk) :
   myDesktop(desk),
   propertiesPanel(0),
   pipelineBrowserWidget(0),
+  pipelineModel(0),
   sourcesMenu(0),
   filtersMenu(0),
   macrosMenu(0),
@@ -88,7 +89,10 @@ void PVViewer_GUIElements::buildPVWidgets()
 
     //Pipeline Browser
     if ( !pipelineBrowserWidget ) {
-      pipelineBrowserWidget  = new pqPipelineBrowserWidget(myDesktop);
+        pqPipelineModel* pipelineModel = new pqPipelineModel(*pqApplicationCore::instance()->getServerManagerModel(), this);
+        pipelineModel->setView(pqActiveObjects::instance().activeView());
+        pipelineBrowserWidget  = new pqPipelineBrowserWidget(myDesktop);
+        pipelineBrowserWidget->setModel(pipelineModel);
     }
 
     // Properties panel

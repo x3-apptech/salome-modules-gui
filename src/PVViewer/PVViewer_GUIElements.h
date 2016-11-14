@@ -28,6 +28,7 @@
 
 class pqPropertiesPanel;
 class pqPipelineBrowserWidget;
+class pqPipelineModel;
 class QMainWindow;
 class QMenu;
 class QToolBar;
@@ -75,6 +76,7 @@ private:
   // Widgets
   pqPropertiesPanel* propertiesPanel;
   pqPipelineBrowserWidget* pipelineBrowserWidget;
+  pqPipelineModel* pipelineModel;
 
   // Dummy QMenus receiving ParaView's reaction for automatic add when new sources are added
   QMenu* sourcesMenu;
