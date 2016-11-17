@@ -4,5 +4,5 @@ void main()
 {
   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
   gl_FrontColor = gl_Color;
-  gl_PointSize = 1400.0 * gl_ProjectionMatrix[1].y * diameter;
+  gl_PointSize = 700.0 * gl_ProjectionMatrix[1].y * diameter;
 }
