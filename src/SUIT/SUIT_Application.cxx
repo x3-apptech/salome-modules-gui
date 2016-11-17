@@ -58,7 +58,8 @@ SUIT_Application::SUIT_Application()
 : QObject( 0 ),
   myStudy( 0 ),
   myDesktop( 0 ),
-  myStatusLabel( 0 )
+  myStatusLabel( 0 ),
+  myPostRoutines( QList<PostRoutine>() )
 {
   if ( SUIT_Session::session() )
     SUIT_Session::session()->insertApplication( this );
@@ -74,6 +75,9 @@ SUIT_Application::~SUIT_Application()
   delete s;
 
   setDesktop( 0 );
+
+  foreach ( PostRoutine routine, myPostRoutines )
+    routine();
 }
 
 /*!
@@ -726,4 +730,10 @@ void SUIT_Application::onHelpContextModule( const QString& /*theComponentName*/,
                                             const QString& /*theFileName*/,
                                             const QString& /*theContext*/ )
 {
+}
+
+void SUIT_Application::addPostRoutine( PostRoutine theRoutine )
+{
+  if ( !myPostRoutines.contains( theRoutine ) )
+    myPostRoutines << theRoutine;
 }

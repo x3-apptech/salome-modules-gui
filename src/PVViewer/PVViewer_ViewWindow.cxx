@@ -28,6 +28,7 @@
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 #include <SUIT_Desktop.h>
+#include <SUIT_Application.h>
 
 #include <pqTabbedMultiViewWidget.h>
 #include <pqApplicationCore.h>
@@ -51,6 +52,9 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
   setViewManager(myModel->getViewManager());
   myPVMgr = qobject_cast<pqTabbedMultiViewWidget*>(pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
   if (myPVMgr) {
+    SUIT_Application* app = SUIT_Session::session()->activeApplication();
+    if ( app )
+      app->addPostRoutine(&PVViewer_ViewWindow::removePVMgr);
     myPVMgr->setParent( this );
     // This is mandatory, see setParent() method in Qt 4 documentation
     myPVMgr->show();
@@ -86,6 +90,12 @@ PVViewer_ViewWindow::~PVViewer_ViewWindow()
     myPVMgr = 0;
     setCentralWidget( 0 );
   }
+}
+
+void PVViewer_ViewWindow::removePVMgr()
+{
+  pqTabbedMultiViewWidget* aPVMgr = qobject_cast<pqTabbedMultiViewWidget*>(pqApplicationCore::instance()->manager("MULTIVIEW_WIDGET"));
+  delete aPVMgr;
 }
 
 /*!

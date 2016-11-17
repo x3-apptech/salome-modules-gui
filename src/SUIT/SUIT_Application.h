@@ -116,6 +116,8 @@ public:
   virtual void          viewManagers( const QString&, QList<SUIT_ViewManager*>& ) const = 0;
   QAction*              action( const int ) const;
 
+  void                  addPostRoutine( void (*theRoutine)() );
+
 signals:
   void                  applicationClosed( SUIT_Application* );
   void                  activated( SUIT_Application* );
@@ -191,6 +193,9 @@ private:
   SUIT_ShortcutMgr*     myShortcutMgr;
 
   QLabel*               myStatusLabel;
+
+  typedef void (*PostRoutine)();
+  QList<PostRoutine>    myPostRoutines;
 };
 
 //! This function must return a new application instance.

@@ -44,6 +44,8 @@ public:
   
   pqTabbedMultiViewWidget*    getMultiViewManager() const;
 
+  static void removePVMgr();
+
 private:
   SUIT_Desktop*     myDesktop;
   PVViewer_Viewer*     myModel;
