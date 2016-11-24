@@ -112,7 +112,7 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   //@}
 
   virtual 
-  unsigned long int 
+  vtkMTimeType
   GetMTime();
 
   /** @name For shrink mamnagement purpose */

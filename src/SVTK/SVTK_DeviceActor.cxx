@@ -189,11 +189,11 @@ SetStoreMapping(bool theStoreMapping)
 /*!
   \return time of modification
 */
-unsigned long int 
+vtkMTimeType
 SVTK_DeviceActor
 ::GetMTime()
 {
-  unsigned long mTime = this->Superclass::GetMTime();
+  vtkMTimeType mTime = this->Superclass::GetMTime();
 
   mTime = std::max(mTime,myGeomFilter->GetMTime());
 

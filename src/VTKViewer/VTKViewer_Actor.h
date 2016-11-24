@@ -179,7 +179,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
 
   //! To calculatate last modified time
   virtual
-  unsigned long int
+  vtkMTimeType
   GetMTime();
 
   //----------------------------------------------------------------------------

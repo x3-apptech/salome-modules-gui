@@ -49,6 +49,7 @@ SET(_link_LIBRARIES
   pqApplicationComponents
   #vtkRenderingFreeTypeOpenGL
   vtkRenderingFreeType
+  vtkInteractionStyle
   )
 
 # --- headers ---

@@ -332,12 +332,12 @@ VTKViewer_Actor
 /*!
   To calculatate last modified time
 */
-unsigned long int
+vtkMTimeType
 VTKViewer_Actor
 ::GetMTime()
 {
-  unsigned long mTime = this->Superclass::GetMTime();
-  unsigned long time = myTransformFilter->GetMTime();
+  vtkMTimeType mTime = this->Superclass::GetMTime();
+  vtkMTimeType time = myTransformFilter->GetMTime();
   mTime = ( time > mTime ? time : mTime );
   if(vtkDataSet *aDataSet = dynamic_cast<vtkDataSet*>(myPassFilter[0]->GetInput())){ // bad usage of GetInput
     time = aDataSet->GetMTime();
