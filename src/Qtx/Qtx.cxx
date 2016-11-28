@@ -2210,7 +2210,7 @@ Qtx::CmdLineArgs::CmdLineArgs()
 Qtx::CmdLineArgs::~CmdLineArgs()
 {
   for ( int i = 0; i < myArgc; i++ )
-    delete myArgv[i];
+    delete[] myArgv[i];
   delete[] myArgv;
 }
 
