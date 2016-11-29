@@ -20,7 +20,7 @@
         <translation>Zoomer</translation>
     </message>
     <message>
-        <source>PAN_TXT</source>
+        <source>ZOOM_PAN_TXT</source>
         <translation>Déplacer</translation>
     </message>
     <message>

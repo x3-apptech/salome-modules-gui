@@ -367,6 +367,49 @@ Veuillez consulter la documentation.</translation>
     </message>
 </context>
 <context>
+    <name>SVTK_PsOptionsDlg</name>
+    <message>
+        <source>DLG_PSOPTIONS_TITLE</source>
+        <translation>Export PostScript</translation>
+    </message>
+    <message>
+        <source>PS_OPTIONS</source>
+        <translation>Options</translation>
+    </message>
+    <message>
+        <source>PS_LINE_WIDTH</source>
+        <translation>Facteur d'épaisseur de ligne</translation>
+    </message>
+    <message>
+        <source>PS_POINT_SIZE</source>
+        <translation>Facteur de taille du point</translation>
+    </message>
+    <message>
+        <source>PS_SORT_METHOD</source>
+        <translation>Méthode de tri</translation>
+    </message>
+    <message>
+        <source>PS_NO_SORTING</source>
+        <translation>Pas de tri</translation>
+    </message>
+    <message>
+        <source>PS_SIMPLE_SORTING</source>
+        <translation>Tri simple</translation>
+    </message>
+    <message>
+        <source>PS_BPS_SORTING</source>
+        <translation>Tri BPS</translation>
+    </message>
+    <message>
+        <source>PS_RASTERIZE_3D</source>
+        <translation>Rastériser la géométrie 3D</translation>
+    </message>
+    <message>
+        <source>PS_USE_SHFILL</source>
+        <translation>Utiliser l'opérateur d'ombrage shfill</translation>
+    </message>                
+</context>
+<context>
     <name>SVTK_RecorderDlg</name>
     <message>
         <source>ALL_DISLPAYED_FRAMES</source>
