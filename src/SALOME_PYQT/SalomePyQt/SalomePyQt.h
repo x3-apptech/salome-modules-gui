@@ -262,6 +262,8 @@ public:
   static QByteArray        byteArraySetting( const QString&, const QString&, const QByteArray& = QByteArray() );
   static void              removeSetting ( const QString&, const QString& );
   static bool              hasSetting    ( const QString&, const QString& );
+  static QStringList       parameters    ( const QString& );
+  static QStringList       parameters    ( const QStringList& );
 
   static int               addGlobalPreference( const QString& );
   static int               addPreference( const QString& );

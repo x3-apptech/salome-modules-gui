@@ -366,6 +366,8 @@ public:
   static QByteArray        byteArraySetting( const QString&, const QString&, const QByteArray& = QByteArray() ) /ReleaseGIL/ ;
   static void              removeSetting ( const QString&, const QString& ) /ReleaseGIL/ ;
   static bool              hasSetting    ( const QString&, const QString& ) /ReleaseGIL/ ;
+  static QStringList       parameters    ( const QString& ) /ReleaseGIL/ ;
+  static QStringList       parameters    ( const QStringList& ) /ReleaseGIL/ ;
 
 // obsolete
   static void              addStringSetting( const QString&, const QString&, bool = true ) /ReleaseGIL/ ;

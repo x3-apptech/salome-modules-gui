@@ -1504,6 +1504,50 @@ bool SalomePyQt::hasSetting( const QString& section, const QString& name )
 }
 
 /*!
+  \fn QStringList SalomePyQt::parameters( const QString& section );
+  \brief Get names of preference items stored within the given section.
+  \param section resources file section's name 
+  \return \c list of preferences items
+*/
+
+/*!
+  \fn QStringList SalomePyQt::parameters( const QStringList& section );
+  \brief Get names of preference items stored within the given section.
+  \param section resources file section's name 
+  \return \c list of preferences items
+*/
+
+class TParametersEvent: public SALOME_Event 
+{
+public:
+  typedef QStringList TResult;
+  TResult myResult;
+  QStringList mySection;
+  TParametersEvent( const QString& section ) 
+  {
+    mySection << section;
+  }
+  TParametersEvent( const QStringList& section ) 
+    : mySection( section )
+  {}
+  virtual void Execute() 
+  {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = resMgr->parameters( mySection );
+    }
+  }
+};
+QStringList SalomePyQt::parameters( const QString& section )
+{
+  return ProcessEvent( new TParametersEvent( section ) );
+}
+QStringList SalomePyQt::parameters( const QStringList& section )
+{
+  return ProcessEvent( new TParametersEvent( section ) );
+}
+
+/*!
   \fn QString SalomePyQt::getFileName( QWidget*           parent, 
                                        const QString&     initial, 
                                        const QStringList& filters, 
