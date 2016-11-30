@@ -3320,6 +3320,36 @@ QList<int> SalomePyQt::neighbourViews( const int id )
 
 
 /*!
+  \fn void SalomePyQt::createRoot();
+  \brief Initialize root data object.
+
+  Does nothing if root is already initialized.
+*/
+
+void SalomePyQt::createRoot()
+{
+  class TEvent: public SALOME_Event
+  {
+  public:
+    TEvent() {}
+    virtual void Execute() 
+    {
+      SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+      if ( module ) {
+        SALOME_PYQT_DataModelLight* dm =
+          dynamic_cast<SALOME_PYQT_DataModelLight*>( module->dataModel() );
+        if ( dm )
+          dm->getRoot();
+      }
+      else {
+        if ( verbose() ) printf( "SalomePyQt.createRoot() function is not supported for the current module.\n" );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
+}
+
+/*!
   \fn QString SalomePyQt::createObject( const QString& parent );
   \brief Create empty data object
   \param parent entry of parent data object

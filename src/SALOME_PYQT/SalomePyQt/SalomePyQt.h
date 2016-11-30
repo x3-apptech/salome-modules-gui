@@ -183,6 +183,7 @@ public:
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& );
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& );
 
+  static void              createRoot();
   static QString           createObject( const QString& parent = QString() );
   static QString           createObject( const QString&, const QString&, const QString&, const QString& = QString() );
 

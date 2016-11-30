@@ -285,6 +285,7 @@ public:
   static QStringList       getOpenFileNames    ( QWidget*, const QString&, const QStringList&, const QString& ) /ReleaseGIL/ ;
   static QString           getExistingDirectory( QWidget*, const QString&, const QString& ) /ReleaseGIL/ ;
 			 
+  static void              createRoot() /ReleaseGIL/ ;
   static QString           createObject( const QString& = QString("") )  /ReleaseGIL/ ;
   static QString           createObject( const QString&,
 			                 const QString&,
