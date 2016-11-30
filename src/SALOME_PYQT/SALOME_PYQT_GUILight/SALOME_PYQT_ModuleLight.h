@@ -58,8 +58,8 @@ public:
   void            preferencesChanged( const QString&, const QString& );
 
   // persistence & dump python
-  void            save( QStringList& );
-  bool            load( const QStringList& );
+  void            save( QStringList&, const QString& );
+  bool            load( const QStringList&, const QString& );
   void            dumpPython( QStringList& );
 
   // drag-n-drop support

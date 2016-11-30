@@ -70,7 +70,7 @@ bool SALOME_PYQT_DataModelLight::open( const QString& theURL, CAM_Study* study, 
 
   setModified( false );
   
-  return aModule->load(theListOfFiles);
+  return aModule->load(theListOfFiles, theURL);
   
 }
 
@@ -95,7 +95,7 @@ bool SALOME_PYQT_DataModelLight::save( QStringList& theListOfFiles)
 
   theListOfFiles.append(QString(aTmpDir.c_str()));
   int listSize = theListOfFiles.size();
-  aModule->save(theListOfFiles);
+  aModule->save(theListOfFiles, myStudyURL);
 
   setModified( false );
 
