@@ -65,6 +65,9 @@ const int DEFAULT_GROUP = 40;
 */
 QMutex myInitMutex;
 
+/*! DEBUG mode */
+const bool DEBUG = false;
+
 /*!
   \var IsCallOldMethods
   \brief Allow calling obsolete callback methods.
@@ -165,15 +168,18 @@ public:
   FuncMsg( const QString& funcName )
   {
     myName = funcName;
-    MESSAGE( qPrintable( myName ) << " [ begin ]" );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " [ begin ]" );
   }
   ~FuncMsg()
   {
-    MESSAGE( qPrintable( myName ) << " [ end ]" );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " [ end ]" );
   }
   void message( const QString& msg )
   {
-    MESSAGE( qPrintable( myName ) << " : " << qPrintable( msg ) );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " : " << qPrintable( msg ) );
   }
 private:
   QString myName;
