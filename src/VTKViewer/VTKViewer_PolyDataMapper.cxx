@@ -593,6 +593,8 @@ namespace VTK
     virtual
     void
     get( TVertex& theVertex, vtkIdType thePointId, vtkIdType theCellId ) = 0;
+
+    virtual ~TColorFunctorBase() {}
   };
 
   //-----------------------------------------------------------------------------

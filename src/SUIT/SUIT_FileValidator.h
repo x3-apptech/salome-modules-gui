@@ -33,9 +33,10 @@ class QString;
 
 class SUIT_EXPORT SUIT_FileValidator
 {
-public:
+ public:
   SUIT_FileValidator( QWidget* = 0 );
-  
+  virtual ~SUIT_FileValidator() {}
+
   virtual bool    canOpen( const QString&, bool = true );
   virtual bool    canSave( const QString&, bool = true );
 

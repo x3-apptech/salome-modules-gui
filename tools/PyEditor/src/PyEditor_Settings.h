@@ -31,21 +31,22 @@ class PYEDITOR_EXPORT PyEditor_Settings
 {
 protected:
   enum Option { snEditor, 
-		snHighlightCurrentLine,
-		snTextWrapping,
-		snCenterCursorOnScroll,
-		snLineNumberArea,
-		snVerticalEdge,
-		snNumberColumns,
-		snTabSpaceVisible,
-		snTabSize,
-		snFont };
+                snHighlightCurrentLine,
+                snTextWrapping,
+                snCenterCursorOnScroll,
+                snLineNumberArea,
+                snVerticalEdge,
+                snNumberColumns,
+                snTabSpaceVisible,
+                snTabSize,
+                snFont };
 
 public:
   static PyEditor_Settings* settings();
   static void setSettings( PyEditor_Settings* );
   
   PyEditor_Settings();
+  virtual ~PyEditor_Settings() {}
 
   void setHighlightCurrentLine( bool );
   bool highlightCurrentLine() const;

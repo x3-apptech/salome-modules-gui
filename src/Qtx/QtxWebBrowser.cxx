@@ -119,7 +119,9 @@ bool QtxWebBrowser::Searcher::find( const QString& text, QtxSearchTool* st )
   if ( st->isSearchWrapped() ) fl = fl | WebPage::FindWrapsAroundDocument;
   return myView->findText( text, fl );
 #else
-  myView->findText( text, fl, [this](bool found) { return found; });  
+  bool textFound;
+  myView->findText( text, fl, [&](bool found) { textFound = found; });
+  return textFound;
 #endif    
 }
 
@@ -150,7 +152,9 @@ bool QtxWebBrowser::Searcher::findPrevious( const QString& text, QtxSearchTool* 
   if ( st->isSearchWrapped() ) fl = fl | WebPage::FindWrapsAroundDocument;
   return myView->findText( text, fl );
 #else
-  myView->findText( text, fl, [this](bool found) { return found; });
+  bool textFound;
+  myView->findText( text, fl, [&](bool found) { textFound = found; });
+  return textFound;
 #endif 
 }
 
@@ -222,10 +226,10 @@ QtxWebBrowser::Downloader::Downloader( const QString& fileName, int action, cons
 
   QGridLayout* l = new QGridLayout( this );
   l->addWidget( new QLabel( QtxWebBrowser::tr( "You are opening the file" ), this ), 
-		            0, 0, 1, 4 );
+                            0, 0, 1, 4 );
   l->addWidget( myFileName, 1, 1, 1, 3 );
   l->addWidget( new QLabel( QtxWebBrowser::tr( "Please choose the action to be done" ), this ), 
-		            3, 0, 1, 4 );
+                            3, 0, 1, 4 );
   l->addWidget( rbOpen,     4, 1, 1, 1 );
   l->addWidget( myBrowse,   4, 2, 1, 1 );
   l->addWidget( rbSave,     5, 1, 1, 3 );
@@ -367,11 +371,11 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   
   myFindPanel = new QtxSearchTool( frame, myWebView,
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
-				   QtxSearchTool::Basic | QtxSearchTool::Case | QtxSearchTool::Wrap,
+                                   QtxSearchTool::Basic | QtxSearchTool::Case | QtxSearchTool::Wrap,
 #else
-				   QtxSearchTool::Basic | QtxSearchTool::Case,
-#endif				   
-				   Qt::Horizontal );
+                                   QtxSearchTool::Basic | QtxSearchTool::Case,
+#endif                             
+                                   Qt::Horizontal );
   myFindPanel->setFrameStyle( QFrame::NoFrame | QFrame::Plain );
   myFindPanel->setActivators( QtxSearchTool::SlashKey );
   myFindPanel->setSearcher( new Searcher( myWebView ) );
@@ -384,29 +388,29 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
 
   QMenu* fileMenu = menuBar()->addMenu( tr( "&File" ) );
   fileMenu->addAction( QPixmap( ":/images/open.png" ), tr( "&Open..." ), 
-		       this, SLOT( open() ),
-		       QKeySequence( QKeySequence::Open ) );
+                       this, SLOT( open() ),
+                       QKeySequence( QKeySequence::Open ) );
   fileMenu->addSeparator();
   fileMenu->addAction( myWebView->pageAction( WebPage::Back ) );
   fileMenu->addAction( myWebView->pageAction( WebPage::Forward ) );
   fileMenu->addAction( myWebView->pageAction( WebPage::Reload ) );
   fileMenu->addSeparator();
   fileMenu->addAction( tr( "&Find in text..." ),
-		       myFindPanel, SLOT( find() ),
-		       QKeySequence( QKeySequence::Find ) );
+                       myFindPanel, SLOT( find() ),
+                       QKeySequence( QKeySequence::Find ) );
   fileMenu->addAction( tr( "&Find next" ),
-		       myFindPanel, SLOT( findNext() ),
-		       QKeySequence( QKeySequence::FindNext ) );
+                       myFindPanel, SLOT( findNext() ),
+                       QKeySequence( QKeySequence::FindNext ) );
   fileMenu->addAction( tr( "&Find previous" ),
-		       myFindPanel, SLOT( findPrevious() ),
-		       QKeySequence( QKeySequence::FindPrevious ) );
+                       myFindPanel, SLOT( findPrevious() ),
+                       QKeySequence( QKeySequence::FindPrevious ) );
   fileMenu->addSeparator();
   fileMenu->addAction( QPixmap( ":/images/close.png" ), tr( "&Close" ),
-		       this, SLOT( close() ) );
+                       this, SLOT( close() ) );
 
   QMenu* helpMenu = menuBar()->addMenu( tr( "&Help" ) );
   helpMenu->addAction( tr( "&About..." ),
-		       this, SLOT( about() ) );
+                       this, SLOT( about() ) );
   
   QVBoxLayout* main = new QVBoxLayout( frame );
   main->addWidget( myWebView );
@@ -418,22 +422,22 @@ QtxWebBrowser::QtxWebBrowser( ) : QMainWindow( 0 )
   connect( myWebView, SIGNAL( loadFinished( bool ) ),    SLOT( finished( bool ) ) );
   
   connect( myWebView->pageAction( WebPage::DownloadLinkToDisk ), SIGNAL( triggered() ),
-	   SLOT( linkAction() ) );
+           SLOT( linkAction() ) );
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
   //QtWebKit case:
   connect( myWebView, SIGNAL( linkClicked( QUrl ) ),     SLOT( linkClicked( QUrl ) ) );
   connect( myWebView->page(), SIGNAL( linkHovered( QString, QString, QString ) ), 
-	   SLOT( linkHovered( QString, QString, QString ) ) ); 
+           SLOT( linkHovered( QString, QString, QString ) ) ); 
   disconnect( myWebView->pageAction( WebPage::OpenLink ), 0, 0, 0 );
   connect( myWebView->pageAction( WebPage::OpenLink ), SIGNAL( triggered() ),
-	   SLOT( linkAction() ) );
+           SLOT( linkAction() ) );
 #else
   //QtWebEngine (Qt-5.6.0) case:
   connect( myWebView->page(), SIGNAL( linkHovered( QString ) ), 
-	   SLOT( linkHovered( QString ) ) );
+           SLOT( linkHovered( QString ) ) );
   disconnect( myWebView->pageAction( WebPage::OpenLinkInThisWindow ), 0, 0, 0 );
   connect( myWebView->pageAction( WebPage::OpenLinkInThisWindow ), SIGNAL( triggered() ),
-	   SLOT( linkAction() ) );
+           SLOT( linkAction() ) );
 #endif  
   setCentralWidget( frame );
   setFocusProxy( myWebView );
@@ -513,7 +517,7 @@ QtxResourceMgr* QtxWebBrowser::resourceMgr() const
 void QtxWebBrowser::about()
 {
   QMessageBox::about( this, tr( "About %1" ).arg( tr( "Help Browser" ) ),
-		      QString( "SALOME %1" ).arg( tr( "Help Browser" ) ) );
+                      QString( "SALOME %1" ).arg( tr( "Help Browser" ) ) );
 }
 
 /*!
@@ -636,7 +640,7 @@ void QtxWebBrowser::openLink( const QString& fileName, bool force )
       myResourceMgr->setValue( resSection, actionParam, defAction );
       myResourceMgr->setValue( resSection, repeatParam, defRepeat );
       if ( defAction == Downloader::mOpen )
-	myResourceMgr->setValue( resSection, programParam, defProgram );
+        myResourceMgr->setValue( resSection, programParam, defProgram );
     }
   }
   switch( defAction ) {
@@ -689,12 +693,13 @@ void QtxWebBrowser::load( const QString& link )
 void QtxWebBrowser::saveLink( const QString& fileName )
 {
   QString newFileName = QFileDialog::getSaveFileName( this, tr( "Save file" ), fileName, 
-						      QString( "*.%1" ).arg( QFileInfo( fileName ).suffix() ) );
+                                                      QString( "*.%1" ).arg( QFileInfo( fileName ).suffix() ) );
   if ( !newFileName.isEmpty() && 
        QFileInfo( newFileName ).canonicalFilePath() != QFileInfo( fileName ).canonicalFilePath() ) {
     QFile toFile( newFileName );
     QFile fromFile( fileName );
-    if ( toFile.exists() && !toFile.remove() || !fromFile.copy( newFileName ) )
+    if (( toFile.exists() && !toFile.remove() ) ||
+        ( !fromFile.copy( newFileName ) ))
       QMessageBox::warning( this, tr( "Error"), tr( "Can't save file:\n%1" ).arg( newFileName ) );
   }
 }
