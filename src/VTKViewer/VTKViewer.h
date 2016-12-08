@@ -35,9 +35,11 @@
 
 #endif
 
-// Keep compatibility with paraview 5.0.1
-#ifndef VTK_HAS_MTIME_TYPE
-#define VTK_HAS_MTIME_TYPE
-typedef unsigned long int vtkMTimeType;
+// Keep compatibility with paraview 5.0.1 on Linux
+#ifndef WIN32
+  #ifndef VTK_HAS_MTIME_TYPE
+  #define VTK_HAS_MTIME_TYPE
+  typedef unsigned long int vtkMTimeType;
+  #endif
 #endif
 
