@@ -1146,9 +1146,9 @@ VTKViewer_GeometryFilter
                         // avoid adding it when treating another face
                         process = midPoints.insert( face->GetPointId(p2) ).second; break;
                       case 1: // the edge is shared by two cells
-                        process = ( cellIdsTmp->GetId(0) == cellId ); break;
+                        process = ( cellIdsTmp->GetId(0) < cellId ); break;
                       default: // the edge is shared by >2 cells
-                        process = ( cellIdsTmp->GetId(0) != cellId ); break;
+                        process = ( cellIdsTmp->GetId(0) < cellId ); break;
                       }
                       if ( process )
                       {
