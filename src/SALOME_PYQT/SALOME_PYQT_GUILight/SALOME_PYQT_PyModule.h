@@ -97,8 +97,8 @@ public slots:
   void                       tryCloseView( SUIT_ViewWindow* );
   void                       closeView( SUIT_ViewWindow* );
   void                       cloneView( SUIT_ViewWindow* );
-  void                       save( QStringList& );
-  bool                       load( const QStringList& );
+  void                       save( QStringList&, const QString& );
+  bool                       load( const QStringList&, const QString& );
   void                       dumpPython( QStringList& files );
   bool                       isDraggable( const SUIT_DataObject* ) const;
   bool                       isDropAccepted( const SUIT_DataObject* ) const;
@@ -127,8 +127,8 @@ private:
   void                       internalTryCloseView( SUIT_ViewWindow* );
   void                       internalCloseView( SUIT_ViewWindow* );
   void                       internalCloneView( SUIT_ViewWindow* );
-  void                       internalSave( QStringList& );
-  void                       internalLoad( const QStringList&, bool& );
+  void                       internalSave( QStringList&, const QString& );
+  void                       internalLoad( const QStringList&, const QString&, bool& );
   void                       internalDumpPython( QStringList& );
   bool                       internalIsDraggable( LightApp_DataObject* );
   bool                       internalIsDropAccepted( LightApp_DataObject* );

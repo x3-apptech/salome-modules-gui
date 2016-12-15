@@ -65,6 +65,9 @@ const int DEFAULT_GROUP = 40;
 */
 QMutex myInitMutex;
 
+/*! DEBUG mode */
+const bool DEBUG = false;
+
 /*!
   \var IsCallOldMethods
   \brief Allow calling obsolete callback methods.
@@ -165,15 +168,18 @@ public:
   FuncMsg( const QString& funcName )
   {
     myName = funcName;
-    MESSAGE( qPrintable( myName ) << " [ begin ]" );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " [ begin ]" );
   }
   ~FuncMsg()
   {
-    MESSAGE( qPrintable( myName ) << " [ end ]" );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " [ end ]" );
   }
   void message( const QString& msg )
   {
-    MESSAGE( qPrintable( myName ) << " : " << qPrintable( msg ) );
+    if ( DEBUG )
+      MESSAGE( qPrintable( myName ) << " : " << qPrintable( msg ) );
   }
 private:
   QString myName;
@@ -1368,8 +1374,9 @@ void PyModuleHelper::cloneView( SUIT_ViewWindow* view )
 /*!
   \brief Save module data. Called when user saves study.
   \param files output list of files where module stores data
+  \param url study URL
 */
-void PyModuleHelper::save( QStringList& files )
+void PyModuleHelper::save( QStringList& files, const QString& url )
 {
   FuncMsg fmsg( "PyModuleHelper::save()" );
 
@@ -1385,33 +1392,38 @@ void PyModuleHelper::save( QStringList& files )
   public:     
     SaveReq( PyInterp_Interp* _py_interp,
              PyModuleHelper*  _helper,
-             QStringList&     _files )
+             QStringList&     _files,
+             const QString&   _url )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
-        myFiles( _files )
+        myFiles( _files ),
+        myUrl( _url )
     {}
   protected:
     virtual void execute()
     {
-      myHelper->internalSave( myFiles );
+      myHelper->internalSave( myFiles, myUrl );
     }
   private:
     PyModuleHelper* myHelper;
     QStringList&    myFiles;
+    QString         myUrl;
   };
   
   // Posting the request only if dispatcher is not busy!
   // Executing the request synchronously
   if ( !PyInterp_Dispatcher::Get()->IsBusy() )
-    PyInterp_Dispatcher::Get()->Exec( new SaveReq( myInterp, this, files ) );
+    PyInterp_Dispatcher::Get()->Exec( new SaveReq( myInterp, this, files, url ) );
 }
 
 /*
- \brief Load module data. Called when user opens study 
- and activates module.
- \param files list of files where module data is stored
+  \brief Load module data. Called when user opens study 
+  and activates module.
+  \param files list of files where module data is stored
+  \param url study URL
+  \return \c true if loading has been finished successfully or \c false otherwise
 */
-bool PyModuleHelper::load( const QStringList& files )
+bool PyModuleHelper::load( const QStringList& files, const QString& url )
 {
   FuncMsg fmsg( "PyModuleHelper::load()" );
 
@@ -1423,27 +1435,30 @@ bool PyModuleHelper::load( const QStringList& files )
     LoadReq( PyInterp_Interp* _py_interp,
              PyModuleHelper*  _helper,
              QStringList      _files,
+             const QString&   _url,
              bool&            _loaded )
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ) ,
         myFiles( _files ),
+        myUrl( _url ),
         myLoaded( _loaded )
     {}
   protected:
     virtual void execute()
     {
-      myHelper->internalLoad( myFiles, myLoaded );
+      myHelper->internalLoad( myFiles, myUrl, myLoaded );
     }
   private:
     PyModuleHelper* myHelper;
     QStringList     myFiles;
+    QString         myUrl;
     bool&           myLoaded;
   };
   
   // Posting the request only if dispatcher is not busy!
   // Executing the request synchronously
   if ( !PyInterp_Dispatcher::Get()->IsBusy() )
-    PyInterp_Dispatcher::Get()->Exec( new LoadReq( myInterp, this, files, loaded ) );
+    PyInterp_Dispatcher::Get()->Exec( new LoadReq( myInterp, this, files, url, loaded ) );
 
   return loaded;
 }
@@ -2415,8 +2430,9 @@ void PyModuleHelper::internalCloneView( SUIT_ViewWindow* view )
   \brief Module data saving callback function.
   \internal
   \param files output list of files where module stores data
+  \param url study URL
 */
-void PyModuleHelper::internalSave( QStringList& files )
+void PyModuleHelper::internalSave( QStringList& files, const QString& url )
 {
   FuncMsg fmsg( "--- PyModuleHelper::internalSave()" );
 
@@ -2428,9 +2444,16 @@ void PyModuleHelper::internalSave( QStringList& files )
 
   if ( PyObject_HasAttrString(myPyModule, (char*)"saveFiles") ) {
 
+    // try with two parameters (new syntax)
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"saveFiles",
-                                           (char*)"s", files.first().toLatin1().constData() ) );
-
+                                           (char*)"ss",
+                                           files.first().toLatin1().constData(),
+                                           url.toLatin1().constData() ) );
+    if ( !res )
+      // try with single parameter (old syntax)
+      res = PyObject_CallMethod( myPyModule, (char*)"saveFiles",
+                                 (char*)"s", files.first().toLatin1().constData() );
+    
     if ( !res ) {
       PyErr_Print();
     }
@@ -2459,9 +2482,10 @@ void PyModuleHelper::internalSave( QStringList& files )
   \brief Module data loading callback function.
   \internal
   \param files list of files where module data is stored
+  \param url study URL
   \param opened output success flag
 */
-void PyModuleHelper::internalLoad( const QStringList& files, bool& opened )
+void PyModuleHelper::internalLoad( const QStringList& files, const QString& url, bool& opened )
 {
   FuncMsg fmsg( "--- PyModuleHelper::internalLoad()" );
 
@@ -2478,13 +2502,22 @@ void PyModuleHelper::internalLoad( const QStringList& files, bool& opened )
   PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
 #endif
   if ( PyObject_HasAttrString(myPyModule , (char*)"openFiles") ) {
+
+    // try with two parameters (new syntax)
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"openFiles",
-                                           (char*)"O", sipList.get()));
-    if( !res || !PyBool_Check( res )) {
+                                           (char*)"Os", sipList.get(),
+                                           url.toLatin1().constData() ) );
+
+    if ( !res )
+      // try with single parameter (old syntax)
+      res = PyObject_CallMethod( myPyModule, (char*)"openFiles",
+                                 (char*)"O", sipList.get() );
+
+    if ( !res || !PyBool_Check( res ) ) {
       PyErr_Print();
       opened = false;
     }
-    else{
+    else {
       opened = PyObject_IsTrue( res );
     }
   }

@@ -253,24 +253,27 @@ void SALOME_PYQT_ModuleLight::preferencesChanged( const QString& section, const 
 /*!
   \brief Save module data. Called when user saves study.
   \param files output list of files where module stores data
+  \param url study URL
   \sa PyModuleHelper::save()
 */
-void SALOME_PYQT_ModuleLight::save( QStringList& files )
+void SALOME_PYQT_ModuleLight::save( QStringList& files, const QString& url )
 {
   // call helper
-  myHelper->save( files );
+  myHelper->save( files, url );
 }
 
 /*
- \brief Load module data. Called when user opens study 
- and activates module.
- \param files list of files where module data is stored
- \sa PyModuleHelper::load()
+  \brief Load module data. Called when user opens study 
+  and activates module.
+  \param files list of files where module data is stored
+  \param url study URL
+  \return \c true if loading has been finished successfully or \c false otherwise
+  \sa PyModuleHelper::load()
 */
-bool SALOME_PYQT_ModuleLight::load( const QStringList& files )
+bool SALOME_PYQT_ModuleLight::load( const QStringList& files, const QString& url )
 {
   // call helper
-  return myHelper->load( files );
+  return myHelper->load( files, url );
 }
 
 /*!
