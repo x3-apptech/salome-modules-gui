@@ -245,10 +245,13 @@ bool OCCViewer_ViewPort3d::syncronize( const OCCViewer_ViewPort3d* ref )
   /* update */
   tgtView->Update();
   tgtView->SetImmediateUpdate( Standard_True );
+#if OCC_VERSION_LARGE <= 0x07000000
   tgtView->ZFitAll();
+#endif
   return true;
 }
 
+#if OCC_VERSION_LARGE <= 0x07000000
 /*!
   Returns Z-size of this view. [ public ]
 */
@@ -270,6 +273,7 @@ void OCCViewer_ViewPort3d::setZSize( double zsize )
         if ( !myPerspView.IsNull() )
         myPerspView->SetZSize( zsize );*/
 }
+#endif
 
 /*!
   Get axial scale to the view
@@ -574,8 +578,8 @@ void OCCViewer_ViewPort3d::rotate( int x, int y,
 void OCCViewer_ViewPort3d::endRotation()
 {
   if ( !activeView().IsNull() ) {
+#if OCC_VERSION_LARGE <= 0x07000000
     activeView()->ZFitAll( 1.0 );
-#if OCC_VERSION_LARGE <= 0x06070100
     activeView()->SetZSize( 0.0 );
 #endif
     activeView()->Update();
@@ -651,12 +655,14 @@ void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
   
 #if OCC_VERSION_LARGE > 0x06070100
   activeView()->FitAll( margin, upd );
+#if OCC_VERSION_LARGE <= 0x07000000
   if(withZ)
     activeView()->ZFitAll();
-#else 
+#endif  
+#else
   activeView()->FitAll( margin, withZ, upd );
-#endif
   activeView()->SetZSize(0.);
+#endif
   emit vpTransformed( this );
 }
 
@@ -770,7 +776,9 @@ bool OCCViewer_ViewPort3d::synchronize( OCCViewer_ViewPort* view )
     aView3d->SetViewMapping( aRefView3d->ViewMapping() );
     aView3d->SetViewOrientation( aRefView3d->ViewOrientation() );
 #endif
+#if OCC_VERSION_LARGE <= 0x07000000
     aView3d->ZFitAll();
+#endif
     aView3d->SetImmediateUpdate( Standard_True );
     aView3d->Update();
     blockSignals( blocked );
