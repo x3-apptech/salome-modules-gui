@@ -47,6 +47,7 @@ SET(_other_HEADERS
   PyInterp_Interp.h
   PyInterp_Request.h
   PyInterp_Utils.h
+  PyInterp_RefCounterObj.h
 )
 
 # header files / to install

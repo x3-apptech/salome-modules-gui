@@ -155,9 +155,10 @@ void PyConsole_CallbackStderr( void* data, char* c )
 PyConsole_Editor::PyConsole_Editor( QWidget* parent )
   : QTextEdit( parent )
 {
-  PyConsole_Interp* interp = new PyConsole_Interp();
+  PyConsole_Interp *interp(new PyConsole_Interp);
   interp->initialize();
-  init( interp );
+  myInterp=interp;
+  init();
 }
 
 /*!
@@ -171,13 +172,13 @@ PyConsole_Editor::PyConsole_Editor( QWidget*          parent,
                                     PyConsole_Interp* interp )
   : QTextEdit( parent )
 {
-  init( interp );
+  myInterp.takeRef(interp);
+  init();
 }
 
 
-void PyConsole_Editor::init( PyConsole_Interp* interp )
+void PyConsole_Editor::init()
 {
-  myInterp = interp;
   myCmdInHistory = -1;
   myEventLoop = 0;
   myShowBanner = true;
@@ -219,15 +220,14 @@ void PyConsole_Editor::init( PyConsole_Interp* interp )
 */
 PyConsole_Editor::~PyConsole_Editor()
 {
-  myInterp = 0;
 }
 
 /*!
   \brief Get Python interpreter
 */
-PyConsole_Interp* PyConsole_Editor::getInterp() const
+PyConsole_Interp *PyConsole_Editor::getInterp() const
 {
-  return myInterp;
+  return myInterp.iAmATrollConstCast();
 }
 
 /*!
