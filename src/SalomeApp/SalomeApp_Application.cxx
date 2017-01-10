@@ -2082,7 +2082,7 @@ bool SalomeApp_Application::checkExistingDoc()
 
 PyConsole_Interp* SalomeApp_Application::createPyInterp()
 {
-  return new SalomeApp_PyInterp();
+  return new SalomeApp_PyInterp;
 }
 
 #endif // DISABLE_PYCONSOLE

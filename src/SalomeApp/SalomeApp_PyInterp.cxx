@@ -28,7 +28,7 @@
   \brief Constructor
 */
 SalomeApp_PyInterp::SalomeApp_PyInterp()
-  : PyConsole_Interp(), myFirstRun( true ), myFirstInitStudy( false )
+  : myFirstRun( true ), myFirstInitStudy( false )
 {
 }
 
