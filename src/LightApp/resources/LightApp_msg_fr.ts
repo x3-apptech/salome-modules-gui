@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
         <source>EXTERNAL_BROWSER_CANNOT_SHOW_PAGE</source>
-        <translation>Le navigateur externe &quot;%1&quot; ne peut pas trouver la page d&apos;aide &quot;%2&quot;. Voulez-vous le modifierdans les préférences ?</translation>
+        <translation>Le navigateur externe &quot;%1&quot; ne peut pas trouver la page d&apos;aide &quot;%2&quot;. Voulez-vous modifier les settings du navigateur externe dans les préférences ?</translation>
     </message>
     <message>
         <source>ABOUT_COPYRIGHT</source>
