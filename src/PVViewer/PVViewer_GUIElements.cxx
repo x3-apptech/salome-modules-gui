@@ -219,7 +219,7 @@ void PVViewer_GUIElements::buildPVWidgets()
 				 Q_ARG( pqServerManagerModelItem* , NULL ) );
     }
     
-    publishExistingSources();
+    //publishExistingSources();
     myPVWidgetsFlag = true;
   }
 }
