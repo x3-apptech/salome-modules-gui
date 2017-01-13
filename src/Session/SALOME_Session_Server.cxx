@@ -213,8 +213,8 @@ protected:
 #endif
       QString fname = QFileInfo( _fname ).fileName();
       if ( exp.exactMatch( fname ) ) {
-	long fid = Qtx::versionToId( exp.cap( 1 ) );
-	if ( fid > 0 ) id = fid;
+        long fid = Qtx::versionToId( exp.cap( 1 ) );
+        if ( fid > 0 ) id = fid;
       }
     }
     return id;
@@ -550,8 +550,8 @@ int main( int argc, char **argv )
       SALOME::StatSession stat = session->GetStatSession();
       shutdownSession = stat.state == SALOME::shutdown;
       if ( shutdownSession ) {
-	_SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
-	break;
+        _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
+        break;
       }
 
       // SUIT_Session creation
