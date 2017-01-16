@@ -201,7 +201,7 @@ public:
                   myStudy->setVisibilityState( theID.c_str(), Qtx::HiddenState ); //hide the just added object
                   //MESSAGE("Object with entry : "<< theID <<" CAN be displayed !!!");
                 }
-                else
+                //else
                   //MESSAGE("Object with entry : "<< theID <<" CAN'T be displayed !!!");
               }
             }
@@ -334,7 +334,7 @@ public:
                 myStudy->setVisibilityState( theID.c_str(), Qtx::HiddenState );
                 //MESSAGE("Object with entry : "<< theID <<" CAN be displayed !!!");
               }
-              else
+              //else
                 //MESSAGE("Object with entry : "<< theID <<" CAN'T be displayed !!!");
             }
           }
