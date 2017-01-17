@@ -77,6 +77,9 @@
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QTextStream>
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+#include <QSurfaceFormat>
+#endif
 
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
@@ -366,6 +369,15 @@ int main( int argc, char **argv )
       QLocale::setDefault( QLocale::system() );
     }
   }
+  
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+  // initialization of the X11 visual on Linux
+  QSurfaceFormat format;
+  format.setDepthBufferSize(16);
+  format.setStencilBufferSize(1);
+  format.setProfile(QSurfaceFormat::CompatibilityProfile);
+  QSurfaceFormat::setDefaultFormat(format);
+#endif
 
   // Create Qt application instance;
   // this should be done the very first!
