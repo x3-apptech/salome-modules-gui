@@ -2851,6 +2851,33 @@ bool SalomePyQt::activateView( const int id )
 }
 
 /*!
+ *
+ */
+
+class TGetViewWidget: public SALOME_Event
+{
+public:
+  typedef QWidget* TResult;
+  TResult myResult;
+  int myWndId;
+  TGetViewWidget( const int id )
+    : myResult( 0 ),
+      myWndId( id ) {}
+  virtual void Execute()
+  {
+    SUIT_ViewWindow* wnd = getWnd( myWndId );
+    if ( wnd ) {
+        myResult = (QWidget*)wnd;
+    }
+  }
+};
+QWidget* SalomePyQt::getViewWidget( const int id)
+{
+  return ProcessEvent( new TGetViewWidget( id ) );
+}
+
+
+/*!
   \fn int SalomePyQt::createView( const QString& type, bool visible = true, const int width = 0, const int height = 0 );
   \brief Create new view and activate it
   \param type viewer type
