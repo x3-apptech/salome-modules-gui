@@ -36,7 +36,9 @@
 #include <QPainter>
 #include <QFile>
 
-#ifndef WIN32
+#if defined(__APPLE__)
+#include <OpenGL/CGLCurrent.h>
+#elif !defined(WIN32)
 #include <GL/glx.h>
 #endif
 
@@ -377,7 +379,7 @@ static GLuint displayListBase( QFont* theFont )
   aFindFont.myIsUndl = theFont->underline();
   aFindFont.myPointSize = theFont->pointSize();
 
-#ifdef WIN32
+#if defined(WIN32)
   HGLRC ctx = ::wglGetCurrentContext();
   if ( !ctx )
     return aList;  
@@ -403,6 +405,33 @@ static GLuint displayListBase( QFont* theFont )
  #endif
     if ( !::wglUseFontBitmaps( glHdc, 0, 256, listBase ) )
       listBase = 0;
+    aList = listBase;
+    GLViewer_TexFont::BitmapFontCache[aFindFont] = aList;
+  }
+#elif defined(__APPLE__)
+  CGLContextObj ctx = ::CGLGetCurrentContext();
+  if ( !ctx )
+    return aList;
+
+  aFindFont.myViewPortId = (long)ctx;
+
+  if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
+    aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
+  else
+  {
+    GLuint listBase = 0;
+    QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
+    for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
+    {
+      if ( it.key().myViewPortId == (long)ctx && it.value() > listBase )
+        listBase = it.value();
+    }
+    listBase += 256;
+
+    //HDC glHdc = ::wglGetCurrentDC();
+    //::SelectObject( glHdc, theFont->handle() );
+    //if ( !::wglUseFontBitmaps( glHdc, 0, 256, listBase ) )
+    //  listBase = 0;
     aList = listBase;
     GLViewer_TexFont::BitmapFontCache[aFindFont] = aList;
   }

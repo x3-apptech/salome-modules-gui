@@ -34,8 +34,10 @@
 #endif
 #include <Aspect_DisplayConnection.hxx>
 
-#ifdef WIN32
+#if defined(WIN32)
 #include <WNT_Window.hxx>
+#elif defined(__APPLE__)
+#include <Cocoa_Window.hxx>
 #else
 #include <Xw_Window.hxx>
 #endif
@@ -47,8 +49,10 @@ Handle(Aspect_Window) OCCViewer_VService::CreateWindow( const Handle(V3d_View)& 
 							WId winId )
 {
   Aspect_Handle aWindowHandle = (Aspect_Handle)winId;
-#ifdef WIN32
+#if defined(WIN32)
   Handle(WNT_Window) viewWindow = new WNT_Window( aWindowHandle );
+#elif defined(__APPLE__)
+  Handle(Cocoa_Window) viewWindow = new Cocoa_Window( (NSView*)winId );
 #else
   Handle(Aspect_DisplayConnection) aDispConnection = view->Viewer()->Driver()->GetDisplayConnection();
   Handle(Xw_Window) viewWindow = new Xw_Window( aDispConnection, aWindowHandle );
@@ -75,7 +79,7 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
   if (aGraphicDriver.IsNull())
   {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
     aDisplayConnection = new Aspect_DisplayConnection( displayName );
 #else
     aDisplayConnection = new Aspect_DisplayConnection();

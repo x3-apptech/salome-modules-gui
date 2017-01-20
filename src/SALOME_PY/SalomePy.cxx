@@ -449,7 +449,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_setView( PyObject* self, PyObje
         case ViewLeft:
           aVTKViewWindow->onLeftView();   break;
         default:
-          PyErr_Format(PyExc_ValueError,"setView%: wrong parameter value; must be between %d and %d", ViewFront, ViewLeft );
+          PyErr_Format(PyExc_ValueError,"setView: wrong parameter value; must be between %d and %d", ViewFront, ViewLeft );
           break;
         }
       }

@@ -248,7 +248,7 @@ class SALOME_QApplication : public QApplication
 public:
   SALOME_QApplication( int& argc, char** argv )
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if !defined WIN32 && QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#if !defined(WIN32) && !defined(__APPLE__) && (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
   // san: Opening an X display and choosing a visual most suitable for 3D visualization
   // in order to make SALOME viewers work with non-native X servers
   : QApplication( (Display*)Qtx::getDisplay(), argc, argv, Qtx::getVisual() ),

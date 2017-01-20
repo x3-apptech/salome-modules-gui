@@ -771,8 +771,10 @@ void CAM_Application::readModuleList()
     if ( !modLibrary.isEmpty() )
     {
       modLibrary = SUIT_Tools::file( modLibrary.trimmed() );
-#ifdef WIN32
+#if defined(WIN32)
       QString libExt = QString( "dll" );
+#elif defined(__APPLE__)
+      QString libExt = QString( "dylib" );
 #else
       QString libExt = QString( "so" );
 #endif

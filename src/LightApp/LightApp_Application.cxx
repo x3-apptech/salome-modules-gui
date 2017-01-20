@@ -4458,8 +4458,10 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
   bool isPythonLightModule = lib.contains("SalomePyQtGUILight");
 
   QStringList paths;
-#ifdef WIN32
+#if defined(WIN32)
   paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
+#elif defined(__APPLE__)
+  paths = QString(::getenv( "DYLD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
 #else
   paths = QString(::getenv( "LD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
 #endif

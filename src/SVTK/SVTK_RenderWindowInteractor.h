@@ -124,9 +124,9 @@ class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
   //! To handle native events (from such devices as SpaceMouse)
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#ifdef WIN32
+#if defined(WIN32)
   virtual bool winEvent( MSG*, long* );
-#else
+#elif !defined(__APPLE__)
   virtual bool x11Event( XEvent *e );
 #endif
 #else

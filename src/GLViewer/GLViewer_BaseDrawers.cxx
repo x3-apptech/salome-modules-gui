@@ -34,8 +34,7 @@
 // Qt includes
 #include <QColor>
 
-
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
 #include <GL/glx.h>
 #endif
 

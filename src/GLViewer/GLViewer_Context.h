@@ -39,7 +39,11 @@ class QRect;
 #include <Quantity_NameOfColor.hxx>
 #include <Quantity_Color.hxx>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 class GLViewer_Viewer2d;
 

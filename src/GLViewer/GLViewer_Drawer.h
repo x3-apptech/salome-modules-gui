@@ -36,7 +36,11 @@
 
 class QFile;
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include "GLViewer.h"
 #include "GLViewer_Defs.h"
@@ -79,8 +83,8 @@ struct GLVIEWER_API GLViewer_TexFindId
   bool        myIsUndl;
   //! Font Size
   int         myPointSize;
-  //! View POrt ID
-  int         myViewPortId;
+  //! View Port ID
+  long        myViewPortId;
   //! Overloaded operator for using struct as MAP key
   bool operator < (const GLViewer_TexFindId theStruct) const 
   { 

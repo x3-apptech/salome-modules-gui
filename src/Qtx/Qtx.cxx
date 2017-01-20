@@ -429,13 +429,15 @@ QString Qtx::library( const QString& str )
     name = QString( "lib" ) + name;
 #endif
 
-#ifdef WIN32
+#if defined(WIN32)
   QString libExt( "dll" );
+#elif defined(__APPLE__)
+  QString libExt( "dylib" );
 #else
   QString libExt( "so" );
 #endif
 
-  if ( ext.toLower() != QString( "so" ) && ext.toLower() != QString( "dll" ) )
+  if ( ext.toLower() != QString( "so" ) && ext.toLower() != QString( "dll" ) && ext.toLower() != QString( "dylib" ) )
   {
     if ( !name.isEmpty() && !ext.isEmpty() )
       name += QString( "." );
@@ -2104,7 +2106,7 @@ QFont Qtx::stringToFont( const QString& fontDescription )
   return font;
 }
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__ 
 
 #include <X11/Xlib.h>
 #include <GL/glx.h>

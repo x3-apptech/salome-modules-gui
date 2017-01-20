@@ -115,7 +115,11 @@ static QEvent* l_mbPressEvent = 0;
 //# include <QWindowsStyle>
 //#endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 // To avoid conflict between KeyPress from the X.h (define KeyPress 2)
 // and QEvent::KeyPress (qevent.h)
