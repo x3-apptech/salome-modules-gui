@@ -68,6 +68,7 @@
 #include <QPaintEvent>
 #include <QCoreApplication>
 
+#include <utilities.h>
 namespace
 {
   /*!
@@ -2809,7 +2810,10 @@ public:
         for ( int i = 0, n = vec.size(); i < n; i++ ) {
           SUIT_ViewWindow* wnd = vec[ i ];
           if ( wnd )
-            myResult.append( wnd->getId() );
+            {
+              MESSAGE("SUIT_ViewWindow*: "<< wnd << " id: " << wnd->getId());
+              myResult.append( wnd->getId() );
+            }
         }
       }
     }
@@ -2839,6 +2843,7 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
+    MESSAGE("window id:" << myWndId << " SUIT_ViewWindow*: " << wnd);
     if ( wnd ) {
       wnd->setFocus();
       myResult = true;
@@ -2848,6 +2853,37 @@ public:
 bool SalomePyQt::activateView( const int id )
 {
   return ProcessEvent( new TActivateView( id ) );
+}
+
+/*!
+ *
+ */
+
+class TActivateViewManagerAndView: public SALOME_Event
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  int myWndId;
+  TActivateViewManagerAndView( const int id )
+    : myResult( false ),
+      myWndId( id ) {}
+  virtual void Execute()
+  {
+    SUIT_ViewWindow* wnd = getWnd( myWndId );
+    MESSAGE("window id:" << myWndId << " SUIT_ViewWindow*: " << wnd);
+    if ( wnd )
+      {
+        LightApp_Application* app  = getApplication();
+        app->setActiveViewManager(wnd->getViewManager());
+        wnd->setFocus();
+        myResult = true;
+      }
+  }
+};
+bool SalomePyQt::activateViewManagerAndView( const int id )
+{
+  return ProcessEvent( new TActivateViewManagerAndView( id ) );
 }
 
 /*!

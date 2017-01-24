@@ -104,6 +104,8 @@ public:
 
   virtual void          updateDesktopTitle();
 
+  virtual void          setActiveViewManager( SUIT_ViewManager* );
+
 signals:
   /*!emit that view manager added*/
   void                  viewManagerAdded( SUIT_ViewManager* );
@@ -160,8 +162,6 @@ protected:
 
   virtual void          beforeCloseDoc( SUIT_Study* theDoc );
   virtual void          afterCloseDoc();
-
-  virtual void          setActiveViewManager( SUIT_ViewManager* );
 
   virtual int           openChoice( const QString& );
   virtual bool          openAction( const int, const QString& );

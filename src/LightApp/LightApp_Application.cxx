@@ -1461,19 +1461,31 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
 {
   SUIT_ViewManager* aVM = viewManager( vmType );
   SUIT_ViewManager* anActiveVM = CAM_Application::activeViewManager();
-
+  MESSAGE("vmType: " << vmType.toStdString() << " aVM: " << aVM << " anActiveVM: " << anActiveVM );
   if ( anActiveVM && anActiveVM->getType() == vmType )
-    aVM = anActiveVM;
+    {
+      MESSAGE("aVM = anActiveVM");
+      aVM = anActiveVM;
+    }
 
   if ( aVM && create )
   {
     if ( !aVM->getActiveView() )
-      aVM->createView();
+      {
+        MESSAGE("aVM->createView()");
+        aVM->createView();
+      }
     else
-      desktop()->setActiveWindow( aVM->getActiveView() );
+      {
+        MESSAGE("desktop()->setActiveWindow: " << aVM->getActiveView());
+        desktop()->setActiveWindow( aVM->getActiveView() );
+      }
   }
   else if ( create )
-    aVM = createViewManager( vmType );
+    {
+      MESSAGE("aVM = createViewManager( vmType )");
+      aVM = createViewManager( vmType );
+    }
 
   return aVM;
 }
