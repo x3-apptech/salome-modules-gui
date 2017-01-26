@@ -1836,12 +1836,10 @@ void LightApp_Application::studyCreated( SUIT_Study* s )
 }
 
 /*!Gets file filter.
- *\retval QString "(*.bin)"
+ *\retval QString "(*.hdf)"
  */
-QString LightApp_Application::getFileFilter() const
+QString LightApp_Application::getFileFilter( bool /*open*/) const
 {
-  //return "(*.bin)";
-  // HDF persistence
   return "(*.hdf)";
 }
 

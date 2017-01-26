@@ -36,7 +36,7 @@
 #include <QStringList>
 
 #include <Resource_Manager.hxx>
-#include <TColStd_SequenceOfExtendedString.hxx>
+#include <TColStd_SequenceOfAsciiString.hxx>
 
 /*!
   \brief Create new instance of CAF_Application.
@@ -106,13 +106,16 @@ Handle( TDocStd_Application ) CAF_Application::stdApp() const
 
   \return file filters for open/save document dialog box
 */
-QString CAF_Application::getFileFilter() const
+QString CAF_Application::getFileFilter( bool open ) const
 {
   if ( stdApp().IsNull() )
     return QString();
 
-  TColStd_SequenceOfExtendedString formats;
-  stdApp()->Formats( formats );
+  TColStd_SequenceOfAsciiString formats;
+  if ( open )
+    stdApp()->ReadingFormats( formats );
+  else
+    stdApp()->WritingFormats( formats );
 
   QStringList allWC;
   QMap<QString, QStringList> wildCards;

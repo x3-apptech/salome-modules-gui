@@ -33,7 +33,7 @@
 
 #include <TDF_Delta.hxx>
 #include <TDF_ListIteratorOfDeltaList.hxx>
-
+#include <TColStd_SequenceOfAsciiString.hxx>
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
@@ -106,8 +106,10 @@ bool CAF_Study::createDocument( const QString& doc )
   {
     try {
       OCC_CATCH_SIGNALS;
-      TColStd_SequenceOfExtendedString formats;
-      app->stdApp()->Formats( formats );
+      TColStd_SequenceOfAsciiString formats;
+      app->stdApp()->WritingFormats( formats );
+      if ( formats.IsEmpty() )
+        app->stdApp()->ReadingFormats( formats );
       if ( !formats.IsEmpty() )
         app->stdApp()->NewDocument( formats.First(), myStdDoc );
     }

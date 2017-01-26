@@ -969,14 +969,6 @@ void SalomeApp_Application::onDockWindowVisibilityChanged( bool theIsVisible )
     objectBrowserColumnsVisibility();
 }
 
-/*!Gets file filter.
- *\retval QString "(*.hdf)"
- */
-QString SalomeApp_Application::getFileFilter() const
-{
-  return "(*.hdf)";
-}
-
 /*!Create window.*/
 QWidget* SalomeApp_Application::createWindow( const int flag )
 {

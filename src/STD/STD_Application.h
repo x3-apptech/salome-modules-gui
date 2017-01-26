@@ -60,7 +60,7 @@ public:
          UserID
   };
 
- public:
+public:
   STD_Application();
   virtual ~STD_Application();
 
@@ -88,9 +88,9 @@ public:
   void                  viewManagers( const QString&, ViewManagerList& ) const;
   virtual int           viewManagerId (const SUIT_ViewManager* ) const;
 
-  virtual QString       getFileFilter() const { return QString(); }
+  virtual QString       getFileFilter( bool open ) const;
   virtual QString       getFileName( bool open, const QString& initial, const QString& filters,
-                                                             const QString& caption, QWidget* parent );
+				     const QString& caption, QWidget* parent );
   QString               getDirectory( const QString& initial, const QString& caption, QWidget* parent );
 
   virtual void          start();

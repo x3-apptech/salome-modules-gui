@@ -118,7 +118,7 @@ public:
 
   LightApp_Preferences*               preferences() const;
 
-  virtual QString                     getFileFilter() const;
+  virtual QString                     getFileFilter( bool ) const;
 
   virtual QString                     getFileName( bool open, const QString& initial, const QString& filters,
                                                    const QString& caption, QWidget* parent );

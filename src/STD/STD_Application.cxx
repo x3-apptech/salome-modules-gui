@@ -314,7 +314,7 @@ bool STD_Application::onNewDoc( const QString& name )
 void STD_Application::onOpenDoc()
 {
   // It is preferrable to use OS-specific file dialog box here !!!
-  QString aName = getFileName( true, QString(), getFileFilter(), QString(), 0 );
+  QString aName = getFileName( true, QString(), getFileFilter( true ), QString(), 0 );
   if ( aName.isNull() )
     return;
 
@@ -611,7 +611,7 @@ bool STD_Application::onSaveAsDoc()
   bool isOk = false;
   while ( !isOk )
   {
-    QString aName = getFileName( false, study->studyName(), getFileFilter(), QString(), 0 );
+    QString aName = getFileName( false, study->studyName(), getFileFilter( false ), QString(), 0 );
     if ( aName.isNull() )
       return false;
 
@@ -882,6 +882,12 @@ void STD_Application::onConnectPopupRequest( SUIT_PopupClient* client, QContextM
   if ( !popup->actions().isEmpty() )
     popup->exec( e->globalPos() );
   delete popup;
+}
+
+/*!\retval QString - return file extension(s).*/
+QString STD_Application::getFileFilter( bool /*open*/ ) const
+{
+  return QString();
 }
 
 /*!\retval QString - return file name from dialog.*/
