@@ -342,12 +342,6 @@ SET(_${PROJECT_NAME}_exposed_targets
     ImageComposer
 )
 
-# CAF package (not compilable while TDocStd_Application::Formats is removed)
-IF(CAS_VERSION_STR VERSION_LESS "7.0.1")
-  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       caf)
-ENDIF()
-
 IF(SALOME_USE_OCCVIEWER OR SALOME_USE_VTKVIEWER OR SALOME_USE_GLVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
        OpenGLUtils)
