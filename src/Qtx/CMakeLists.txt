@@ -72,6 +72,7 @@ SET(_moc_HEADERS
   QtxSlider.h
   QtxSplash.h
   QtxToolBar.h
+  QtxToolButton.h
   QtxToolTip.h
   QtxTreeView.h
   QtxValidator.h
@@ -164,6 +165,7 @@ SET(_other_SOURCES
   QtxSlider.cxx
   QtxSplash.cxx
   QtxToolBar.cxx
+  QtxToolButton.cxx
   QtxToolTip.cxx
   QtxTranslator.cxx
   QtxTreeView.cxx
