@@ -492,35 +492,30 @@ void OCCViewer_PolygonSketcher::onSketch( SketchState state )
     if ( state != Fin )
       p.drawPolyline( *mypPoints );
       }*/
-  if ( mypPolyRB )
-    {
+  if ( mypPolyRB ) {
+    if ( state == Fin ) {
+      mypPolyRB->clearGeometry();
+      mypPolyRB->hide();
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+      QApplication::syncX();
+#endif
+      mypViewWindow->activateSketching( OCCViewer_ViewWindow::NoSketching );
+    } else {
       mypPolyRB->setUpdatesEnabled ( false );
       if ( !mypPolyRB->isVisible() )
-        mypPolyRB->show();
+	mypPolyRB->show();
       //if ( state != Debut )
       //  mypPolyRB->repaint();
-
+      
       if ( state != Fin && points->count() )
-        mypPolyRB->initGeometry( QPolygon(*points) << myCurr );
+	mypPolyRB->initGeometry( QPolygon(*points) << myCurr );
       //mypPolyRB->addNode( myCurr );
-
+      
       //if ( state != Fin )
       //  mypPolyRB->repaint();
       mypPolyRB->setUpdatesEnabled ( true );
       //mypPolyRB->repaint();
     }
-      
-  if ( state == Fin )
-  {
-    if ( mypPolyRB )
-      {
-        mypPolyRB->clearGeometry();
-        mypPolyRB->hide();
-      }
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QApplication::syncX();
-#endif
-    mypViewWindow->activateSketching( OCCViewer_ViewWindow::NoSketching );
   }
 }
 
