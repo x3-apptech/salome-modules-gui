@@ -49,7 +49,6 @@ PYQT_WRAP_SIP(_sip_SOURCES ${_sip_files})
 
 # sources / to compile
 SET(PyConsolePy_SOURCES ${_sip_SOURCES})
-message("PyConsolePy_SOURCES = ${PyConsolePy_SOURCES}")
 
 # --- rules ---
 
