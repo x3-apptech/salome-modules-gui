@@ -347,7 +347,7 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
     }
     Handle(V3d_View) aView3d = aView->getViewPort()->getView();
     if ( !aView3d.IsNull() ) {
-      myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+      myAISContext->MoveTo( theEvent->x(), theEvent->y(), aView3d, Standard_True );
     }
   }
 }
@@ -379,14 +379,14 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
     if ( !isPreselectionEnabled() ) {
       Handle(V3d_View) aView3d = aView->getViewPort()->getView();
       if ( !aView3d.IsNull() ) {
-	myAISContext->MoveTo(myEndPnt.x(), myEndPnt.y(), aView3d);
+	myAISContext->MoveTo( myEndPnt.x(), myEndPnt.y(), aView3d, Standard_True );
       }
     }
 
     if (aHasShift && myMultiSelectionEnabled)
-      myAISContext->ShiftSelect();
-    else
-      myAISContext->Select();
+      myAISContext->ShiftSelect( Standard_True );
+    else 
+      myAISContext->Select( Standard_True );
   }
   else
   {
@@ -438,14 +438,14 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
     if ( !isPreselectionEnabled() ) {
       Handle(V3d_View) aView3d = aView->getViewPort()->getView();
       if ( !aView3d.IsNull() ) {
-	myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d);
+	myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d, Standard_True );
       }
     }
 
     if (aHasShift && myMultiSelectionEnabled)
-      myAISContext->ShiftSelect();
+      myAISContext->ShiftSelect( Standard_True );
     else
-      myAISContext->Select();
+      myAISContext->Select( Standard_True );
 
     emit selectionChanged();
 
@@ -1287,7 +1287,7 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
     myAISContext->Deactivate( myTrihedron );
   }
   else {
-    myAISContext->Erase( myTrihedron );
+    myAISContext->Erase( myTrihedron , Standard_True );
   }
 }
 

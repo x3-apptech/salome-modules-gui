@@ -94,7 +94,7 @@ public:
   
   void                            getSelectedObjects(AIS_ListOfInteractive& theList);
   void                            setObjectsSelected(const AIS_ListOfInteractive& theList);
-  void                            setSelected(const Handle(AIS_InteractiveObject)& theIO) { myAISContext->SetSelected(theIO);}
+  void                            setSelected(const Handle(AIS_InteractiveObject)& theIO) { myAISContext->SetSelected(theIO,Standard_True);}
 
   void                            performSelectionChanged();
   // emit signal selectionChanged

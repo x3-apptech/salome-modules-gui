@@ -542,7 +542,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
         if ( theEvent->button() == Qt::LeftButton )
         {
           Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-          ic->Select();
+          ic->Select( Standard_True );
           for ( ic->InitSelected(); ic->MoreSelected(); ic->NextSelected() )
           {
             TopoDS_Shape aShape = ic->SelectedShape();
@@ -581,7 +581,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
           }
           if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
           if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-          ic->CloseAllContexts();
+          ic->CloseAllContexts( Standard_True );
           myOperation = NOTHING;
           myViewPort->setCursor( myCursor );
           myCursorIsHand = false;
@@ -776,7 +776,7 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    ic->CloseAllContexts();
+    ic->CloseAllContexts( Standard_True );
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
@@ -816,7 +816,7 @@ void OCCViewer_ViewWindow::activateSetRotationSelected( double theX, double theY
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    ic->CloseAllContexts();
+    ic->CloseAllContexts( Standard_True );
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
