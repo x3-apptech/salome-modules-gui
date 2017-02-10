@@ -72,17 +72,17 @@ l={}
 for j in range(0,20):
    k[j] = j*10+1
    l[j] = "C"+str(j+1)
-ARealTable.AddRow(k.values())
+ARealTable.AddRow(list(k.values()))
 ARealTable.SetRowTitle(1, "Row 0")
 ARealTable.SetRowUnit(1, "Hz")
-ARealTable.SetColumnTitles(l.values())
+ARealTable.SetColumnTitles(list(l.values()))
 for i in range(1,11):
    for j in range(1,21):
       if j % 2 == 1:
          k[j] = math.log10(j*30*math.pi/180) * 20 + i * 15 + j*5
       else:
          k[j] = math.sin(j*30*math.pi/180) * 20 + i * 15 + j*5 
-   ARealTable.AddRow(k.values())
+   ARealTable.AddRow(list(k.values()))
    ARealTable.SetRowTitle(i+1, "Row " + str(i))
    ARealTable.SetRowUnit(i+1, "Wt")
 ARealTable.SetTitle("TEST table of real")

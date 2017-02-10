@@ -20,8 +20,8 @@
 // File   : SALOME_PYQT_ModuleLight.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-#include "SALOME_PYQT_DataModelLight.h"
 #include "SALOME_PYQT_ModuleLight.h"
+#include "SALOME_PYQT_DataModelLight.h"
 #include "SALOME_PYQT_PyModule.h"
 
 #include "CAM_Application.h"
@@ -60,7 +60,7 @@
 // and to get C API from sip : sipBuildResult for example
 //
 
-#define INIT_FUNCTION initSalomePyQtGUILight
+#define INIT_FUNCTION PyInit_SalomePyQtGUILight
 #if defined(SIP_STATIC_MODULE)
 extern "C" void INIT_FUNCTION();
 #else

@@ -77,7 +77,7 @@ int SALOME_PYQT_PyInterp::run(const char *command)
     PyErr_Print();
     return -1;
   }
-  PyObject *r = PyEval_EvalCode((PyCodeObject *)code,_global_context,_local_context);
+  PyObject *r = PyEval_EvalCode((PyObject *)code,_global_context,_local_context);
 
   Py_DECREF(code);
   if(!r){

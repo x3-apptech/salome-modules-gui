@@ -26,7 +26,7 @@
 #include "PyInterp_Utils.h"
 
 #include <pythread.h>
-#include <cStringIO.h>
+//#include <cStringIO.h>
 #include <structmember.h>
 #include <string>
 #include <vector>
@@ -93,8 +93,8 @@ static PyMemberDef PyStdOut_memberlist[] = {
 static PyTypeObject PyStdOut_Type = {
   /* The ob_type field must be initialized in the module init function
    * to be portable to Windows without using C++. */
-  PyObject_HEAD_INIT(NULL)
-  0,                            /*ob_size*/
+  PyVarObject_HEAD_INIT(NULL, 0)
+  /*0,*/                            /*ob_size*/
   "PyOut",                      /*tp_name*/
   sizeof(PyStdOut),             /*tp_basicsize*/
   0,                            /*tp_itemsize*/
@@ -242,9 +242,16 @@ void PyInterp_Interp::initPython()
 {
   if (!Py_IsInitialized()){
     // Python is not initialized
-    Py_SetProgramName(_argv[0]);
+    wchar_t **changed_argv = new wchar_t*[_argc]; // Setting arguments
+    size_t mbslen;
+    for (int i = 0; i < _argc; i++)
+    {
+      changed_argv[i] = Py_DecodeLocale(_argv[i], NULL);
+    }
+   
+    Py_SetProgramName(changed_argv[0]);
     Py_Initialize(); // Initialize the interpreter
-    PySys_SetArgv(_argc, _argv);
+    PySys_SetArgv(_argc, changed_argv);
 
     PyEval_InitThreads(); // Create (and acquire) the Python global interpreter lock (GIL)
     PyEval_ReleaseLock();
@@ -342,7 +349,7 @@ static int run_command(const char *command, PyObject * global_ctxt, PyObject * l
     return 1;
   }
   else {
-    PyObjWrapper r(PyEval_EvalCode((PyCodeObject *)(void *)v,global_ctxt, local_ctxt));
+    PyObjWrapper r(PyEval_EvalCode((PyObject *)(void *)v,global_ctxt, local_ctxt));
     if(!r) {
       // Execution error. We return -1
       PyErr_Print();

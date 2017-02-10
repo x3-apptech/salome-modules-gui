@@ -35,8 +35,8 @@
 #endif
 
 #ifndef DISABLE_PYCONSOLE
-  #include "LightApp_PyEditor.h"
   #include "PyConsole_Interp.h"
+  #include "LightApp_PyEditor.h"
   #include "PyConsole_Console.h"
 #endif
 

@@ -20,6 +20,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#ifndef DISABLE_PYCONSOLE
+  #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
+#endif
+
 #include "SalomeApp_Study.h"
 
 #include "SalomeApp_Module.h"
@@ -46,10 +50,6 @@
 #include <SUIT_Desktop.h>
 
 #include <LightApp_Displayer.h>
-
-#ifndef DISABLE_PYCONSOLE
-  #include "SalomeApp_PyInterp.h" // WARNING! This include must be the first!
-#endif
 
 #include "utilities.h"
 

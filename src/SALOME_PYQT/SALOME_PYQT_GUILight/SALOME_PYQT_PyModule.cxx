@@ -1914,9 +1914,9 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
           // parse the return value
           // it should be a map: {integer:integer}
           int aKey, aValue;
-          if( key && PyInt_Check( key ) && value && PyInt_Check( value ) ) {
-            aKey   = PyInt_AsLong( key );
-            aValue = PyInt_AsLong( value );
+          if( key && PyLong_Check( key ) && value && PyLong_Check( value ) ) {
+            aKey   = PyLong_AsLong( key );
+            aValue = PyLong_AsLong( value );
             myWindowsMap[ aKey ] = aValue;
           }
         }
@@ -1934,16 +1934,16 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res2 ) ) {
-        myViewMgrList.append( PyString_AsString( res2 ) );
+      if ( PyUnicode_Check( res2 ) ) {
+        myViewMgrList.append( PyUnicode_AsUTF8( res2 ) );
       }
       // ... or list of strings
       else if ( PyList_Check( res2 ) ) {
         int size = PyList_Size( res2 );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res2, i );
-          if( value && PyString_Check( value ) ) {
-            myViewMgrList.append( PyString_AsString( value ) );
+          if( value && PyUnicode_Check( value ) ) {
+            myViewMgrList.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2460,8 +2460,8 @@ void PyModuleHelper::internalSave( QStringList& files, const QString& url )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res ) ) {
-        QString astr = PyString_AsString( res );
+      if ( PyUnicode_Check( res ) ) {
+        QString astr = PyUnicode_AsUTF8( res );
         files.append( astr );
       }
       //also result can be a list...
@@ -2469,8 +2469,8 @@ void PyModuleHelper::internalSave( QStringList& files, const QString& url )
         int size = PyList_Size( res );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res, i );
-          if ( value && PyString_Check( value ) ) {
-            files.append( PyString_AsString( value ) );
+          if ( value && PyUnicode_Check( value ) ) {
+            files.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2548,8 +2548,8 @@ void PyModuleHelper::internalDumpPython( QStringList& files )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res ) ) {
-        QString astr = PyString_AsString( res );
+      if ( PyUnicode_Check( res ) ) {
+        QString astr = PyUnicode_AsUTF8( res );
         //SCRUTE(astr);
         files.append(astr);
       }
@@ -2558,8 +2558,8 @@ void PyModuleHelper::internalDumpPython( QStringList& files )
         int size = PyList_Size( res );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res, i );
-          if( value && PyString_Check( value ) ) {
-            files.append( PyString_AsString( value ) );
+          if( value && PyUnicode_Check( value ) ) {
+            files.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2701,8 +2701,8 @@ QString PyModuleHelper::internalEngineIOR() const
       }
       else {
         // parse the return value, result chould be string
-        if ( PyString_Check( res ) ) {
-          ior = PyString_AsString( res );
+        if ( PyUnicode_Check( res ) ) {
+          ior = PyUnicode_AsUTF8( res );
         }
       }
     }

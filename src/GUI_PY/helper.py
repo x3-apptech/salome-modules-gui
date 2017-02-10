@@ -103,7 +103,7 @@ def showSObjectSelected():
         test, attr = sobj.FindAttribute( "AttributeName" )
         if test:
             message = "My name is '%s'" % attr.Value()
-            print message
+            print(message)
     pass
 
 def deleteSObjectSelected(): 
@@ -140,7 +140,7 @@ def deleteSObjectSelected():
 def TEST_getSObjectSelected():
     mySObject, myEntry = getSObjectSelected()
     myName = mySObject.GetName()
-    print "The name of the selected object is %s"%myName
+    print("The name of the selected object is %s"%myName)
 
 def TEST_showSObjectSelected():
     showSObjectSelected()

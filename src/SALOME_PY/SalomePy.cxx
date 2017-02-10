@@ -494,7 +494,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_resetView( PyObject* self, PyOb
   return Py_None;
 }
 
-static PyMethodDef Module_Methods[] = 
+static PyMethodDef libSalomePy_methods[] = 
 {
   { "getRenderer",               libSalomePy_getRenderer,               METH_VARARGS },
   { "getRenderWindow",           libSalomePy_getRenderWindow,           METH_VARARGS },
@@ -506,16 +506,42 @@ static PyMethodDef Module_Methods[] =
   { NULL, NULL }
 };
 
+struct module_state {
+    PyObject *error;
+};
+
+#define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
+
+static int libSalomePy_traverse(PyObject *m, visitproc visit, void *arg) {
+    Py_VISIT(GETSTATE(m)->error);
+    return 0;
+}
+
+static int libSalomePy_clear(PyObject *m) {
+    Py_CLEAR(GETSTATE(m)->error);
+    return 0;
+}
+
+static struct PyModuleDef moduledef = {
+        PyModuleDef_HEAD_INIT,
+        "libSalomePy",
+        NULL,
+        sizeof(struct module_state),
+        libSalomePy_methods,
+        NULL,
+        libSalomePy_traverse,
+        libSalomePy_clear,
+        NULL
+};
+
 /*!
   \brief Python module initialization.
   \internal
 */
 extern "C" SALOMEPY_EXPORT void initlibSalomePy()
 {
-  static char* modulename = (char*)"libSalomePy";
-
   // init module
-  PyObject* aModule = Py_InitModule( modulename, Module_Methods );
+  PyObject *aModule = PyModule_Create(&moduledef);
   if( PyErr_Occurred() ) {
     PyErr_Print();
     return;

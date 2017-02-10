@@ -120,9 +120,9 @@ def TEST_GenericDialog():
     dlg=GenericDialog()
     dlg.displayAndWait()
     if dlg.wasOk():
-        print "OK has been pressed"
+        print("OK has been pressed")
     else:
-        print "Cancel has been pressed"
+        print("Cancel has been pressed")
         
 if __name__ == "__main__":
     TEST_GenericDialog()

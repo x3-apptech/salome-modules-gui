@@ -88,8 +88,8 @@
   - <Ctrl><Tab>          : undoes auto-completion
 */
 
-#include "PyConsole_Editor.h"
 #include "PyConsole_Interp.h"
+#include "PyConsole_Editor.h"
 #include "PyConsole_Event.h"
 #include "PyInterp_Dispatcher.h"
 #include "PyConsole_Request.h"

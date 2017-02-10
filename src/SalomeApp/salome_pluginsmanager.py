@@ -103,14 +103,14 @@ plugins={}
 current_plugins_manager=None
 
 def initialize(module,name,basemenuname,menuname):
-  if not plugins.has_key(name):
+  if name not in plugins:
     if module:
       plugins[name]={}
     else:
       plugins[name]=[]
   if module:
     d=sgPyQt.getDesktop()
-    if plugins[name].has_key(d):return
+    if d in plugins[name]:return
     plugins[name][d]=PluginsManager(module,name,basemenuname,menuname)
   else:
     plugins[name].append(PluginsManager(module,name,basemenuname,menuname))
@@ -149,8 +149,8 @@ logger=Logger("PluginsManager") #,color=GREEN)
 class PluginsManager:
     def __init__(self,module,name,basemenuname,menuname):
         self.name=name
-        self.basemenuname=unicode(basemenuname, "utf-8")
-        self.menuname=unicode(menuname, "utf-8")
+        self.basemenuname=basemenuname
+        self.menuname=menuname
         self.module=module
         self.registry={}
         self.handlers={}
@@ -164,7 +164,7 @@ class PluginsManager:
         # MODULES plugins are supposed to be located in the
         # installation folder of the module, in the subdirectory
         # "share/salome/plugins". We first look for these directories.
-        for key in os.environ.keys():
+        for key in list(os.environ.keys()):
           if key.endswith("_ROOT_DIR"):
             rootpath=os.environ[key]
             dirpath=os.path.join(rootpath,PLUGIN_PATH_PATTERN)
@@ -281,7 +281,7 @@ class PluginsManager:
               sys.path.insert(0,directory)
               logger.debug("The directory %s has been added to PYTHONPATH"%directory)
             try:
-              execfile(plugins_file,globals(),{})
+              exec(compile(open(plugins_file).read(), plugins_file, 'exec'),globals(),{})
             except:
               logger.fatal("Error while loading plugins from file %s"%plugins_file)
               traceback.print_exc()
@@ -305,7 +305,7 @@ class PluginsManager:
                 submenus[str(menu.title())]=menu
             while len(names) > 1:
               name=names.pop(0)
-              if submenus.has_key(name):
+              if name in submenus:
                 amenu=submenus[name]
               else:
                 amenu=QMenu(name,parentMenu)

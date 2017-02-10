@@ -68,7 +68,7 @@ class TubeDialog(TubeDialog_UI):
             length=eval(str(self.txtLength.text()))
             width=eval(str(self.txtWidth.text()))
         except:
-            print "pb a la saisie"
+            print("pb a la saisie")
 
         return radius, length, width
 
@@ -103,7 +103,7 @@ def TEST_getData_synchrone():
     tubedialog.exec_()
     if tubedialog.wasOk():
         radius, length, width = tubedialog.getData()
-        print radius, length, width
+        print(radius, length, width)
 
 
 def main( args ):
