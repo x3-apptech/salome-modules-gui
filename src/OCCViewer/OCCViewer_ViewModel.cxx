@@ -129,13 +129,15 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 
   // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
-#if OCC_VERSION_LARGE > 0x07000000
-    
+#if OCC_VERSION_LARGE > 0x07010000
+  myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor( Quantity_NOC_WHITE );
+  myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_Selected)->SetColor( Quantity_NOC_WHITE );
+#elif OCC_VERSION_LARGE > 0x07000000
   const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
-  sStyle->SetColor( Quantity_NOC_WHITE ); 
-#else  
+  sStyle->SetColor( Quantity_NOC_WHITE );
+#else
   myAISContext->SelectionColor( Quantity_NOC_WHITE );
-#endif  
+#endif
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
