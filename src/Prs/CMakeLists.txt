@@ -19,11 +19,11 @@
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 # libraries to link to
-SET(_link_LIBRARIES ${CAS_KERNEL})
+SET(_link_LIBRARIES ${OpenCASCADE_FoundationClasses_LIBRARIES})
 
 ADD_LIBRARY(SalomePrs SALOME_Prs.cxx)
 TARGET_LINK_LIBRARIES(SalomePrs ${_link_LIBRARIES})

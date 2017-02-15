@@ -24,7 +24,7 @@ INCLUDE(UseQtExt)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${PTHREAD_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/Qtx
@@ -32,10 +32,10 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})
+ADD_DEFINITIONS(${OpenCASCADE_DEFINITIONS} ${QT_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${VTK_LIBRARIES} ${CAS_KERNEL} qtx suit ${KERNEL_SALOMELocalTrace})
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${VTK_LIBRARIES} ${OpenCASCADE_FoundationClasses_LIBRARIES} qtx suit ${KERNEL_SALOMELocalTrace})
 
 # --- headers ---
 

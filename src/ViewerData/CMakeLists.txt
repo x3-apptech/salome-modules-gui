@@ -21,14 +21,16 @@
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+ADD_DEFINITIONS(${OpenCASCADE_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_VIEWER})
+SET(_link_LIBRARIES 
+    ${OpenCASCADE_FoundationClasses_LIBRARIES}
+    ${OpenCASCADE_Visualization_LIBRARIES})
 
 # --- headers ---
 

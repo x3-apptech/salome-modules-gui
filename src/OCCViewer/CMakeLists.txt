@@ -26,7 +26,7 @@ INCLUDE(UseQtExt)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${OGL_INCLUDE_DIRS}
   ${QT_INCLUDES}
   ${PTHREAD_INCLUDE_DIR}
@@ -39,12 +39,15 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS} ${OGL_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES
-  ${OPENGL_LIBRARIES} ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER} ${CAS_TKGeomAlgo}
-  ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKOpenGl}
+  ${OPENGL_LIBRARIES} ${QT_LIBRARIES}
+  ${OpenCASCADE_FoundationClasses_LIBRARIES}
+  ${OpenCASCADE_ModelingData_LIBRARIES}
+  ${OpenCASCADE_ModelingAlgorithms_LIBRARIES}
+  ${OpenCASCADE_Visualization_LIBRARIES}
   CASCatch qtx suit ViewerTools ViewerData OpenGLUtils
 )
 

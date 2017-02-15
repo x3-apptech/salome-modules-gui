@@ -23,7 +23,7 @@ INCLUDE(UseQtExt)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SUIT
@@ -34,11 +34,11 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${OGL_DEFINITIONS})
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS} ${OGL_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES
-  ${QT_LIBRARIES} ${CAS_KERNEL} ${CAS_VIEWER}
+  ${QT_LIBRARIES} ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_Visualization_LIBRARIES}
   qtx suit SalomeObject SalomePrs OCCViewer
 )
 

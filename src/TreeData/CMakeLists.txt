@@ -25,7 +25,6 @@ ADD_SUBDIRECTORY(Test)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
   ${QT_INCLUDES}
   ${OMNIORB_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
@@ -42,7 +41,6 @@ INCLUDE_DIRECTORIES(
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(
-  ${CAS_DEFINITIONS}
   ${QT_DEFINITIONS}
   ${BOOST_DEFINITIONS}
   ${OMNIORB_DEFINITIONS}

@@ -23,7 +23,7 @@ INCLUDE(UseQtExt)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${QWT_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/Qtx
@@ -34,7 +34,7 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${QWT_DEFINITIONS} ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${QWT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES ${QT_LIBRARIES} ${QWT_LIBRARY} qtx suit Plot2d SalomePrs SalomeObject)

@@ -21,15 +21,15 @@
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/ViewerData
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${CAS_DEFINITIONS})
+ADD_DEFINITIONS(${OpenCASCADE_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${CAS_LDPATH} ${CAS_KERNEL} ${CAS_TKV3d} ViewerData)
+SET(_link_LIBRARIES ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_Visualization_LIBRARIES} ViewerData)
 
 # --- headers ---
 

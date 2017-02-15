@@ -22,7 +22,7 @@ INCLUDE(UseQtExt)
 # --- options ---
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${OMNIORB_INCLUDE_DIR}
   ${Boost_INCLUDE_DIRS}
   ${PTHREAD_INCLUDE_DIR}
@@ -33,7 +33,7 @@ INCLUDE_DIRECTORIES(
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(
   ${QT_DEFINITIONS}
-  ${CAS_DEFINITIONS}
+  ${OpenCASCADE_DEFINITIONS}
   ${BOOST_DEFINITIONS}
   ${OMNIORB_DEFINITIONS}
 )
@@ -41,7 +41,7 @@ ADD_DEFINITIONS(
 # libraries to link to
 SET(_link_LIBRARIES
   ${QT_LIBRARIES}
-  ${CAS_KERNEL}
+  ${OpenCASCADE_FoundationClasses_LIBRARIES}
   ${KERNEL_SalomeIDLKernel}
   ${KERNEL_SALOMELocalTrace}
   ${KERNEL_SalomeNS}

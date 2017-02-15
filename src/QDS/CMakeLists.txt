@@ -23,17 +23,17 @@ INCLUDE(UseQtExt)
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/DDS
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_KERNEL} qtx DDS)
+SET(_link_LIBRARIES ${QT_LIBRARIES} ${OpenCASCADE_FoundationClasses_LIBRARIES} qtx DDS)
 
 # --- headers ---
 
