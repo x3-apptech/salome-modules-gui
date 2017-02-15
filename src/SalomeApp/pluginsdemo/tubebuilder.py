@@ -104,7 +104,7 @@ def exportModel(mesh, filename):
     '''
     print("TUBE: exporting mesh to file %s ..."%filename)
     import SMESH
-    mesh.ExportMED(filename, 0, SMESH.MED_V2_2, 1 )
+    mesh.ExportMED(filename)
 
 
 #
