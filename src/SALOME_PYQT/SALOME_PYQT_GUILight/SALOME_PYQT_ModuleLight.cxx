@@ -23,11 +23,13 @@
 #include "SALOME_PYQT_DataModelLight.h"
 #include "SALOME_PYQT_ModuleLight.h"
 #include "SALOME_PYQT_PyModule.h"
+#include "SALOME_PYQT_Selector.h"
 
 #include "CAM_Application.h"
 #include "SUITApp_init_python.hxx"
 #include "SUIT_DataObjectIterator.h"
 #include "LightApp_Application.h"
+#include "LightApp_SelectionMgr.h"
 #include "SUIT_DataBrowser.h"
 #include "sipAPISalomePyQtGUILight.h"
 
@@ -36,6 +38,7 @@
 #endif
 
 #include <QCoreApplication>
+#include <utilities.h>
 
 // Py_ssize_t for old Pythons
 // This code is as recommended by"
@@ -106,7 +109,7 @@ extern "C"
   \brief Constructor
 */
 SALOME_PYQT_ModuleLight::SALOME_PYQT_ModuleLight()
-  : LightApp_Module( "noname" ) // name is set explicitly at the module initialization
+  : LightApp_Module( "noname" ), mySelector(0) // name is set explicitly at the module initialization
 {
   // initialize helper
   myHelper = new PyModuleHelper( this );
@@ -601,3 +604,46 @@ SALOME_PYQT_DataObjectLight* SALOME_PYQT_ModuleLight::findObject( const QString&
   }
   return obj;
 }
+
+void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
+{
+  MESSAGE("getSelected");
+}
+
+unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
+{
+  MESSAGE("getModifiedTime");
+
+}
+
+
+SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
+{
+  MESSAGE("root");
+
+}
+
+
+void SALOME_PYQT_ModuleLight::setSelected( const DataObjectList&, const bool)
+{
+  MESSAGE("setSelected");
+
+}
+
+
+//void SALOME_PYQT_ModuleLight::selectionChanged()
+//{
+//  MESSAGE("signal selectionChanged");
+//}
+
+void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
+{
+  MESSAGE("setLocalSelected");
+  if (!mySelector)
+    {
+       mySelector = new SALOME_PYQT_Selector(this, this->getApp()->selectionMgr());
+    }
+  mySelector->setLocalEntries(entries);
+  emit selectionChanged();
+}
+

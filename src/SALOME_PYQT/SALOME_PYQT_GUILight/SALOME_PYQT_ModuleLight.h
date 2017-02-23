@@ -34,6 +34,7 @@
 
 class QMenu;
 class PyModuleHelper;
+class SALOME_PYQT_Selector;
 class SALOME_PYQT_DataObjectLight;
 
 class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_ModuleLight: public LightApp_Module
@@ -97,6 +98,12 @@ public:
 
   QStringList     getChildren( const QString&, const bool = false ) const;
 
+  void             setLocalSelected(const QStringList &);
+  void             getSelected( DataObjectList& ) const;
+  unsigned long    getModifiedTime() const;
+  SUIT_DataObject* root() const;
+  void             setSelected( const DataObjectList&, const bool = false );
+
 protected:
   CAM_DataModel*  createDataModel();
 
@@ -104,8 +111,12 @@ private:
   SALOME_PYQT_DataObjectLight* 
                   findObject( const QString& ) const;
 
+signals:
+  void            selectionChanged();
+
 private:
   PyModuleHelper* myHelper;
+  SALOME_PYQT_Selector* mySelector;
 };
 
 #endif // SALOME_PYQT_MODULELIGHT_H

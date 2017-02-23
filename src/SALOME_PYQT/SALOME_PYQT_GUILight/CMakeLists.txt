@@ -47,6 +47,9 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/tools/PyConsole/src
   ${PROJECT_SOURCE_DIR}/tools/PyInterp/src
 )
+IF(SALOME_USE_SALOMEOBJECT)
+  INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/OBJECT)
+ENDIF()
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(
@@ -73,11 +76,13 @@ SET(_moc_HEADERS
   SALOME_PYQT_DataModelLight.h
   SALOME_PYQT_ModuleLight.h
   SALOME_PYQT_PyModule.h
+  SALOME_PYQT_Selector.h
 )
 
 # header files / no moc processing
 SET(_other_HEADERS
   SALOME_PYQT_DataObjectLight.h
+  SALOME_PYQT_BorrowedDataObjectLight.h
   SALOME_PYQT_GUILight.h
   SALOME_PYQT_PyInterp.h
 )
@@ -102,9 +107,11 @@ PYQT_WRAP_SIP(_sip_SOURCES ${_sip_files})
 SET(_other_SOURCES
   SALOME_PYQT_DataModelLight.cxx
   SALOME_PYQT_DataObjectLight.cxx
+  SALOME_PYQT_BorrowedDataObjectLight.cxx
   SALOME_PYQT_ModuleLight.cxx
   SALOME_PYQT_PyInterp.cxx
   SALOME_PYQT_PyModule.cxx
+  SALOME_PYQT_Selector.cxx
 )
 
 # sources / to compile

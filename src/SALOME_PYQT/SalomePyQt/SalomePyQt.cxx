@@ -244,6 +244,7 @@ SALOME_Selection* SALOME_Selection::GetSelection( LightApp_Application* app )
   return sel;
 }
 
+
 /*!
   \brief Constructor.
   \param p parent object
@@ -558,6 +559,31 @@ public:
 SALOME_Selection* SalomePyQt::getSelection()
 {
   return ProcessEvent( new TGetSelectionEvent() );
+}
+
+/*!
+  \fn QStringList* SalomePyQt::setSelection(const QStringList& );
+  \brief Send local selection for notification.
+
+  The list of locally selected objects (study entries) is sent for notification of
+  other listening entities (modules, viewers...).
+*/
+
+class TSetSelectionEvent: public SALOME_Event
+{
+  QStringList myEntryList;
+public:
+  TSetSelectionEvent(const QStringList& entryList) : myEntryList(entryList) {}
+  virtual void Execute()
+  {
+	SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+	if ( !module ) return;
+	module->setLocalSelected(myEntryList);
+  }
+};
+void SalomePyQt::setSelection( const QStringList& entryList)
+{
+  return ProcessVoidEvent( new TSetSelectionEvent(entryList) );
 }
 
 /*!
