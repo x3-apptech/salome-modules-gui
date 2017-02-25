@@ -1007,10 +1007,13 @@ void LightApp_Application::onHelpAbout()
 */
 void LightApp_Application::onSelection()
 {
+  MESSAGE("onSelection_1")
   onSelectionChanged();
+  MESSAGE("onSelection_2")
 
   if ( activeModule() && activeModule()->inherits( "LightApp_Module" ) )
     ((LightApp_Module*)activeModule())->selectionChanged();
+  MESSAGE("onSelection_3")
 }
 
 /*!

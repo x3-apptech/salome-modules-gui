@@ -102,7 +102,7 @@ public:
   void             getSelected( DataObjectList& ) const;
   unsigned long    getModifiedTime() const;
   SUIT_DataObject* root() const;
-  void             setSelected( const DataObjectList&, const bool = false );
+  void             setSelected( const QStringList&, const bool = false );
 
 protected:
   CAM_DataModel*  createDataModel();
@@ -113,6 +113,7 @@ private:
 
 signals:
   void            selectionChanged();
+  void            localSelectionChanged();
 
 private:
   PyModuleHelper* myHelper;

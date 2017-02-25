@@ -1163,6 +1163,45 @@ void PyModuleHelper::actionActivated()
 }
 
 /*!
+  \brief update selection from other views or modules.
+
+  Called when selection is modified outside.
+*/
+void PyModuleHelper::selectionUpdated(const QStringList& entries)
+{
+  FuncMsg fmsg( "PyModuleHelper::selectionUpdated()" );
+
+  // perform synchronous request to Python event dispatcher
+  class SelectionReq : public PyInterp_LockRequest
+  {
+  public:
+    SelectionReq( PyInterp_Interp* _py_interp,
+                  PyModuleHelper*  _helper,
+                  const QStringList& _entries )
+      : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
+        myHelper( _helper ),
+        myEntries( _entries  )
+    {}
+  protected:
+    virtual void execute()
+    {
+      myHelper->internalSelectionUpdated( myEntries );
+    }
+  private:
+    PyModuleHelper* myHelper;
+    const QStringList& myEntries;
+  };
+
+  // get sender action
+  QAction* action = qobject_cast<QAction*>( sender() );
+  if ( !action )
+    return;
+
+  // post request
+  PyInterp_Dispatcher::Get()->Exec( new SelectionReq( myInterp, this, entries ) );
+}
+
+/*!
   \brief Process context popup menu request.
   
   Called when user activates popup menu in some window
@@ -2218,6 +2257,41 @@ void PyModuleHelper::internalActionActivated( int id )
       PyErr_Print();
     }
   }
+}
+
+/*!
+  \brief update selection from other views or modules
+  \internal
+
+  Performs the following actions:
+  - calls Python module's onSelectionpdated(entries) method
+
+  \param list of entries
+*/
+void PyModuleHelper::internalSelectionUpdated(const QStringList& entries)
+{
+  FuncMsg fmsg("--- PyModuleHelper::internalSelectionUpdated()");
+
+  // Python interpreter should be initialized and Python module should be imported first
+  if (!myInterp || !myPyModule)
+    return; // Error
+
+  QStringList* theList = new QStringList(entries);
+
+#if SIP_VERSION < 0x040800
+  PyObjWrapper sipList(sipBuildResult(0, "M", theList, sipClass_QStringList));
+#else
+  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
+#endif
+  if (PyObject_HasAttrString(myPyModule, (char*) "onSelectionUpdated"))
+    {
+      PyObjWrapper res(PyObject_CallMethod(myPyModule, (char*) "onSelectionUpdated", (char*) "O", sipList.get()));
+
+      if (!res)
+        {
+          PyErr_Print();
+        }
+    }
 }
 
 /*!

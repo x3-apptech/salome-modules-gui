@@ -624,10 +624,10 @@ SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
 }
 
 
-void SALOME_PYQT_ModuleLight::setSelected( const DataObjectList&, const bool)
+void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const bool isUnused)
 {
   MESSAGE("setSelected");
-
+  return myHelper->selectionUpdated(entries);
 }
 
 
@@ -644,6 +644,6 @@ void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
        mySelector = new SALOME_PYQT_Selector(this, this->getApp()->selectionMgr());
     }
   mySelector->setLocalEntries(entries);
-  emit selectionChanged();
+  emit localSelectionChanged();
 }
 

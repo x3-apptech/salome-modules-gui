@@ -91,6 +91,7 @@ public slots:
   void                       preferenceChanged( const QString&, const QString&, const QString& setting );
   void                       studyActivated( SUIT_Study* );
   void                       actionActivated();
+  void                       selectionUpdated(const QStringList&);
   void                       contextMenu( const QString&, QMenu* );
   void                       createPreferences();
   void                       activeViewChanged( SUIT_ViewWindow* );
@@ -121,6 +122,7 @@ private:
   void                       internalPreferencesChanged( const QString&, const QString& );
   void                       internalStudyChanged( SUIT_Study* );
   void                       internalActionActivated( int );
+  void                       internalSelectionUpdated(const QStringList&);
   void                       internalContextMenu( const QString&, QMenu* );
   void                       internalCreatePreferences();
   void                       internalActiveViewChanged( SUIT_ViewWindow* );

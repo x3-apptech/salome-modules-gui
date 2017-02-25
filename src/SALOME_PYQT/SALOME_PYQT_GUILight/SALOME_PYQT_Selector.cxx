@@ -53,7 +53,7 @@ SALOME_PYQT_Selector::SALOME_PYQT_Selector(SALOME_PYQT_ModuleLight* pymod, SUIT_
   MESSAGE("constructor");
   if (myPyModule)
     {
-      connect(myPyModule, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
+      connect(myPyModule, SIGNAL(localSelectionChanged()), this, SLOT(onSelectionChanged()));
     }
   setModified();
 }
@@ -159,15 +159,15 @@ void SALOME_PYQT_Selector::setSelection(const SUIT_DataOwnerPtrList& theList)
   if (myEntries.count() == 0 || myModifiedTime < myPyModule->getModifiedTime())
     fillEntries(myEntries);
 
-  DataObjectList objList;
-  for (SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); it != theList.end(); ++it)
-    {
-      const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>((*it).operator->());
-      if (owner && myEntries.contains(owner->entry()))
-        objList.append(myEntries[owner->entry()]);
-    }
-
-  myPyModule->setSelected(objList);
+//  DataObjectList objList;
+//  for (SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); it != theList.end(); ++it)
+//    {
+//      const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>((*it).operator->());
+//      if (owner && myEntries.contains(owner->entry()))
+//        objList.append(myEntries[owner->entry()]);
+//    }
+//
+//  myPyModule->setSelected(objList);
   mySelectedList.clear();
 }
 
@@ -183,12 +183,12 @@ void SALOME_PYQT_Selector::fillEntries(QMap<QString, LightApp_DataObject*>& entr
   if (!myPyModule)
     return;
 
-  for (SUIT_DataObjectIterator it(myPyModule->root(), SUIT_DataObjectIterator::DepthLeft); it.current(); ++it)
-    {
-      LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>(it.current());
-      if (obj)
-        entries.insert(obj->entry(), obj);
-    }
+//  for (SUIT_DataObjectIterator it(myPyModule->root(), SUIT_DataObjectIterator::DepthLeft); it.current(); ++it)
+//    {
+//      LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>(it.current());
+//      if (obj)
+//        entries.insert(obj->entry(), obj);
+//    }
 
   setModified();
 }
