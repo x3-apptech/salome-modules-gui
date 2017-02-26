@@ -63,13 +63,13 @@ protected:
   virtual void       setSelection( const SUIT_DataOwnerPtrList& );
 
 private:
-  void               fillEntries( QMap<QString, LightApp_DataObject*>& );
+  void               fillEntries( QStringList& );
 
 private:
   QStringList                         myLocalEntries;
   SALOME_PYQT_ModuleLight*            myPyModule;
   SUIT_DataOwnerPtrList               mySelectedList;
-  QMap<QString, LightApp_DataObject*> myEntries;
+  QStringList                         myEntries;
   unsigned long                       myModifiedTime;
 };
 

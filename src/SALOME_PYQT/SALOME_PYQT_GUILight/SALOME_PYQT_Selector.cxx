@@ -127,6 +127,7 @@ void SALOME_PYQT_Selector::getSelection(SUIT_DataOwnerPtrList& theList) const
   MESSAGE("getSelection");
   if (mySelectedList.count() == 0)
     {
+      MESSAGE("mySelectedList.count(): " << mySelectedList.count() << " myLocalEntries.size(): "<< myLocalEntries.size());
       SALOME_PYQT_Selector* that = (SALOME_PYQT_Selector*) this; // because of const...
       for (int i = 0; i < myLocalEntries.size(); i++)
         {
@@ -156,18 +157,18 @@ void SALOME_PYQT_Selector::setSelection(const SUIT_DataOwnerPtrList& theList)
   if (!myPyModule)
     return;
 
-  if (myEntries.count() == 0 || myModifiedTime < myPyModule->getModifiedTime())
-    fillEntries(myEntries);
-
-//  DataObjectList objList;
-//  for (SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); it != theList.end(); ++it)
-//    {
-//      const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>((*it).operator->());
-//      if (owner && myEntries.contains(owner->entry()))
-//        objList.append(myEntries[owner->entry()]);
-//    }
-//
-//  myPyModule->setSelected(objList);
+  myEntries.clear();
+  for (SUIT_DataOwnerPtrList::const_iterator it = theList.begin(); it != theList.end(); ++it)
+    {
+      const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>((*it).operator->());
+      if (owner)
+        {
+          QString entry = owner->entry();
+          myEntries.append(entry);
+          MESSAGE("Selected: "<< entry.toStdString());
+        }
+    }
+  fillEntries(myEntries);
   mySelectedList.clear();
 }
 
@@ -175,21 +176,12 @@ void SALOME_PYQT_Selector::setSelection(const SUIT_DataOwnerPtrList& theList)
  \brief Fill map of the data objects currently shown in the Object Browser.
  \param entries map to be filled
  */
-void SALOME_PYQT_Selector::fillEntries(QMap<QString, LightApp_DataObject*>& entries)
+void SALOME_PYQT_Selector::fillEntries(QStringList& entries)
 {
   MESSAGE("fillEntries");
-  entries.clear();
-
   if (!myPyModule)
     return;
-
-//  for (SUIT_DataObjectIterator it(myPyModule->root(), SUIT_DataObjectIterator::DepthLeft); it.current(); ++it)
-//    {
-//      LightApp_DataObject* obj = dynamic_cast<LightApp_DataObject*>(it.current());
-//      if (obj)
-//        entries.insert(obj->entry(), obj);
-//    }
-
+  myPyModule->setSelected(entries);
   setModified();
 }
 

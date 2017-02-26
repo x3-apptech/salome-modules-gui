@@ -1170,6 +1170,7 @@ void PyModuleHelper::actionActivated()
 void PyModuleHelper::selectionUpdated(const QStringList& entries)
 {
   FuncMsg fmsg( "PyModuleHelper::selectionUpdated()" );
+  MESSAGE("selectionUpdated");
 
   // perform synchronous request to Python event dispatcher
   class SelectionReq : public PyInterp_LockRequest
@@ -1181,21 +1182,19 @@ void PyModuleHelper::selectionUpdated(const QStringList& entries)
       : PyInterp_LockRequest( _py_interp, 0, true ), // this request should be processed synchronously (sync == true)
         myHelper( _helper ),
         myEntries( _entries  )
-    {}
+    {
+      MESSAGE("SelectionReq");
+    }
   protected:
     virtual void execute()
     {
+      MESSAGE("execute");
       myHelper->internalSelectionUpdated( myEntries );
     }
   private:
     PyModuleHelper* myHelper;
     const QStringList& myEntries;
   };
-
-  // get sender action
-  QAction* action = qobject_cast<QAction*>( sender() );
-  if ( !action )
-    return;
 
   // post request
   PyInterp_Dispatcher::Get()->Exec( new SelectionReq( myInterp, this, entries ) );
@@ -2271,6 +2270,7 @@ void PyModuleHelper::internalActionActivated( int id )
 void PyModuleHelper::internalSelectionUpdated(const QStringList& entries)
 {
   FuncMsg fmsg("--- PyModuleHelper::internalSelectionUpdated()");
+  MESSAGE("internalSelectionUpdated");
 
   // Python interpreter should be initialized and Python module should be imported first
   if (!myInterp || !myPyModule)
@@ -2285,6 +2285,7 @@ void PyModuleHelper::internalSelectionUpdated(const QStringList& entries)
 #endif
   if (PyObject_HasAttrString(myPyModule, (char*) "onSelectionUpdated"))
     {
+      MESSAGE("call onSelectionUpdated");
       PyObjWrapper res(PyObject_CallMethod(myPyModule, (char*) "onSelectionUpdated", (char*) "O", sipList.get()));
 
       if (!res)

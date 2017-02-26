@@ -630,12 +630,6 @@ void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const boo
   return myHelper->selectionUpdated(entries);
 }
 
-
-//void SALOME_PYQT_ModuleLight::selectionChanged()
-//{
-//  MESSAGE("signal selectionChanged");
-//}
-
 void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
 {
   MESSAGE("setLocalSelected");
