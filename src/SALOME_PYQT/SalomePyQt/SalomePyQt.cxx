@@ -2901,7 +2901,8 @@ public:
     if ( wnd )
       {
         LightApp_Application* app  = getApplication();
-        app->setActiveViewManager(wnd->getViewManager());
+        app->desktop()->windowActivated(wnd);
+        //app->setActiveViewManager(wnd->getViewManager());
         wnd->setFocus();
         myResult = true;
       }
