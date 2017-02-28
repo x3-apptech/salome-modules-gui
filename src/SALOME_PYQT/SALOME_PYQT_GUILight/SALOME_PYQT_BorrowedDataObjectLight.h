@@ -32,6 +32,9 @@
 
 /*!
  * SALOME_PYQT_BorrowedDataObjectLight - PYTHON LIGHT module's data object class
+ * for objects created by other modules and referenced in a light module.
+ * Used to propagate selection in a light module client of other modules publishing objects in study.
+ * (copied from SALOME_PYQT_DataObjectLight)
  */
 class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_BorrowedDataObjectLight : public virtual LightApp_DataObject
 {

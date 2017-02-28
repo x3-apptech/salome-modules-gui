@@ -33,7 +33,9 @@
 
 /*!
  *  Class:       SALOME_PYQT_BorrowedDataObjectLight
- *  Description: LIGHT PYTHON module's Borrowed data object: reference objects from other modules
+ *  Description: LIGHT PYTHON module's Borrowed data object: reference objects from other modules.
+ *  Used to propagate selection in a light module client of other modules publishing objects in study.
+ *  (copied from SALOME_PYQT_DataObjectLight)
  */
 
 //=================================================================================

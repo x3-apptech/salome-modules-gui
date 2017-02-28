@@ -2882,7 +2882,10 @@ bool SalomePyQt::activateView( const int id )
 }
 
 /*!
- *
+  \fn bool SalomePyQt::activateManagerAndView( const int id );
+  \brief Activate view manager and view: useful for a view embedded in a module main Window
+  \param id window identifier
+  \return \c true if operation is completed successfully and \c false otherwise
  */
 
 class TActivateViewManagerAndView: public SALOME_Event
@@ -2901,8 +2904,7 @@ public:
     if ( wnd )
       {
         LightApp_Application* app  = getApplication();
-        app->desktop()->windowActivated(wnd);
-        //app->setActiveViewManager(wnd->getViewManager());
+        app->desktop()->windowActivated(wnd); // equivalent to app->setActiveViewManager(wnd->getViewManager())
         wnd->setFocus();
         myResult = true;
       }

@@ -605,31 +605,44 @@ SALOME_PYQT_DataObjectLight* SALOME_PYQT_ModuleLight::findObject( const QString&
   return obj;
 }
 
+/*!
+  \brief not used yet
+*/
 void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
 {
   MESSAGE("getSelected");
 }
 
+/*!
+  \brief not used yet
+*/
 unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
 {
   MESSAGE("getModifiedTime");
-
 }
 
-
+/*!
+  \brief not used yet
+*/
 SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
 {
   MESSAGE("root");
-
 }
 
-
+/*!
+  \brief Used to notify a Python light module of a modification of selection in study (propagation of a remote selection)
+  \param list of study entries
+*/
 void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const bool isUnused)
 {
   MESSAGE("setSelected");
   return myHelper->selectionUpdated(entries);
 }
 
+/*!
+  \brief called by Python module to notify a list of study entries locally selected (for selection propagation)
+  \param list of study entries
+*/
 void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
 {
   MESSAGE("setLocalSelected");
