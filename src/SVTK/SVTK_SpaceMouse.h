@@ -29,7 +29,7 @@
 
 #include <QtGlobal>
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 extern "C"
 {
 #include <X11/X.h>
@@ -39,7 +39,6 @@ extern "C"
 #include <xcb/xcb.h>
 #endif
 }
-
 #endif
 
 class SVTK_SpaceMouse 
@@ -76,7 +75,7 @@ public:
   // access to SpaceMouse utility class
   static SVTK_SpaceMouseX* getInstance();
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   int initialize     ( Display*, Window );
   int setWindow      ( Display*, Window );
   int translateEvent ( Display*, XEvent*, MoveEvent*, double, double );
@@ -93,7 +92,9 @@ private:
   static SVTK_SpaceMouseX* myInstance;
 
 };
+
 #else
+
 class SVTK_SpaceMouseXCB: public SVTK_SpaceMouse
 {
 
@@ -103,7 +104,7 @@ public:
   // access to SpaceMouse utility class
   static SVTK_SpaceMouseXCB* getInstance();
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   int initialize     ( xcb_connection_t*, xcb_window_t );
   int setWindow      ( xcb_connection_t*, xcb_window_t );
   int translateEvent ( xcb_connection_t*, xcb_client_message_event_t*, MoveEvent*, double, double );
@@ -119,5 +120,6 @@ private:
   static SVTK_SpaceMouseXCB* myInstance;
 
 };
+
 #endif
 #endif

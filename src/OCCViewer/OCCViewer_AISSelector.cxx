@@ -157,8 +157,7 @@ bool OCCViewer_AISSelector::moveTo ( int x, int y, const Handle (V3d_View)& view
     return false;
   
   AIS_StatusOfDetection status = AIS_SOD_Error;
-  status = myAISContext->MoveTo (x, y, view);
-  
+  status = myAISContext->MoveTo ( x, y, view, Standard_True );
   return ( status != AIS_SOD_Error && status != AIS_SOD_AllBad );
 }
 
@@ -177,7 +176,7 @@ bool OCCViewer_AISSelector::select ()
   bool hadSelection = ( myNumSelected > 0 );
   
   /* select and send notifications */
-  return checkSelection ( myAISContext->Select(), hadSelection, false );
+  return checkSelection ( myAISContext->Select( Standard_True ), hadSelection, false );
 }
 
 /*!
@@ -197,8 +196,8 @@ bool OCCViewer_AISSelector::select ( int left, int top, int right, int bottom,
   bool hadSelection = ( myNumSelected > 0 );
   
   /* select and send notifications */
-  return checkSelection ( myAISContext->Select(left, top, right, bottom, view),
-                          hadSelection, false );
+  return checkSelection ( myAISContext->Select( left, top, right, bottom, view, Standard_True ),
+			  hadSelection, false );
 }
 
 /*!
@@ -219,7 +218,7 @@ bool OCCViewer_AISSelector::shiftSelect ()
     return false;
   
   /* select and send notifications */
-  return checkSelection ( myAISContext->ShiftSelect(), hadSelection, true );
+  return checkSelection ( myAISContext->ShiftSelect( Standard_True ), hadSelection, true );
 }
 
 /*!
@@ -243,6 +242,6 @@ bool OCCViewer_AISSelector::shiftSelect ( int left, int top, int right, int bott
     return false;
   
   /* select and send notifications */
-  return checkSelection ( myAISContext->ShiftSelect(left,top,right,bottom, view),
-    hadSelection, true );
+  return checkSelection ( myAISContext->ShiftSelect( left, top, right, bottom, view, Standard_True ),
+			  hadSelection, true );
 }

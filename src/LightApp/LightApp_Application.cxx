@@ -1849,12 +1849,10 @@ void LightApp_Application::studyCreated( SUIT_Study* s )
 }
 
 /*!Gets file filter.
- *\retval QString "(*.bin)"
+ *\retval QString "(*.hdf)"
  */
-QString LightApp_Application::getFileFilter() const
+QString LightApp_Application::getFileFilter( bool /*open*/) const
 {
-  //return "(*.bin)";
-  // HDF persistence
   return "(*.hdf)";
 }
 
@@ -4471,8 +4469,10 @@ bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
   bool isPythonLightModule = lib.contains("SalomePyQtGUILight");
 
   QStringList paths;
-#ifdef WIN32
+#if defined(WIN32)
   paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
+#elif defined(__APPLE__)
+  paths = QString(::getenv( "DYLD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
 #else
   paths = QString(::getenv( "LD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
 #endif

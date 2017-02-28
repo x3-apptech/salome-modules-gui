@@ -1096,7 +1096,7 @@ GLboolean GLViewer_Polyline::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer
     GLfloat xa, xb, ya, yb, l;
     GLfloat rsin, rcos, r, ra, rb;
     // GLboolean update;
-    GLboolean selected = myIsSel;
+    // GLboolean selected = myIsSel;
 
     myIsSel = GL_FALSE;
 

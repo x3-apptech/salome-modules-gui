@@ -30,7 +30,7 @@
 
 #include <QtGlobal>
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 #include <X11/X.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -64,7 +64,7 @@ SVTK_SpaceMouse::SVTK_SpaceMouse()
 SVTK_SpaceMouseX::SVTK_SpaceMouseX()
 : SVTK_SpaceMouse()
 {
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   win = InputFocus;
 #endif
 }
@@ -79,7 +79,7 @@ SVTK_SpaceMouseX* SVTK_SpaceMouseX::getInstance()
   return myInstance;
 }
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 
 static int errorCallback( Display *display, XErrorEvent *Error )
 {
@@ -232,7 +232,7 @@ int SVTK_SpaceMouseX::translateEvent( Display* display, XEvent* xEvent, MoveEven
 SVTK_SpaceMouseXCB::SVTK_SpaceMouseXCB()
 : SVTK_SpaceMouse()
 {
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   win = InputFocus;
 #endif
 }
@@ -249,7 +249,7 @@ SVTK_SpaceMouseXCB* SVTK_SpaceMouseXCB::getInstance()
 /*!
   Initialization
 */
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 int SVTK_SpaceMouseXCB::initialize( xcb_connection_t *connection, xcb_window_t window )
 {
   // make request

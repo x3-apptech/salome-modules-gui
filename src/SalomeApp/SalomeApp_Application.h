@@ -87,8 +87,6 @@ public:
 
   virtual void                        updateObjectBrowser( const bool = true );
 
-  virtual QString                     getFileFilter() const;
-
   virtual void                        start();
 
   virtual void                        contextMenuPopup( const QString&, QMenu*, QString& );

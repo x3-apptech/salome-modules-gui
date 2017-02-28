@@ -57,6 +57,9 @@
 #include <QRegExp>
 #include <QString>
 #include <QStringList>
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+#include <QSurfaceFormat>
+#endif
 
 #include <stdlib.h>
 
@@ -178,6 +181,15 @@ int main( int argc, char* argv[] )
       QLocale::setDefault( QLocale::system() );
     }
   }
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+  // initialization of the X11 visual on Linux
+  QSurfaceFormat format;
+  format.setDepthBufferSize(16);
+  format.setStencilBufferSize(1);
+  format.setProfile(QSurfaceFormat::CompatibilityProfile);
+  QSurfaceFormat::setDefaultFormat(format);
+#endif
 
   // add <qtdir>/plugins directory to the pluins search path for image plugins
   QString qtdir = Qtx::qtDir( "plugins" );

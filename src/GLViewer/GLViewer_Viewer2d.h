@@ -38,7 +38,11 @@ class QFile;
 
 #include <TColStd_SequenceOfInteger.hxx>
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 class GLViewer_Object;
 class GLViewer_ViewFrame;

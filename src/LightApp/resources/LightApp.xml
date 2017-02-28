@@ -281,7 +281,7 @@
     <!-- External HELP browser settings -->
     <parameter name="winapplication"       value="C:\Program Files\Internet Explorer\iexplore.exe" />
     <parameter name="use_external_browser" value="false" />
-    <parameter name="application"          value="/usr/bin/mozilla" />
+    <parameter name="application"          value="/usr/bin/firefox" />
     <parameter name="parameters"           value="" />
   </section>
   <section name="add_help">

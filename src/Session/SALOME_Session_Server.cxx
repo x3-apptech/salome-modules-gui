@@ -77,6 +77,9 @@
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QTextStream>
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+#include <QSurfaceFormat>
+#endif
 
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
@@ -213,8 +216,8 @@ protected:
 #endif
       QString fname = QFileInfo( _fname ).fileName();
       if ( exp.exactMatch( fname ) ) {
-	long fid = Qtx::versionToId( exp.cap( 1 ) );
-	if ( fid > 0 ) id = fid;
+        long fid = Qtx::versionToId( exp.cap( 1 ) );
+        if ( fid > 0 ) id = fid;
       }
     }
     return id;
@@ -248,7 +251,7 @@ class SALOME_QApplication : public QApplication
 public:
   SALOME_QApplication( int& argc, char** argv )
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if !defined WIN32 && QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#if !defined(WIN32) && !defined(__APPLE__) && (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
   // san: Opening an X display and choosing a visual most suitable for 3D visualization
   // in order to make SALOME viewers work with non-native X servers
   : QApplication( (Display*)Qtx::getDisplay(), argc, argv, Qtx::getVisual() ),
@@ -366,6 +369,15 @@ int main( int argc, char **argv )
       QLocale::setDefault( QLocale::system() );
     }
   }
+  
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+  // initialization of the X11 visual on Linux
+  QSurfaceFormat format;
+  format.setDepthBufferSize(16);
+  format.setStencilBufferSize(1);
+  format.setProfile(QSurfaceFormat::CompatibilityProfile);
+  QSurfaceFormat::setDefaultFormat(format);
+#endif
 
   // Create Qt application instance;
   // this should be done the very first!
@@ -550,8 +562,8 @@ int main( int argc, char **argv )
       SALOME::StatSession stat = session->GetStatSession();
       shutdownSession = stat.state == SALOME::shutdown;
       if ( shutdownSession ) {
-	_SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
-	break;
+        _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
+        break;
       }
 
       // SUIT_Session creation

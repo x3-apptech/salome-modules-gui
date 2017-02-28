@@ -34,7 +34,27 @@
 # ifndef GLX_GLXEXT_LEGACY
 #  define GLX_GLXEXT_LEGACY
 # endif
+#ifdef __APPLE__
+#import <mach-o/dyld.h>
+#import <stdlib.h>
+#import <string.h>
+void * glXGetProcAddressARB (const GLubyte *name)
+
+{
+    NSSymbol symbol;
+    char *symbolName;
+    symbolName = (char *)malloc (strlen ((const char *)name) + 2); // 1
+    strcpy(symbolName + 1, (const char *)name); // 2
+    symbolName[0] = '_'; // 3
+    symbol = NULL;
+    if (NSIsSymbolNameDefined (symbolName)) // 4
+        symbol = NSLookupAndBindSymbol (symbolName);
+    free (symbolName); // 5
+    return symbol ? NSAddressOfSymbol (symbol) : NULL; // 6
+}
+#else
 # include <GL/glx.h>
+#endif
 # include <dlfcn.h>
 #else
 # include <wingdi.h>

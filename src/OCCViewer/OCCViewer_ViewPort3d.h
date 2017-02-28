@@ -65,8 +65,10 @@ public:
 //   void         setActive( V3d_TypeOfView );
   virtual bool          syncronize( const OCCViewer_ViewPort3d* );
 
+#if OCC_VERSION_LARGE <= 0x07000000
   double                getZSize() const;
   void                  setZSize( double );
+#endif
 
   void                  getAxialScale( double&, double&, double& );
 

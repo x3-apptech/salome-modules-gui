@@ -34,7 +34,7 @@
 // QT Includes
 // Put Qt includes before the X11 includes which #define the symbol None
 // (see SVTK_SpaceMouse.h) to avoid the compilation error.
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <xcb/xcb.h>
 #endif
@@ -84,7 +84,7 @@ QVTK_RenderWindowInteractor
   myRenderWindow->Delete();
   myRenderWindow->DoubleBufferOn();
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   myRenderWindow->SetDisplayId((void*)QX11Info::display());
 #endif
   myRenderWindow->SetWindowId((void*)winId());
@@ -112,7 +112,7 @@ QVTK_RenderWindowInteractor
 QVTK_RenderWindowInteractor
 ::~QVTK_RenderWindowInteractor() 
 {
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
   if ( aSpaceMouse && aSpaceMouse->isSpaceMouseOn() )
@@ -415,7 +415,7 @@ QVTK_RenderWindowInteractor
 {
   QWidget::focusInEvent( event );
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   // register set space mouse events receiver
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
@@ -451,7 +451,7 @@ QVTK_RenderWindowInteractor
 {
   QWidget::focusOutEvent( event );
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
   // unregister set space mouse events receiver
   SVTK_SpaceMouseX* aSpaceMouse = SVTK_SpaceMouseX::getInstance();
@@ -467,7 +467,7 @@ QVTK_RenderWindowInteractor
 
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#ifdef WIN32
+#if defined(WIN32)
 
 /*!
   To handle native Win32 events (from such devices as SpaceMouse)
@@ -478,8 +478,7 @@ bool QVTK_RenderWindowInteractor::winEvent( MSG* msg, long* result )
   return QWidget::winEvent( msg, result);
 }
 
-#else
-
+#elif !defined(__APPLE__)
 /*!
   To handle native X11 events (from such devices as SpaceMouse)
 */
@@ -519,9 +518,9 @@ QVTK_RenderWindowInteractor
 bool QVTK_RenderWindowInteractor
 ::nativeEvent(const QByteArray& eventType, void* message, long* result)
 {
-#ifdef WIN32
+#if defined(WIN32)
   // TODO: WIN32-related implementation
-#else
+#elif !defined(__APPLE__)
   if ( eventType == "xcb_generic_event_t" )
   {
     xcb_generic_event_t* ev = static_cast<xcb_generic_event_t *>(message);

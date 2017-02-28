@@ -48,7 +48,7 @@ public:
 
   Handle(TDocStd_Application) stdApp() const;
 
-  virtual QString             getFileFilter() const;
+  virtual QString             getFileFilter( bool ) const;
 
 public slots:  
   virtual void                onHelpAbout();

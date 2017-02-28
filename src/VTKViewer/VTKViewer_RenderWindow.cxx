@@ -31,7 +31,7 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRendererCollection.h>
 #include <vtkCamera.h>
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 #include <QX11Info>
 #include <vtkXOpenGLRenderWindow.h>
 #endif
@@ -47,7 +47,7 @@ QWidget(parent, Qt::FramelessWindowHint )
   setAttribute( Qt::WA_DeleteOnClose );
 
   myRW = vtkRenderWindow::New();
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
   myRW->SetDisplayId((void*)(QX11Info::display()));
 #endif
   myRW->SetWindowId((void*)winId());

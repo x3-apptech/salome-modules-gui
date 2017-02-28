@@ -129,13 +129,15 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 
   // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
-#if OCC_VERSION_LARGE > 0x07000000
-    
+#if OCC_VERSION_LARGE > 0x07010000
+  myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor( Quantity_NOC_WHITE );
+  myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_Selected)->SetColor( Quantity_NOC_WHITE );
+#elif OCC_VERSION_LARGE > 0x07000000
   const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
-  sStyle->SetColor( Quantity_NOC_WHITE ); 
-#else  
+  sStyle->SetColor( Quantity_NOC_WHITE );
+#else
   myAISContext->SelectionColor( Quantity_NOC_WHITE );
-#endif  
+#endif
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
@@ -347,7 +349,7 @@ void OCCViewer_Viewer::onMouseMove(SUIT_ViewWindow* theWindow, QMouseEvent* theE
     }
     Handle(V3d_View) aView3d = aView->getViewPort()->getView();
     if ( !aView3d.IsNull() ) {
-      myAISContext->MoveTo(theEvent->x(), theEvent->y(), aView3d);
+      myAISContext->MoveTo( theEvent->x(), theEvent->y(), aView3d, Standard_True );
     }
   }
 }
@@ -379,14 +381,14 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
     if ( !isPreselectionEnabled() ) {
       Handle(V3d_View) aView3d = aView->getViewPort()->getView();
       if ( !aView3d.IsNull() ) {
-	myAISContext->MoveTo(myEndPnt.x(), myEndPnt.y(), aView3d);
+	myAISContext->MoveTo( myEndPnt.x(), myEndPnt.y(), aView3d, Standard_True );
       }
     }
 
     if (aHasShift && myMultiSelectionEnabled)
-      myAISContext->ShiftSelect();
-    else
-      myAISContext->Select();
+      myAISContext->ShiftSelect( Standard_True );
+    else 
+      myAISContext->Select( Standard_True );
   }
   else
   {
@@ -438,14 +440,14 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
     if ( !isPreselectionEnabled() ) {
       Handle(V3d_View) aView3d = aView->getViewPort()->getView();
       if ( !aView3d.IsNull() ) {
-	myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d);
+	myAISContext->MoveTo(myCurPnt.x(), myCurPnt.y(), aView3d, Standard_True );
       }
     }
 
     if (aHasShift && myMultiSelectionEnabled)
-      myAISContext->ShiftSelect();
+      myAISContext->ShiftSelect( Standard_True );
     else
-      myAISContext->Select();
+      myAISContext->Select( Standard_True );
 
     emit selectionChanged();
 
@@ -1287,7 +1289,7 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
     myAISContext->Deactivate( myTrihedron );
   }
   else {
-    myAISContext->Erase( myTrihedron );
+    myAISContext->Erase( myTrihedron , Standard_True );
   }
 }
 

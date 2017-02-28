@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
         <source>EXTERNAL_BROWSER_CANNOT_SHOW_PAGE</source>
-        <translation>External browser &quot;%1&quot; can not show help page &quot;%2&quot;. Do you want to change it in preferences?</translation>
+        <translation>External browser &quot;%1&quot; can not show help page &quot;%2&quot;. Do you want to change the browser's settings in preferences?</translation>
     </message>
     <message>
         <source>ABOUT_COPYRIGHT</source>

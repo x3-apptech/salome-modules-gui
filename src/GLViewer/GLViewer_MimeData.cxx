@@ -235,8 +235,8 @@ const char* GLViewer_MimeData::format( int theIndex ) const
 */
 QByteArray GLViewer_MimeData::encodedData( const char* theObjectType ) const
 {
-    if( theObjectType == "GLViewer_Objects" )
-        return myByteArray;
-    
-    return QByteArray();
+  if ( theObjectType && strcmp( theObjectType, "GLViewer_Objects" ) == 0 )
+    return myByteArray;
+
+  return QByteArray();
 }

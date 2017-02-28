@@ -359,13 +359,30 @@ void QtxMenu::setTitleAlignment( const Qt::Alignment a )
 }
 
 /*!
- * \brief Append a title to the and of the menu
- *  \param [in] text - title text
- */
-void QtxMenu::appendGroupTitle( const QString& text )
+  \brief Append group title to the end of the menu.
+  \param text group title's text
+*/
+void QtxMenu::addGroup( const QString& text )
 {
   Title* aTitle = new Title( this );
   aTitle->setText( text );
+
+  QWidgetAction* anAction = new QWidgetAction( this );
+  anAction->setDefaultWidget( aTitle );
+
+  addAction( anAction );
+}
+
+/*!
+  \brief Append group title to the end of the menu.
+  \param icon group title's icon
+  \param text group title's text
+*/
+void QtxMenu::addGroup( const QIcon& icon, const QString& text )
+{
+  Title* aTitle = new Title( this );
+  aTitle->setText( text );
+  aTitle->setIcon( icon );
 
   QWidgetAction* anAction = new QWidgetAction( this );
   anAction->setDefaultWidget( aTitle );

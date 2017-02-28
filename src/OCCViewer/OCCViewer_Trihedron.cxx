@@ -21,7 +21,11 @@
 #include <windows.h>
 #endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include "OCCViewer_Trihedron.h"
 
@@ -37,7 +41,7 @@
 #include <PrsMgr_PresentationManager3d.hxx>
 
 
-#ifndef WIN32
+#if !defined WIN32 && !defined __APPLE__
 # include <GL/glx.h>
 #endif
 
@@ -122,7 +126,7 @@ GLuint generateTextList()
   bool ok = false;
   GLuint aList = glGenLists( 256 );
 
-#ifdef WIN32
+#if defined(WIN32)
   HGLRC hglrc = wglGetCurrentContext();
   if( hglrc )
   {
@@ -142,7 +146,7 @@ GLuint generateTextList()
     SelectObject( hdc, oldFont );
     DeleteObject( font );
   }
-#else // X Window
+#elif !defined(__APPLE__) // X Window
   Display* dpy = glXGetCurrentDisplay();
   if( dpy )
   {

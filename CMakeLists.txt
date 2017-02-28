@@ -37,7 +37,7 @@ SET(${PROJECT_NAME_UC}_MINOR_VERSION 2)
 SET(${PROJECT_NAME_UC}_PATCH_VERSION 0)
 SET(${PROJECT_NAME_UC}_VERSION
   ${${PROJECT_NAME_UC}_MAJOR_VERSION}.${${PROJECT_NAME_UC}_MINOR_VERSION}.${${PROJECT_NAME_UC}_PATCH_VERSION})
-SET(${PROJECT_NAME_UC}_VERSION_DEV 0)
+SET(${PROJECT_NAME_UC}_VERSION_DEV 1)
 
 # Common CMake macros
 # ===================
@@ -341,12 +341,6 @@ SET(_${PROJECT_NAME}_exposed_targets
     QDS qtx SalomePrs SalomeStyle std SUITApp suit ViewerTools ViewerData
     ImageComposer
 )
-
-# CAF package (not compilable while TDocStd_Application::Formats is removed)
-IF(CAS_VERSION_STR VERSION_LESS "7.0.1")
-  LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       caf)
-ENDIF()
 
 IF(SALOME_USE_OCCVIEWER OR SALOME_USE_VTKVIEWER OR SALOME_USE_GLVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 

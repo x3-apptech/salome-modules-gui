@@ -115,7 +115,11 @@ static QEvent* l_mbPressEvent = 0;
 //# include <QWindowsStyle>
 //#endif
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 // To avoid conflict between KeyPress from the X.h (define KeyPress 2)
 // and QEvent::KeyPress (qevent.h)
@@ -406,7 +410,9 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
           int x1 = (int)( aEvent->x() + width()*delta/100 );
           int y1 = (int)( aEvent->y() + height()*delta/100 );
           myViewPort->zoom( x, y, x1, y1 );
+#if OCC_VERSION_LARGE <= 0x07000000
           myViewPort->getView()->ZFitAll();
+#endif
           emit vpTransformationFinished ( ZOOMVIEW );
         }
       }
@@ -536,7 +542,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
         if ( theEvent->button() == Qt::LeftButton )
         {
           Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-          ic->Select();
+          ic->Select( Standard_True );
           for ( ic->InitSelected(); ic->MoreSelected(); ic->NextSelected() )
           {
             TopoDS_Shape aShape = ic->SelectedShape();
@@ -575,7 +581,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
           }
           if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
           if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
-          ic->CloseAllContexts();
+          ic->CloseAllContexts( Standard_True );
           myOperation = NOTHING;
           myViewPort->setCursor( myCursor );
           myCursorIsHand = false;
@@ -770,7 +776,7 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    ic->CloseAllContexts();
+    ic->CloseAllContexts( Standard_True );
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
@@ -810,7 +816,7 @@ void OCCViewer_ViewWindow::activateSetRotationSelected( double theX, double theY
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    ic->CloseAllContexts();
+    ic->CloseAllContexts( Standard_True );
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
@@ -1060,7 +1066,9 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 
   case PANVIEW:
   case ZOOMVIEW:
+#if OCC_VERSION_LARGE <= 0x07000000
     myViewPort->getView()->ZFitAll();
+#endif
     resetState();
     break;
 
@@ -3667,8 +3675,9 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
 #endif
 
   getViewPort()->setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
-
+#if OCC_VERSION_LARGE <= 0x07000000
   aDestView->ZFitAll();
+#endif
   aDestView->SetImmediateUpdate( Standard_True );
   aDestView->Redraw();
 

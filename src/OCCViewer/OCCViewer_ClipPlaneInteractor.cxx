@@ -406,7 +406,7 @@ void OCCViewer_ClipPlaneInteractor::performDragging( const QPoint& theDragPos,
       thePlane->SetToUpdate();
       thePlane->UpdateSelection();
 
-      myViewer->getAISContext()->Update( thePlane );
+      myViewer->getAISContext()->Update( thePlane , Standard_True );
     }
     break;
 
@@ -447,7 +447,7 @@ void OCCViewer_ClipPlaneInteractor::performDragging( const QPoint& theDragPos,
       thePlane->SetToUpdate();
       thePlane->UpdateSelection();
 
-      myViewer->getAISContext()->Update( thePlane );
+      myViewer->getAISContext()->Update( thePlane , Standard_True );
     }
     break;
   }
@@ -495,7 +495,7 @@ bool OCCViewer_ClipPlaneInteractor::mousePress( QMouseEvent* theEvent,
   Handle(AIS_InteractiveContext) anAISContext = myViewer->getAISContext();
 
   // check detection of plane
-  anAISContext->MoveTo( theEvent->x(), theEvent->y(), aView3D );
+  anAISContext->MoveTo( theEvent->x(), theEvent->y(), aView3D , Standard_True );
 
   if ( !anAISContext->HasDetected() )
   {
@@ -522,7 +522,7 @@ bool OCCViewer_ClipPlaneInteractor::mousePress( QMouseEvent* theEvent,
   // process mouse click on the object
   if ( myIsClickable )
   {
-    myViewer->getAISContext()->SetSelected( Handle(AIS_InteractiveObject)::DownCast(aPlane) );
+    myViewer->getAISContext()->SetSelected( Handle(AIS_InteractiveObject)::DownCast(aPlane) , Standard_True );
     emit planeClicked( aPlane );
   }
 

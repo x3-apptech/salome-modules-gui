@@ -26,7 +26,11 @@
 //
 #include "GLViewer_Tools.h"
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include <iostream>
 #include <string.h>

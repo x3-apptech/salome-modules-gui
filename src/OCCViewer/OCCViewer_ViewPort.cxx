@@ -40,7 +40,7 @@
 
 #include <stdlib.h>
 
-#if !defined WIN32
+#if !defined WIN32 && !defined __APPLE__
 #include <QX11Info>
 #include <GL/glx.h>
 #include <X11/Xlib.h>
@@ -236,7 +236,7 @@ void OCCViewer_ViewPort::cleanup()
 */
 void OCCViewer_ViewPort::selectVisualId()
 {
-#if !defined WIN32
+#if !defined WIN32 && !defined __APPLE__
   XVisualInfo* pVisualInfo;
   if ( QX11Info::display() )
   {

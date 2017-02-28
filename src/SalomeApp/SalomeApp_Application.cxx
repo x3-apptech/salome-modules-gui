@@ -969,14 +969,6 @@ void SalomeApp_Application::onDockWindowVisibilityChanged( bool theIsVisible )
     objectBrowserColumnsVisibility();
 }
 
-/*!Gets file filter.
- *\retval QString "(*.hdf)"
- */
-QString SalomeApp_Application::getFileFilter() const
-{
-  return "(*.hdf)";
-}
-
 /*!Create window.*/
 QWidget* SalomeApp_Application::createWindow( const int flag )
 {
@@ -2082,7 +2074,7 @@ bool SalomeApp_Application::checkExistingDoc()
 
 PyConsole_Interp* SalomeApp_Application::createPyInterp()
 {
-  return new SalomeApp_PyInterp();
+  return new SalomeApp_PyInterp;
 }
 
 #endif // DISABLE_PYCONSOLE

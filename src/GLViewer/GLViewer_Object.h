@@ -34,7 +34,11 @@
 #include "GLViewer.h"
 #include "GLViewer_Geom.h"
 
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include <QString>
 
