@@ -180,6 +180,8 @@ void SALOME_PYQT_ModuleLight::onModelClosed()
 {
   // call helper
   myHelper->modelClosed(application()->activeStudy());
+  if (mySelector)
+    mySelector->clear();
   LightApp_Module::onModelClosed();
 }
 
