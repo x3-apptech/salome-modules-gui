@@ -54,6 +54,7 @@ public:
   unsigned long      getModifiedTime() const;
   void               setModified();
   void               setLocalEntries(const QStringList& entries) { myLocalEntries = entries; };
+  void               clear();
 
 private slots:
   void               onSelectionChanged();

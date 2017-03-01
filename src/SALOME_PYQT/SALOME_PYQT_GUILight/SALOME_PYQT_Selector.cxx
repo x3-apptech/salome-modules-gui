@@ -51,6 +51,10 @@ SALOME_PYQT_Selector::SALOME_PYQT_Selector(SALOME_PYQT_ModuleLight* pymod, SUIT_
     SUIT_Selector(mgr, pymod), myPyModule(pymod)
 {
   MESSAGE("constructor");
+  myLocalEntries.clear();
+  mySelectedList.clear();
+  myEntries.clear();
+  myModifiedTime = 0;
   if (myPyModule)
     {
       connect(myPyModule, SIGNAL(localSelectionChanged()), this, SLOT(onSelectionChanged()));
@@ -64,6 +68,17 @@ SALOME_PYQT_Selector::SALOME_PYQT_Selector(SALOME_PYQT_ModuleLight* pymod, SUIT_
 SALOME_PYQT_Selector::~SALOME_PYQT_Selector()
 {
   MESSAGE("destructor");
+}
+
+/*!
+ \brief Reset selection internally. Used on close study.
+ */
+void SALOME_PYQT_Selector::clear()
+{
+  MESSAGE("clear");
+  myLocalEntries.clear();
+  mySelectedList.clear();
+  myEntries.clear();
 }
 
 /*!
