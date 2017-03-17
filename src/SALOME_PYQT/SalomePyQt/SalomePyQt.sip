@@ -407,7 +407,7 @@ public:
   static bool              activateView( const int ) /ReleaseGIL/ ;
   static bool              activateViewManagerAndView( const int ) /ReleaseGIL/ ;
   static QWidget*          getViewWidget( const int ) /ReleaseGIL/ ;
-  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 ) /ReleaseGIL/ ;
+  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0, bool detached = false ) /ReleaseGIL/ ;
   static int               createView( const QString&, QWidget* ) /ReleaseGIL/ ;
   static bool              closeView( const int ) /ReleaseGIL/ ;
   static int               cloneView( const int ) /ReleaseGIL/ ;

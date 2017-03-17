@@ -2961,17 +2961,19 @@ public:
   bool myVisible;
   int myWidth;
   int myHeight;
-  TCreateView( const QString& theType, bool visible, const int width, const int height )
+  bool myDetached;
+  TCreateView( const QString& theType, bool visible, const int width, const int height, bool detached )
     : myResult( -1 ),
       myType( theType ),
       myVisible(visible),
       myWidth(width),
-      myHeight(height) {}
+      myHeight(height),
+      myDetached(detached) {}
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
     if ( app ) {
-      SUIT_ViewManager* viewMgr = app->createViewManager( myType );
+      SUIT_ViewManager* viewMgr = app->createViewManager( myType, myDetached );
       if ( viewMgr ) {
         QWidget* wnd = viewMgr->getActiveView();
         myResult = viewMgr->getActiveView()->getId();
@@ -2994,9 +2996,9 @@ public:
     }
   }
 };
-int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height )
+int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height, bool detached )
 {
-  int ret = ProcessEvent( new TCreateView( type, visible, width, height ) );
+  int ret = ProcessEvent( new TCreateView( type, visible, width, height, detached ) );
   QCoreApplication::processEvents();
   return ret;
 }

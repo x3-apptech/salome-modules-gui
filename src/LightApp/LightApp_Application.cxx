@@ -1495,7 +1495,7 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
   Creates view manager of some type
   \param vmType - type of view manager
 */
-SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType )
+SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType, bool detached )
 {
   SUIT_ResourceMgr* resMgr = resourceMgr();
 
@@ -1653,6 +1653,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
   if ( !viewMgr )
     return 0;
 
+  viewMgr->setDetached(detached);
   addViewManager( viewMgr );
   SUIT_ViewWindow* viewWin = viewMgr->createViewWindow();
 

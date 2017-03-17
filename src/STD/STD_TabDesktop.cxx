@@ -23,6 +23,7 @@
 #include "STD_TabDesktop.h"
 
 #include <SUIT_Session.h>
+#include <SUIT_ViewManager.h>
 #include <SUIT_ViewWindow.h>
 #include <SUIT_ResourceMgr.h>
 
@@ -133,6 +134,12 @@ void STD_TabDesktop::addWindow( QWidget* w )
 {
   if ( !w || !workstack() )
     return;
+  if ( w && w->inherits( "SUIT_ViewWindow" ) )
+	{
+	  SUIT_ViewWindow* wid = (SUIT_ViewWindow*)w;
+	  if ( wid->getViewManager()->getDetached() )
+		return;
+	}
 
   workstack()->addWindow( w );
 }
