@@ -270,6 +270,8 @@ public:
   static QMenu*            getPopupMenu( const MenuName ) /ReleaseGIL/ ;
   static QMenu*            getPopupMenu( const QString& ) /ReleaseGIL/ ;
   static QTreeView*        getObjectBrowser() /ReleaseGIL/ ;
+  static void              enableSelector() /ReleaseGIL/ ;
+  static void              disableSelector() /ReleaseGIL/ ;
   static SALOME_Selection* getSelection() /Factory,ReleaseGIL/ ;
   static void              setSelection( const QStringList& ) /ReleaseGIL/ ;
   static int               getStudyId() /ReleaseGIL/ ;

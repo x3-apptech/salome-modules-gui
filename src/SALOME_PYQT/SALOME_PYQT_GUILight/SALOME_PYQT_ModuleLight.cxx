@@ -656,3 +656,19 @@ void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
   emit localSelectionChanged();
 }
 
+void SALOME_PYQT_ModuleLight::enableSelector()
+{
+  MESSAGE("enableSelector");
+  if (!mySelector)
+    {
+	  mySelector = new SALOME_PYQT_Selector(this, this->getApp()->selectionMgr());
+    }
+  mySelector->setEnabled(true);
+}
+
+void SALOME_PYQT_ModuleLight::disableSelector()
+{
+  MESSAGE("disableSelector");
+  if (mySelector)
+	mySelector->setEnabled(false);
+}

@@ -168,6 +168,8 @@ public:
   static QMenu*            getPopupMenu( const MenuName );
   static QMenu*            getPopupMenu( const QString& );
   static QTreeView*        getObjectBrowser();
+  static void              enableSelector();
+  static void              disableSelector();
   static SALOME_Selection* getSelection();
   static void              setSelection( const QStringList& );
   static int               getStudyId();
