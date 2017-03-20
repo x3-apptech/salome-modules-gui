@@ -91,7 +91,7 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
 #endif
   }
 
-#if OCC_VERSION_LARGE > 0x07010000
+#if OCC_VERSION_LARGE > 0x07010001
   return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
 			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD,
 			 computedMode, defaultComputedMode );

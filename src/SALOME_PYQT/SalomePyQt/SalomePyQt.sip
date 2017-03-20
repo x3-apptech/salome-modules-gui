@@ -271,6 +271,7 @@ public:
   static QMenu*            getPopupMenu( const QString& ) /ReleaseGIL/ ;
   static QTreeView*        getObjectBrowser() /ReleaseGIL/ ;
   static SALOME_Selection* getSelection() /Factory,ReleaseGIL/ ;
+  static void              setSelection( const QStringList& ) /ReleaseGIL/ ;
   static int               getStudyId() /ReleaseGIL/ ;
   static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
   static const QString     getActiveComponent() /ReleaseGIL/ ;
@@ -404,6 +405,8 @@ public:
   static bool              setViewSize( const int, const int, const int = 0 ) /ReleaseGIL/ ;
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
+  static bool              activateViewManagerAndView( const int ) /ReleaseGIL/ ;
+  static QWidget*          getViewWidget( const int ) /ReleaseGIL/ ;
   static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 ) /ReleaseGIL/ ;
   static int               createView( const QString&, QWidget* ) /ReleaseGIL/ ;
   static bool              closeView( const int ) /ReleaseGIL/ ;

@@ -68,6 +68,7 @@
 #include <QPaintEvent>
 #include <QCoreApplication>
 
+#include <utilities.h>
 namespace
 {
   /*!
@@ -242,6 +243,7 @@ SALOME_Selection* SALOME_Selection::GetSelection( LightApp_Application* app )
     sel = SelMap[ app ] = new SALOME_Selection( app );
   return sel;
 }
+
 
 /*!
   \brief Constructor.
@@ -557,6 +559,31 @@ public:
 SALOME_Selection* SalomePyQt::getSelection()
 {
   return ProcessEvent( new TGetSelectionEvent() );
+}
+
+/*!
+  \fn QStringList* SalomePyQt::setSelection(const QStringList& );
+  \brief Send local selection for notification.
+
+  The list of locally selected objects (study entries) is sent for notification of
+  other listening entities (modules, viewers...).
+*/
+
+class TSetSelectionEvent: public SALOME_Event
+{
+  QStringList myEntryList;
+public:
+  TSetSelectionEvent(const QStringList& entryList) : myEntryList(entryList) {}
+  virtual void Execute()
+  {
+	SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+	if ( !module ) return;
+	module->setLocalSelected(myEntryList);
+  }
+};
+void SalomePyQt::setSelection( const QStringList& entryList)
+{
+  return ProcessVoidEvent( new TSetSelectionEvent(entryList) );
 }
 
 /*!
@@ -2809,7 +2836,10 @@ public:
         for ( int i = 0, n = vec.size(); i < n; i++ ) {
           SUIT_ViewWindow* wnd = vec[ i ];
           if ( wnd )
-            myResult.append( wnd->getId() );
+            {
+              MESSAGE("SUIT_ViewWindow*: "<< wnd << " id: " << wnd->getId());
+              myResult.append( wnd->getId() );
+            }
         }
       }
     }
@@ -2839,6 +2869,7 @@ public:
   virtual void Execute() 
   {
     SUIT_ViewWindow* wnd = getWnd( myWndId );
+    MESSAGE("window id:" << myWndId << " SUIT_ViewWindow*: " << wnd);
     if ( wnd ) {
       wnd->setFocus();
       myResult = true;
@@ -2849,6 +2880,67 @@ bool SalomePyQt::activateView( const int id )
 {
   return ProcessEvent( new TActivateView( id ) );
 }
+
+/*!
+  \fn bool SalomePyQt::activateManagerAndView( const int id );
+  \brief Activate view manager and view: useful for a view embedded in a module main Window
+  \param id window identifier
+  \return \c true if operation is completed successfully and \c false otherwise
+ */
+
+class TActivateViewManagerAndView: public SALOME_Event
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  int myWndId;
+  TActivateViewManagerAndView( const int id )
+    : myResult( false ),
+      myWndId( id ) {}
+  virtual void Execute()
+  {
+    SUIT_ViewWindow* wnd = getWnd( myWndId );
+    MESSAGE("window id:" << myWndId << " SUIT_ViewWindow*: " << wnd);
+    if ( wnd )
+      {
+        LightApp_Application* app  = getApplication();
+        app->desktop()->windowActivated(wnd); // equivalent to app->setActiveViewManager(wnd->getViewManager())
+        wnd->setFocus();
+        myResult = true;
+      }
+  }
+};
+bool SalomePyQt::activateViewManagerAndView( const int id )
+{
+  return ProcessEvent( new TActivateViewManagerAndView( id ) );
+}
+
+/*!
+ *
+ */
+
+class TGetViewWidget: public SALOME_Event
+{
+public:
+  typedef QWidget* TResult;
+  TResult myResult;
+  int myWndId;
+  TGetViewWidget( const int id )
+    : myResult( 0 ),
+      myWndId( id ) {}
+  virtual void Execute()
+  {
+    SUIT_ViewWindow* wnd = getWnd( myWndId );
+    if ( wnd ) {
+        myResult = (QWidget*)wnd;
+    }
+  }
+};
+QWidget* SalomePyQt::getViewWidget( const int id)
+{
+  return ProcessEvent( new TGetViewWidget( id ) );
+}
+
 
 /*!
   \fn int SalomePyQt::createView( const QString& type, bool visible = true, const int width = 0, const int height = 0 );

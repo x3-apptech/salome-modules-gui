@@ -41,7 +41,7 @@
   #include "SALOME_ListIO.hxx"
 #endif
 
-
+#include <utilities.h>
 
 #ifndef DISABLE_VTKVIEWER
 #ifndef DISABLE_SALOMEOBJECT
@@ -103,7 +103,7 @@ LightApp_SVTKDataOwner
     }
   }
   
-  return -1;
+  return ActorSelection; // workaround for embedded VTK viewer in a module : is it safe ?
 }
 
 /*!
@@ -228,6 +228,7 @@ LightApp_VTKSelector
           for(; anIter != theList.end(); ++anIter){
             const SUIT_DataOwner* aDataOwner = (*anIter).get();
             if(const LightApp_SVTKDataOwner* anOwner = dynamic_cast<const LightApp_SVTKDataOwner*>(aDataOwner)){
+              MESSAGE("aSelector->SetSelectionMode("<<anOwner->GetMode()<<");");
               aSelector->SetSelectionMode(anOwner->GetMode());
               Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
 

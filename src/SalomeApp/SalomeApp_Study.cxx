@@ -161,6 +161,12 @@ public:
             if (oldFather) {
               oldFather->removeChild(suit_obj, false);
               SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( myStudy->application() );
+//              MESSAGE("myStudy: " << myStudy->id() << " app " << app);
+//              MESSAGE("objectBrowser: "<< app->objectBrowser());
+              if (!app->objectBrowser()) {
+                MESSAGE("Object Browser not found. Problem ??");
+                return;
+              }
               SUIT_AbstractModel* model = dynamic_cast<SUIT_AbstractModel*>(app->objectBrowser()->model());
               model->forgetObject( suit_obj );
                 

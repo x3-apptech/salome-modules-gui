@@ -23,11 +23,13 @@
 #include "SALOME_PYQT_ModuleLight.h"
 #include "SALOME_PYQT_DataModelLight.h"
 #include "SALOME_PYQT_PyModule.h"
+#include "SALOME_PYQT_Selector.h"
 
 #include "CAM_Application.h"
 #include "SUITApp_init_python.hxx"
 #include "SUIT_DataObjectIterator.h"
 #include "LightApp_Application.h"
+#include "LightApp_SelectionMgr.h"
 #include "SUIT_DataBrowser.h"
 #include "sipAPISalomePyQtGUILight.h"
 
@@ -36,6 +38,7 @@
 #endif
 
 #include <QCoreApplication>
+#include <utilities.h>
 
 // Py_ssize_t for old Pythons
 // This code is as recommended by"
@@ -106,7 +109,7 @@ extern "C"
   \brief Constructor
 */
 SALOME_PYQT_ModuleLight::SALOME_PYQT_ModuleLight()
-  : LightApp_Module( "noname" ) // name is set explicitly at the module initialization
+  : LightApp_Module( "noname" ), mySelector(0) // name is set explicitly at the module initialization
 {
   // initialize helper
   myHelper = new PyModuleHelper( this );
@@ -177,6 +180,8 @@ void SALOME_PYQT_ModuleLight::onModelClosed()
 {
   // call helper
   myHelper->modelClosed(application()->activeStudy());
+  if (mySelector)
+    mySelector->clear();
   LightApp_Module::onModelClosed();
 }
 
@@ -601,3 +606,53 @@ SALOME_PYQT_DataObjectLight* SALOME_PYQT_ModuleLight::findObject( const QString&
   }
   return obj;
 }
+
+/*!
+  \brief not used yet
+*/
+void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
+{
+  MESSAGE("getSelected");
+}
+
+/*!
+  \brief not used yet
+*/
+unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
+{
+  MESSAGE("getModifiedTime");
+}
+
+/*!
+  \brief not used yet
+*/
+SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
+{
+  MESSAGE("root");
+}
+
+/*!
+  \brief Used to notify a Python light module of a modification of selection in study (propagation of a remote selection)
+  \param list of study entries
+*/
+void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const bool isUnused)
+{
+  MESSAGE("setSelected");
+  return myHelper->selectionUpdated(entries);
+}
+
+/*!
+  \brief called by Python module to notify a list of study entries locally selected (for selection propagation)
+  \param list of study entries
+*/
+void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
+{
+  MESSAGE("setLocalSelected");
+  if (!mySelector)
+    {
+       mySelector = new SALOME_PYQT_Selector(this, this->getApp()->selectionMgr());
+    }
+  mySelector->setLocalEntries(entries);
+  emit localSelectionChanged();
+}
+
