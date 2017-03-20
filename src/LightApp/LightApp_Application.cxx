@@ -1469,7 +1469,7 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
       aVM = anActiveVM;
     }
 
-  if ( aVM && create )
+  if ( aVM && !aVM->getDetached() && create )
   {
     if ( !aVM->getActiveView() )
       {
