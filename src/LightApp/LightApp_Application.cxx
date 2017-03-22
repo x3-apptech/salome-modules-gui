@@ -255,7 +255,7 @@ namespace
     while ( tmp < inputLen ) {
       tmp = input.indexOf( QToolBarMarker, tmp + 1 );
       if ( tmp < 0 )
-	break;
+        break;
       anInputData.device()->seek( tmp );
       uchar mark;
       anInputData >> mark;
@@ -263,9 +263,9 @@ namespace
       anInputData >> lines;
 
       if ( lines == 0 && anInputData.atEnd() ) {
-	//Case then array doesn't contain information about toolbars,
-	aResult = tmp;
-	break;
+        //Case then array doesn't contain information about toolbars,
+        aResult = tmp;
+        break;
       }
 
       int pos;
@@ -275,10 +275,10 @@ namespace
       QString str;
       anInputData >> str;
       if ( aFlags.contains( str ) ) {
-	aResult = tmp;
-	break;
+        aResult = tmp;
+        break;
       }
-    }        
+    }
     return aResult;
   }
 
@@ -817,7 +817,7 @@ void LightApp_Application::createActions()
   createMenu( FullScreenId, viewMenu, 20, -1 );
 
   int modTBar = createTool( tr( "INF_TOOLBAR_MODULES" ),    // title (language-dependant)
-			    QString( "SalomeModules" ) );   // name (language-independant)
+                            QString( "SalomeModules" ) );   // name (language-independant)
   createTool( ModulesListId, modTBar );
 }
 
@@ -1312,8 +1312,8 @@ void LightApp_Application::insertDockWindow( const int id, QWidget* wid )
   connect( dock, SIGNAL(  destroyed( QObject* ) ), this, SLOT( onWCDestroyed( QObject* ) ) );
 
   dock->setFeatures( QDockWidget::AllDockWidgetFeatures );
-  dock->setObjectName( wid->objectName().isEmpty() ? QString( "window_%1" ).arg( id ) : 
-		       QString( "%1Dock" ).arg( wid->objectName() ) );
+  dock->setObjectName( wid->objectName().isEmpty() ? QString( "window_%1" ).arg( id ) :
+                       QString( "%1Dock" ).arg( wid->objectName() ) );
   dock->setWidget( wid );
   dock->toggleViewAction()->setData( QVariant( wid->objectName() ) );
   connect( dock->toggleViewAction(), SIGNAL( triggered( bool ) ),
@@ -1547,7 +1547,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
 #ifndef DISABLE_PVVIEWER
   if( vmType == PVViewer_Viewer::Type() )
   {
-    if ( viewMgr = dynamic_cast<PVViewer_ViewManager*>( getViewManager( vmType, false ) ) ) {
+    if (( viewMgr = dynamic_cast<PVViewer_ViewManager*>( getViewManager( vmType, false )))) {
       viewMgr->getActiveView()->setFocus();
       return 0;
     } else {
@@ -1789,7 +1789,7 @@ void LightApp_Application::onStudySaved( SUIT_Study* s )
 {
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
   if ( mru && s )
-      mru->insert( s->studyName() );
+    mru->insert( s->studyName() );
 
   emit studySaved();
 }
@@ -1799,7 +1799,7 @@ void LightApp_Application::onStudyClosed( SUIT_Study* s )
 {
   /*
   disconnect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
-	      this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
+              this, SLOT( onViewManagerRemoved( SUIT_ViewManager* ) ) );
   */
 
   // stop auto-save timer
@@ -2359,7 +2359,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->setItemProperty( "columns", 2, fullScreenGroup );
   // .... -> automatic hiding toolbars
   pref->addPreference( tr( "PREF_FULL_SCREEN_AUTO" ), fullScreenGroup,
-		       LightApp_Preferences::Bool, "OCCViewer", "automatic_hiding" );
+                       LightApp_Preferences::Bool, "OCCViewer", "automatic_hiding" );
   // ... "Full-screen" group <<end>>
 
   // .. "General" preferences tab <<end>>
@@ -2478,13 +2478,13 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   // .... -> Reverse stereo
   pref->addPreference( tr( "PREF_REVERSE_STEREO" ), stereoGroup,
- 		       LightApp_Preferences::Bool, "OCCViewer", "reverse_stereo" );
+                       LightApp_Preferences::Bool, "OCCViewer", "reverse_stereo" );
   // .... -> Enable V-Sync
   pref->addPreference( tr( "PREF_ENABLE_VSYNC" ), stereoGroup,
- 		       LightApp_Preferences::Bool, "OCCViewer", "enable_vsync" );
+                       LightApp_Preferences::Bool, "OCCViewer", "enable_vsync" );
   // .... -> Enable quad-buffer support
   pref->addPreference( tr( "PREF_ENABLE_QUAD_BUFFER_SUPPORT" ), stereoGroup,
- 		       LightApp_Preferences::Bool, "OCCViewer", "enable_quad_buffer_support" );
+                       LightApp_Preferences::Bool, "OCCViewer", "enable_quad_buffer_support" );
 #endif
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
@@ -2546,18 +2546,18 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   int occSelectionGroup = pref->addPreference( tr( "PREF_GROUP_SELECTION" ), occGroup );
   pref->setItemProperty( "columns", 2, occSelectionGroup );
   // .... -> enable preselection
-  pref->addPreference( tr( "PREF_ENABLE_PRESELECTION" ), occSelectionGroup, 
-		       LightApp_Preferences::Bool, "OCCViewer", "enable_preselection" );
+  pref->addPreference( tr( "PREF_ENABLE_PRESELECTION" ), occSelectionGroup,
+                       LightApp_Preferences::Bool, "OCCViewer", "enable_preselection" );
   // .... -> enable selection
-  pref->addPreference( tr( "PREF_ENABLE_SELECTION" ), occSelectionGroup, 
-		       LightApp_Preferences::Bool, "OCCViewer", "enable_selection" );
+  pref->addPreference( tr( "PREF_ENABLE_SELECTION" ), occSelectionGroup,
+                       LightApp_Preferences::Bool, "OCCViewer", "enable_selection" );
   // ... "Selection" group <<end>>
 
   // ... "Clipping" group <<start>>
   int occClippingGroup = pref->addPreference( tr( "PREF_GROUP_CLIPPING" ), occGroup );
   // .... -> clipping color
   pref->addPreference( tr( "PREF_CLIPPING_COLOR" ), occClippingGroup,
-               LightApp_Preferences::Color, "OCCViewer", "clipping_color" );
+                       LightApp_Preferences::Color, "OCCViewer", "clipping_color" );
   int texturePref = pref->addPreference( "", occClippingGroup, LightApp_Preferences::Frame );
   pref->setItemProperty( "columns", 2, texturePref );
   // .... -> use default texture
@@ -3691,7 +3691,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     if ( !vm || !vm->inherits( "Plot2d_Viewer" ) )
       continue;
 
-    Plot2d_Viewer* Plot2dVM = dynamic_cast<Plot2d_Viewer*>( vm );
+    //Plot2d_Viewer* Plot2dVM = dynamic_cast<Plot2d_Viewer*>( vm );
 
     viewMgr->setViewModel( vm  );
     Plot2d_ViewWindow* wnd = dynamic_cast<Plot2d_ViewWindow*>( viewMgr->getActiveView() );
@@ -4036,11 +4036,11 @@ void LightApp_Application::loadDockWindowsState()
   if(tbMap) {
     QList<QToolBar*> tbList = findToolBars();
     for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit )
-      {	
-	QToolBar* tb = *tit;
-	if ( tbMap->contains( tb->objectName() ) ) {	  
-	  tb->setVisible( (*tbMap)[tb->objectName()] );
-	}
+      { 
+        QToolBar* tb = *tit;
+        if ( tbMap->contains( tb->objectName() ) ) {      
+          tb->setVisible( (*tbMap)[tb->objectName()] );
+        }
       }
   }
 
@@ -4048,14 +4048,14 @@ void LightApp_Application::loadDockWindowsState()
     QList<QDockWidget*> dwList = desktop()->findChildren<QDockWidget*>();
     for ( QList<QDockWidget*>::iterator dit = dwList.begin(); dit != dwList.end(); ++dit )
       {
-	QDockWidget* dw = *dit;
-	
-	QObject* po = Qtx::findParent( dw, "QMainWindow" );
-	if ( po != desktop() )
-	  continue;
-	
-	if ( dwMap->contains( dw->objectName() ) )
-	  dw->setVisible( (*dwMap)[dw->objectName()] );
+        QDockWidget* dw = *dit;
+        
+        QObject* po = Qtx::findParent( dw, "QMainWindow" );
+        if ( po != desktop() )
+          continue;
+        
+        if ( dwMap->contains( dw->objectName() ) )
+          dw->setVisible( (*dwMap)[dw->objectName()] );
       }
   }
   */
@@ -4898,10 +4898,10 @@ QList<QToolBar*> LightApp_Application::findToolBars( const QStringList& names )
   QList<QToolBar*> aResult;
   QList<QToolBar*> tbList = desktop()->findChildren<QToolBar*>();
   for ( QList<QToolBar*>::iterator tit = tbList.begin(); tit != tbList.end(); ++tit ) {
-    QToolBar* tb = *tit;    
+    QToolBar* tb = *tit;
     QObject* po = Qtx::findParent( tb, "QMainWindow" );
     if ( po != desktop() )
-      continue;	
+      continue;
     if ( names.isEmpty() || names.contains( tb->objectName() ) )
       aResult.append(tb);
   }
@@ -4910,12 +4910,12 @@ QList<QToolBar*> LightApp_Application::findToolBars( const QStringList& names )
 
 /*!
   Internal method to parse toolbars and dockable windows state.
- */
-QByteArray LightApp_Application::processState(QByteArray& input, 
-					      const bool processWin, 
-					      const bool processTb, 
-					      const bool isRestoring, 
-					      QByteArray defaultState) {
+*/
+QByteArray LightApp_Application::processState(QByteArray& input,
+                                              const bool processWin,
+                                              const bool processTb,
+                                              const bool isRestoring,
+                                              QByteArray defaultState) {
 
   QByteArray aRes;
   bool hasDefaultState  = !defaultState.isEmpty();
@@ -4930,7 +4930,7 @@ QByteArray LightApp_Application::processState(QByteArray& input,
     tmpInputData >> version;
     tmpInputData >> dockmarker;
     tmpInputData >> nbDocWin;
-  }  
+  }
   if(processWin && processTb && !isRestoring) {
     aRes = input;
   } else if(!processWin && !processTb ) {
@@ -4941,7 +4941,7 @@ QByteArray LightApp_Application::processState(QByteArray& input,
     QList<QToolBar*> aToolBars = findToolBars();
 
     QStringList aNames;
-    for ( QList<QToolBar*>::iterator tit = aToolBars.begin(); tit != aToolBars.end(); ++tit ) {	
+    for ( QList<QToolBar*>::iterator tit = aToolBars.begin(); tit != aToolBars.end(); ++tit ) {
       QToolBar* tb = *tit;
       aNames.append(tb->objectName());
     }
@@ -4955,7 +4955,7 @@ QByteArray LightApp_Application::processState(QByteArray& input,
     if(hasDefaultState) {
       toolBarMarkerIndexDef = getToolbarMarkerIndex(defaultState, aNames);
       if(toolBarMarkerIndexDef < 0)
-	return aRes;      
+        return aRes;
     }
     QDataStream anInputDataDef(&defaultState, QIODevice::ReadOnly);
 
@@ -4971,28 +4971,28 @@ QByteArray LightApp_Application::processState(QByteArray& input,
     } else {
       //Write date from default settings
       if(hasDefaultState) {
-	aTargetData = &anInputDataDef;
-	aTargetIndex = toolBarMarkerIndexDef;
+        aTargetData = &anInputDataDef;
+        aTargetIndex = toolBarMarkerIndexDef;
       } else {
-	//If no default state, write current snapshot of the dockable windows
-	if(isRestoring) {
-	  aTargetData = &anInputDataCur;
-	  int toolBarMarkerIndexCur = getToolbarMarkerIndex(currentArr, aNames);
-	  aTargetIndex = toolBarMarkerIndexCur;
-	}	  
+        //If no default state, write current snapshot of the dockable windows
+        if(isRestoring) {
+          aTargetData = &anInputDataCur;
+          int toolBarMarkerIndexCur = getToolbarMarkerIndex(currentArr, aNames);
+          aTargetIndex = toolBarMarkerIndexCur;
+        }
       }
     }
 
     if(aTargetData && aTargetIndex >= 0 ) {
       aTargetData->device()->seek(0);
       while( aTargetData->device()->pos() < aTargetIndex ) {
-	uchar ch;
-	*aTargetData >> ch;
-	aData<<ch;
+        uchar ch;
+        *aTargetData >> ch;
+        aData<<ch;
       }
       isDockWinWriten = true;
     }
-    
+
     aTargetData = 0;
     aTargetIndex = -1;
 
@@ -5001,34 +5001,34 @@ QByteArray LightApp_Application::processState(QByteArray& input,
       aTargetIndex = toolBarMarkerIndex;
     } else {
       if(hasDefaultState) {
-	aTargetData = &anInputDataDef;
-	aTargetIndex = toolBarMarkerIndexDef;	
-      }      
+        aTargetData = &anInputDataDef;
+        aTargetIndex = toolBarMarkerIndexDef;
+      }
     }
 
     if(aTargetData && aTargetIndex >= 0) {
       int index;
       if(!isDockWinWriten ) {
-	//Write version marker
-	int marker, version;
-	aTargetData->device()->seek(0);
-	*aTargetData >> marker;
-	*aTargetData >> version;
-	aData << marker;
-	aData << version;
-	aData << (uchar) QDockWidgetMarker;
-	aData << (int) 0;
-	int shift = 4*sizeof(int) + sizeof(QSize);
-	index = aTargetIndex - shift;
+        //Write version marker
+        int marker, version;
+        aTargetData->device()->seek(0);
+        *aTargetData >> marker;
+        *aTargetData >> version;
+        aData << marker;
+        aData << version;
+        aData << (uchar) QDockWidgetMarker;
+        aData << (int) 0;
+        int shift = 4*sizeof(int) + sizeof(QSize);
+        index = aTargetIndex - shift;
       } else {
-	index = aTargetIndex;
+        index = aTargetIndex;
       }
-      
+
       aTargetData->device()->seek(index);
       while(!aTargetData->atEnd()) {
-	uchar ch;
-	*aTargetData >> ch;
-	aData << ch;
+        uchar ch;
+        *aTargetData >> ch;
+        aData << ch;
       }
     } else { // Not treat toolbars
       aData << (uchar) QToolBarMarker;
@@ -5055,7 +5055,7 @@ void LightApp_Application::emitOperationFinished( const QString& theModuleName,
   Update visibility state of given objects
 */
 void LightApp_Application::updateVisibilityState( DataObjectList& theList,
-						  SUIT_ViewModel*  theViewModel )
+                                                  SUIT_ViewModel*  theViewModel )
 {
   if ( !theViewModel || theList.isEmpty() ) return;
 
@@ -5074,14 +5074,14 @@ void LightApp_Application::updateVisibilityState( DataObjectList& theList,
     if ( anObjModule ) {
       LightApp_Displayer* aDisplayer = anObjModule->displayer();
       if ( aDisplayer ) {
-	Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
+        Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
         if ( aDisplayer->canBeDisplayed( obj->entry(), theViewModel->getType() ) ) {
           if ( aView && aDisplayer->IsDisplayed( obj->entry(), aView ) )
             anObjState = Qtx::ShownState;
           else
             anObjState = Qtx::HiddenState;
         }
-	aStudy->setVisibilityState( obj->entry(), anObjState );
+        aStudy->setVisibilityState( obj->entry(), anObjState );
       }
     }
   }
@@ -5128,23 +5128,23 @@ bool LightApp_Application::checkExistingDoc()
 {
   bool result = true;
   if( activeStudy() ) {
-    int answer = SUIT_MessageBox::question( desktop(), 
-					    tr( "APPCLOSE_CAPTION" ), 
-					    tr( "STUDYCLOSE_DESCRIPTION" ),
-					    tr( "APPCLOSE_SAVE" ), 
-					    tr( "APPCLOSE_CLOSE" ),
-					    tr( "APPCLOSE_CANCEL" ), 0 );
+    int answer = SUIT_MessageBox::question( desktop(),
+                                            tr( "APPCLOSE_CAPTION" ),
+                                            tr( "STUDYCLOSE_DESCRIPTION" ),
+                                            tr( "APPCLOSE_SAVE" ),
+                                            tr( "APPCLOSE_CLOSE" ),
+                                            tr( "APPCLOSE_CANCEL" ), 0 );
     if(answer == 0) {
       if ( activeStudy()->isSaved() ) {
-	onSaveDoc();
-	closeDoc( false );
+        onSaveDoc();
+        closeDoc( false );
       } else if ( onSaveAsDoc() ) {
-	if( !closeDoc( false ) ) {
-	  result = false;
-	}
+        if( !closeDoc( false ) ) {
+          result = false;
+        }
       } else {
-	result = false;
-      }	
+        result = false;
+      }
     }
     else if( answer == 1 ) {
       closeDoc( false );

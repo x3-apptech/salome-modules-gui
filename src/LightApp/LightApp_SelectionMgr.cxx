@@ -75,10 +75,25 @@ void LightApp_SelectionMgr::setSelected( const SUIT_DataOwnerPtrList& lst, const
 
 #ifndef DISABLE_SALOMEOBJECT
 /*!
+  Get a sole selected objects from selection manager. If more than one object selected, return NULL.
+  Useful to optimize performance in case of large number of objects (IPAL0054049)
+*/
+Handle(SALOME_InteractiveObject)
+  LightApp_SelectionMgr::soleSelectedObject( const QString& theType,
+                                             const bool convertReferences ) const
+{
+  SALOME_ListIO list;
+  selectedObjects( list, theType, convertReferences, true );
+  return  list.Extent() == 1 ? list.First() : Handle(SALOME_InteractiveObject)();
+}
+
+/*!
   Get all selected objects from selection manager
 */
-void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QString& theType,
-                                             const bool convertReferences ) const
+void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList,
+                                             const QString& theType,
+                                             const bool     convertReferences,
+                                             const bool     sole) const
 {
   LightApp_Study* study = dynamic_cast<LightApp_Study*>( application()->activeStudy() );
   if ( !study )
@@ -88,7 +103,7 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
 
   QList<Handle(SALOME_InteractiveObject)> selList;
 
-  if ( isActualSelectionCache( theType ) ) {
+  if ( !sole && isActualSelectionCache( theType )) {
     selList = selectionCache( theType );
   }
   else {
@@ -101,27 +116,27 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
     QSet<QString> aSet;
     for ( QStringList::iterator it = types.begin(); it != types.end(); ++it ) {
       SUIT_DataOwnerPtrList aList;
-      selected( aList, *it );
+      selected( aList, *it, sole );
 
       QList<Handle(SALOME_InteractiveObject)> typeSelList;
 
       for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr ) {
-	const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
-	if ( !owner )
-	  continue;
+        const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
+        if ( !owner )
+          continue;
 
-	if ( !aSet.contains( owner->entry() ) && !owner->IO().IsNull() ) {
-	  selList.append( owner->IO() );
-	  aSet.insert( owner->entry() );
-	}
+        if ( !aSet.contains( owner->entry() ) && !owner->IO().IsNull() ) {
+          selList.append( owner->IO() );
+          aSet.insert( owner->entry() );
+        }
 
-	typeSelList.append( owner->IO() );
+        typeSelList.append( owner->IO() );
       }
 
-      if ( isSelectionCacheEnabled() ) {
-	LightApp_SelectionMgr* that = (LightApp_SelectionMgr*)this;
-	that->myCacheSelection.insert( *it, typeSelList );
-	that->myCacheTimes.insert( *it, QTime::currentTime() );
+      if ( !sole && isSelectionCacheEnabled() ) {
+        LightApp_SelectionMgr* that = (LightApp_SelectionMgr*)this;
+        that->myCacheSelection.insert( *it, typeSelList );
+        that->myCacheTimes.insert( *it, QTime::currentTime() );
       }
     }
   }
@@ -138,11 +153,11 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
       QString refEntry = study->referencedToEntry( entry );
       if ( !entrySet.contains( refEntry ) ) {
         if ( refEntry != entry ) {
-	  entry = refEntry;
+          entry = refEntry;
           QString component = study->componentDataType( entry );
           theList.Append( new SALOME_InteractiveObject( (const char*)entry.toLatin1(),
-							(const char*)component.toLatin1(),
-							""/*refobj->Name().c_str()*/ ) );
+                                                        (const char*)component.toLatin1(),
+                                                        ""/*refobj->Name().c_str()*/ ) );
         }
         else if ( !io.IsNull() )
           theList.Append( io );
@@ -153,6 +168,9 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList, const QStri
 
     entrySet.insert( entry );
   }
+
+  if ( sole && theList.Extent() > 1 )
+    theList.Clear();
 }
 
 /*!
@@ -202,22 +220,22 @@ void LightApp_SelectionMgr::selectedObjects( QStringList& theList, const QString
       QStringList typeSelList;
 
       for ( SUIT_DataOwnerPtrList::const_iterator itr = aList.begin(); itr != aList.end(); ++itr ) {
-	const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
-	if ( !owner )
-	  continue;
+        const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*>( (*itr).operator->() );
+        if ( !owner )
+          continue;
 
         if ( !aSet.contains( owner->entry() ) ) {
-	  selList.append( owner->entry() );
-	  aSet.insert( owner->entry() );
-	}
+          selList.append( owner->entry() );
+          aSet.insert( owner->entry() );
+        }
 
-	typeSelList.append( owner->entry() );
+        typeSelList.append( owner->entry() );
       }
 
       if ( isSelectionCacheEnabled() ) {
-	LightApp_SelectionMgr* that = (LightApp_SelectionMgr*)this;
-	that->myCacheSelection.insert( *it, typeSelList );
-	that->myCacheTimes.insert( *it, QTime::currentTime() );
+        LightApp_SelectionMgr* that = (LightApp_SelectionMgr*)this;
+        that->myCacheSelection.insert( *it, typeSelList );
+        that->myCacheTimes.insert( *it, QTime::currentTime() );
       }
     }
   }
@@ -471,10 +489,10 @@ QList<Handle(SALOME_InteractiveObject)> LightApp_SelectionMgr::selectionCache( c
     if ( myCacheSelection.contains( *it ) ) {
       const SelList& lst = myCacheSelection[*it];
       for ( SelList::const_iterator itr = lst.begin(); itr != lst.end(); ++itr ) {
-	if ( !(*itr).IsNull() && !set.contains( (*itr)->getEntry() ) ) {
-	  res.append( *itr );
-	  set.insert( (*itr)->getEntry() );
-	}
+        if ( !(*itr).IsNull() && !set.contains( (*itr)->getEntry() ) ) {
+          res.append( *itr );
+          set.insert( (*itr)->getEntry() );
+        }
       }
     }
   }
@@ -498,10 +516,10 @@ QStringList LightApp_SelectionMgr::selectionCache( const QString& type ) const
     if ( myCacheSelection.contains( *it ) ) {
       const SelList& lst = myCacheSelection[*it];
       for ( SelList::const_iterator itr = lst.begin(); itr != lst.end(); ++itr ) {
-	if ( !set.contains( *itr ) ) {
-	  res.append( *itr );
-	  set.insert( *itr );
-	}
+        if ( !set.contains( *itr ) ) {
+          res.append( *itr );
+          set.insert( *itr );
+        }
       }
     }
   }
