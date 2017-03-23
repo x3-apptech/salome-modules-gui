@@ -23,6 +23,35 @@
 #include "SUITApp_init_python.hxx"
 #include <QString>
 
+#if PY_VERSION_HEX < 0x03050000
+static wchar_t*
+Py_DecodeLocale(const char *arg, size_t *size)
+{
+    wchar_t *res;
+    unsigned char *in;
+    wchar_t *out;
+    size_t argsize = strlen(arg) + 1;
+
+    if (argsize > PY_SSIZE_T_MAX/sizeof(wchar_t))
+        return NULL;
+    res = (wchar_t*) PyMem_RawMalloc(argsize*sizeof(wchar_t));
+    if (!res)
+        return NULL;
+
+    in = (unsigned char*)arg;
+    out = res;
+    while(*in)
+        if(*in < 128)
+            *out++ = *in++;
+        else
+            *out++ = 0xdc00 + *in++;
+    *out = 0;
+    if (size != NULL)
+        *size = out - res;
+    return res;
+}
+#endif
+
 bool SUIT_PYTHON::initialized                       = false;
 
 void SUIT_PYTHON::init_python(int argc, char **argv)
