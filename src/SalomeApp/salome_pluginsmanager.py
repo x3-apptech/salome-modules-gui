@@ -164,13 +164,16 @@ class PluginsManager:
         # MODULES plugins are supposed to be located in the
         # installation folder of the module, in the subdirectory
         # "share/salome/plugins". We first look for these directories.
-        for key in list(os.environ.keys()):
+        searched = []
+        for key in os.environ.keys():
           if key.endswith("_ROOT_DIR"):
             rootpath=os.environ[key]
             dirpath=os.path.join(rootpath,PLUGIN_PATH_PATTERN)
-            if os.path.isdir(dirpath) and dirpath not in self.plugindirs:
+            if os.path.isdir(dirpath) and dirpath not in self.plugindirs + searched:
               logger.debug("Looking for plugins in the directory %s ..."%dirpath)
               walktree(dirpath,self.analyseFile)
+              if dirpath not in self.plugindirs and dirpath not in searched:
+                searched.append(dirpath)
 
         # USER plugins directory
         user_dir = os.path.expanduser("~/.config/salome/Plugins")
