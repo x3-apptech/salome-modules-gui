@@ -102,8 +102,8 @@ public:
   void             disableSelector();
   void             setLocalSelected(const QStringList &);
   void             getSelected( DataObjectList& ) const;
-  unsigned long    getModifiedTime() const;
-  SUIT_DataObject* root() const;
+//  unsigned long    getModifiedTime() const;
+//  SUIT_DataObject* root() const;
   void             setSelected( const QStringList&, const bool = false );
 
 protected:

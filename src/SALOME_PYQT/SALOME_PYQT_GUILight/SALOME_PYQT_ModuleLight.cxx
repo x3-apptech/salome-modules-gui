@@ -618,18 +618,20 @@ void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
 /*!
   \brief not used yet
 */
-unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
-{
-  MESSAGE("getModifiedTime");
-}
+//unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
+//{
+//  MESSAGE("getModifiedTime");
+//  return 0;
+//}
 
 /*!
   \brief not used yet
 */
-SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
-{
-  MESSAGE("root");
-}
+//SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
+//{
+//  MESSAGE("root");
+//  return NULL;
+//}
 
 /*!
   \brief Used to notify a Python light module of a modification of selection in study (propagation of a remote selection)
