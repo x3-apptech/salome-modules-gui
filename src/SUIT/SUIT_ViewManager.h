@@ -84,6 +84,8 @@ public:
   int              getId() const;
 
   int              getGlobalId() const;
+  void             setDetached(bool detached);
+  bool             getDetached() const;
 
 public slots:
   void             createView();
@@ -143,6 +145,7 @@ protected:
   QPixmap                     myIcon;
   QString                     myTitle;
   SUIT_Study*                 myStudy;
+  bool                        myIsDetached;
 
   static QMap<QString, int>   _ViewMgrId;
 };

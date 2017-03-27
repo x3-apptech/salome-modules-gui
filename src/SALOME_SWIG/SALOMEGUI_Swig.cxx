@@ -62,6 +62,7 @@
 #endif
 #endif
 
+#include <utilities.h>
 
 /*!
   \class SALOMEGUI_Swig
@@ -623,7 +624,9 @@ public:
   virtual void Execute()
   {
     if ( LightApp_Application* anApp = getApplication() ) {
-      SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+      SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+      if (!viewMgr) return;
+      SUIT_ViewWindow* window = viewMgr->getActiveView();
       if ( window ) {
         SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
         if ( view ) {
@@ -651,7 +654,9 @@ void SALOMEGUI_Swig::UpdateView()
     virtual void Execute()
     {
       if ( LightApp_Application* anApp = getApplication() ) {
-        SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+        SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+        if (!viewMgr) return;
+        SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
           SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
           if ( view )
@@ -668,6 +673,7 @@ void SALOMEGUI_Swig::UpdateView()
 */
 void SALOMEGUI_Swig::FitAll()
 {
+  MESSAGE("FitAll");
   class TEvent: public SALOME_Event
   {
   public:
@@ -675,7 +681,9 @@ void SALOMEGUI_Swig::FitAll()
     virtual void Execute()
     {
       if ( LightApp_Application* anApp = getApplication() ) {
-        SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+        SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+        if (!viewMgr) return;
+        SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
 #ifndef DISABLE_SALOMEOBJECT
 #ifndef DISABLE_VTKVIEWER
@@ -710,7 +718,9 @@ void SALOMEGUI_Swig::ResetView()
     virtual void Execute()
     {
       if ( LightApp_Application* anApp = getApplication() ) {
-        SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+        SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+        if (!viewMgr) return;
+        SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
 #ifndef DISABLE_SALOMEOBJECT
 #ifndef DISABLE_VTKVIEWER
@@ -764,7 +774,9 @@ static void setView( int view )
     virtual void Execute()
     {
       if ( LightApp_Application* anApp = getApplication() ) {
-        SUIT_ViewWindow* window = anApp->desktop()->activeWindow();
+	    SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+	    if (!viewMgr) return;
+	    SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
 #ifndef DISABLE_SALOMEOBJECT
 #ifndef DISABLE_VTKVIEWER
@@ -880,7 +892,9 @@ public:
   TGetViewParameters() : myResult( "" ) {}
   virtual void Execute() {  
     if ( LightApp_Application* anApp = getApplication() ) {
-      if ( SUIT_ViewWindow* window = anApp->desktop()->activeWindow() ) {
+	  SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+	  if (!viewMgr) return;
+	  if ( SUIT_ViewWindow* window = viewMgr->getActiveView() ) {
 #ifndef DISABLE_VTKVIEWER
 	if ( SVTK_ViewWindow* svtk = dynamic_cast<SVTK_ViewWindow*>( window ) ) {	  
 	  if ( vtkRenderer* ren = svtk->getRenderer()) {		    
@@ -944,7 +958,9 @@ static void setViewParameter( int parameter, QList<double>& values ) {
 
     virtual void Execute() {
       if ( LightApp_Application* anApp = getApplication() ) {
-	if ( SUIT_ViewWindow* window = anApp->desktop()->activeWindow() ) {
+	  SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+	  if (!viewMgr) return;
+	  if ( SUIT_ViewWindow* window = viewMgr->getActiveView() ) {
 #ifndef DISABLE_VTKVIEWER
 	  if ( SVTK_ViewWindow* svtk = dynamic_cast<SVTK_ViewWindow*>( window ) ) {	  
 	    if ( vtkRenderer* ren = svtk->getRenderer()) {		    

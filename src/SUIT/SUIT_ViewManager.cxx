@@ -49,7 +49,8 @@ SUIT_ViewManager::SUIT_ViewManager( SUIT_Study* theStudy,
 : QObject( 0 ),
   myDesktop( theDesktop ),
   myTitle( "Default: %M - viewer %V" ),
-  myStudy( NULL )
+  myStudy( NULL ),
+  myIsDetached( false )
 {
   myViewModel = 0;
   myActiveView = 0;
@@ -397,4 +398,16 @@ void SUIT_ViewManager::contextMenuPopup( QMenu* popup )
   SUIT_ViewModel* vm = getViewModel();
   if ( vm )
     vm->contextMenuPopup( popup );
+}
+
+/*! option detached (false by default) to set before the viewWindow is added to Desktop TabBar */
+void SUIT_ViewManager::setDetached(bool detached)
+{
+  myIsDetached = detached;
+}
+
+/*! get option detached (false by default) to decide if the viewWindow is to be added to Desktop TabBar */
+bool SUIT_ViewManager::getDetached() const
+{
+  return myIsDetached;
 }

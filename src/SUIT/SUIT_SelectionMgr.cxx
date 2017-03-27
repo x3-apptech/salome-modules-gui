@@ -92,7 +92,7 @@ void SUIT_SelectionMgr::setEnabled( const bool on, const QString& typ )
 
 /*! Gets selected data owners from list with type \a type to list \a lst.
 */
-void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& type ) const
+void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& type, const bool onlyOne ) const
 {
   lst.clear();
 
@@ -103,10 +103,25 @@ void SUIT_SelectionMgr::selected( SUIT_DataOwnerPtrList& lst, const QString& typ
     if ( !type.isEmpty() && (*it)->type() != type )
       continue;
 
-    SUIT_DataOwnerPtrList curList;
+    SUIT_DataOwnerPtrList curList( /*skipAllEqual=*/false );
     (*it)->selected( curList );
-    for ( SUIT_DataOwnerPtrList::const_iterator itr = curList.begin(); itr != curList.end(); ++itr )
-      lst.append( *itr );
+    if ( onlyOne )
+    {
+      for ( SUIT_DataOwnerPtrList::const_iterator itr = curList.begin(); itr != curList.end(); ++itr )
+      {
+        lst.append( *itr );
+        if ( lst.count() > 1 )
+        {
+          lst.clear();
+          return;
+        }
+      }
+    }
+    else
+    {
+      for ( SUIT_DataOwnerPtrList::const_iterator itr = curList.begin(); itr != curList.end(); ++itr )
+        lst.append( *itr );
+    }
   }
 }
 

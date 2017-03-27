@@ -168,6 +168,8 @@ public:
   static QMenu*            getPopupMenu( const MenuName );
   static QMenu*            getPopupMenu( const QString& );
   static QTreeView*        getObjectBrowser();
+  static void              enableSelector();
+  static void              disableSelector();
   static SALOME_Selection* getSelection();
   static void              setSelection( const QStringList& );
   static int               getStudyId();
@@ -290,7 +292,7 @@ public:
   static bool              activateView( const int );
   static bool              activateViewManagerAndView( const int );
   static QWidget*          getViewWidget( const int );
-  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0 );
+  static int               createView( const QString&, bool visible = true, const int width = 0, const int height = 0, bool detached = false );
   static int               createView( const QString&, QWidget* );
   static bool              closeView( const int );
   static int               cloneView( const int );

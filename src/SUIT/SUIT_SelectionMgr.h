@@ -44,7 +44,7 @@ public:
   virtual ~SUIT_SelectionMgr();
 
   void            clearSelected();
-  virtual void    selected( SUIT_DataOwnerPtrList&, const QString& = QString() ) const;
+  virtual void    selected( SUIT_DataOwnerPtrList&, const QString& = QString(), const bool = false ) const;
   virtual void    setSelected( const SUIT_DataOwnerPtrList&, const bool = false );
 
   void            selectors( QList<SUIT_Selector*>& ) const;

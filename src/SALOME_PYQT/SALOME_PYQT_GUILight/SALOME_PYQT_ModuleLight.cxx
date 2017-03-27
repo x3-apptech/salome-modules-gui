@@ -618,18 +618,20 @@ void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
 /*!
   \brief not used yet
 */
-unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
-{
-  MESSAGE("getModifiedTime");
-}
+//unsigned long SALOME_PYQT_ModuleLight::getModifiedTime() const
+//{
+//  MESSAGE("getModifiedTime");
+//  return 0;
+//}
 
 /*!
   \brief not used yet
 */
-SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
-{
-  MESSAGE("root");
-}
+//SUIT_DataObject* SALOME_PYQT_ModuleLight::root() const
+//{
+//  MESSAGE("root");
+//  return NULL;
+//}
 
 /*!
   \brief Used to notify a Python light module of a modification of selection in study (propagation of a remote selection)
@@ -656,3 +658,19 @@ void SALOME_PYQT_ModuleLight::setLocalSelected(const QStringList & entries)
   emit localSelectionChanged();
 }
 
+void SALOME_PYQT_ModuleLight::enableSelector()
+{
+  MESSAGE("enableSelector");
+  if (!mySelector)
+    {
+	  mySelector = new SALOME_PYQT_Selector(this, this->getApp()->selectionMgr());
+    }
+  mySelector->setEnabled(true);
+}
+
+void SALOME_PYQT_ModuleLight::disableSelector()
+{
+  MESSAGE("disableSelector");
+  if (mySelector)
+	mySelector->setEnabled(false);
+}

@@ -131,7 +131,7 @@ public:
   SUIT_ViewManager*                   getViewManager( const QString&, const bool );
   virtual void                        addViewManager( SUIT_ViewManager* );
   virtual void                        removeViewManager( SUIT_ViewManager* );
-  virtual SUIT_ViewManager*           createViewManager( const QString& vmType );
+  virtual SUIT_ViewManager*           createViewManager( const QString& vmType, bool detached = false );
   virtual SUIT_ViewManager*           createViewManager( const QString& vmType, QWidget* w );
   virtual SUIT_ViewManager*           createViewManager( SUIT_ViewModel* );
 

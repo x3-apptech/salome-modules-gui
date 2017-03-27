@@ -587,6 +587,50 @@ void SalomePyQt::setSelection( const QStringList& entryList)
 }
 
 /*!
+  \fn void SalomePyQt::enableSelector();
+  \brief enable PyQt_Selector (on module activation, for instance)
+*/
+
+class TEnableSelectorEvent: public SALOME_Event
+{
+public:
+	TEnableSelectorEvent() {}
+  virtual void Execute()
+  {
+	SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+	if ( !module ) return;
+	module->enableSelector();
+  }
+};
+void SalomePyQt::enableSelector()
+{
+  return ProcessVoidEvent( new TEnableSelectorEvent() );
+}
+
+
+/*!
+  \fn void SalomePyQt::disableSelector();
+  \brief disable PyQt_Selector (on module activation, for instance)
+*/
+
+class TdisableSelectorEvent: public SALOME_Event
+{
+public:
+	TdisableSelectorEvent() {}
+  virtual void Execute()
+  {
+	SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );
+	if ( !module ) return;
+	module->disableSelector();
+  }
+};
+void SalomePyQt::disableSelector()
+{
+  return ProcessVoidEvent( new TdisableSelectorEvent() );
+}
+
+
+/*!
   \fn void SalomePyQt::putInfo( const QString& msg, const int sec );
   \brief Put an information message to the current application's 
   desktop status bar.
@@ -2961,17 +3005,19 @@ public:
   bool myVisible;
   int myWidth;
   int myHeight;
-  TCreateView( const QString& theType, bool visible, const int width, const int height )
+  bool myDetached;
+  TCreateView( const QString& theType, bool visible, const int width, const int height, bool detached )
     : myResult( -1 ),
       myType( theType ),
       myVisible(visible),
       myWidth(width),
-      myHeight(height) {}
+      myHeight(height),
+      myDetached(detached) {}
   virtual void Execute() 
   {
     LightApp_Application* app  = getApplication();
     if ( app ) {
-      SUIT_ViewManager* viewMgr = app->createViewManager( myType );
+      SUIT_ViewManager* viewMgr = app->createViewManager( myType, myDetached );
       if ( viewMgr ) {
         QWidget* wnd = viewMgr->getActiveView();
         myResult = viewMgr->getActiveView()->getId();
@@ -2994,9 +3040,9 @@ public:
     }
   }
 };
-int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height )
+int SalomePyQt::createView( const QString& type, bool visible, const int width, const int height, bool detached )
 {
-  int ret = ProcessEvent( new TCreateView( type, visible, width, height ) );
+  int ret = ProcessEvent( new TCreateView( type, visible, width, height, detached ) );
   QCoreApplication::processEvents();
   return ret;
 }
