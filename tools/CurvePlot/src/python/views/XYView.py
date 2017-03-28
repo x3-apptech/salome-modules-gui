@@ -15,7 +15,7 @@ class EventHandler(QObject):
   """ Handle the right-click properly so that it only triggers the contextual menu """
   def __init__(self,parent=None):
     QObject.__init__(self, parent)
-  
+
   def eventFilter(self, obj, event):
     if event.type() == QtCore.QEvent.MouseButtonPress:
       if event.button() == 2:
@@ -25,7 +25,7 @@ class EventHandler(QObject):
 
 class XYView(View):
   AUTOFIT_MARGIN = 0.03  # 3%
-  
+
   # See http://matplotlib.org/api/markers_api.html:
   CURVE_MARKERS = [ "o" ,#  circle
                     "*",  # star
@@ -48,13 +48,13 @@ class XYView(View):
                     "d",  # thin diamond
                     "",   # NO MARKER
                    ]
-  
+
   _DEFAULT_LEGEND_STATE = False   # for test purposes mainly - initial status of the legend
-  
+
   def __init__(self, controller):
     View.__init__(self, controller)
     self._eventHandler = EventHandler()
-    
+
     self._curveViews = {}    # key: curve (model) ID, value: CurveView
     self._salomeViewID = None
     self._mplFigure = None
@@ -67,15 +67,15 @@ class XYView(View):
     self._toobarMPL = None
     self._grid = None
     self._currCrv = None   # current curve selected in the view
-    
+
     self._legend = None
     self._legendLoc = "right"  # "right" or "bottom"
-    
+
     self._fitArea = False
     self._zoomPan = False
     self._dragOnDrop = False
     self._move = False
-    
+
     self._patch = None
     self._xdata = None
     self._ydata = None
@@ -83,11 +83,11 @@ class XYView(View):
     self._last_point = None
     self._lastMarkerID = -1
     self._blockLogSignal = False
-    
+
     self._axisXSciNotation = False
     self._axisYSciNotation = False
     self._prevTitle = None
-    
+
   def __repaintOK(self):
     """ To be called inside XYView each time a low-level expansive matplotlib methods is to be invoked.
     @return False if painting is currently locked, in which case it will also register the current XYView 
@@ -97,21 +97,21 @@ class XYView(View):
     if ret:
       self._controller._plotManager.registerRepaint(self._model)
     return (not ret)
-    
+
   def appendCurve(self, curveID):
     newC = CurveView(self._controller, self)
     newC.setModel(self._model._curves[curveID])
-    newC.setMPLAxes(self._mplAxes) 
+    newC.setMPLAxes(self._mplAxes)
     newC.draw()
     newC.setMarker(self.getMarker(go_next=True))
-    self._curveViews[curveID] = newC 
-    
+    self._curveViews[curveID] = newC
+
   def removeCurve(self, curveID):
     v = self._curveViews.pop(curveID)
     v.erase()
     if self._currCrv is not None and self._currCrv.getID() == curveID:
       self._currCrv = None
-  
+
   def cleanBeforeClose(self):
     """ Clean some items to avoid accumulating stuff in memory """
     self._mplFigure.clear()
@@ -120,7 +120,7 @@ class XYView(View):
     # For memory debugging only:
     import gc
     gc.collect()
-  
+
   def repaint(self):
     if self.__repaintOK():
       Logger.Debug("XYView::draw")
@@ -130,28 +130,28 @@ class XYView(View):
     if self.__repaintOK():
       self._mplAxes.set_xlabel(self._model._xlabel)
       self.repaint()
-    
+
   def onYLabelChange(self):
     if self.__repaintOK():
       self._mplAxes.set_ylabel(self._model._ylabel)
       self.repaint()
-  
+
   def onTitleChange(self):
     if self.__repaintOK():
       self._mplAxes.set_title(self._model._title)
       self.updateViewTitle()
       self.repaint()
-  
+
   def onCurveTitleChange(self):
     # Updating the legend should suffice
     self.showHideLegend()
-  
+
   def onClearAll(self):
     """ Just does an update with a reset of the marker cycle. """
     if self.__repaintOK():
       self._lastMarkerID = -1
       self.update()
-  
+
   def onPick(self, event):
     """ MPL callback when picking
     """
@@ -163,10 +163,10 @@ class XYView(View):
           selected_id = crv_id
       # Use the plotmanager so that other plot sets get their current reset:
       self._controller._plotManager.setCurrentCurve(selected_id)
-  
+
   def createAndAddLocalAction(self, icon_file, short_name):
     return self._toolbar.addAction(self._sgPyQt.loadIcon("CURVEPLOT", icon_file), short_name)
-    
+
   def createPlotWidget(self):
     self._mplFigure = Figure((8.0,5.0), dpi=100)
     self._mplCanvas = FigureCanvasQTAgg(self._mplFigure)
@@ -174,23 +174,23 @@ class XYView(View):
     self._mplCanvas.mpl_connect('pick_event', self.onPick)
     self._mplAxes = self._mplFigure.add_subplot(1, 1, 1)
     self._plotWidget = PlotWidget()
-    self._toobarMPL = NavigationToolbar2QT(self._mplCanvas, None) 
+    self._toobarMPL = NavigationToolbar2QT(self._mplCanvas, None)
     for act in self._toobarMPL.actions():
       actionName = str(act.text()).strip()
       self._mplNavigationActions[actionName] = act
     self._plotWidget.setCentralWidget(self._mplCanvas)
     self._toolbar = self._plotWidget.toolBar
     self.populateToolbar()
-     
+
     self._popupMenu = QtGui.QMenu()
     self._popupMenu.addAction(self._actionLegend)
-    
+
     # Connect evenement for the graphic scene
     self._mplCanvas.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-    self._mplCanvas.customContextMenuRequested.connect(self.onContextMenu) 
+    self._mplCanvas.customContextMenuRequested.connect(self.onContextMenu)
     self._mplCanvas.mpl_connect('scroll_event', self.onScroll)
     self._mplCanvas.mpl_connect('button_press_event', self.onMousePress)
-  
+
   def populateToolbar(self):
     # Action to dump view in a file
     a = self.createAndAddLocalAction("dump_view.png", trQ("DUMP_VIEW_TXT"))
@@ -199,7 +199,7 @@ class XYView(View):
     # Actions to manipulate the scene
     a = self.createAndAddLocalAction("fit_all.png", trQ("FIT_ALL_TXT"))
     a.triggered.connect(self.autoFit)
-    #    Zoom and pan are mutually exclusive but can be both de-activated: 
+    #    Zoom and pan are mutually exclusive but can be both de-activated:
     self._zoomAction = self.createAndAddLocalAction("fit_area.png", trQ("FIT_AREA_TXT"))
     self._zoomAction.triggered.connect(self.zoomArea)
     self._zoomAction.setCheckable(True)
@@ -242,7 +242,7 @@ class XYView(View):
     self._verActionGroup.triggered.connect(self.onViewVerticalMode)
     self._verActionGroup.setExclusive(True)
     self._toolbar.addSeparator()
-    # Action to show or hide the legend 
+    # Action to show or hide the legend
     self._actionLegend = self.createAndAddLocalAction("legend.png", trQ("SHOW_LEGEND_TXT"))
     self._actionLegend.setCheckable(True)
     self._actionLegend.triggered.connect(self.showHideLegend)
@@ -253,7 +253,7 @@ class XYView(View):
     a = self.createAndAddLocalAction("settings.png", trQ("SETTINGS_TXT"))
     a.triggered.connect(self.onSettings)
     pass
-    
+
   def dumpView(self):
     # Choice of the view backup file
     filters = []
@@ -264,11 +264,11 @@ class XYView(View):
                                         filters,
                                         trQ("DUMP_VIEW_FILE"),
                                         False )
-    if not fileName.isEmpty():
-      name = str(fileName)
+    name = str(fileName)
+    if name != "":
       self._mplAxes.figure.savefig(name)
     pass
-    
+
   def autoFit(self, check=True, repaint=True):
     if self.__repaintOK():
       self._mplAxes.relim()
@@ -278,13 +278,13 @@ class XYView(View):
       self._mplAxes.axis([xm, xM, ym-i*self.AUTOFIT_MARGIN, yM+i*self.AUTOFIT_MARGIN])
       if repaint:
         self.repaint()
-  
+
   def zoomArea(self):
     if self._panAction.isChecked() and self._zoomAction.isChecked():
       self._panAction.setChecked(False)
     # Trigger underlying matplotlib action:
     self._mplNavigationActions["Zoom"].trigger()
-  
+
   def pan(self):
     if self._panAction.isChecked() and self._zoomAction.isChecked():
       self._zoomAction.setChecked(False)
@@ -310,7 +310,7 @@ class XYView(View):
       raise NotImplementedError
     if repaint:
       self.repaint()
-  
+
   def setXLog(self, log, repaint=True):
     if not self.__repaintOK():
       return
@@ -340,34 +340,34 @@ class XYView(View):
       self.autoFit()
       self.repaint()
     self._blockLogSignal = False
-    
+
   def setXSciNotation(self, sciNotation, repaint=True):
     self._axisXSciNotation = sciNotation
     self.changeFormatAxis()
     if repaint:
       self.repaint()
-   
+
   def setYSciNotation(self, sciNotation, repaint=True):
     self._axisYSciNotation = sciNotation
     self.changeFormatAxis()
     if repaint:
       self.repaint()
-    
+
   def onViewHorizontalMode(self, checked=True, repaint=True):
     if self._blockLogSignal:
       return
-    action = self._horActionGroup.checkedAction()  
+    action = self._horActionGroup.checkedAction()
     if action is self._horLinearAction:
       self.setXLog(False, repaint)
     elif action is self._horLogarithmicAction:
       self.setXLog(True, repaint)
     else:
       raise NotImplementedError
-  
+
   def onViewVerticalMode(self, checked=True, repaint=True):
     if self._blockLogSignal:
       return
-    action = self._verActionGroup.checkedAction()  
+    action = self._verActionGroup.checkedAction()
     if action is self._verLinearAction:
       self.setYLog(False, repaint)
     elif action is self._verLogarithmicAction:
@@ -376,13 +376,13 @@ class XYView(View):
       raise NotImplementedError
     if repaint:
       self.repaint()
-  
+
   def __adjustFigureMargins(self, withLegend):
     """ Adjust figure margins to make room for the legend """
     if withLegend:
       leg = self._legend
       bbox = leg.get_window_extent()
-      # In axes coordinates: 
+      # In axes coordinates:
       bbox2 = bbox.transformed(leg.figure.transFigure.inverted())
       if self._legendLoc == "right":
         self._mplFigure.subplots_adjust(right=1.0-(bbox2.width+0.02))
@@ -391,7 +391,7 @@ class XYView(View):
     else:
       # Reset to default (rc) values
       self._mplFigure.subplots_adjust(bottom=0.1, right=0.9)
-  
+
   def setLegendVisible(self, visible, repaint=True):
     if visible and not self._actionLegend.isChecked():
       self._actionLegend.setChecked(True)
@@ -399,18 +399,18 @@ class XYView(View):
     if not visible and self._actionLegend.isChecked():
       self._actionLegend.setChecked(False)
       self.showHideLegend(repaint=repaint)
-  
+
   def showHideLegend(self, actionChecked=None, repaint=True):
     if not self.__repaintOK():  # Show/hide legend is extremely costly
       return
-    
+
     show = self._actionLegend.isChecked()
     nCurves = len(self._curveViews)
     if nCurves > 10: fontSize = 'x-small'
     else:            fontSize = None
-    
+
     if nCurves == 0:
-      # Remove legend 
+      # Remove legend
       leg = self._mplAxes.legend()
       if leg is not None: leg.remove()
     if show and nCurves > 0:
@@ -419,8 +419,8 @@ class XYView(View):
         self._legend = None
         self._mplAxes._legend = None
       if self._legendLoc == "bottom":
-        self._legend = self._mplAxes.legend(loc="upper left", bbox_to_anchor=(0.0, -0.05, 1.0, -0.05), 
-                                            borderaxespad=0.0, mode="expand", fancybox=True, 
+        self._legend = self._mplAxes.legend(loc="upper left", bbox_to_anchor=(0.0, -0.05, 1.0, -0.05),
+                                            borderaxespad=0.0, mode="expand", fancybox=True,
                                             shadow=True, ncol=3, prop={'size':fontSize, 'style': 'italic'})
       elif self._legendLoc == "right":
         self._legend = self._mplAxes.legend(loc="upper left", bbox_to_anchor=(1.02,1.0), borderaxespad=0.0,
@@ -440,7 +440,7 @@ class XYView(View):
         self._mplAxes._legend = None
         self._mplCanvas.draw()
         self.__adjustFigureMargins(withLegend=False)
-    
+
     curr_crv = self._model._currentCurve
     if curr_crv is None: curr_title = None
     else:                curr_title = curr_crv.getTitle()
@@ -451,10 +451,10 @@ class XYView(View):
           label.set_backgroundcolor('0.85')
         else :
           label.set_backgroundcolor('white')
-        
+
     if repaint:
       self.repaint()
-   
+
   def onSettings(self, trigger=False, dlg_test=None):
     dlg = dlg_test or PlotSettings()
     dlg.titleEdit.setText(self._mplAxes.get_title())
@@ -483,7 +483,7 @@ class XYView(View):
       dlg.markerCurve.setEnabled(True)
       name = curr_crv.getTitle()
       dlg.nameCurve.setText(name)
-      view = self._curveViews[curr_crv.getID()] 
+      view = self._curveViews[curr_crv.getID()]
       marker = view.getMarker()
       color = view.getColor()
       index = dlg.markerCurve.findText(marker)
@@ -508,8 +508,8 @@ class XYView(View):
           dlg.legendPositionComboBox.setCurrentIndex(1)
       else :
         dlg.showLegendCheckBox.setChecked(False)
-        dlg.legendPositionComboBox.setEnabled(False)    
-             
+        dlg.legendPositionComboBox.setEnabled(False)
+
     if dlg.exec_():
       # Title
       self._model.setTitle(dlg.titleEdit.text())
@@ -540,23 +540,23 @@ class XYView(View):
       self.changeFormatAxis()
       # Color and marker of the curve
       if view:
-        view.setColor(dlg.getRGB()) 
+        view.setColor(dlg.getRGB())
         view.setMarker(self.CURVE_MARKERS[dlg.markerCurve.currentIndex()])
       self.showHideLegend(repaint=True)
       self._mplCanvas.draw()
     pass
-    
+
   def updateViewTitle(self):
     s = ""
     if self._model._title != "":
       s = " - %s" % self._model._title
     title = "CurvePlot (%d)%s" % (self._model.getID(), s)
     self._sgPyQt.setViewTitle(self._salomeViewID, title)
-    
+
   def onCurrentPlotSetChange(self):
-    """ Avoid a unnecessary call to update() when just switching current plot set! """ 
+    """ Avoid a unnecessary call to update() when just switching current plot set! """
     pass
-  
+
   def onCurrentCurveChange(self):
     curr_crv2 = self._model.getCurrentCurve()
     if curr_crv2 != self._currCrv:
@@ -564,51 +564,51 @@ class XYView(View):
         view = self._curveViews[self._currCrv.getID()]
         view.toggleHighlight(False)
       if not curr_crv2 is None:
-        view = self._curveViews[curr_crv2.getID()] 
+        view = self._curveViews[curr_crv2.getID()]
         view.toggleHighlight(True)
       self._currCrv = curr_crv2
       self.showHideLegend(repaint=False) # redo legend
-      self.repaint() 
-      
+      self.repaint()
+
   def changeFormatAxis(self) :
     if not self.__repaintOK():
       return
-    
-    # don't try to switch to sci notation if we are not using the 
+
+    # don't try to switch to sci notation if we are not using the
     # matplotlib.ticker.ScalarFormatter (i.e. if in Log for ex.)
     if self._horLinearAction.isChecked():
       if self._axisXSciNotation :
         self._mplAxes.ticklabel_format(style='sci',scilimits=(0,0), axis='x')
       else :
         self._mplAxes.ticklabel_format(style='plain',axis='x')
-    if self._verLinearAction.isChecked():    
+    if self._verLinearAction.isChecked():
       if self._axisYSciNotation :
         self._mplAxes.ticklabel_format(style='sci',scilimits=(0,0), axis='y')
       else :
         self._mplAxes.ticklabel_format(style='plain',axis='y')
-    
+
   def update(self):
     if self._salomeViewID is None:
       self.createPlotWidget()
       self._salomeViewID = self._sgPyQt.createView("CurvePlot", self._plotWidget)
       Logger.Debug("Creating SALOME view ID=%d" % self._salomeViewID)
       self._sgPyQt.setViewVisible(self._salomeViewID, True)
-    
+
     self.updateViewTitle()
-    
+
     # Check list of curve views:
     set_mod = set(self._model._curves.keys())
     set_view = set(self._curveViews.keys())
-    
+
     # Deleted/Added curves:
     dels = set_view - set_mod
     added = set_mod - set_view
-    
+
     for d in dels:
       self.removeCurve(d)
 
     if not len(self._curveViews):
-      # Reset color cycle 
+      # Reset color cycle
       self._mplAxes.set_color_cycle(None)
 
     for a in added:
@@ -628,30 +628,30 @@ class XYView(View):
     # Redo auto-fit
     self.autoFit(repaint=False)
     self.repaint()
-  
+
   def onDataChange(self):
     # the rest is done in the CurveView:
     self.autoFit(repaint=True)
-    
+
   def onMousePress(self, event):
     if event.button == 3 :
       if self._panAction.isChecked():
         self._panAction.setChecked(False)
       if self._zoomAction.isChecked():
         self._zoomAction.setChecked(False)
-    
+
   def onContextMenu(self, position):
     pos = self._mplCanvas.mapToGlobal(QtCore.QPoint(position.x(),position.y()))
     self._popupMenu.exec_(pos)
-    
+
   def onScroll(self, event):
     # Event location (x and y)
     xdata = event.xdata
     ydata = event.ydata
-    
+
     cur_xlim = self._mplAxes.get_xlim()
     cur_ylim = self._mplAxes.get_ylim()
-    
+
     base_scale = 2.
     if event.button == 'down':
       # deal with zoom in
@@ -662,7 +662,7 @@ class XYView(View):
     else:
       # deal with something that should never happen
       scale_factor = 1
-    
+
     new_width = (cur_xlim[1] - cur_xlim[0]) * scale_factor
     new_height = (cur_ylim[1] - cur_ylim[0]) * scale_factor
 
@@ -671,10 +671,10 @@ class XYView(View):
 
     self._mplAxes.set_xlim([xdata - new_width * (1-relx), xdata + new_width * (relx)])
     self._mplAxes.set_ylim([ydata - new_height * (1-rely), ydata + new_height * (rely)])
-    
+
     self.repaint()
     pass
-    
+
   def onPressEvent(self, event):
     if event.button == 3 :
       #self._mplCanvas.emit(QtCore.SIGNAL("button_release_event()"))
@@ -688,13 +688,13 @@ class XYView(View):
     #  point = event.canvas.mapToGlobal(QtCore.QPoint(event.x,canvasSize.height()-event.y))
     #  self._popupMenu.move(point)
     #  self._popupMenu.show()
-   
+
   def onMotionEvent(self, event):
     print "OnMotionEvent ",event.button
     #if event.button == 3 :
     #  event.button = None
     #  return True
-   
+
   def onReleaseEvent(self, event):
     print "OnReleaseEvent ",event.button
     #if event.button == 3 :
