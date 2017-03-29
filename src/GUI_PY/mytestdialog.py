@@ -18,11 +18,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-__author__="gboulant"
-__date__ ="$31 mars 2010 17:09:53$"
 from qtsalome import *
-from mytestdialog_ui import Ui_MyTestDialog
-from .genericdialog import GenericDialog
+from salome.gui.genericdialog import GenericDialog
+from salome.gui.mytestdialog_ui import Ui_MyTestDialog
+
 
 class MyTestDialog(GenericDialog):
     """

@@ -18,12 +18,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-__author__="gboulant"
-__date__ ="$31 mars 2010 17:09:53$"
-
 from qtsalome import QDialog, QMessageBox
+from salome.gui.genericdialog_ui import Ui_GenericDialog
 
-from genericdialog_ui import Ui_GenericDialog
 
 class GenericDialog(QDialog):
     """
