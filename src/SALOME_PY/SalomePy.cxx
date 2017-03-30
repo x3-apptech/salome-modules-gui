@@ -91,10 +91,10 @@
 {                                                    \
   PyObject *w;                                       \
   int rc;                                            \
-  if ( ( w = PyInt_FromLong( i ) ) == NULL ) return; \
+  if ( ( w = PyLong_FromLong( i ) ) == NULL ) return NULL; \
   rc = PyDict_SetItemString( aModuleDict, #i, w );   \
   Py_DECREF( w );                                    \
-  if ( rc < 0 ) return;                              \
+  if ( rc < 0 ) return NULL;                              \
 }
 
 //! View operation type
@@ -538,19 +538,19 @@ static struct PyModuleDef moduledef = {
   \brief Python module initialization.
   \internal
 */
-extern "C" SALOMEPY_EXPORT void initlibSalomePy()
+extern "C" SALOMEPY_EXPORT PyMODINIT_FUNC PyInit_libSalomePy(void)
 {
   // init module
   PyObject *aModule = PyModule_Create(&moduledef);
   if( PyErr_Occurred() ) {
     PyErr_Print();
-    return;
+    return NULL;
   }
 
   // get module's dictionary
   PyObject *aModuleDict = PyModule_GetDict( aModule );
   if ( aModuleDict == NULL )
-    return;
+    return NULL;
 
   // export View type enumeration
   PUBLISH_ENUM( ViewFront );
@@ -559,4 +559,6 @@ extern "C" SALOMEPY_EXPORT void initlibSalomePy()
   PUBLISH_ENUM( ViewBottom );
   PUBLISH_ENUM( ViewRight );
   PUBLISH_ENUM( ViewLeft );
+
+  return aModule;
 }
