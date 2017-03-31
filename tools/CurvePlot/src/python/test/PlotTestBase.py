@@ -72,7 +72,7 @@ class PlotTestBase(unittest.TestCase):
       self.tmpBaselineDir = os.path.join(tempfile.gettempdir(), "curveplot_baselines")
       if not os.path.isdir(self.tmpBaselineDir):
         os.mkdir(self.tmpBaselineDir)
-      print "### Rebuilding base lines. Reference files will be saved to '%s'" % self.tmpBaselineDir
+      print("### Rebuilding base lines. Reference files will be saved to '%s'" % self.tmpBaselineDir)
        
     PlotController.WITH_CURVE_BROWSER = True
     XYView._DEFAULT_LEGEND_STATE = True   # always show legend by default
@@ -146,7 +146,7 @@ class PlotTestBase(unittest.TestCase):
     if not ret:
       # Keep file if assert is false
       self.keepDir = True
-      print "[%s] -- Failed screenshot equality, or unable to open baseline file - directory is kept alive: %s" % (self.getTestName(), self.tmpDir)
+      print("[%s] -- Failed screenshot equality, or unable to open baseline file - directory is kept alive: %s" % (self.getTestName(), self.tmpDir))
     return ret 
   
   def showTabWidget(self):

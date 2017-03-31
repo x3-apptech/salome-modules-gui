@@ -35,11 +35,11 @@ class CurveBrowserView( View, CurveTreeDockWidget) :
         plotSets = self._model._plotSets
             
         # The second (hidden) column in the tree bares the ID of the object and its nature (plotset or curve)
-        for p in plotSets.values():
-          item = QtGui.QTreeWidgetItem([unicode(p.getTitle()), unicode(p.getID()) + '_set'])
+        for p in list(plotSets.values()):
+          item = QtGui.QTreeWidgetItem([str(p.getTitle()), str(p.getID()) + '_set'])
           treeWidget.addTopLevelItem(item)
-          for c in p._curves.values():
-            chld = QtGui.QTreeWidgetItem([unicode(c.getTitle()), unicode(c.getID()) + '_crv'])
+          for c in list(p._curves.values()):
+            chld = QtGui.QTreeWidgetItem([str(c.getTitle()), str(c.getID()) + '_crv'])
             item.addChild(chld)
           
         treeWidget.expandAll()

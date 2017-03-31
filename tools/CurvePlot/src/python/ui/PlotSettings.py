@@ -53,10 +53,10 @@ class PlotSettings(QtGui.QDialog):
     return pix
 
   def accept(self):
-    xminText = unicode(self.axisXMinEdit.text())
-    xmaxText = unicode(self.axisXMaxEdit.text())
-    yminText = unicode(self.axisYMinEdit.text())
-    ymaxText = unicode(self.axisYMaxEdit.text())
+    xminText = str(self.axisXMinEdit.text())
+    xmaxText = str(self.axisXMaxEdit.text())
+    yminText = str(self.axisYMinEdit.text())
+    ymaxText = str(self.axisYMaxEdit.text())
     if (yminText == "" or ymaxText == "") :
       QtGui.QMessageBox.critical(self, "Plot settings", "A field \"YMin\" or \"YMax\" is empty")
     else :

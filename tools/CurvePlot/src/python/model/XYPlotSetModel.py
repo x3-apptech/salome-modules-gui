@@ -26,7 +26,7 @@ class XYPlotSetModel(Model):
     return self._title
       
   def setCurrentCurve(self, curveID, silent=False):
-    if not self._curves.has_key(curveID) and curveID != -1:
+    if curveID not in self._curves and curveID != -1:
       raise ValueError("Invalid curve ID (%d)!" % curveID)
     self._currentCurve = self._curves.get(curveID, None)
     if not silent:
@@ -41,7 +41,7 @@ class XYPlotSetModel(Model):
       self.notifyChange("AddCurve")
   
   def removeCurve(self, curveID, silent=False):
-    if not self._curves.has_key(curveID):
+    if curveID not in self._curves:
       raise ValueError("Curve ID (%d) not found for deletion!" % curveID)
     c = self._curves.pop(curveID)
     if self._currentCurve is c:

@@ -8,12 +8,12 @@ try:
     raise Exception
   import PyQt4
   _use_pyqt = True
-  print "Using PyQt4 run-time ..."
+  print("Using PyQt4 run-time ...")
 except:
   try:
     import PySide
     _use_pyqt = False
-    print "Using PySide run-time ..."
+    print("Using PySide run-time ...")
   except:
     raise Exception("Neither PyQt4 nor PySide could be imported!")
 
@@ -24,7 +24,7 @@ try:
   if _use_pyqt:  back = 'PyQt4'
   else:          back = 'PySide'
   matplotlib.rcParams['backend.qt4'] = back
-  print "Matplotlib found - Set matplotlib backend to '%s'!" % back 
+  print("Matplotlib found - Set matplotlib backend to '%s'!" % back) 
 except:
   # No matplotlib, silently discard err message.
   pass

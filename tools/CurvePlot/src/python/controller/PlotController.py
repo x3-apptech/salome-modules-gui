@@ -104,13 +104,13 @@ class PlotController(object):
     if model is None or self._blockNotifications:
       return
     
-    if not self._modelViews.has_key(model):
+    if model not in self._modelViews:
       return
     
     for view in self._modelViews[model]:
       method = "on%s" % what
       if what != "" and what is not None and hasattr(view, method):
-        exec "view.%s()" % method
+        exec("view.%s()" % method)
       elif hasattr(view, "update"):
         # Generic update:
         view.update()
@@ -268,12 +268,12 @@ class PlotController(object):
         return -1
 
     ps = control._plotManager.removeXYPlotSet(plot_set_id)
-    for _, crv in ps._curves.items():
+    for _, crv in list(ps._curves.items()):
       control.removeModelListeners(crv)
     control.removeModelListeners(ps)
     psets = control._plotManager._plotSets 
     if len(psets):
-      control._plotManager.setCurrentPlotSet(psets.keys()[-1])
+      control._plotManager.setCurrentPlotSet(list(psets.keys())[-1])
     return plot_set_id
   
   @classmethod
@@ -282,7 +282,7 @@ class PlotController(object):
       gc.collect()
       import resource
       m = resource.getrusage(resource.RUSAGE_SELF)[2]*resource.getpagesize()/1e6
-      print "** Used memory: %.2f Mb" % m
+      print("** Used memory: %.2f Mb" % m)
   
   @classmethod
   def DeleteCurrentItem(cls):
@@ -397,7 +397,7 @@ class PlotController(object):
     """ @return the first plot set whose name matches the provided name. Otherwise returns -1
     """ 
     pm = cls.GetInstance()._plotManager
-    for _, ps in pm._plotSets.items():
+    for _, ps in list(pm._plotSets.items()):
       if ps._title == name:
         return ps.getID()
     return -1
@@ -407,10 +407,10 @@ class PlotController(object):
     """ @return two lists: plot set names, and corresponding plot set IDs
     """
     pm = cls.GetInstance()._plotManager
-    it = pm._plotSets.items()
+    it = list(pm._plotSets.items())
     ids, inst, titles = [], [], []
     if len(it):  
-      ids, inst = zip(*it)        
+      ids, inst = list(zip(*it))        
     if len(inst):
       titles = [i.getTitle() for i in inst]
     return list(ids), titles
@@ -477,7 +477,7 @@ class PlotController(object):
     @return True if plot_set_id is the identifier of a valid and existing plot set.
     """
     control = cls.GetInstance()
-    return control._plotManager._plotSets.has_key(plot_set_id)
+    return plot_set_id in control._plotManager._plotSets
 
   @classmethod
   def GetSalomeViewID(cls, plot_set_id):
@@ -535,7 +535,7 @@ class PlotController(object):
       raise ValueError("Invalid marker: '%s'" % marker)
     
     cont = cls.GetInstance()
-    for mod, views in cont._modelViews.items():
+    for mod, views in list(cont._modelViews.items()):
       if isinstance(mod, CurveModel) and mod.getID() == crv_id:
         for v in views:
           if isinstance(v, CurveView):
@@ -566,11 +566,11 @@ class PlotController(object):
     from XYView import XYView
     
     cont = cls.GetInstance()
-    for mod, views in cont._modelViews.items():
+    for mod, views in list(cont._modelViews.items()):
       if isinstance(mod, XYPlotSetModel) and mod.getID() == ps_id:
         for v in views:
           if isinstance(v, XYView):
-            exec "v.%s(*args, **kwargs)" % func
+            exec("v.%s(*args, **kwargs)" % func)
             found = True
     if not found:
       raise Exception("Invalid plot set ID or plot set currently not displayed (ps_id=%d)!" % ps_id)

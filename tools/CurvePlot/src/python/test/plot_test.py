@@ -148,7 +148,7 @@ class PlotTest(PlotTestBase):
   def testAddCurve(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
-    PlotController.AddCurve(x, y, curve_label="My curve", x_label=u"Lèés X (unicode!)", y_label=u"Et des ŷ", append=False)
+    PlotController.AddCurve(x, y, curve_label="My curve", x_label="Lèés X (unicode!)", y_label="Et des ŷ", append=False)
     self.assertTrue(self.areScreenshotEqual(tw))
       
   def testAddCurveAppend(self):
@@ -304,21 +304,21 @@ class PlotTest(PlotTestBase):
   def testSetLabelX(self):
     tw = self.showTabWidget()
     ps_id = PlotController.AddPlotSet("My plotset")
-    PlotController.SetXLabel(u"The X-s éà", ps_id)
+    PlotController.SetXLabel("The X-s éà", ps_id)
     self.assertTrue(self.areScreenshotEqual(tw))
 
   def testSetLabelY(self):
     tw = self.showTabWidget()
     ps_id = PlotController.AddPlotSet("My plotset")
-    PlotController.SetYLabel(u"Tutu", ps_id)
-    PlotController.SetYLabel(u"The Y-s uûàç", ps_id)
+    PlotController.SetYLabel("Tutu", ps_id)
+    PlotController.SetYLabel("The Y-s uûàç", ps_id)
     self.assertTrue(self.areScreenshotEqual(tw))
 
   def testSetPlotSetTitle(self):
     tw = self.showTabWidget()
     ps_id = PlotController.AddPlotSet("tutu")
     PlotController.AddPlotSet("tata")
-    PlotController.SetPlotSetTitle(u"un titre àé", ps_id)
+    PlotController.SetPlotSetTitle("un titre àé", ps_id)
     PlotController.SetCurrentPlotSet(ps_id)
     self.assertTrue(self.areScreenshotEqual(tw))
         
@@ -354,7 +354,7 @@ class PlotTest(PlotTestBase):
       dlg_test.showLegendCheckBox.setChecked(True)
       return True  
     dlg_test.exec_ = fun
-    t = PlotController.GetInstance()._curveTabsView._XYViews.items()
+    t = list(PlotController.GetInstance()._curveTabsView._XYViews.items())
     t[0][1].onSettings(dlg_test=dlg_test)  
     self.assertTrue(self.areScreenshotEqual(tw))
  
@@ -389,7 +389,7 @@ class PlotTest(PlotTestBase):
       dlg_test.showLegendCheckBox.setChecked(True)
       return True  
     dlg_test.exec_ = fun
-    t = PlotController.GetInstance()._curveTabsView._XYViews.items()
+    t = list(PlotController.GetInstance()._curveTabsView._XYViews.items())
     t[0][1].onSettings(dlg_test=dlg_test)  
     self.assertTrue(self.areScreenshotEqual(tw))
     

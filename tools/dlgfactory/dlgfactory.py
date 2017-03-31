@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     if options.verbose:
       print("Note that the following directives should be present in your CMakeLists.txt (or something like that): \n")
-      print(__msg_str.replace( "__CLASSNAME__", className ))
+      print((__msg_str.replace( "__CLASSNAME__", className )))
       pass
   pass
 
