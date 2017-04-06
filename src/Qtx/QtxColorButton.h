@@ -51,6 +51,8 @@ public:
   QString       autoText() const;
   void          setAutoText( const QString& );
 
+  QSize         sizeHint() const;
+
 signals:
   void          clicked( QColor );
   void          changed( QColor );

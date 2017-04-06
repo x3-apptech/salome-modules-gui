@@ -414,6 +414,17 @@ QList<QColor> QtxColorButton::colorsList() const
 }
 
 /*!
+  \brief Get size hint for this widget.
+*/
+QSize QtxColorButton::sizeHint() const
+{
+  QSize sz = QToolButton::sizeHint();
+  sz.setWidth( sz.width() + 18 );
+  return sz;
+}
+
+
+/*!
   \fn void QtxColorButton::clicked( QColor color );
   \brief This signal is emitted when the widget button is clicked by
          the user.
