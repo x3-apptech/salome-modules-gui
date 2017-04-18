@@ -3672,10 +3672,15 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
   }
   if ( sec == "desktop" && param == "opaque_resize" ) {
     bool opaqueResize = resMgr->booleanValue( "desktop", "opaque_resize", false );
-    QMainWindow::DockOptions dopts = desktop()->dockOptions();
-    if ( opaqueResize ) dopts |= QMainWindow::AnimatedDocks;
-    else                dopts &= ~QMainWindow::AnimatedDocks;
-    desktop()->setDockOptions( dopts );
+    // RNV: This code has been commented, because clearing of the QMainWindow::AnimatedDocks option
+    //      leads to strange behaviour of the dockable windows (at least at qt-5.6.1):
+    //      any dockable window can't be docked to the another area, except initial area.
+    //      It is possible to move window to another area, but it always returns to the initial area.
+    //
+    //    QMainWindow::DockOptions dopts = desktop()->dockOptions();
+    //    if ( opaqueResize ) dopts |= QMainWindow::AnimatedDocks;
+    //     else                dopts &= ~QMainWindow::AnimatedDocks;
+    //    desktop()->setDockOptions( dopts );
     desktop()->setOpaqueResize( opaqueResize );
     if ( dynamic_cast<STD_TabDesktop*>( desktop() ) )
       dynamic_cast<STD_TabDesktop*>( desktop() )->workstack()->setOpaqueResize( opaqueResize );
@@ -3743,10 +3748,10 @@ void LightApp_Application::loadPreferences()
   if ( desktop() ) {
     desktop()->retrieveGeometry( aResMgr->stringValue( "desktop", "geometry" ) );
     bool opaqueResize = aResMgr->booleanValue( "desktop", "opaque_resize", false );
-    QMainWindow::DockOptions dopts = desktop()->dockOptions();
-    if ( opaqueResize ) dopts |= QMainWindow::AnimatedDocks;
-    else                dopts &= ~QMainWindow::AnimatedDocks;
-    desktop()->setDockOptions( dopts );
+    //    QMainWindow::DockOptions dopts = desktop()->dockOptions();
+    //    if ( opaqueResize ) dopts |= QMainWindow::AnimatedDocks;
+    //    else                dopts &= ~QMainWindow::AnimatedDocks;
+    //    desktop()->setDockOptions( dopts );
     desktop()->setOpaqueResize( opaqueResize );
     if ( dynamic_cast<STD_TabDesktop*>( desktop() ) )
       dynamic_cast<STD_TabDesktop*>( desktop() )->workstack()->setOpaqueResize( opaqueResize );
