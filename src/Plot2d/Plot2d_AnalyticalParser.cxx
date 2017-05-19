@@ -46,8 +46,7 @@ namespace {
   PyStdOut_write(PyStdOut *self, PyObject *args)
   {
     char *c;
-    int l;
-    if (!PyArg_ParseTuple(args, "t#:write",&c, &l))
+    if (!PyArg_ParseTuple(args, "s",&c))
       return NULL;
 
     *(self->out)=*(self->out)+c;
@@ -114,6 +113,14 @@ namespace {
     0,                            /*tp_new*/
     0,                            /*tp_free*/
     0,                            /*tp_is_gc*/
+    0,                            /*tp_bases*/
+    0,                            /*tp_mro*/
+    0,                            /*tp_cache*/
+    0,                            /*tp_subclasses*/
+    0,                            /*tp_weaklist*/
+    0,                            /*tp_del*/
+    0,                            /*tp_version_tag*/
+    0,                             /*tp_finalize*/  
   };
 
   PyObject * newPyStdOut( std::string& out )
@@ -179,7 +186,7 @@ int Plot2d_AnalyticalParser::calculate( const QString& theExpr,
 
   if(obj == NULL) {
     PyErr_Print();
-    PyGILState_Release(gstate);        
+    PyGILState_Release(gstate);
     return result;
     
   } else {
@@ -210,9 +217,9 @@ int Plot2d_AnalyticalParser::calculate( const QString& theExpr,
     PyGILState_Release(gstate);
     return result;
   }
-    
+
   PyObject* coords = PyObject_CallFunction(func,(char*)"(d, d, i)", theMin, theMax, theNbStep );
-  
+
   if (coords == NULL){
     fflush(stderr);
     std::string err_description="";
@@ -253,22 +260,21 @@ int Plot2d_AnalyticalParser::calculate( const QString& theExpr,
 */
 void Plot2d_AnalyticalParser::initScript() {
   myScript.clear();
-  myScript += "from math import *                      \n";
-  myScript += "def Y(x):                               \n";
-  myScript += "    return ";
-  myScript += "%1\n";
+  myScript += "from math import *\n";
+  myScript += "def Y(x):\n";
+  myScript += "\treturn %1\n";
 
-  myScript += "def coordCalculator(xmin, xmax, nstep):     \n";
-  myScript += "   coords = []                              \n";
-  myScript += "   xstep  = (xmax - xmin) / nstep           \n";
-  myScript += "   n = 0                                    \n";
-  myScript += "   while n <= nstep :                       \n";
-  myScript += "      x = xmin + n*xstep                    \n";
-  myScript += "      try:                                  \n";
-  myScript += "			y = Y(x)                           \n";
-  myScript += "			coords.append([x,y])               \n";
-  myScript += "      except ValueError, ZeroDivisionError: \n";
-  myScript += "			pass                               \n";
-  myScript += "      n = n+1                               \n";
-  myScript += "   return coords                            \n";
+  myScript += "def coordCalculator(xmin, xmax, nstep):\n";
+  myScript += "\tcoords = []\n";
+  myScript += "\txstep  = (xmax - xmin) / nstep\n";
+  myScript += "\tn = 0\n";
+  myScript += "\twhile n <= nstep :\n";
+  myScript += "\t\tx = xmin + n*xstep\n";
+  myScript += "\t\ttry:\n";
+  myScript += "\t\t\ty = Y(x)\n";
+  myScript += "\t\t\tcoords.append([x,y])\n";
+  myScript += "\t\texcept (ValueError, ZeroDivisionError):\n";
+  myScript += "\t\t\tpass\n";
+  myScript += "\t\tn = n+1\n";
+  myScript += "\treturn coords\n";
 }
