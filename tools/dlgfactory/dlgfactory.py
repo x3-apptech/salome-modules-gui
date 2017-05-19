@@ -81,7 +81,7 @@ salomeinclude_HEADERS       += __CLASSNAME__.h
 
 if __name__ == "__main__":
   from optparse import OptionParser
-  import shutil, fileinput
+  import codecs
 
   tool_path = os.path.dirname( os.path.abspath( sys.argv[0] ) )
 
@@ -108,12 +108,13 @@ if __name__ == "__main__":
     else:
       file_src = os.path.join( tool_path, "__GDIALOG__" + ext )
       pass
-    shutil.copyfile( file_src, file_dest )
-    finput = fileinput.FileInput( file_dest, inplace=1 )
-    for line in finput:
+    fi = codecs.open(file_src, 'r', encoding='utf-8')
+    fo = codecs.open(file_dest, 'w', encoding='utf-8')
+    for line in fi:
       line = line[:-1] 
       line = line.replace( "__CLASSNAME__", className )
-      print(line)
+      line = line + "\n"
+      fo.write(line)
       pass
 
     if options.verbose:
