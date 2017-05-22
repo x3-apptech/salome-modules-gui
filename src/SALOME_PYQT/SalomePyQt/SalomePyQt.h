@@ -114,6 +114,23 @@ enum {
   PT_Font     = LightApp_Preferences::Font, 
   PT_DirList  = LightApp_Preferences::DirList, 
   PT_File     = LightApp_Preferences::File, 
+  PT_Slider       = LightApp_Preferences::Slider, 
+  PT_Shortcut     = LightApp_Preferences::Shortcut, 
+  PT_ShortcutTree = LightApp_Preferences::ShortcutTree, 
+  PT_BiColor      = LightApp_Preferences::BiColor, 
+  PT_Background   = LightApp_Preferences::Background, 
+  PT_UserDefined  = LightApp_Preferences::UserDefined, 
+};
+
+class UserDefinedContent: public QWidget
+{
+  Q_OBJECT
+
+public:
+  explicit UserDefinedContent();
+
+  virtual void store();
+  virtual void retrieve();
 };
 
 //! Orientation
@@ -277,6 +294,7 @@ public:
                                           const QString& = QString() );
   static QVariant          preferenceProperty( const int, const QString& );
   static void              setPreferenceProperty( const int, const QString&, const QVariant& );
+  static void              setPreferencePropertyWg( const int, const QString&, UserDefinedContent* );
   static void              addPreferenceProperty( const int, const QString&, const int, const QVariant& );
 
   static void              message( const QString&, bool = true );

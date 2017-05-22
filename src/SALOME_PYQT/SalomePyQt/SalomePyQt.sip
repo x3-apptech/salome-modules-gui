@@ -102,6 +102,12 @@ enum PrefType {
   PT_Font, 
   PT_DirList, 
   PT_File, 
+  PT_Slider,
+  PT_Shortcut,
+  PT_ShortcutTree,
+  PT_BiColor,
+  PT_Background,
+  PT_UserDefined
 };
 
 enum Orientation {
@@ -235,6 +241,26 @@ signals:
 
 private:
   QtxTreeView( const QtxTreeView& );
+};
+
+class UserDefinedContent : public QWidget
+{
+%TypeHeaderCode
+#include <SalomePyQt.h>
+%End
+
+%ConvertToSubClassCode
+    if ( qobject_cast<UserDefinedContent*>( sipCpp ) )
+      sipClass = sipClass_UserDefinedContent;
+    else
+      sipClass = NULL;
+%End
+
+public:
+  explicit UserDefinedContent();
+
+  virtual void store();
+  virtual void retrieve();
 };
 
 enum VisibilityState 
@@ -391,6 +417,9 @@ public:
   static void              setPreferenceProperty( const int, 
                                                   const QString&,
                                                   const QVariant& ) /ReleaseGIL/ ;
+  static void              setPreferencePropertyWg( const int, 
+                                                    const QString&,	
+                                                    UserDefinedContent* ) /ReleaseGIL/ ;
   static void              addPreferenceProperty( const int, 
                                                   const QString&, 
 						  const int, 

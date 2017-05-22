@@ -67,8 +67,10 @@
 #include <QApplication>
 #include <QPaintEvent>
 #include <QCoreApplication>
+#include <QVBoxLayout>
 
 #include <utilities.h>
+
 namespace
 {
   /*!
@@ -327,6 +329,90 @@ void SALOME_Selection::ClearFilters()
     }
   };
   ProcessVoidEvent( new TEvent( mySelMgr ) );
+}
+
+/*!
+  \class UserDefinedContent
+  \brief The class represents base class for user defined widget that
+  can be inserted to the Preferences dialog.
+*/
+
+/*!
+  \brief Constructor
+*/
+UserDefinedContent::UserDefinedContent()
+  : QWidget()
+{
+}
+
+/*!
+  \brief Called from Preferences dialog to store settings to the resource file.
+*/
+void UserDefinedContent::store()
+{
+}
+
+/*!
+  \brief Called from Preferences dialog to restore settings from the resource file.
+*/
+void UserDefinedContent::retrieve()
+{
+}
+
+/*!
+  \class SgPyQtUserDefinedContent
+  \brief A Wrapper for UserDefinedContent class.
+  \internal
+*/
+class SgPyQtUserDefinedContent: public QtxUserDefinedContent
+{
+public:
+  SgPyQtUserDefinedContent(UserDefinedContent*);
+  virtual ~SgPyQtUserDefinedContent();
+
+  void store( QtxResourceMgr*, QtxPreferenceMgr* );
+  void retrieve( QtxResourceMgr*, QtxPreferenceMgr* );
+
+private:
+  UserDefinedContent* myContent;
+};
+
+/*!
+  \brief Create custom item for Preferences dialog wrapping widget passed from Python.
+  \internal
+*/
+SgPyQtUserDefinedContent::SgPyQtUserDefinedContent(UserDefinedContent* content)
+  : QtxUserDefinedContent( 0 ), myContent( content )
+{
+  QVBoxLayout* l = new QVBoxLayout( this );
+  l->setContentsMargins( 0, 0, 0, 0 );
+  l->addWidget( myContent );
+}
+
+/*!
+  \brief Destructor.
+  \internal
+*/
+SgPyQtUserDefinedContent::~SgPyQtUserDefinedContent()
+{
+}
+
+/*!
+  \brief Called from Preferences dialog to store settings to the resource file.
+  \internal
+*/
+void SgPyQtUserDefinedContent::store( QtxResourceMgr*, QtxPreferenceMgr* )
+{
+  myContent->store();
+}
+
+/*!
+  \brief Called from Preferences dialog to restore settings from the resource file.
+  \internal
+*/
+void SgPyQtUserDefinedContent::retrieve( QtxResourceMgr*, QtxPreferenceMgr* )
+{
+  myContent->retrieve();
 }
 
 /*!
@@ -2440,7 +2526,39 @@ void SalomePyQt::setPreferenceProperty( const int id,
       }
     }
   };
-  ProcessVoidEvent( new TEvent( id, prop, var) );
+  ProcessVoidEvent( new TEvent( id, prop, var ) );
+}
+
+/*!
+  \brief Set specific widget as a custom preferences item.
+  \param id preferences identifier
+  \param prop preferences property name
+  \param widget custom widget
+*/
+void SalomePyQt::setPreferencePropertyWg( const int id, 
+                                          const QString& prop,
+                                          UserDefinedContent* widget )
+{
+  class TEvent: public SALOME_Event
+  {
+    int      myId;
+    QString  myProp;
+    UserDefinedContent* myWidget;
+  public:
+    TEvent( const int id, const QString& prop, UserDefinedContent* widget ) 
+      : myId( id ), myProp( prop ), myWidget( widget ) {}
+    virtual void Execute() 
+    {
+      LightApp_Module* module = getActiveModule();
+      if ( module ) {
+	LightApp_Preferences* pref = module->getApp()->preferences();
+	if ( pref ) {
+	  pref->setItemProperty( myProp, (qint64) new SgPyQtUserDefinedContent( myWidget ), myId );
+        }
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( id, prop, widget ) );
 }
 
 /*!
