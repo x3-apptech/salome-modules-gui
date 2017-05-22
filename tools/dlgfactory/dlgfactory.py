@@ -80,25 +80,24 @@ salomeinclude_HEADERS       += __CLASSNAME__.h
 """ 
 
 if __name__ == "__main__":
-  from optparse import OptionParser
-  import codecs
+  from argparse import ArgumentParser
 
   tool_path = os.path.dirname( os.path.abspath( sys.argv[0] ) )
 
-  parser = OptionParser( description = __descr_str )
-  parser.add_option( "-n", action="store", default="TestDialog", dest="className", metavar="className",
-                     help="specify the name of the class (default is TestDialog)" )
-  parser.add_option( "-t", action="store", default="qdialog", dest="classType",
-                     choices=["qdialog", "gdialog"], metavar="classType",
+  parser = ArgumentParser( description = __descr_str )
+  parser.add_argument( "-n", action="store", default="TestDialog", dest="className", metavar="className",
+                       help="specify the name of the class (default is TestDialog)" )
+  parser.add_argument( "-t", action="store", default="qdialog", dest="classType",
+                       choices=["qdialog", "gdialog"], metavar="classType",
                      help="specify the type of the class (default is qdialog)" )
-  parser.add_option( "-v", "--verbose", action="store_true", default=True, dest="verbose",
-                     help="verbose mode" )
-  parser.add_option( "-s", "--silent", action="store_false", dest="verbose",
-                     help="silent mode" )
+  parser.add_argument( "-v", "--verbose", action="store_true", default=True, dest="verbose",
+                       help="verbose mode" )
+  parser.add_argument( "-s", "--silent", action="store_false", dest="verbose",
+                       help="silent mode" )
 
-  (options, args) = parser.parse_args()
-  className = options.className
-  classType = options.classType
+  args = parser.parse_args()
+  className = args.className
+  classType = args.classType
 
   for ext in [".cxx", ".h", ".ui"]:
     file_dest = className + ext 
@@ -108,18 +107,19 @@ if __name__ == "__main__":
     else:
       file_src = os.path.join( tool_path, "__GDIALOG__" + ext )
       pass
-    fi = codecs.open(file_src, 'r', encoding='utf-8')
-    fo = codecs.open(file_dest, 'w', encoding='utf-8')
-    for line in fi:
-      line = line[:-1] 
-      line = line.replace( "__CLASSNAME__", className )
-      line = line + "\n"
-      fo.write(line)
-      pass
+     
+    with open(file_src, 'r', encoding='utf-8') as fi, \
+         open(file_dest, 'w', encoding='utf-8') as fo:
+		    for line in fi:
+		      line = line[:-1] 
+		      line = line.replace( "__CLASSNAME__", className )
+		      line = line + "\n"
+		      fo.write(line)
+		      pass
 
-    if options.verbose:
+    if args.verbose:
       print("Note that the following directives should be present in your CMakeLists.txt (or something like that): \n")
-      print((__msg_str.replace( "__CLASSNAME__", className )))
+      print(__msg_str.replace( "__CLASSNAME__", className ))
       pass
   pass
 
