@@ -46,7 +46,6 @@
 #include <pqCollaborationBehavior.h>
 #include <pqVerifyRequiredPluginBehavior.h>
 #include <pqPluginSettingsBehavior.h>
-#include <pqFixPathsInStateFilesBehavior.h>
 #include <pqApplyBehavior.h>
 
 #include <pqPropertiesPanel.h>
@@ -81,7 +80,6 @@ void PVViewer_Behaviors::instanciateMinimalBehaviors(QMainWindow * desk)
       new pqAlwaysConnectedBehavior(this);  // client always connected to a server
       new pqVerifyRequiredPluginBehavior(this);
       new pqPluginSettingsBehavior(this);
-      new pqFixPathsInStateFilesBehavior(this);
       new pqCrashRecoveryBehavior(this);
       new pqCommandLineOptionsBehavior(this);
 
