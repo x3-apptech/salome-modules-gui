@@ -86,7 +86,7 @@ end
 # set additional environment
 ###
 
-set python_version=`python -c "import sys; print sys.version[:3]"`
+set python_version=`python -c "import sys; print(sys.version[:3])"`
 
 set MY_PATH=""
 set MY_LD_LIBRARY_PATH=""

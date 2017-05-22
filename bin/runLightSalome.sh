@@ -214,7 +214,7 @@ run_light_salome(){
     # set additional environment
     ###
 
-    local PVERSION=`python -c "import sys; print sys.version[:3]" 2>/dev/null`
+    local PVERSION=`python -c "import sys; print(sys.version[:3])" 2>/dev/null`
     
     local MY_PATH=""
     local MY_LD_LIBRARY_PATH=""
