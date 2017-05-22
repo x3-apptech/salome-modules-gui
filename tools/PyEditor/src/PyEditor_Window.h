@@ -29,7 +29,7 @@
 #include <QMap>
 
 class QAction;
-class PyEditor_Editor;
+class PyEditor_Widget;
 
 class PYEDITOR_EXPORT PyEditor_Window : public QMainWindow
 {
@@ -38,11 +38,15 @@ class PYEDITOR_EXPORT PyEditor_Window : public QMainWindow
 public:
   enum { NewId, OpenId, SaveId, SaveAsId, ExitId,
          UndoId, RedoId, CutId, CopyId, PasteId, DeleteId, SelectAllId,
+         FindId, ReplaceId,
          PreferencesId, HelpId };
 
   PyEditor_Window( QWidget* = 0 );
   ~PyEditor_Window();
 
+  void        loadFile( const QString&, bool = true );
+  bool        saveFile( const QString&, bool = true );
+  
 protected:
   virtual void closeEvent( QCloseEvent* );
 
@@ -54,16 +58,12 @@ private Q_SLOTS:
   void        onPreferences();
   void        onHelp();
 
-private:
-  void        loadFile( const QString& );
-  bool        saveFile( const QString& );
-  
   void        setCurrentFile( const QString& );
   bool        whetherSave();
   QString     defaultName() const;
 
 private:
-  PyEditor_Editor*    myTextEditor;
+  PyEditor_Widget*    myEditor;
   QString             myURL;
   QMap<int, QAction*> myActions;
 };

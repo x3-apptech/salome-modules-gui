@@ -22,7 +22,7 @@
 
 #include "PyViewer_ViewWindow.h"
 
-#include "PyEditor_Editor.h"
+#include "PyEditor_Widget.h"
 #include "PyEditor_SettingsDlg.h"
 
 #include "SUIT_Session.h"
@@ -32,9 +32,11 @@
 #include "QtxActionToolMgr.h"
 
 #include <QApplication>
+#include <QCloseEvent>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QVBoxLayout>
 
 /*!
   \class PyViewer_ViewWindow
@@ -48,9 +50,9 @@
 PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
   SUIT_ViewWindow( desktop )
 {
-  // Create editor and set it as a central widget.
-  myTextEditor = new PyEditor_Editor( this );
-  setCentralWidget( myTextEditor );
+  // Create central widget.
+  myEditor = new PyEditor_Widget( this );
+  setCentralWidget( myEditor );
 
   // Create actions.
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
@@ -82,7 +84,7 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
   action->setShortcut( QKeySequence::Save );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onSave() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( modificationChanged( bool ) ),
+  connect( myEditor, SIGNAL( modificationChanged( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, SaveId );
   
@@ -101,9 +103,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_UNDO" ), 0, this );
   action->setStatusTip( tr( "DSC_UNDO" ) );
   action->setShortcut( QKeySequence::Undo );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( undo() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( undo() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( undoAvailable( bool ) ),
+  connect( myEditor, SIGNAL( undoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, UndoId );
 
@@ -113,9 +115,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_REDO" ), 0, this );
   action->setStatusTip( tr( "DSC_REDO" ) );
   action->setShortcut( QKeySequence::Redo );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( redo() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( redo() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( redoAvailable( bool ) ),
+  connect( myEditor, SIGNAL( redoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, RedoId );
 
@@ -125,9 +127,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_CUT" ), 0, this );
   action->setStatusTip( tr( "DSC_CUT" ) );
   action->setShortcut( QKeySequence::Cut );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( cut() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( cut() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, CutId );
 
@@ -137,9 +139,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_COPY" ), 0, this );
   action->setStatusTip( tr( "DSC_COPY" ) );
   action->setShortcut( QKeySequence::Copy );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( copy() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( copy() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, CopyId );
 
@@ -149,7 +151,7 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_PASTE" ), 0, this );
   action->setStatusTip( tr( "DSC_PASTE" ) );
   action->setShortcut( QKeySequence::Paste );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( paste() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( paste() ) );
   toolMgr()->registerAction( action, PasteId );
 
   // . Delete
@@ -158,9 +160,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_DELETE" ), 0, this );
   action->setStatusTip( tr( "DSC_DELETE" ) );
   action->setShortcut( QKeySequence::Delete );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( deleteSelected() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( deleteSelected() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   toolMgr()->registerAction( action, DeleteId );
 
@@ -170,8 +172,28 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           tr( "ACT_SELECT_ALL" ), 0, this );
   action->setStatusTip( tr( "DSC_SELECT_ALL" ) );
   action->setShortcut( QKeySequence::SelectAll );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( selectAll() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( selectAll() ) );
   toolMgr()->registerAction( action, SelectAllId );
+
+  // . Find
+  action = new QtxAction( tr( "TTP_FIND" ),
+                          resMgr->loadPixmap( "PyViewer", tr( "ICON_FIND" ) ),
+                          tr( "ACT_FIND" ), 0, this );
+  action->setStatusTip( tr( "DSC_FIND" ) );
+  action->setShortcut( QKeySequence::Find );
+  action->setShortcutContext( Qt::WidgetShortcut );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( find() ) );
+  toolMgr()->registerAction( action, FindId );
+
+  // . Replace
+  action = new QtxAction( tr( "TTP_REPLACE" ),
+                          resMgr->loadPixmap( "PyViewer", tr( "ICON_REPLACE" ) ),
+                          tr( "ACT_REPLACE" ), 0, this );
+  action->setStatusTip( tr( "DSC_REPLACE" ) );
+  action->setShortcut( QKeySequence::Replace );
+  action->setShortcutContext( Qt::WidgetShortcut );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( replace() ) );
+  toolMgr()->registerAction( action, ReplaceId );
 
   // . Preferences
   action = new QtxAction( tr( "TTP_PREFERENCES" ),
@@ -204,6 +226,9 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
   toolMgr()->append( PasteId, idTB );
   toolMgr()->append( DeleteId, idTB );
   toolMgr()->append( SelectAllId, idTB );
+  toolMgr()->append( toolMgr()->separator(), idTB );
+  toolMgr()->append( FindId, idTB );
+  toolMgr()->append( ReplaceId, idTB );
   toolMgr()->append( toolMgr()->separator(), idTB );
   toolMgr()->append( PreferencesId, idTB );
   toolMgr()->append( toolMgr()->separator(), idTB );
@@ -239,7 +264,7 @@ void PyViewer_ViewWindow::onNew()
 {
   if ( whetherSave() )
   {
-    myTextEditor->clear();
+    myEditor->clear();
     setCurrentFile( QString() );
   }
 }
@@ -299,7 +324,7 @@ bool PyViewer_ViewWindow::onSaveAs()
 */
 void PyViewer_ViewWindow::onPreferences()
 {
-  PyEditor_SettingsDlg dlg( myTextEditor, true, this );
+  PyEditor_SettingsDlg dlg( myEditor->editor(), true, this );
   connect( &dlg, SIGNAL( help() ), this, SLOT( onHelp() ) );
   dlg.exec();
 }
@@ -311,7 +336,7 @@ void PyViewer_ViewWindow::onPreferences()
 void PyViewer_ViewWindow::setCurrentFile( const QString& filePath )
 {
   myURL = filePath;
-  myTextEditor->document()->setModified( false );
+  myEditor->setModified( false );
 }
 
 /*!
@@ -321,7 +346,7 @@ void PyViewer_ViewWindow::setCurrentFile( const QString& filePath )
 */
 bool PyViewer_ViewWindow::whetherSave()
 {
-  if ( myTextEditor->document()->isModified() )
+  if ( myEditor->isModified() )
   {
     QMessageBox::StandardButton answer =  QMessageBox::warning( this,
                                                                 tr( "NAME_PYEDITOR" ),
@@ -358,7 +383,7 @@ void PyViewer_ViewWindow::loadFile( const QString& filePath )
 
   QTextStream anInput( &aFile );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  myTextEditor->setPlainText( anInput.readAll() );
+  myEditor->setText( anInput.readAll() );
   QApplication::restoreOverrideCursor();
 
   setCurrentFile( filePath );
@@ -382,7 +407,7 @@ bool PyViewer_ViewWindow::saveFile( const QString& filePath )
 
   QTextStream anOutput( &aFile );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  anOutput << myTextEditor->toPlainText();
+  anOutput << myEditor->text();
   QApplication::restoreOverrideCursor();
 
   setCurrentFile( filePath );

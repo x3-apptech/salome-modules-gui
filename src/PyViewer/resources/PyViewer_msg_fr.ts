@@ -147,6 +147,30 @@
       <translation>Sélectionne tout le contenu</translation>
     </message>
     <message>
+      <source>ACT_FIND</source>
+      <translation type="unfinished">Find</translation>
+    </message>
+    <message>
+      <source>TTP_FIND</source>
+      <translation type="unfinished">Find</translation>
+    </message>
+    <message>
+      <source>DSC_FIND</source>
+      <translation type="unfinished">Find text</translation>
+    </message>
+    <message>
+      <source>ACT_REPLACE</source>
+      <translation type="unfinished">Replace</translation>
+    </message>
+    <message>
+      <source>TTP_REPLACE</source>
+      <translation type="unfinished">Find &amp; Replace</translation>
+    </message>
+    <message>
+      <source>DSC_REPLACE</source>
+      <translation type="unfinished">Find and replace text</translation>
+    </message>
+    <message>
       <source>ACT_PREFERENCES</source>
       <translation>Préférences</translation>
     </message>

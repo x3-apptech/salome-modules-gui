@@ -251,6 +251,30 @@
       <translation>全選択</translation>
     </message>
     <message>
+      <source>ACT_FIND</source>
+      <translation type="unfinished">Find</translation>
+    </message>
+    <message>
+      <source>TTP_FIND</source>
+      <translation type="unfinished">Find</translation>
+    </message>
+    <message>
+      <source>DSC_FIND</source>
+      <translation type="unfinished">Find text</translation>
+    </message>
+    <message>
+      <source>ACT_REPLACE</source>
+      <translation type="unfinished">Replace</translation>
+    </message>
+    <message>
+      <source>TTP_REPLACE</source>
+      <translation type="unfinished">Find &amp; Replace</translation>
+    </message>
+    <message>
+      <source>DSC_REPLACE</source>
+      <translation type="unfinished">Find and replace text</translation>
+    </message>
+    <message>
       <source>ACT_PREFERENCES</source>
       <translation>環境設定 (&amp;f)</translation>
     </message>
@@ -308,11 +332,13 @@
     </message>
     <message>
       <source>WRN_READ_FILE</source>
-      <translation>ファイルが読めません %1:\n%2.</translation>
+      <translation>ファイルが読めません %1:
+%2.</translation>
     </message>
     <message>
       <source>WRN_WRITE_FILE</source>
-      <translation>ファイルが書き込めません %1:\n%2.</translation>
+      <translation>ファイルが書き込めません %1:
+%2.</translation>
     </message>
     <message>
       <source>STS_READY</source>
@@ -329,6 +355,56 @@
     <message>
       <source>NONAME</source>
       <translation>Noname. py</translation>
+    </message>
+  </context>
+  <context>
+    <name>PyEditor</name>
+    <message>
+      <source>PROGRAM_DESCRIPTION</source>
+      <translation>Pythonのエディタ</translation>
+    </message>
+    <message>
+      <source>FILE_PARAM_NAME</source>
+      <translation type="unfinished">file</translation>
+    </message>
+    <message>
+      <source>FILE_PARAM_DESCRIPTION</source>
+      <translation type="unfinished">File to edit.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PyEditor_FindTool</name>
+    <message>
+      <source>FIND_LABEL</source>
+      <translation type="unfinished">Find:</translation>
+    </message>
+    <message>
+      <source>REPLACE_LABEL</source>
+      <translation type="unfinished">Replace with:</translation>
+    </message>
+    <message>
+      <source>REPLACE_BTN</source>
+      <translation type="unfinished">Replace</translation>
+    </message>
+    <message>
+      <source>REPLACE_ALL_BTN</source>
+      <translation type="unfinished">Replace All</translation>
+    </message>
+    <message>
+      <source>CASE_SENSITIVE_CHECK</source>
+      <translation type="unfinished">Case Sensitive</translation>
+    </message>
+    <message>
+      <source>WHOLE_WORDS_CHECK</source>
+      <translation type="unfinished">Whole Words Only</translation>
+    </message>
+    <message>
+      <source>REGEX_CHECK</source>
+      <translation type="unfinished">Use Regular Expressions</translation>
+    </message>
+    <message>
+      <source>NB_MATCHED_LABEL</source>
+      <translation type="unfinished">%1 of %2 matches</translation>
     </message>
   </context>
 </TS>

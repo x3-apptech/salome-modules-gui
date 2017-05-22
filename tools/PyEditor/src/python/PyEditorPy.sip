@@ -103,3 +103,75 @@ private:
   PyEditor_Editor( const PyEditor_Editor& );
   PyEditor_Editor& operator=( const PyEditor_Editor& );
 };
+
+class PyEditor_FindTool : public QWidget
+{ 
+%TypeHeaderCode
+#include <PyEditor_FindTool.h>
+%End
+
+public:
+  explicit PyEditor_FindTool( PyEditor_Editor* /TransferThis/, QWidget* /TransferThis/ = 0 );
+
+public slots:
+  void activateFind();
+  void activateReplace();
+
+private:
+  PyEditor_FindTool( const PyEditor_FindTool& );
+  PyEditor_FindTool& operator=( const PyEditor_FindTool& );
+};
+
+class PyEditor_Widget : public QWidget
+{ 
+%TypeHeaderCode
+#include <PyEditor_Widget.h>
+%End
+
+public:
+  explicit PyEditor_Widget( QWidget* /TransferThis/ = 0 );
+
+  PyEditor_Editor* editor();
+  PyEditor_FindTool* findTool();
+
+  bool isModified();
+
+  QString text() const;
+
+  QStringList keywords() const;
+  void appendKeywords( const QStringList&, int, const QColor& = QColor() );
+  void removeKeywords( const QStringList& );
+
+  int completionPolicy() const;
+  void setCompletionPolicy( int );
+
+public slots:
+  void find();
+  void replace();
+
+  void undo();
+  void redo();
+  void cut();
+  void copy();
+  void paste();
+  void deleteSelected();
+  void selectAll();
+  void clear();
+
+  void setModified( bool );
+
+  void setText( const QString& );
+
+signals:
+  void modificationChanged( bool );
+  void undoAvailable( bool );
+  void redoAvailable( bool );
+  void copyAvailable( bool );
+  void selectionChanged();
+  void textChanged();
+  void cursorPositionChanged();
+
+private:
+  PyEditor_Widget( const PyEditor_Widget& );
+  PyEditor_Widget& operator=( const PyEditor_Widget& );
+};

@@ -21,12 +21,13 @@
 //
 
 #include "PyEditor_Window.h"
-#include "PyEditor_Editor.h"
+#include "PyEditor_Widget.h"
 #include "PyEditor_Settings.h"
 #include "PyEditor_SettingsDlg.h"
 
 #include <QAction>
 #include <QApplication>
+#include <QCloseEvent>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -48,9 +49,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
 {
   Q_INIT_RESOURCE( PyEditor );
 
-  // Create editor and set it as a central widget.
-  myTextEditor = new PyEditor_Editor( this );
-  setCentralWidget( myTextEditor );
+  // Create central widget.
+  myEditor = new PyEditor_Widget( this );
+  setCentralWidget( myEditor );
 
   // Create actions.
   QAction* action;
@@ -81,7 +82,7 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setShortcut( QKeySequence::Save );
   connect( action, SIGNAL( triggered( bool ) ), this, SLOT( onSave() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( modificationChanged( bool ) ),
+  connect( myEditor, SIGNAL( modificationChanged( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ SaveId ] = action;
 
@@ -109,9 +110,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_UNDO" ) );
   action->setStatusTip( tr( "DSC_UNDO" ) );
   action->setShortcut( QKeySequence::Undo );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( undo() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( undo() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( undoAvailable( bool ) ),
+  connect( myEditor, SIGNAL( undoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ UndoId ] = action;
 
@@ -121,9 +122,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_REDO" ) );
   action->setStatusTip( tr( "DSC_REDO" ) );
   action->setShortcut( QKeySequence::Redo );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( redo() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( redo() ) );
   action->setEnabled( false );
-  connect( myTextEditor->document(), SIGNAL( redoAvailable( bool ) ),
+  connect( myEditor, SIGNAL( redoAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ RedoId ] = action;
 
@@ -133,9 +134,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_CUT" ) );
   action->setStatusTip( tr( "DSC_CUT" ) );
   action->setShortcut( QKeySequence::Cut );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( cut() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( cut() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ CutId ] = action;
 
@@ -145,9 +146,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_COPY" ) );
   action->setStatusTip( tr( "DSC_COPY" ) );
   action->setShortcut( QKeySequence::Copy );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( copy() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( copy() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ CopyId ] = action;
 
@@ -157,7 +158,7 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_PASTE" ) );
   action->setStatusTip( tr( "DSC_PASTE" ) );
   action->setShortcut( QKeySequence::Paste );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( paste() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( paste() ) );
   myActions[ PasteId ] = action;
 
   // . Delete
@@ -166,9 +167,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_DELETE" ) );
   action->setStatusTip( tr( "DSC_DELETE" ) );
   action->setShortcut( QKeySequence::Delete );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( deleteSelected() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( deleteSelected() ) );
   action->setEnabled( false );
-  connect( myTextEditor, SIGNAL( copyAvailable( bool ) ),
+  connect( myEditor, SIGNAL( copyAvailable( bool ) ),
            action, SLOT( setEnabled( bool ) ) );
   myActions[ DeleteId ] = action;
 
@@ -178,8 +179,28 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   action->setToolTip( tr( "TTP_SELECT_ALL" ) );
   action->setStatusTip( tr( "DSC_SELECT_ALL" ) );
   action->setShortcut( QKeySequence::SelectAll );
-  connect( action, SIGNAL( triggered( bool ) ), myTextEditor, SLOT( selectAll() ) );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( selectAll() ) );
   myActions[ SelectAllId ] = action;
+
+  // . Find
+  action = new QAction( QIcon( ":/images/py_find.png" ),
+                        tr( "ACT_FIND" ), this );
+  action->setToolTip( tr( "TTP_FIND" ) );
+  action->setStatusTip( tr( "DSC_FIND" ) );
+  action->setShortcut( QKeySequence::Find );
+  action->setShortcutContext( Qt::WidgetShortcut );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( find() ) );
+  myActions[ FindId ] = action;
+
+  // . Replace
+  action = new QAction( QIcon( ":/images/py_replace.png" ),
+                        tr( "ACT_REPLACE" ), this );
+  action->setToolTip( tr( "TTP_REPLACE" ) );
+  action->setStatusTip( tr( "DSC_REPLACE" ) );
+  action->setShortcut( QKeySequence::Replace );
+  action->setShortcutContext( Qt::WidgetShortcut );
+  connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( replace() ) );
+  myActions[ ReplaceId ] = action;
 
   // . Preferences
   action = new QAction( QIcon( ":/images/py_preferences.png" ),
@@ -218,6 +239,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   menu->addSeparator();
   menu->addAction( myActions[ SelectAllId ] );
   menu->addSeparator();
+  menu->addAction( myActions[ FindId ] );
+  menu->addAction( myActions[ ReplaceId ] );
+  menu->addSeparator();
   menu->addAction( myActions[ PreferencesId ] );
 
   menu = menuBar()->addMenu( tr( "MNU_HELP" ) );
@@ -242,6 +266,9 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   toolbar->addAction( myActions[ DeleteId ] );
   toolbar->addAction( myActions[ SelectAllId ] );
   toolbar->addSeparator();
+  toolbar->addAction( myActions[ FindId ] );
+  toolbar->addAction( myActions[ ReplaceId ] );
+  toolbar->addSeparator();
   toolbar->addAction( myActions[ PreferencesId ] );
   toolbar->addSeparator();
   toolbar->addAction( myActions[ HelpId ] );
@@ -250,7 +277,7 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
   setCurrentFile( QString() );
 
   // Additional set-up for main window.
-  connect( myTextEditor->document(), SIGNAL( modificationChanged( bool ) ),
+  connect( myEditor, SIGNAL( modificationChanged( bool ) ),
            this, SLOT( setWindowModified( bool ) ) );
 
   // Initialize status bar.
@@ -283,7 +310,7 @@ void PyEditor_Window::onNew()
 {
   if ( whetherSave() )
   {
-    myTextEditor->clear();
+    myEditor->clear();
     setCurrentFile( QString() );
   }
 }
@@ -343,7 +370,7 @@ bool PyEditor_Window::onSaveAs()
 */
 void PyEditor_Window::onPreferences()
 {
-  PyEditor_SettingsDlg dlg( myTextEditor, true, this );
+  PyEditor_SettingsDlg dlg( myEditor->editor(), true, this );
   connect( &dlg, SIGNAL( help() ), this, SLOT( onHelp() ) );
   dlg.exec();
 }
@@ -355,7 +382,7 @@ void PyEditor_Window::onPreferences()
 void PyEditor_Window::setCurrentFile( const QString& filePath )
 {
   myURL = filePath;
-  myTextEditor->document()->setModified( false );
+  myEditor->setModified( false );
 
   setWindowModified( false );
 
@@ -369,7 +396,7 @@ void PyEditor_Window::setCurrentFile( const QString& filePath )
 */
 bool PyEditor_Window::whetherSave()
 {
-  if ( myTextEditor->document()->isModified() )
+  if ( myEditor->isModified() )
   {
     QMessageBox::StandardButton answer =  QMessageBox::warning( this,
                                                                 tr( "NAME_PYEDITOR" ),
@@ -394,19 +421,20 @@ bool PyEditor_Window::whetherSave()
   \brief Open file.
   \param filePath file path
 */
-void PyEditor_Window::loadFile( const QString& filePath )
+void PyEditor_Window::loadFile( const QString& filePath, bool verbose )
 {
   QFile aFile( filePath );
   if ( !aFile.open(QFile::ReadOnly | QFile::Text) )
   {
-    QMessageBox::warning( this, tr( "NAME_PYEDITOR" ),
-                          tr( "WRN_READ_FILE" ).arg( filePath ).arg( aFile.errorString() ) );
+    if ( verbose )
+      QMessageBox::warning( this, tr( "NAME_PYEDITOR" ),
+                            tr( "WRN_READ_FILE" ).arg( filePath ).arg( aFile.errorString() ) );
     return;
   }
 
   QTextStream anInput( &aFile );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  myTextEditor->setPlainText( anInput.readAll() );
+  myEditor->setText( anInput.readAll() );
   QApplication::restoreOverrideCursor();
 
   setCurrentFile( filePath );
@@ -419,19 +447,20 @@ void PyEditor_Window::loadFile( const QString& filePath )
   \brief Save file.
   \param filePath file path
 */
-bool PyEditor_Window::saveFile( const QString& filePath )
+bool PyEditor_Window::saveFile( const QString& filePath, bool verbose )
 {
   QFile aFile( filePath );
   if ( !aFile.open( QFile::WriteOnly | QFile::Text ) )
   {
-    QMessageBox::warning( this, tr( "NAME_PYEDITOR" ),
-                          tr( "WRN_WRITE_FILE" ).arg( filePath ).arg( aFile.errorString() ) );
+    if ( verbose )
+      QMessageBox::warning( this, tr( "NAME_PYEDITOR" ),
+                            tr( "WRN_WRITE_FILE" ).arg( filePath ).arg( aFile.errorString() ) );
     return false;
   }
 
   QTextStream anOutput( &aFile );
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  anOutput << myTextEditor->toPlainText();
+  anOutput << myEditor->text();
   QApplication::restoreOverrideCursor();
 
   setCurrentFile( filePath );

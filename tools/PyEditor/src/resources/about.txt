@@ -1,10 +1,16 @@
 <b>Python Editor</b>
 <hr>
 
+<p>
 Python Editor is a simple program for writing Python scripts.
-Program provides standard editing operations like copy/cut/paste, undo/redo, select all, delete, etc.
-Also it supports syntax highlighting and auto-indentation of Python code.
+</p>
 
+<p>
+Program provides standard editing operations like copy/cut/paste, undo/redo, select all, delete, etc.
+It supports syntax highlighting and auto-indentation of Python code.
+</p>
+
+<p>
 Most often used editing operations are available via the toolbar:
 <ul>
 <li><b>New</b>: creates new document.</li>
@@ -22,7 +28,13 @@ Most often used editing operations are available via the toolbar:
 <li><b>Preferences</b>: opens Preferences dialog that allows specifying advanced parameters for the program.</li>
 <li><b>Help</b>: shows this help information.</li>
 </ul>
+</p>
 
+<p>
+Also, editor supports standard <b>Find</b> and <b>Replace</b> operations.
+</p>
+
+<p>
 The behavior of the editor can be customized via the <b>Preferences</b> dialog. The following options can be customized:
 <ul>
 <li><b>Font settings</b>: choose the font.</li>
@@ -35,3 +47,4 @@ The behavior of the editor can be customized via the <b>Preferences</b> dialog. 
 <li><b>Display tab delimiters</b>: displays tab marks at a given number of white spaces.</li>
 <li><b>Save settings as default</b>: saves chosen options as a default ones. These settings will be restored after application restart.</li>
 </ul>
+</p>
