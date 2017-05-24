@@ -1042,6 +1042,30 @@ File does not exist</translation>
     <translation>Display line numbers area</translation>
   </message>
   <message>
+    <source>PREF_GROUP_PY_EDITOR</source>
+    <translation>Editor settings</translation>
+  </message>
+  <message>
+    <source>PREF_PY_COMPLETION_MODE</source>
+    <translation>Completion mode</translation>
+  </message>
+  <message>
+    <source>PREF_PY_NONE</source>
+    <translation>None</translation>
+  </message>
+  <message>
+    <source>PREF_PY_AUTO</source>
+    <translation>Auto</translation>
+  </message>
+  <message>
+    <source>PREF_PY_MANUAL</source>
+    <translation>Manual</translation>
+  </message>
+  <message>
+    <source>PREF_PY_ALWAYS</source>
+    <translation>Always</translation>
+  </message>
+  <message>
     <source>PREF_GROUP_PY_TAB</source>
     <translation>Tab settings</translation>
   </message>
