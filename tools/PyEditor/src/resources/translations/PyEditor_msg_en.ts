@@ -32,6 +32,30 @@
       <translation>Display line numbers area</translation>
     </message>
     <message>
+      <source>GR_EDIT_SET</source>
+      <translation>Editor settings</translation>
+    </message>
+    <message>
+      <source>LBL_COMPLETION_MODE</source>
+      <translation>Completion mode</translation>
+    </message>
+    <message>
+      <source>LBL_NONE</source>
+      <translation>None</translation>
+    </message>
+    <message>
+      <source>LBL_AUTO</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>LBL_MANUAL</source>
+      <translation>Manual</translation>
+    </message>
+    <message>
+      <source>LBL_ALWAYS</source>
+      <translation>Always</translation>
+    </message>
+    <message>
       <source>GR_TAB_SET</source>
       <translation>Tab settings</translation>
     </message>

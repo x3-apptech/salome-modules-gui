@@ -22,6 +22,8 @@
 
 #include "PyEditor_Settings.h"
 
+#include "PyEditor_Editor.h"
+
 /*!
   \class PyEditor_Settings
   \brief Manager of setting values.
@@ -61,7 +63,8 @@ PyEditor_Settings::PyEditor_Settings()
     myNumberColumns( 80 ),
     myTabSpaceVisible( true ),
     myTabSize( 4 ),
-    myFont( "Courier", 10 )
+    myFont( "Courier", 10 ),
+    myCompletionPolicy( PyEditor_Editor::Always )
 {
 }
 
@@ -228,6 +231,24 @@ QFont PyEditor_Settings::font() const
 }
 
 /*!
+  \brief Set "completionPolicy" option.
+  \param completion policy option value
+*/
+void PyEditor_Settings::setCompletionPolicy( int value )
+{
+  myCompletionPolicy = value;
+}
+
+/*!
+  \brief Get "completionPolicy" option.
+  \return option value
+*/
+int PyEditor_Settings::completionPolicy() const
+{
+  return myCompletionPolicy;
+}
+
+/*!
   \brief Read settings from the persistence storage.
   Base implementation does nothing; it should be reimplemented in successors.
 */
@@ -258,6 +279,8 @@ void PyEditor_Settings::copyFrom( const PyEditor_Settings& other )
   setVerticalEdge( other.verticalEdge() );
   setNumberColumns( other.numberColumns() );
   setFont( other.font() );
+  setCompletionPolicy( other.completionPolicy() );
+
   save();
 }
 
@@ -278,6 +301,7 @@ QString PyEditor_Settings::option( Option option )
     "TabSpaceVisible",
     "TabSize",
     "Font",
+    "CompletionPolicy"
   };
-  return option >= 0 && option <= snFont ? options[option] : "Unknown";
+  return option >= 0 && option <= snCompletionPolicy ? options[option] : "Unknown";
 }

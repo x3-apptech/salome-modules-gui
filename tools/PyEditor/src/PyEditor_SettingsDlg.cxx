@@ -85,6 +85,16 @@ PyEditor_SettingsDlg::PyEditor_SettingsDlg( PyEditor_Editor* theEditor,
   aMainLayout->addWidget( aDisplaySetBox );
   // . Display settings <end>
 
+  // . Editor settings <start>
+  QGroupBox* aEditorSetBox = new QGroupBox( tr( "GR_EDIT_SET" ), this );
+  QGridLayout* aEditorSetLayout = new QGridLayout( aEditorSetBox );
+  aEditorSetLayout->addWidget( new QLabel( tr( "LBL_COMPLETION_MODE" ), aEditorSetBox ), 0, 0 );
+  aEditorSetLayout->addWidget( myCompletionPolicy = new QComboBox( aEditorSetBox ), 0, 1 );
+  myCompletionPolicy->addItems( QStringList() << tr( "LBL_NONE" ) << tr( "LBL_AUTO" )
+				<< tr( "LBL_MANUAL" ) << tr( "LBL_ALWAYS" ) );
+  aMainLayout->addWidget( aEditorSetBox );
+  // . Editor settings <end>
+
   // . Tab settings <start>
   QGroupBox* aTabSetBox = new QGroupBox( tr( "GR_TAB_SET" ), this );
   QVBoxLayout* aTabSetLayout = new QVBoxLayout( aTabSetBox );
@@ -237,6 +247,7 @@ void PyEditor_SettingsDlg::settingsFromGui()
   settings.setVerticalEdge( myVerticalEdge->isChecked() );
   settings.setNumberColumns( myNumberColumns->value() );
   settings.setFont( font );
+  settings.setCompletionPolicy( myCompletionPolicy->currentIndex() );
   myEditor->setSettings(settings); // updateContent()
 
   PyEditor_Settings* globals = PyEditor_Settings::settings();
@@ -261,6 +272,7 @@ void PyEditor_SettingsDlg::settingsToGui()
   myNumberColumns->setValue( settings.numberColumns() );
   myFontFamily->setCurrentFont( settings.font() );
   setFontSize( QString::number( settings.font().pointSize() ) );
+  myCompletionPolicy->setCurrentIndex( settings.completionPolicy() );
 
   onVerticalEdgeChecked();
   onFontChanged();

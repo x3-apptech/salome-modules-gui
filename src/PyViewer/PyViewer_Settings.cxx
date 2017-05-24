@@ -50,6 +50,8 @@ void PyViewer_Settings::load()
   setTabSpaceVisible( myResMgr->booleanValue( group, option( snTabSpaceVisible ), tabSpaceVisible() ) );
   setTabSize( myResMgr->integerValue( group, option( snTabSize ), tabSize() ) );
   setFont( myResMgr->fontValue( group, option( snFont ), font() ) );
+  setCompletionPolicy( myResMgr->integerValue( group, option( snCompletionPolicy ),
+					       completionPolicy() ) );
 }
 
 void PyViewer_Settings::save()
@@ -65,4 +67,5 @@ void PyViewer_Settings::save()
   myResMgr->setValue( group, option( snTabSpaceVisible ), tabSpaceVisible() );
   myResMgr->setValue( group, option( snTabSize ), tabSize() );
   myResMgr->setValue( group, option( snFont ), font() );
+  myResMgr->setValue( group, option( snCompletionPolicy ), completionPolicy() );
 }

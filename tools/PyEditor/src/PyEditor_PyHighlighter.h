@@ -26,6 +26,7 @@
 #include <QSyntaxHighlighter>
 
 class QTextDocument;
+class PyEditor_Keywords;
 
 class PyEditor_PyHighlighter : public QSyntaxHighlighter
 {
@@ -52,11 +53,14 @@ public:
   };
 
 public:
-  PyEditor_PyHighlighter( QTextDocument* = 0 );
+  PyEditor_PyHighlighter( QTextDocument*,
+			  PyEditor_Keywords*, PyEditor_Keywords* );
 
-  void initialize();
-  QStringList keywords();
-  QStringList specialKeywords();
+private Q_SLOTS:
+  void        onKeywordsChanged();
+
+protected:
+  void        updateHighlight();
 
 protected:
   struct HighlightingRule
@@ -76,8 +80,6 @@ protected:
   QTextCharFormat classFormat;
   QTextCharFormat referenceClassFormat;
   QTextCharFormat functionFormat;
-  QTextCharFormat keywordFormat;
-  QTextCharFormat specialFromat;
   QTextCharFormat numberFormat;
   QTextCharFormat singleLineCommentFormat;
   QTextCharFormat multiLineCommentFormat;
@@ -86,6 +88,10 @@ protected:
   void highlightBlock( const QString& );
   void insertBracketsData( char, char, TextBlockData*, const QString& );
   void insertBracketsData( Brackets, TextBlockData*, const QString& );
+
+private:
+  PyEditor_Keywords* myStdKeywords;
+  PyEditor_Keywords* myUserKeywords;
 };
 
 #endif // PYEDITOR_PYHIGHLIGHTER_H

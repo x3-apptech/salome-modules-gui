@@ -32,6 +32,30 @@
       <translation>Affiche les numéros de ligne</translation>
     </message>
     <message>
+      <source>GR_EDIT_SET</source>
+      <translation type="unfinished">Editor settings</translation>
+    </message>
+    <message>
+      <source>LBL_COMPLETION_MODE</source>
+      <translation type="unfinished">Completion mode</translation>
+    </message>
+    <message>
+      <source>LBL_NONE</source>
+      <translation type="unfinished">None</translation>
+    </message>
+    <message>
+      <source>LBL_AUTO</source>
+      <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+      <source>LBL_MANUAL</source>
+      <translation type="unfinished">Manual</translation>
+    </message>
+    <message>
+      <source>LBL_ALWAYS</source>
+      <translation type="unfinished">Always</translation>
+    </message>
+    <message>
       <source>GR_TAB_SET</source>
       <translation>Indentation</translation>
     </message>

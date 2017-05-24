@@ -28,6 +28,8 @@
 
 #include <QPlainTextEdit>
 
+class PyEditor_Keywords;
+class PyEditor_Completer;
 class PyEditor_PyHighlighter;
 
 class PYEDITOR_EXPORT PyEditor_Editor : public QPlainTextEdit
@@ -35,12 +37,22 @@ class PYEDITOR_EXPORT PyEditor_Editor : public QPlainTextEdit
   Q_OBJECT
 
 public:
+  typedef enum { None, Auto, Manual, Always } CompletionPolicy;
+
+public:
   PyEditor_Editor( QWidget* = 0 );
   virtual ~PyEditor_Editor();
   
-  void setSettings( const PyEditor_Settings& );
+  void    setSettings( const PyEditor_Settings& );
   const PyEditor_Settings& settings() const;
   QString text() const;
+
+  QStringList keywords() const;
+  void        appendKeywords( const QStringList&, int, const QColor& = QColor() );
+  void        removeKeywords( const QStringList& );
+
+  CompletionPolicy completionPolicy() const;
+  void             setCompletionPolicy( const CompletionPolicy& );
 
 public Q_SLOTS:
   void deleteSelected();
@@ -51,7 +63,10 @@ protected:
   virtual void keyPressEvent( QKeyEvent* );
   virtual void resizeEvent( QResizeEvent* );
   virtual void paintEvent( QPaintEvent* );
-    
+
+  PyEditor_Keywords* userKeywords() const;
+  PyEditor_Keywords* standardKeywords() const;
+
 private Q_SLOTS:
   void updateHighlightCurrentLine();
   void matchParentheses();
@@ -72,12 +87,18 @@ private:
   int  lineIndent();
   void tabIndentation( bool );
   void indentSelection( bool );
-  
+
   int findFirstNonSpace( const QString& );
-  
+
   QWidget*                myLineNumberArea;
   PyEditor_PyHighlighter* mySyntaxHighlighter;
+  PyEditor_Completer*     myCompleter;
   PyEditor_Settings       mySettings;
+
+  PyEditor_Keywords*      myStdKeywords;
+  PyEditor_Keywords*      myUserKeywords;
+
+  CompletionPolicy        myCompletionPolicy;
 
   friend class PyEditor_LineNumberArea;
 };

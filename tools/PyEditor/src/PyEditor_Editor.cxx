@@ -23,10 +23,14 @@
 #include "PyEditor_Editor.h"
 #include "PyEditor_LineNumberArea.h"
 #include "PyEditor_PyHighlighter.h"
+#include "PyEditor_Completer.h"
 #include "PyEditor_Settings.h"
+#include "PyEditor_Keywords.h"
 
 #include <QPainter>
 #include <QTextBlock>
+
+#include <iostream>
 
 /*!
   \class PyEditor_Editor
@@ -38,19 +42,27 @@
   \param parent parent widget
 */
 PyEditor_Editor::PyEditor_Editor( QWidget* parent )
-  : QPlainTextEdit( parent )
+  : QPlainTextEdit( parent ),
+    myCompletionPolicy( Always )
 {
+  myStdKeywords = new PyEditor_StandardKeywords( this );
+  myUserKeywords = new PyEditor_Keywords( this );
+  myUserKeywords->append( "print", 0, Qt::red );
+
   // Set up line number area
   myLineNumberArea = new PyEditor_LineNumberArea( this );
   myLineNumberArea->setMouseTracking( true );
 
   // Set up syntax highighter
-  mySyntaxHighlighter = new PyEditor_PyHighlighter( this->document() );
+  mySyntaxHighlighter = new PyEditor_PyHighlighter( this->document(),
+						    myStdKeywords, myUserKeywords );
 
   // Set-up settings
   PyEditor_Settings* settings = PyEditor_Settings::settings();
   if ( settings )
     setSettings( *settings );
+
+  myCompleter = new PyEditor_Completer( this, myStdKeywords, myUserKeywords );
 
   // Connect signals
   connect( this, SIGNAL( blockCountChanged( int ) ), this, SLOT( updateLineNumberAreaWidth( int ) ) );
@@ -98,6 +110,9 @@ void PyEditor_Editor::setSettings( const PyEditor_Settings& settings )
   // Set size white spaces
   setTabStopWidth( mySettings.tabSize() * 10 );
 
+  // Set completion policy
+  setCompletionPolicy( (CompletionPolicy)mySettings.completionPolicy() );
+
   // Update current line highlight
   updateHighlightCurrentLine();
 
@@ -106,6 +121,54 @@ void PyEditor_Editor::setSettings( const PyEditor_Settings& settings )
 
   mySyntaxHighlighter->rehighlight();
   viewport()->update();
+}
+
+/*!
+  \brief Gets the current completion policy
+  \return completion policy
+*/
+PyEditor_Editor::CompletionPolicy PyEditor_Editor::completionPolicy() const
+{
+  return myCompletionPolicy;
+}
+
+/*!
+  \brief Sets the current completion policy
+  \param policy completion policy
+*/
+void PyEditor_Editor::setCompletionPolicy( const CompletionPolicy& policy )
+{
+  myCompletionPolicy = policy;
+}
+
+/*!
+  \brief Gets the all user keywords.
+  \param event key press event
+  \return keyword string list
+*/
+QStringList PyEditor_Editor::keywords() const
+{
+  return myUserKeywords->keywords();
+}
+
+/*!
+  \brief Add the user keywords.
+  \param kws keywords string list
+  \param type keywords type
+  \param color keywords color
+*/
+void PyEditor_Editor::appendKeywords( const QStringList& kws, int type, const QColor& color )
+{
+  myUserKeywords->append( kws, type, color );
+}
+
+/*!
+  \brief Remove the user keywords.
+  \param kws keywords string list
+*/
+void PyEditor_Editor::removeKeywords( const QStringList& kws )
+{
+  myUserKeywords->remove( kws );
 }
 
 /*!
@@ -149,6 +212,12 @@ void PyEditor_Editor::keyPressEvent( QKeyEvent* event )
         QPlainTextEdit::keyPressEvent( event );
       }
       aCursor.endEditBlock();
+      event->accept();
+    }
+    else if ( aKey == Qt::Key_Space && aCtrl && !aShift &&
+	      ( completionPolicy() == Manual || completionPolicy() == Always ) )
+    {
+      myCompleter->perform();
       event->accept();
     }
     else if ( event == QKeySequence::MoveToStartOfLine || event == QKeySequence::SelectStartOfLine )
@@ -823,4 +892,22 @@ void PyEditor_Editor::setText( const QString& text )
 QString PyEditor_Editor::text() const
 {
   return toPlainText();
+}
+
+/*!
+  \brief Get user keywords dictionary.
+  \return keywords dictionary
+*/
+PyEditor_Keywords* PyEditor_Editor::userKeywords() const
+{
+  return myUserKeywords;
+}
+
+/*!
+  \brief Get standard keywords dictionary.
+  \return keywords dictionary
+*/
+PyEditor_Keywords* PyEditor_Editor::standardKeywords() const
+{
+  return myStdKeywords;
 }

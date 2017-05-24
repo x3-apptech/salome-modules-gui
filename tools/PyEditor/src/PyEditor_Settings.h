@@ -39,7 +39,8 @@ protected:
                 snNumberColumns,
                 snTabSpaceVisible,
                 snTabSize,
-                snFont };
+                snFont,
+                snCompletionPolicy };
 
 public:
   static PyEditor_Settings* settings();
@@ -75,6 +76,9 @@ public:
   void setFont( const QFont& );
   QFont font() const;
 
+  void setCompletionPolicy( int );
+  int completionPolicy() const;
+
   virtual void load();
   virtual void save();
 
@@ -100,6 +104,9 @@ private:
   
   // Font settings
   QFont myFont;
+
+  // Completion settings
+  int myCompletionPolicy;
 
   static PyEditor_Settings* myGlobalSettings;
 };

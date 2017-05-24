@@ -44,6 +44,8 @@ SET(_link_LIBRARIES ${PLATFORM_LIBS} ${QT_LIBRARIES})
 SET(_moc_HEADERS
   PyEditor_Editor.h
   PyEditor_LineNumberArea.h
+  PyEditor_Keywords.h
+  PyEditor_Completer.h
   PyEditor_PyHighlighter.h
   PyEditor_SettingsDlg.h
   PyEditor_Window.h
@@ -83,6 +85,8 @@ QT_ADD_RESOURCES(_rcc_SOURCES ${_rcc_RESOURCES})
 SET(_other_SOURCES
   PyEditor_Editor.cxx
   PyEditor_LineNumberArea.cxx
+  PyEditor_Keywords.cxx
+  PyEditor_Completer.cxx
   PyEditor_PyHighlighter.cxx
   PyEditor_Settings.cxx
   PyEditor_SettingsDlg.cxx

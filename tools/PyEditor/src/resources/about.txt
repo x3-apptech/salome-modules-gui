@@ -30,6 +30,7 @@ The behavior of the editor can be customized via the <b>Preferences</b> dialog. 
 <li><b>Enable text wrapping</b>: allows wrapping text at the border of the editor's window.</li>
 <li><b>Center cursor on scroll</b>: allows scrolling the script vertically to make the cursor visible at the center of the viewer.</li>
 <li><b>Display line numbers area</b>: shows line numbers at the left border of the editor.</li>
+<li><b>Completion mode</b>: select the completion mode for inputted keywords.</li>
 <li><b>Vertical edge settings</b>: draws vertical line at the specified column of the viewer.</li>
 <li><b>Display tab delimiters</b>: displays tab marks at a given number of white spaces.</li>
 <li><b>Save settings as default</b>: saves chosen options as a default ones. These settings will be restored after application restart.</li>

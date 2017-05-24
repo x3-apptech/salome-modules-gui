@@ -39,7 +39,7 @@ class PYEDITOR_EXPORT PyEditor_SettingsDlg : public QDialog
 
 public:
   PyEditor_SettingsDlg( PyEditor_Editor*, bool = false, QWidget* = 0 );
-  ~PyEditor_SettingsDlg();
+  virtual ~PyEditor_SettingsDlg();
 
 private Q_SLOTS:
   void onVerticalEdgeChecked();
@@ -70,6 +70,8 @@ private:
 
   QFontComboBox*    myFontFamily;
   QComboBox*        myFontSize;
+
+  QComboBox*        myCompletionPolicy;
 
   QCheckBox*        myDefaultCheck;
 

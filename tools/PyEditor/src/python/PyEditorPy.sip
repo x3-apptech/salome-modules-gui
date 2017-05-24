@@ -66,6 +66,9 @@ public:
 
   void setFont( const QFont& );
   QFont font() const;
+
+  void setCompletionPolicy( int );
+  int completionPolicy() const;
 };
 
 class PyEditor_Editor : QPlainTextEdit
@@ -81,6 +84,10 @@ public:
   void setSettings( const PyEditor_Settings& );
   const PyEditor_Settings& settings() const;
   QString text() const;
+
+  QStringList keywords() const;
+  void        appendKeywords( const QStringList&, int, const QColor& = QColor() );
+  void        removeKeywords( const QStringList& );
 
 public slots:
   void deleteSelected();
