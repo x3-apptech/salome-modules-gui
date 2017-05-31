@@ -27,7 +27,7 @@
 
 #include <SUIT_ViewWindow.h>
 
-class PyEditor_Editor;
+class PyEditor_Widget;
 
 class PYVIEWER_EXPORT PyViewer_ViewWindow : public SUIT_ViewWindow
 {
@@ -36,6 +36,7 @@ class PYVIEWER_EXPORT PyViewer_ViewWindow : public SUIT_ViewWindow
 public:
   enum { NewId, OpenId, SaveId, SaveAsId,
          UndoId, RedoId, CutId, CopyId, PasteId, DeleteId, SelectAllId,
+         FindId, ReplaceId,
          PreferencesId, HelpId };
 
   PyViewer_ViewWindow( SUIT_Desktop* = 0 );
@@ -61,7 +62,7 @@ private:
   QString     defaultName() const;
 
 private:
-  PyEditor_Editor*  myTextEditor;
+  PyEditor_Widget*  myEditor;
   QString           myURL;
 };
 

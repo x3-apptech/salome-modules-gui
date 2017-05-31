@@ -59,15 +59,24 @@ void PyEditor_StdSettings::load()
 {
   mySettings.beginGroup( myGroup.isEmpty() ? option( snEditor ) : myGroup );
 
-  setHighlightCurrentLine( mySettings.value( option( snHighlightCurrentLine ), highlightCurrentLine() ).toBool() );
-  setTextWrapping( mySettings.value( option( snTextWrapping ), textWrapping() ).toBool() );
-  setCenterCursorOnScroll( mySettings.value( option( snCenterCursorOnScroll ), centerCursorOnScroll() ).toBool() );
-  setLineNumberArea( mySettings.value( option( snLineNumberArea ), lineNumberArea() ).toBool() );
-  setVerticalEdge( mySettings.value( option( snVerticalEdge  ), verticalEdge() ).toBool() );
-  setNumberColumns( mySettings.value( option( snNumberColumns ), numberColumns() ).toInt() );
-  setTabSpaceVisible( mySettings.value( option( snTabSpaceVisible ), tabSpaceVisible() ).toBool() );
+  setHighlightCurrentLine( mySettings.value( option( snHighlightCurrentLine ),
+					     highlightCurrentLine() ).toBool() );
+  setTextWrapping( mySettings.value( option( snTextWrapping ),
+				     textWrapping() ).toBool() );
+  setCenterCursorOnScroll( mySettings.value( option( snCenterCursorOnScroll ),
+					     centerCursorOnScroll() ).toBool() );
+  setLineNumberArea( mySettings.value( option( snLineNumberArea ),
+				       lineNumberArea() ).toBool() );
+  setVerticalEdge( mySettings.value( option( snVerticalEdge  ),
+				     verticalEdge() ).toBool() );
+  setNumberColumns( mySettings.value( option( snNumberColumns ),
+				      numberColumns() ).toInt() );
+  setTabSpaceVisible( mySettings.value( option( snTabSpaceVisible ),
+					tabSpaceVisible() ).toBool() );
   setTabSize( mySettings.value( option( snTabSize ), tabSize() ).toInt() );
   setFont( mySettings.value( option( snFont ), font() ).value<QFont>() );
+  setCompletionPolicy( mySettings.value( option( snCompletionPolicy ),
+					 completionPolicy() ).toInt() );
   setLanguage( mySettings.value( "language", language() ).toString() );
 
   mySettings.endGroup();
@@ -86,6 +95,7 @@ void PyEditor_StdSettings::save()
   mySettings.setValue( option( snTabSpaceVisible ), tabSpaceVisible() );
   mySettings.setValue( option( snTabSize ), tabSize() );
   mySettings.setValue( option( snFont ), font() );
+  mySettings.setValue( option( snCompletionPolicy ), completionPolicy() );
   mySettings.setValue( "language", language() );
 
   mySettings.endGroup();

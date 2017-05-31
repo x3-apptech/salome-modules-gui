@@ -69,12 +69,14 @@ SET(_other_RESOURCES
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_copy.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_cut.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_delete.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_find.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_help.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_new.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_open.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_paste.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_preferences.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_redo.png
+  ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_replace.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_save.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_save_as.png
   ${PROJECT_SOURCE_DIR}/tools/PyEditor/src/resources/images/py_select_all.png

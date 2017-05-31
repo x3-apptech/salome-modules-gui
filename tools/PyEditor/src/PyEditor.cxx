@@ -24,6 +24,7 @@
 #include "PyEditor_StdSettings.h"
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QDir>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -67,10 +68,10 @@ int main( int argc, char *argv[] )
   app.setOrganizationDomain( "www.salome-platform.org" );
   app.setApplicationName( "pyeditor" );
   
+  QLocale locale;
+
   PyEditor_StdSettings* settings = new PyEditor_StdSettings();
   PyEditor_Settings::setSettings( settings );
-  
-  QString language = settings->language();
   
   // Load Qt translations.
   QString qtDirTrSet = QLibraryInfo::location( QLibraryInfo::TranslationsPath );
@@ -85,7 +86,11 @@ int main( int argc, char *argv[] )
   foreach( QString qtTrFile, qtTrFiles ) {
     foreach ( QString qtTrDir, qtTrDirs ) {
       QTranslator* translator = new QTranslator;
-      if ( translator->load( QString("%1_%2").arg( qtTrFile ).arg( language ), qtTrDir ) ) {
+      if ( translator->load( locale, QString("%1").arg( qtTrFile ), "_", qtTrDir ) ) {
+        app.installTranslator( translator );
+        break;
+      }
+      else if ( translator->load( QString("%1_en").arg( qtTrFile ), qtTrDir ) ) {
         app.installTranslator( translator );
         break;
       }
@@ -97,13 +102,27 @@ int main( int argc, char *argv[] )
   
   // Load application's translations.
   QTranslator translator;
-  if ( translator.load( QString( "PyEditor_msg_%1" ).arg( language ), resourceDir() ) )
+  if ( translator.load( locale, QString( "PyEditor_msg" ), "_", resourceDir() ) )
     app.installTranslator( &translator );
-  
+  else if ( translator.load( QString( "PyEditor_msg_en" ), resourceDir() ) )
+    app.installTranslator( &translator );
+
+  QCommandLineParser parser;
+  parser.setApplicationDescription( QApplication::translate( "PyEditor", "PROGRAM_DESCRIPTION" ) );
+  parser.addHelpOption();
+  parser.addPositionalArgument( QApplication::translate( "PyEditor", "FILE_PARAM_NAME" ),
+                                QApplication::translate( "PyEditor", "FILE_PARAM_DESCRIPTION" ) );
+
+  parser.process( app );
+  const QStringList args = parser.positionalArguments();
+
   PyEditor_Window window;
   window.setWindowIcon( QIcon( ":/images/py_editor.png" ) );
   window.resize( 650, 700 );
   window.show();
+
+  if ( args.count() > 0 )
+    window.loadFile( args[0], false );
   
   return app.exec();
 }

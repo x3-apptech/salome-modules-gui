@@ -237,6 +237,7 @@
     <parameter name="TabSize"              value="4" />
     <parameter name="VerticalEdge"         value="true" />
     <parameter name="NumberColumns"        value="90" />
+    <parameter name="CompletionPolicy"     value="3" />
   </section>
   <section name="GUI" >
     <parameter name="documentation"     value="gui_help"/>

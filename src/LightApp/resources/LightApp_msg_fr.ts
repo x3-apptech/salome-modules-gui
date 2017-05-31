@@ -1042,6 +1042,30 @@ Le fichier n&apos;existe pas</translation>
         <translation>Affiche les numéros de ligne</translation>
     </message>
     <message>
+        <source>PREF_GROUP_PY_EDITOR</source>
+	<translation type="unfinished">Editor settings</translation>
+    </message>
+    <message>
+        <source>PREF_PY_COMPLETION_MODE</source>
+	<translation type="unfinished">Completion mode</translation>
+    </message>
+    <message>
+        <source>PREF_PY_NONE</source>
+	<translation type="unfinished">None</translation>
+    </message>
+    <message>
+        <source>PREF_PY_AUTO</source>
+	<translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+        <source>PREF_PY_MANUAL</source>
+	<translation type="unfinished">Manual</translation>
+    </message>
+    <message>
+        <source>PREF_PY_ALWAYS</source>
+	<translation type="unfinished">Always</translation>
+    </message>
+    <message>
         <source>PREF_GROUP_PY_TAB</source>
         <translation>Indentation</translation>
     </message>

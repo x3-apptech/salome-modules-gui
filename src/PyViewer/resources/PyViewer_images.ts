@@ -48,6 +48,14 @@
         <translation>py_select_all.png</translation>
     </message>
     <message>
+        <source>ICON_FIND</source>
+        <translation>py_find.png</translation>
+    </message>
+    <message>
+        <source>ICON_REPLACE</source>
+        <translation>py_replace.png</translation>
+    </message>
+    <message>
         <source>ICON_PREFERENCES</source>
         <translation>py_preferences.png</translation>
     </message>

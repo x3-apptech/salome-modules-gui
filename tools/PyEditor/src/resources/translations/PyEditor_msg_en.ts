@@ -32,6 +32,30 @@
       <translation>Display line numbers area</translation>
     </message>
     <message>
+      <source>GR_EDIT_SET</source>
+      <translation>Editor settings</translation>
+    </message>
+    <message>
+      <source>LBL_COMPLETION_MODE</source>
+      <translation>Completion mode</translation>
+    </message>
+    <message>
+      <source>LBL_NONE</source>
+      <translation>None</translation>
+    </message>
+    <message>
+      <source>LBL_AUTO</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>LBL_MANUAL</source>
+      <translation>Manual</translation>
+    </message>
+    <message>
+      <source>LBL_ALWAYS</source>
+      <translation>Always</translation>
+    </message>
+    <message>
       <source>GR_TAB_SET</source>
       <translation>Tab settings</translation>
     </message>
@@ -227,6 +251,30 @@
       <translation>Select all the contents</translation>
     </message>
     <message>
+      <source>ACT_FIND</source>
+      <translation>Find</translation>
+    </message>
+    <message>
+      <source>TTP_FIND</source>
+      <translation>Find</translation>
+    </message>
+    <message>
+      <source>DSC_FIND</source>
+      <translation>Find text</translation>
+    </message>
+    <message>
+      <source>ACT_REPLACE</source>
+      <translation>Replace</translation>
+    </message>
+    <message>
+      <source>TTP_REPLACE</source>
+      <translation>Find &amp; Replace</translation>
+    </message>
+    <message>
+      <source>DSC_REPLACE</source>
+      <translation>Find and replace text</translation>
+    </message>
+    <message>
       <source>ACT_PREFERENCES</source>
       <translation>Pre&amp;ferences</translation>
     </message>
@@ -284,11 +332,13 @@
     </message>
     <message>
       <source>WRN_READ_FILE</source>
-      <translation>Cannot read file %1:\n%2.</translation>
+      <translation>Cannot read file %1:
+%2.</translation>
     </message>
     <message>
       <source>WRN_WRITE_FILE</source>
-      <translation>Cannot write file %1:\n%2.</translation>
+      <translation>Cannot write file %1:
+%2.</translation>
     </message>
     <message>
       <source>STS_READY</source>
@@ -305,6 +355,56 @@
     <message>
       <source>NONAME</source>
       <translation>Noname.py</translation>
+    </message>
+  </context>
+  <context>
+    <name>PyEditor</name>
+    <message>
+      <source>PROGRAM_DESCRIPTION</source>
+      <translation>Simple Python editor</translation>
+    </message>
+    <message>
+      <source>FILE_PARAM_NAME</source>
+      <translation>file</translation>
+    </message>
+    <message>
+      <source>FILE_PARAM_DESCRIPTION</source>
+      <translation>File to edit.</translation>
+    </message>
+  </context>
+  <context>
+    <name>PyEditor_FindTool</name>
+    <message>
+      <source>FIND_LABEL</source>
+      <translation>Find:</translation>
+    </message>
+    <message>
+      <source>REPLACE_LABEL</source>
+      <translation>Replace with:</translation>
+    </message>
+    <message>
+      <source>REPLACE_BTN</source>
+      <translation>Replace</translation>
+    </message>
+    <message>
+      <source>REPLACE_ALL_BTN</source>
+      <translation>Replace All</translation>
+    </message>
+    <message>
+      <source>CASE_SENSITIVE_CHECK</source>
+      <translation>Case Sensitive</translation>
+    </message>
+    <message>
+      <source>WHOLE_WORDS_CHECK</source>
+      <translation>Whole Words Only</translation>
+    </message>
+    <message>
+      <source>REGEX_CHECK</source>
+      <translation>Use Regular Expressions</translation>
+    </message>
+    <message>
+      <source>NB_MATCHED_LABEL</source>
+      <translation>%1 of %2 matches</translation>
     </message>
   </context>
 </TS>

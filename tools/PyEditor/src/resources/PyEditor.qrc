@@ -5,14 +5,19 @@
     <file>images/py_delete.png</file>
     <file>images/py_editor.png</file>
     <file>images/py_exit.png</file>
+    <file>images/py_find.png</file>
+    <file>images/py_find_next.png</file>
+    <file>images/py_find_previous.png</file>
     <file>images/py_help.png</file>
     <file>images/py_new.png</file>
     <file>images/py_open.png</file>
     <file>images/py_paste.png</file>
     <file>images/py_preferences.png</file>
     <file>images/py_redo.png</file>
+    <file>images/py_replace.png</file>
     <file>images/py_save.png</file>
     <file>images/py_save_as.png</file>
+    <file>images/py_search.png</file>
     <file>images/py_select_all.png</file>
     <file>images/py_undo.png</file>
     <file>about.txt</file>

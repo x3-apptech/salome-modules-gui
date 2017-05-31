@@ -22,6 +22,10 @@
 
 #include "PyEditor_PyHighlighter.h"
 
+#include "PyEditor_Keywords.h"
+
+#include <QSet>
+
 #define NORMAL 0
 #define TRIPLESINGLE 1
 #define TRIPLEDOUBLE 2
@@ -53,192 +57,20 @@ void PyEditor_PyHighlighter::TextBlockData::insert( PyEditor_PyHighlighter::Pare
   \brief Constructor.
   \param theDocument container for structured rich text documents.
 */
-PyEditor_PyHighlighter::PyEditor_PyHighlighter( QTextDocument* theDocument )
-  : QSyntaxHighlighter( theDocument )
+PyEditor_PyHighlighter::PyEditor_PyHighlighter( QTextDocument* theDocument,
+						PyEditor_Keywords* std,
+						PyEditor_Keywords* user )
+  : QSyntaxHighlighter( theDocument ),
+    myStdKeywords( std ),
+    myUserKeywords( user )
 {
-  initialize();
-}
 
-/*!
-  \brief Initialization rules.
-*/
-void PyEditor_PyHighlighter::initialize()
-{
-  HighlightingRule aRule;
+  connect(myStdKeywords, SIGNAL( keywordsChanged() ),
+	  this, SLOT( onKeywordsChanged() ) );
+  connect(myUserKeywords, SIGNAL( keywordsChanged() ),
+	  this, SLOT( onKeywordsChanged() ) );
 
-  // Keywords
-  keywordFormat.setForeground( Qt::blue );
-  QStringList aKeywords = keywords();
-  foreach ( const QString& keyword, aKeywords )
-  {
-    aRule.pattern = QRegExp( QString( "\\b%1\\b" ).arg( keyword ) );
-    aRule.format = keywordFormat;
-    aRule.capture = 0;
-    highlightingRules.append( aRule );
-  }
-
-  // Special keywords
-  specialFromat.setForeground( Qt::magenta );
-  QStringList aSpecialKeywords = specialKeywords();
-  foreach ( const QString& keyword, aSpecialKeywords )
-  {
-    aRule.pattern = QRegExp( QString( "\\b%1\\b" ).arg( keyword ) );
-    aRule.format = specialFromat;
-    aRule.capture = 0;
-    highlightingRules.append( aRule );
-  }
-
-  // Reference to the current instance of the class
-  referenceClassFormat.setForeground( QColor( 179, 143, 0 ) );
-  referenceClassFormat.setFontItalic( true );
-  aRule.pattern = QRegExp( "\\bself\\b" );
-  aRule.format = referenceClassFormat;
-  aRule.capture = 0;
-  highlightingRules.append( aRule );
-
-  // Numbers
-  numberFormat.setForeground( Qt::darkMagenta );
-  aRule.pattern = QRegExp( "\\b([-+])?(\\d+(\\.)?\\d*|\\d*(\\.)?\\d+)(([eE]([-+])?)?\\d+)?\\b" );
-  aRule.format = numberFormat;
-  aRule.capture = 0;
-  highlightingRules.append( aRule );
-
-  // String qoutation
-  quotationFormat.setForeground( Qt::darkGreen );
-  aRule.pattern = QRegExp( "(?:'[^']*'|\"[^\"]*\")" );
-  aRule.pattern.setMinimal( true );
-  aRule.format = quotationFormat;
-  aRule.capture = 0;
-  highlightingRules.append( aRule );
-
-  // Function names
-  functionFormat.setFontWeight( QFont::Bold );
-  aRule.pattern = QRegExp( "(?:def\\s*)(\\b[A-Za-z0-9_]+)(?=[\\W])" );
-  aRule.capture = 1;
-  aRule.format = functionFormat;
-  highlightingRules.append( aRule );
-
-  // Class names
-  classFormat.setForeground( Qt::darkBlue );
-  classFormat.setFontWeight( QFont::Bold );
-  aRule.pattern = QRegExp( "(?:class\\s*)(\\b[A-Za-z0-9_]+)(?=[\\W])" );
-  aRule.capture = 1;
-  aRule.format = classFormat;
-  highlightingRules.append( aRule );
-
-  // Multi line comments
-  multiLineCommentFormat.setForeground( Qt::darkRed );
-  tripleQuotesExpression = QRegExp( "(:?\"[\"]\".*\"[\"]\"|'''.*''')" );
-  aRule.pattern = tripleQuotesExpression;
-  aRule.pattern.setMinimal( true );
-  aRule.format = multiLineCommentFormat;
-  aRule.capture = 0;
-  highlightingRules.append( aRule );
-
-  tripleSingleExpression = QRegExp( "'''(?!\")" );
-  tripleDoubleExpression = QRegExp( "\"\"\"(?!')" );
-
-  // Single comments
-  singleLineCommentFormat.setForeground( Qt::darkGray );
-  aRule.pattern = QRegExp( "#[^\n]*" );
-  aRule.format = singleLineCommentFormat;
-  aRule.capture = 0;
-  highlightingRules.append( aRule );
-}
-
-/*!
-  \return string list of Python keywords.
- */
-QStringList PyEditor_PyHighlighter::keywords()
-{
-  QStringList aKeywords;
-  aKeywords << "and"
-            << "as"
-            << "assert"
-            << "break"
-            << "class"
-            << "continue"
-            << "def"
-            << "elif"
-            << "else"
-            << "except"
-            << "exec"
-            << "finally"
-            << "False"
-            << "for"
-            << "from"
-            << "global"
-            << "if"
-            << "import"
-            << "in"
-            << "is"
-            << "lambda"
-            << "None"
-            << "not"
-            << "or"
-            << "pass"
-            << "print"
-            << "raise"
-            << "return"
-            << "True"
-            << "try"
-            << "while"
-            << "with"
-            << "yield";
-  return aKeywords;
-}
-
-/*!
-  \return string list of special Python keywords.
-*/
-QStringList PyEditor_PyHighlighter::specialKeywords()
-{
-  QStringList aSpecialKeywords;
-  aSpecialKeywords << "ArithmeticError"
-                   << "AssertionError"
-                   << "AttributeError"
-                   << "EnvironmentError"
-                   << "EOFError"
-                   << "Exception"
-                   << "FloatingPointError"
-                   << "ImportError"
-                   << "IndentationError"
-                   << "IndexError"
-                   << "IOError"
-                   << "KeyboardInterrupt"
-                   << "KeyError"
-                   << "LookupError"
-                   << "MemoryError"
-                   << "NameError"
-                   << "NotImplementedError"
-                   << "OSError"
-                   << "OverflowError"
-                   << "ReferenceError"
-                   << "RuntimeError"
-                   << "StandardError"
-                   << "StopIteration"
-                   << "SyntaxError"
-                   << "SystemError"
-                   << "SystemExit"
-                   << "TabError"
-                   << "TypeError"
-                   << "UnboundLocalError"
-                   << "UnicodeDecodeError"
-                   << "UnicodeEncodeError"
-                   << "UnicodeError"
-                   << "UnicodeTranslateError"
-                   << "ValueError"
-                   << "WindowsError"
-                   << "ZeroDivisionError"
-                   << "Warning"
-                   << "UserWarning"
-                   << "DeprecationWarning"
-                   << "PendingDeprecationWarning"
-                   << "SyntaxWarning"
-                   << "OverflowWarning"
-                   << "RuntimeWarning"
-                   << "FutureWarning";
-  return aSpecialKeywords;
+  updateHighlight();
 }
 
 void PyEditor_PyHighlighter::highlightBlock( const QString& theText )
@@ -352,4 +184,101 @@ void PyEditor_PyHighlighter::insertBracketsData( Brackets theBrackets,
   }
 
   insertBracketsData( leftChar, rightChar, theData, theText );
+}
+
+void PyEditor_PyHighlighter::onKeywordsChanged()
+{
+  updateHighlight();
+  rehighlight();
+}
+
+void PyEditor_PyHighlighter::updateHighlight()
+{
+  highlightingRules.clear();
+
+  HighlightingRule aRule;
+
+  QList<PyEditor_Keywords*> dictList;
+  dictList << myStdKeywords << myUserKeywords;
+
+  // Keywords
+  QSet<QString> existing;
+  for ( QList<PyEditor_Keywords*>::const_iterator it = dictList.begin();
+	it != dictList.end(); ++it ) {
+    PyEditor_Keywords* kwDict = *it;
+    QList<QColor> colors = kwDict->colors();
+    for ( QList<QColor>::const_iterator itr = colors.begin(); itr != colors.end(); ++itr ) {
+      QColor color = *itr;
+      QTextCharFormat format;
+      format.setForeground( color );
+      QStringList keywords = kwDict->keywords( color );
+      foreach ( const QString& keyword, keywords ) {
+	if ( existing.contains( keyword ) )
+	  continue;
+
+	aRule.pattern = QRegExp( QString( "\\b%1\\b" ).arg( keyword ) );
+	aRule.format = format;
+	aRule.capture = 0;
+	highlightingRules.append( aRule );
+	existing.insert( keyword );
+      }
+    }
+  }
+
+  // Reference to the current instance of the class
+  referenceClassFormat.setForeground( QColor( 179, 143, 0 ) );
+  referenceClassFormat.setFontItalic( true );
+  aRule.pattern = QRegExp( "\\bself\\b" );
+  aRule.format = referenceClassFormat;
+  aRule.capture = 0;
+  highlightingRules.append( aRule );
+
+  // Numbers
+  numberFormat.setForeground( Qt::darkMagenta );
+  aRule.pattern = QRegExp( "\\b([-+])?(\\d+(\\.)?\\d*|\\d*(\\.)?\\d+)(([eE]([-+])?)?\\d+)?\\b" );
+  aRule.format = numberFormat;
+  aRule.capture = 0;
+  highlightingRules.append( aRule );
+
+  // String qoutation
+  quotationFormat.setForeground( Qt::darkGreen );
+  aRule.pattern = QRegExp( "(?:'[^']*'|\"[^\"]*\")" );
+  aRule.pattern.setMinimal( true );
+  aRule.format = quotationFormat;
+  aRule.capture = 0;
+  highlightingRules.append( aRule );
+
+  // Function names
+  functionFormat.setFontWeight( QFont::Bold );
+  aRule.pattern = QRegExp( "(?:def\\s*)(\\b[A-Za-z0-9_]+)(?=[\\W])" );
+  aRule.capture = 1;
+  aRule.format = functionFormat;
+  highlightingRules.append( aRule );
+
+  // Class names
+  classFormat.setForeground( Qt::darkBlue );
+  classFormat.setFontWeight( QFont::Bold );
+  aRule.pattern = QRegExp( "(?:class\\s*)(\\b[A-Za-z0-9_]+)(?=[\\W])" );
+  aRule.capture = 1;
+  aRule.format = classFormat;
+  highlightingRules.append( aRule );
+
+  // Multi line comments
+  multiLineCommentFormat.setForeground( Qt::darkRed );
+  tripleQuotesExpression = QRegExp( "(:?\"[\"]\".*\"[\"]\"|'''.*''')" );
+  aRule.pattern = tripleQuotesExpression;
+  aRule.pattern.setMinimal( true );
+  aRule.format = multiLineCommentFormat;
+  aRule.capture = 0;
+  highlightingRules.append( aRule );
+
+  tripleSingleExpression = QRegExp( "'''(?!\")" );
+  tripleDoubleExpression = QRegExp( "\"\"\"(?!')" );
+
+  // Single comments
+  singleLineCommentFormat.setForeground( Qt::darkGray );
+  aRule.pattern = QRegExp( "#[^\n]*" );
+  aRule.format = singleLineCommentFormat;
+  aRule.capture = 0;
+  highlightingRules.append( aRule );
 }

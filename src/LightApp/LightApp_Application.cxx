@@ -2932,6 +2932,20 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->addPreference( tr( "PREF_PY_LINE_NUMBS_AREA" ), pyDispGroup,
     LightApp_Preferences::Bool, "PyEditor", "LineNumberArea" );
   // ... "Display settings" group <<end>>
+
+  // ... "Editor settings" group <<start>>
+  int pyEditGroup = pref->addPreference( tr( "PREF_GROUP_PY_EDITOR" ), pyeditTab );
+  // ... -> navigation mode
+  int pyCompletion = pref->addPreference( tr( "PREF_PY_COMPLETION_MODE" ), pyEditGroup,
+                                          LightApp_Preferences::Selector, "PyEditor", "CompletionPolicy" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_PY_NONE") << tr("PREF_PY_AUTO") << tr("PREF_PY_MANUAL") << tr("PREF_PY_ALWAYS");
+  anIndicesList << 0                  << 1                  << 2                    << 3                   ;
+  pref->setItemProperty( "strings", aValuesList, pyCompletion );
+  pref->setItemProperty( "indexes", anIndicesList, pyCompletion );
+  // ... "Editor settings" group <<end>>
+
   // ... "Tab settings" group <<start>>
   int pyTabGroup = pref->addPreference( tr( "PREF_GROUP_PY_TAB" ), pyeditTab );
   pref->setItemProperty( "columns", 2, pyTabGroup );
