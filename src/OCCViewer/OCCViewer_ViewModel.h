@@ -132,6 +132,9 @@ public:
 
   virtual OCCViewer_ViewWindow*   createSubWindow();
 
+  void                            setUseLocalSelection(bool theIsUseLocalSelection);
+  bool                            useLocalSelection() const;
+
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
   Handle(AIS_InteractiveContext)  getAISContext()  const { return myAISContext; }
@@ -279,7 +282,7 @@ protected:
   QString                         myClippingTexture;
   bool                            myTextureModulated;
   double                          myClippingTextureScale;
-
+  bool                            myIsUseLocalSelection;
 };
 
 #ifdef WIN32

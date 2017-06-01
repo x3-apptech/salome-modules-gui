@@ -120,7 +120,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myIsRelative(true),
   myTopLayerId( 0 ),
   myTrihedronSize(100),
-  myClippingDlg (NULL)
+  myClippingDlg (NULL),
+  myIsUseLocalSelection(false)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
@@ -454,7 +455,7 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
     break;
   case  Qt::Key_N:
     if ( isPreselectionEnabled() ) {
-      if ( getAISContext()->HasOpenedContext() )
+      if ( useLocalSelection() )
 	getAISContext()->HilightNextDetected( aView->getViewPort()->getView() );
     }
     break;
@@ -1353,6 +1354,27 @@ void OCCViewer_Viewer::isos( int& u, int& v ) const
 OCCViewer_ViewWindow* OCCViewer_Viewer::createSubWindow()
 {
   return new OCCViewer_ViewWindow(0,  this);
+}
+
+/*!
+  Sets using local selection state
+  \param theIsUseLocalSelection - state
+*/
+void OCCViewer_Viewer::setUseLocalSelection(bool theIsUseLocalSelection)
+{
+  myIsUseLocalSelection = theIsUseLocalSelection;
+}
+
+/* 
+ * Returns true if local context is opened or view model local state is set
+ */
+bool OCCViewer_Viewer::useLocalSelection() const
+{
+  if (myIsUseLocalSelection)
+    return true;
+
+  Handle(AIS_InteractiveContext) ic = getAISContext();
+  return !ic.IsNull() && ic->HasOpenedContext();
 }
 
 // obsolete  

@@ -393,7 +393,7 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
 
         if ( aEvent->modifiers().testFlag(Qt::ControlModifier) ) {
           Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-          if ( isPreselectionEnabled() && ic->HasOpenedContext() ) {
+          if ( isPreselectionEnabled() && myModel->useLocalSelection() ) {
             if ( aEvent->delta() > 0 ) {
               ic->HilightNextDetected( myViewPort->getView() );
             } else {
