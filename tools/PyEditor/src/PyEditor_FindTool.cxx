@@ -157,7 +157,7 @@ bool PyEditor_FindTool::event( QEvent* e )
     {
     case Qt::Key_Escape:
       hide();
-      break;
+      return true;
     default:
       break;
     }
