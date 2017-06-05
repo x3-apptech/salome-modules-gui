@@ -693,7 +693,8 @@ int SUIT_Application::registerAction( const int id, QAction* a )
   if ( desktop() && desktop()->toolMgr() )
     desktop()->toolMgr()->registerAction( a );
 
-  if ( desktop() )
+  if ( desktop() && a->shortcutContext() != Qt::WidgetShortcut &&
+       a->shortcutContext() != Qt::WidgetWithChildrenShortcut )
     desktop()->addAction( a );
 
   return ident;

@@ -1027,7 +1027,9 @@ int CAM_Module::registerAction( const int id, QAction* a )
   if ( toolMgr() )
     toolMgr()->registerAction( a );
 
-  if ( application() && application()->desktop() )
+  if ( application() && application()->desktop() &&
+       a->shortcutContext() != Qt::WidgetShortcut &&
+       a->shortcutContext() != Qt::WidgetWithChildrenShortcut )
     application()->desktop()->addAction( a );
 
   return ident;
