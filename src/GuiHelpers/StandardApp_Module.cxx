@@ -20,6 +20,8 @@
 
 #include "StandardApp_Module.hxx"
 
+#include "SALOME_GuiServices.hxx"
+
 #include <SUIT_Desktop.h>
 #include <SUIT_Study.h>
 #include <SalomeApp_Application.h>
@@ -279,7 +281,7 @@ bool StandardApp_Module::activateModule( SUIT_Study* theStudy )
   setToolShown( true );
 
   if ( this->createStudyComponentAtActivation() ) {
-    this->createStudyComponent(theStudy);
+    this->createStudyComponent();
   }
 
   return bOk;
@@ -301,12 +303,9 @@ bool StandardApp_Module::createStudyComponentAtActivation() {
  * the module. This component is associated to the engine (return by
  * getEngine()) if the engine is a SALOMEDS::Driver.
  */
-void StandardApp_Module::createStudyComponent(SUIT_Study* theStudy) {
+void StandardApp_Module::createStudyComponent() {
 
-  SALOME_NamingService *aNamingService = SalomeApp_Application::namingService();
-  CORBA::Object_var aSMObject = aNamingService->Resolve("/myStudyManager");
-  SALOMEDS::StudyManager_var aStudyManager = SALOMEDS::StudyManager::_narrow(aSMObject);
-  SALOMEDS::Study_var aDSStudy = aStudyManager->GetStudyByID(theStudy->id());
+  SALOMEDS::Study_var aDSStudy = GUI::getStudyServant();
 
   SALOMEDS::SComponent_var aFather = aDSStudy->FindComponent(QCHARSTAR(moduleName()));
   if (aFather->_is_nil())

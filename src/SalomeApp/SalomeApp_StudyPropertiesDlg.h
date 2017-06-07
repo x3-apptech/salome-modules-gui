@@ -60,7 +60,6 @@ private:
  void initData();
   
 private:
- _PTR(Study)          myStudyDoc;
  bool                 myIsChanged;
  QLineEdit*           myAuthor;
  QLabel*              myDate;

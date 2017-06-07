@@ -354,12 +354,12 @@ void Session_ServerCheck::run()
       SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
       ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
       NS.init_orb( orb );
-      CORBA::Object_var obj = NS.Resolve( "/myStudyManager" );
-      SALOMEDS::StudyManager_var studyManager = SALOMEDS::StudyManager::_narrow( obj );
-      if ( !CORBA::is_nil( studyManager ) ) {
-        MESSAGE( "/myStudyManager is found" );
-        studyManager->ping();
-        MESSAGE( "StudyManager was activated" );
+      CORBA::Object_var obj = NS.Resolve( "/Study" );
+      SALOMEDS::Study_var study = SALOMEDS::Study::_narrow( obj );
+      if ( !CORBA::is_nil( study ) ) {
+        MESSAGE( "/Study is found" );
+        study->ping();
+        MESSAGE( "Study was activated" );
         setStep( ++current * myAttempts );
         break;
       }

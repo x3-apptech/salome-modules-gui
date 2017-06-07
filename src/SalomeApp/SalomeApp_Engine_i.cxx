@@ -65,43 +65,37 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 {
   SALOMEDS::TMPFile_var aStreamFile = new SALOMEDS::TMPFile;
 
-  if (CORBA::is_nil(theComponent) || CORBA::is_nil(theComponent->GetStudy()))
+  if (CORBA::is_nil(theComponent))
     return aStreamFile._retn();
-
-  const int studyId = theComponent->GetStudy()->StudyId();
 
   // Get a temporary directory to store a file
   //std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
 
-  if (myMap.count(studyId)) {
-    std::string componentName (theComponent->ComponentDataType());
+  std::string componentName (theComponent->ComponentDataType());
 
-    // Error somewhere outside - Save() called with
-    // wrong SComponent instance
-    if ( myComponentName != componentName )
-      return aStreamFile._retn();
+  // Error somewhere outside - Save() called with
+  // wrong SComponent instance
+  if ( myComponentName != componentName )
+    return aStreamFile._retn();
 
-    const ListOfFiles& listOfFiles = myMap[studyId];
+  // listOfFiles must contain temporary directory name in its first item
+  // and names of files (relatively the temporary directory) in the others
+  const int n = myListOfFiles.size() - 1;
 
-    // listOfFiles must contain temporary directory name in its first item
-    // and names of files (relatively the temporary directory) in the others
-    const int n = listOfFiles.size() - 1;
+  if (n > 0) { // there are some files, containing persistent data of the component
+    std::string aTmpDir = myListOfFiles[0];
 
-    if (n > 0) { // there are some files, containing persistent data of the component
-      std::string aTmpDir = listOfFiles[0];
+    // Create a list to store names of created files
+    ListOfFiles aSeq;
+    aSeq.reserve(n);
+    for (int i = 0; i < n; i++)
+      aSeq.push_back(CORBA::string_dup(myListOfFiles[i + 1].c_str()));
 
-      // Create a list to store names of created files
-      SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
-      aSeq->length(n);
-      for (int i = 0; i < n; i++)
-        aSeq[i] = CORBA::string_dup(listOfFiles[i + 1].c_str());
+    // Convert a file to the byte stream
+    aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq, isMultiFile);
 
-      // Convert a file to the byte stream
-      aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq.in(), isMultiFile);
-
-      // Remove the files and tmp directory, created by the component storage procedure
-      if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
-    }
+    // Remove the files and tmp directory, created by the component storage procedure
+    if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
   }
 
   return aStreamFile._retn();
@@ -113,7 +107,7 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
                                          bool isMultiFile)
 {
   std::cout << "SalomeApp_Engine_i::Load() isMultiFile = " << isMultiFile << std::endl;
-  if (CORBA::is_nil(theComponent) || CORBA::is_nil(theComponent->GetStudy()))
+  if (CORBA::is_nil(theComponent))
     return false;
 
   // Error somewhere outside - Load() called with
@@ -122,53 +116,42 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
   if ( myComponentName != componentName )
     return false;
 
-  const int studyId = theComponent->GetStudy()->StudyId();
-
   // Create a temporary directory for the component's data files
   std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
 
   // Convert the byte stream theStream to a files and place them in the tmp directory.
   // The files and temporary directory must be deleted by the component loading procedure.
-  SALOMEDS::ListOfFileNames_var aSeq =
+  ListOfFiles aSeq =
     SALOMEDS_Tool::PutStreamToFiles(theFile, aTmpDir.c_str(), isMultiFile);
 
   // Store list of file names to be used by the component loading procedure
-  const int n = aSeq->length() + 1;
+  const int n = aSeq.size() + 1;
   ListOfFiles listOfFiles (n);
   listOfFiles[0] = aTmpDir;
   for (int i = 1; i < n; i++)
     listOfFiles[i] = std::string(aSeq[i - 1]);
 
-  SetListOfFiles(listOfFiles, studyId);
+  SetListOfFiles(listOfFiles);
 
   return true;
 }
 
-SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles (const int theStudyId)
+SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles()
 {
-  ListOfFiles aListOfFiles;
-
-  if (myMap.find(theStudyId) != myMap.end())
-  {
-    aListOfFiles = myMap[theStudyId];
-  }
-
-  return aListOfFiles;
+  return myListOfFiles;
 }
 
-void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles& theListOfFiles,
-                                         const int          theStudyId)
+void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles& theListOfFiles)
 {
-  myMap[theStudyId] = theListOfFiles;
+  myListOfFiles = theListOfFiles;
 }
 
 /*! 
  *  DumpPython implementation for light modules
  */
-Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy, 
-						 CORBA::Boolean isPublished, 
-						 CORBA::Boolean isMultiFile, 
-						 CORBA::Boolean& isValidScript)
+Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
+						                         CORBA::Boolean isMultiFile,
+						                         CORBA::Boolean& isValidScript)
 {
   MESSAGE("SalomeApp_Engine_i::DumpPython(): myComponentName = "<<
 	  myComponentName << ", this = " << this);
@@ -182,24 +165,13 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy,
   aStreamFile[0] = '\0';
   isValidScript = true;
 
-  if (CORBA::is_nil(theStudy))
-    return aStreamFile._retn();
-
-  SALOMEDS::Study_var studyDS = SALOMEDS::Study::_narrow( theStudy );
-  const int studyId = studyDS->StudyId();
-
-  if (!myMap.count(studyId))
-    return aStreamFile._retn();
-
-  ListOfFiles listOfFiles = myMap[studyId];
-
   // listOfFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
-  if ( listOfFiles.size() < 2 ) 
+  if ( myListOfFiles.size() < 2 )
     return aStreamFile._retn();
 
   // there are some files, containing persistent data of the component
-  QString aTmpPath( listOfFiles.front().c_str() );
+  QString aTmpPath( myListOfFiles.front().c_str() );
   QDir aTmpDir( aTmpPath );
   if ( !aTmpDir.exists() )
     return aStreamFile._retn();    
@@ -208,8 +180,8 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy,
   QStringList aFilePaths;
   QList<qint64> aFileSizes;
   qint64 aBuffSize = 0;
-  ListOfFiles::const_iterator aFIt  = listOfFiles.begin();
-  ListOfFiles::const_iterator aFEnd = listOfFiles.end();
+  ListOfFiles::const_iterator aFIt  = myListOfFiles.begin();
+  ListOfFiles::const_iterator aFEnd = myListOfFiles.end();
   aFIt++;
   for (; aFIt != aFEnd; aFIt++){
     QString aFileName( (*aFIt).c_str() );

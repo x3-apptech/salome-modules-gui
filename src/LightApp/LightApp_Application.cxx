@@ -230,8 +230,6 @@ static const char* imageEmptyIcon[] = {
 "....................",
 "...................."};
 
-int LightApp_Application::lastStudyId = 0;
-
 // Markers used to parse array with dockable windows and toolbars state.
 // For more details please see the qdockarealayout.cpp && qtoolbararealayout.cpp
 // in the Qt source code.
@@ -293,14 +291,6 @@ namespace
       result = QLocale( lang ).nativeLanguageName();
     return result;
   }
-}
-
-/*!
-  \return last global id of study
-*/
-int LightApp_Application::studyId()
-{
-  return LightApp_Application::lastStudyId;
 }
 
 /*!Create new instance of LightApp_Application.*/
@@ -454,6 +444,8 @@ void LightApp_Application::start()
   desktop()->statusBar()->showMessage( "" );
 
   LightApp_EventFilter::Init();
+
+  onNewDoc();
 }
 
 /*!Closeapplication.*/
@@ -932,10 +924,8 @@ void LightApp_Application::onNewWindow()
 */
 void LightApp_Application::onNewDoc()
 {
-#ifdef SINGLE_DESKTOP
   if ( !checkExistingDoc() )
     return;
-#endif
 
   //asl: fix for 0020515
   saveDockWindowsState();
@@ -950,10 +940,8 @@ void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
   
-#ifdef SINGLE_DESKTOP
   if ( !checkExistingDoc() )
     return;
-#endif
   
   CAM_Application::onOpenDoc();
   
@@ -970,10 +958,8 @@ void LightApp_Application::onOpenDoc()
 */
 bool LightApp_Application::onOpenDoc( const QString& aName )
 {
-#ifdef SINGLE_DESKTOP
   if ( !checkExistingDoc() )
     return false;
-#endif
 
   saveDockWindowsState();
 
@@ -1357,10 +1343,9 @@ void LightApp_Application::placeDockWindow( const int id, Qt::DockWidgetArea pla
 /*!
   Gets window.
   \param flag - key for window
-  \param studyId - study id
   Flag used how identificator of window in windows list.
 */
-QWidget* LightApp_Application::getWindow( const int flag, const int )
+QWidget* LightApp_Application::getWindow( const int flag)
 {
   QWidget* wid = dockWindow( flag );
   if ( !wid )
@@ -1999,8 +1984,6 @@ void LightApp_Application::updateActions()
 */
 SUIT_Study* LightApp_Application::createNewStudy()
 {
-  LightApp_Application::lastStudyId++;
-
   LightApp_Study* aStudy = new LightApp_Study( this );
 
   // Set up processing of major study-related events
@@ -5147,19 +5130,20 @@ bool LightApp_Application::checkExistingDoc()
 {
   bool result = true;
   if( activeStudy() ) {
-    int answer = SUIT_MessageBox::question( desktop(),
-                                            tr( "APPCLOSE_CAPTION" ),
-                                            tr( "STUDYCLOSE_DESCRIPTION" ),
-                                            tr( "APPCLOSE_SAVE" ),
-                                            tr( "APPCLOSE_CLOSE" ),
-                                            tr( "APPCLOSE_CANCEL" ), 0 );
+    int answer = !activeStudy()->isModified() ? 1 :
+                 SUIT_MessageBox::question( desktop(),
+					    tr( "APPCLOSE_CAPTION" ),
+					    tr( "STUDYCLOSE_DESCRIPTION" ),
+					    tr( "APPCLOSE_SAVE" ),
+					    tr( "APPCLOSE_CLOSE" ),
+					    tr( "APPCLOSE_CANCEL" ), 0 );
     if(answer == 0) {
       if ( activeStudy()->isSaved() ) {
         onSaveDoc();
         closeDoc( false );
       } else if ( onSaveAsDoc() ) {
-        if( !closeDoc( false ) ) {
-          result = false;
+         if( !closeDoc( false ) ) {
+           result = false;
         }
       } else {
         result = false;

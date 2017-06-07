@@ -156,6 +156,8 @@ void STD_Application::createActions()
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_NEW" ) ),
                 tr( "MEN_DESK_FILE_NEW" ), tr( "PRP_DESK_FILE_NEW" ),
                 Qt::CTRL+Qt::Key_N, desk, false, this, SLOT( onNewDoc() ) );
+  //no need at this action for mono-study application because study is always exists
+  action( FileNewId )->setVisible( false );
 
   createAction( FileOpenId, tr( "TOT_DESK_FILE_OPEN" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
@@ -367,16 +369,11 @@ bool STD_Application::onReopenDoc()
     // post closing actions
     afterCloseDoc();
 
-    int aNbStudies = 0;
-    QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
-    for ( int i = 0; i < apps.count(); i++ )
-      aNbStudies += apps.at( i )->getNbStudies();
-
     // reload study from the file
     res = useFile( studyName ) && activeStudy();
 
     // if reloading is failed, close the desktop
-    if ( aNbStudies && !res )
+    if ( activeStudy() && !res )
       closeApplication();
     else
     {

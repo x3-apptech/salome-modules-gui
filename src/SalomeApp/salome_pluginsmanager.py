@@ -77,7 +77,6 @@ In short to add a plugin:
 context attributes:
 
   - sg : the SALOME Swig interface
-  - studyId : the SALOME studyId that must be used to execute the plugin
   - study : the SALOME study object that must be used to execute the plugin
 
 """
@@ -118,8 +117,7 @@ def initialize(module,name,basemenuname,menuname):
 class Context:
     def __init__(self,sgpyqt):
         self.sg=sgpyqt
-        self.studyId=salome.sg.getActiveStudyId()
-        self.study= salome.myStudyManager.GetStudyByID(self.studyId)
+        self.study=salome.myStudy
 
 def find_menu(smenu):
   lmenus=smenu.split("|")
@@ -239,12 +237,7 @@ class PluginsManager:
 
     def importPlugins(self):
         """Execute the salome_plugins file that contains plugins definition """
-        studyId=sg.getActiveStudyId()
-        if studyId == 0:
-          self.menu.clear()
-          self.menu.menuAction().setVisible(False)
-          return
-        elif self.lasttime ==0 or salome.myStudy == None:
+        if self.lasttime ==0 or salome.myStudy == None:
           salome.salome_init(embedded=1)
 
         lasttime=0

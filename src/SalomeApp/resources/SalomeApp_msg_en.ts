@@ -8,10 +8,6 @@
         <translation>The file %1 does not exist.</translation>
     </message>
     <message>
-        <source>ERR_ACTIVEDOC_LOAD</source>
-        <translation>A study is already active in your session, but you are not connected to it. Use the Connect button to load it in the interface.</translation>
-    </message>
-    <message>
         <source>WRN_STUDY_LOCKED</source>
         <translation>Study is locked.</translation>
     </message>
@@ -214,7 +210,7 @@ Launch a new session or close the study.</translation>
     </message>
     <message>
         <source>QUE_DOC_ALREADYEXIST</source>
-        <translation>The document %1 already exists in study manager.
+        <translation>The document %1 already exists.
 Do you want to reload it ?</translation>
     </message>
     <message>

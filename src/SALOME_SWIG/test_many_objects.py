@@ -84,7 +84,7 @@ for i in range(0,myNb1):
                 myBuilder.Addreference(myRefObject,myObject3);
 
 # >>> Updating Object Browser ================================================
-salome.sg.updateObjBrowser(True)
+salome.sg.updateObjBrowser()
 
 # ============================================================================
 

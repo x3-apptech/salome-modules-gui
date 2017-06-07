@@ -82,9 +82,8 @@ class SalomeApp_Study::Observer_i : public virtual POA_SALOMEDS::Observer, QObje
 
 public:
 
-  Observer_i(_PTR(Study) aStudyDS, SalomeApp_Study* aStudy):QObject(aStudy)
+  Observer_i( SalomeApp_Study* aStudy):QObject(aStudy)
   {
-    myStudyDS=aStudyDS;
     myStudy=aStudy;
     fillEntryMap();
   }
@@ -122,7 +121,7 @@ public:
     switch(event) {
     case 1:
       { //Add sobject
-        _PTR(SObject) aSObj = myStudyDS->FindObjectID(theID);
+        _PTR(SObject) aSObj = SalomeApp_Application::getStudy()->FindObjectID(theID);
         _PTR(SComponent) aSComp = aSObj->GetFatherComponent();
 
         if (!aSComp || aSComp->IsNull()) {
@@ -131,7 +130,7 @@ public:
         }
 
         // Mantis issue 0020136: Drag&Drop in OB
-        _PTR(UseCaseBuilder) aUseCaseBuilder = myStudyDS->GetUseCaseBuilder();
+        _PTR(UseCaseBuilder) aUseCaseBuilder = SalomeApp_Application::getStudy()->GetUseCaseBuilder();
         if (aUseCaseBuilder->IsUseCaseNode(aSComp)) { // BEGIN: work with tree nodes structure
           if (!aUseCaseBuilder->IsUseCaseNode(aSObj)) {
             // tree node is not yet set, it is a normal situation
@@ -392,7 +391,6 @@ private:
   }
 
 private:
-  _PTR(Study)      myStudyDS;
   SalomeApp_Study* myStudy;
   EntryMap         entry2SuitObject;
 };
@@ -404,6 +402,7 @@ private:
 SalomeApp_Study::SalomeApp_Study( SUIT_Application* app )
 : LightApp_Study( app ), myObserver( 0 )
 {
+  myStudyDS = SalomeApp_Application::getStudy();
 }
 
 /*!
@@ -425,17 +424,6 @@ void SalomeApp_Study::onNoteBookVarUpdate( QString theVarName)
 #endif
 
 /*!
-  Gets study id.
-*/
-int SalomeApp_Study::id() const
-{
-  int id = -1;
-  if ( studyDS() )
-    id = studyDS()->StudyId();
-  return id;
-}
-
-/*!
   Get study name.
 */
 QString SalomeApp_Study::studyName() const
@@ -444,7 +432,7 @@ QString SalomeApp_Study::studyName() const
   // it can be changed outside of GUI
   // TEMPORARILY SOLUTION: better to be implemented with help of SALOMEDS observers
   if ( studyDS() ) {
-    QString newName = QString::fromUtf8(studyDS()->Name().c_str());
+    QString newName = QString::fromUtf8(studyDS()->URL().c_str());
     if ( LightApp_Study::studyName() != newName ) {
       SalomeApp_Study* that = const_cast<SalomeApp_Study*>( this );
       that->setStudyName( newName );
@@ -469,35 +457,7 @@ bool SalomeApp_Study::createDocument( const QString& theStr )
 {
   MESSAGE( "createDocument" );
 
-  // initialize myStudyDS, read HDF file
-  QString aName = newStudyName();
-
-  _PTR(Study) study;
-  bool showError = !application()->property("open_study_from_command_line").isValid() || 
-    !application()->property("open_study_from_command_line").toBool();
-  try {
-    study = _PTR(Study)( SalomeApp_Application::studyMgr()->NewStudy( aName.toUtf8().data() ) );
-  }
-  catch(const SALOME_Exception& ex) {
-    application()->putInfo(tr(ex.what()));
-    if ( showError )
-      SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
-                                 tr("ERR_ERROR"), tr(ex.what()));
-    return false;
-  } 
-  catch(...) {
-    application()->putInfo(tr("CREATE_DOCUMENT_PROBLEM"));
-    if ( showError )
-      SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
-                                 tr("ERR_ERROR"), tr("CREATE_DOCUMENT_PROBLEM"));
-    return false;
-  }
-
-  if ( !study )
-    return false;
-
-  setStudyDS( study );
-  setStudyName( aName );
+  setStudyName( QString::fromUtf8(myStudyDS->URL().c_str()) );
 
   // create myRoot
   SalomeApp_RootObject* aRoot=new SalomeApp_RootObject( this );
@@ -509,7 +469,7 @@ bool SalomeApp_Study::createDocument( const QString& theStr )
   bool aRet = CAM_Study::createDocument( theStr );
 
 #ifdef WITH_SALOMEDS_OBSERVER
-  myObserver = new Observer_i(myStudyDS,this);
+  myObserver = new Observer_i(this);
   //attach an observer to the study with notification of modifications
   myStudyDS->attach(myObserver->_this(),true);
 #endif
@@ -527,12 +487,12 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
 {
   MESSAGE( "openDocument" );
 
-  // initialize myStudyDS, read HDF file
-  _PTR(Study) study;
-  bool showError = !application()->property("open_study_from_command_line").isValid() || 
+  // read HDF file
+  bool res = false;
+  bool showError = !application()->property("open_study_from_command_line").isValid() ||
     !application()->property("open_study_from_command_line").toBool();
   try {
-    study = _PTR(Study) ( SalomeApp_Application::studyMgr()->Open( theFileName.toUtf8().data() ) );
+    res = myStudyDS->Open( theFileName.toUtf8().data() );
   }
   catch(const SALOME_Exception& ex) {
     application()->putInfo(tr(ex.what()));
@@ -540,7 +500,7 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
       SUIT_MessageBox::critical( SUIT_Session::session()->activeApplication()->desktop(),
                                  tr("ERR_ERROR"), tr(ex.what()));
     return false;
-  } 
+  }
   catch(...) {
     application()->putInfo(tr("OPEN_DOCUMENT_PROBLEM"));
     if ( showError )
@@ -549,10 +509,8 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
     return false;
   }
 
-  if ( !study )
+  if ( !res)
     return false;
-
-  setStudyDS( study );
 
   setRoot( new SalomeApp_RootObject( this ) ); // create myRoot
 
@@ -570,15 +528,15 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
 
 #ifdef WITH_SALOMEDS_OBSERVER
   dynamic_cast<SalomeApp_RootObject*>( root() )->setToSynchronize(false);
-  myObserver = new Observer_i(myStudyDS,this);
+  myObserver = new Observer_i(this);
   //attach an observer to the study with notification of modifications
   myStudyDS->attach(myObserver->_this(),true);
 #endif
 
-  bool res = CAM_Study::openDocument( theFileName );
+  res = CAM_Study::openDocument( theFileName );
 
   emit opened( this );
-  study->IsSaved(true);
+  myStudyDS->IsSaved(true);
 
   bool restore = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
   if ( restore ) {
@@ -592,19 +550,12 @@ bool SalomeApp_Study::openDocument( const QString& theFileName )
 }
 
 /*!
-  Connects GUI study to SALOMEDS one already loaded into StudyManager
+  Connects GUI study to SALOMEDS one
   \param theStudyName - name of study
 */
 bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 {
   MESSAGE( "loadDocument" );
-
-  // obtain myStudyDS from StudyManager
-  _PTR(Study) study ( SalomeApp_Application::studyMgr()->GetStudyByName( theStudyName.toUtf8().data() ) );
-  if ( !study )
-    return false;
-
-  setStudyDS( study );
 
   setRoot( new SalomeApp_RootObject( this ) ); // create myRoot
 
@@ -625,7 +576,7 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
 
 #ifdef WITH_SALOMEDS_OBSERVER
   dynamic_cast<SalomeApp_RootObject*>( root() )->setToSynchronize(false);
-  myObserver = new Observer_i(myStudyDS,this);
+  myObserver = new Observer_i(this);
   //attach an observer to the study with notification of modifications
   myStudyDS->attach(myObserver->_this(),true);
 #endif
@@ -681,9 +632,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
 
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
   bool isAscii = resMgr->booleanValue( "Study", "ascii_file", false );
-  bool res = (isAscii ?
-    SalomeApp_Application::studyMgr()->SaveAsASCII( theFileName.toUtf8().data(), studyDS(), isMultiFile ) :
-    SalomeApp_Application::studyMgr()->SaveAs     ( theFileName.toUtf8().data(), studyDS(), isMultiFile ))
+  bool res = studyDS()->SaveAs( theFileName.toUtf8().data(), isMultiFile, isAscii )
     && CAM_Study::saveDocumentAs( theFileName );
 
   res = res && saveStudyData(theFileName);
@@ -726,9 +675,7 @@ bool SalomeApp_Study::saveDocument()
 
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
   bool isAscii = resMgr->booleanValue( "Study", "ascii_file", false );
-  bool res = (isAscii ?
-    SalomeApp_Application::studyMgr()->SaveASCII( studyDS(), isMultiFile ) :
-    SalomeApp_Application::studyMgr()->Save     ( studyDS(), isMultiFile )) && CAM_Study::saveDocument();
+  bool res = studyDS()->Save( isMultiFile, isAscii ) && CAM_Study::saveDocument();
 
   res = res && saveStudyData(studyName());
   if ( res )
@@ -745,24 +692,18 @@ void SalomeApp_Study::closeDocument(bool permanently)
   LightApp_Study::closeDocument(permanently);
 
   // close SALOMEDS document
-  _PTR(Study) studyPtr = studyDS();
-  if ( studyPtr )
-  {
-    if ( myObserver )
-      myStudyDS->detach( myObserver->_this() );
-    if ( permanently ) {
-      SUIT_Desktop* desk = SUIT_Session::session()->activeApplication()->desktop();
-      bool isBlocked = desk->signalsBlocked();
-      desk->blockSignals( true );
-      SalomeApp_Application::studyMgr()->Close( studyPtr );
-      desk->blockSignals( isBlocked );
+  if ( myObserver )
+    myStudyDS->detach( myObserver->_this() );
+  if ( permanently ) {
+    SUIT_Desktop* desk = SUIT_Session::session()->activeApplication()->desktop();
+    bool isBlocked = desk->signalsBlocked();
+    desk->blockSignals( true );
+    myStudyDS->Clear();
+    desk->blockSignals( isBlocked );
 #ifndef DISABLE_PYCONSOLE
-      SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
-      app->getPyInterp()->destroy();
+    SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
+    app->getPyInterp()->destroy();
 #endif
-    }
-    SALOMEDSClient_Study* aStudy = 0;
-    setStudyDS( _PTR(Study)(aStudy) );
   }
 }
 
@@ -789,13 +730,12 @@ bool SalomeApp_Study::dump( const QString& theFileName,
   int savePoint;
   _PTR(AttributeParameter) ap;
   _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
-  _PTR(Study) aStudy = studyDS();
 
-  if( ip->isDumpPython( aStudy ) ) 
-    ip->setDumpPython( aStudy ); //Unset DumpPython flag.
+  if( ip->isDumpPython() )
+    ip->setDumpPython(); //Unset DumpPython flag.
 
   if ( toSaveGUI ) { //SRN: Store a visual state of the study at the save point for DumpStudy method
-    ip->setDumpPython( aStudy );
+    ip->setDumpPython();
     //SRN: create a temporary save point
     savePoint = SalomeApp_VisualState( 
       dynamic_cast<SalomeApp_Application*>( application() ) ).storeState(); 
@@ -825,10 +765,10 @@ bool SalomeApp_Study::dump( const QString& theFileName,
   // Now dump SALOMEDS part that also involves SalomeApp_Engine in case if 
   // any light module is present in the current configuration
   QFileInfo aFileInfo( theFileName );
-  bool res = aStudy->DumpStudy( aFileInfo.absolutePath().toUtf8().data(),
-                                aFileInfo.baseName().toUtf8().data(),
-                                toPublish,
-                                isMultiFile);
+  bool res = myStudyDS->DumpStudy( aFileInfo.absolutePath().toUtf8().data(),
+                                  aFileInfo.baseName().toUtf8().data(),
+                                  toPublish,
+                                  isMultiFile);
   if ( toSaveGUI )
     removeSavePoint( savePoint ); //SRN: remove the created temporary save point.
 
@@ -857,8 +797,7 @@ bool SalomeApp_Study::isModified() const
  */
 void SalomeApp_Study::Modified()
 {
-  if(_PTR(Study) aStudy = studyDS())
-    aStudy->Modified();
+  myStudyDS->Modified();
   LightApp_Study::Modified();
 }
 
@@ -945,14 +884,6 @@ bool SalomeApp_Study::openStudyData( const QString& theFileName )
 }
 
 /*!
-  Set studyDS.
-*/
-void SalomeApp_Study::setStudyDS( const _PTR(Study)& s )
-{
-  myStudyDS = s;
-}
-
-/*!
   Virtual method re-implemented from LightApp_Study in order to create
   the module object connected to SALOMEDS - SalomeApp_ModuleObject.
 
@@ -985,11 +916,7 @@ CAM_ModuleObject* SalomeApp_Study::createModuleObject( LightApp_DataModel* theDa
   }
 
   if ( !res ){
-    _PTR(Study) aStudy = studyDS();
-    if ( !aStudy )
-      return res;
-
-    _PTR(SComponent) aComp = aStudy->FindComponent( 
+    _PTR(SComponent) aComp = myStudyDS->FindComponent(
       theDataModel->module()->name().toStdString() );
     if ( !aComp )
       return res;
@@ -1021,16 +948,13 @@ void SalomeApp_Study::addComponent(const CAM_DataModel* dm)
   // 1. aModule == 0 means that this is a light module (no CORBA enigine)
   if (!aModule) {
     // Check SComponent existance
-    _PTR(Study) aStudy = studyDS();
-    if (!aStudy)
-      return;
 
     std::string aCompDataType = dm->module()->name().toStdString();
 
-    _PTR(SComponent) aComp = aStudy->FindComponent(aCompDataType);
+    _PTR(SComponent) aComp = myStudyDS->FindComponent(aCompDataType);
     if (!aComp) {
       // Create SComponent
-      _PTR(StudyBuilder) aBuilder = aStudy->NewBuilder();
+      _PTR(StudyBuilder) aBuilder = myStudyDS->NewBuilder();
       aComp = aBuilder->NewComponent(aCompDataType);
       aBuilder->SetName(aComp, dm->module()->moduleName().toStdString());
       QString anIconName = dm->module()->iconName();
@@ -1049,7 +973,7 @@ void SalomeApp_Study::addComponent(const CAM_DataModel* dm)
       SalomeApp_DataModel::synchronize( aComp, this );
     }
     else {
-      _PTR(StudyBuilder) aBuilder = aStudy->NewBuilder();
+      _PTR(StudyBuilder) aBuilder = myStudyDS->NewBuilder();
       aBuilder->SetName(aComp, dm->module()->moduleName().toStdString());
       QString anIconName = dm->module()->iconName();
       if (!anIconName.isEmpty()) {
@@ -1072,7 +996,6 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
 
   //  SalomeApp_DataModel* aDM = (SalomeApp_DataModel*)(dm);
   SalomeApp_Module* aModule = dynamic_cast<SalomeApp_Module*>( dm->module() );
-  _PTR(Study)       aStudy = studyDS(); // shared_ptr cannot be used here
   _PTR(SComponent)  aSComp;
   QString anEngine;
   // 1. aModule == 0 means that this is a light module (no CORBA enigine)
@@ -1080,7 +1003,7 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
     // Issue 21377 - using separate engine for each type of light module
     std::string aCompDataType = dm->module()->name().toStdString();
     anEngine = SalomeApp_Engine_i::EngineIORForComponent( aCompDataType.c_str(), true ).c_str();
-    aSComp = aStudy->FindComponent( aCompDataType );
+    aSComp = myStudyDS->FindComponent( aCompDataType );
   }
   else {
     SalomeApp_DataModel* aDM = dynamic_cast<SalomeApp_DataModel*>( dm );
@@ -1091,11 +1014,11 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
       anEngine = aDM->getModule()->engineIOR();
       if ( anEngine.isEmpty() )
         return false;
-      aSComp = aStudy->FindComponentID( std::string( anId.toLatin1() ) );
+      aSComp = myStudyDS->FindComponentID( std::string( anId.toLatin1() ) );
     }
   }
   if ( aSComp ) {
-    _PTR(StudyBuilder) aBuilder( aStudy->NewBuilder() );
+    _PTR(StudyBuilder) aBuilder( myStudyDS->NewBuilder() );
     if ( aBuilder ) {
       try {
         aBuilder->LoadWith( aSComp, std::string( anEngine.toLatin1() ) );
@@ -1130,28 +1053,6 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
 }
 
 /*!
-  Create new study name.
-*/
-QString SalomeApp_Study::newStudyName() const
-{
-  std::vector<std::string> studies = SalomeApp_Application::studyMgr()->GetOpenStudies();
-  QString prefix( "Study%1" ), newName, curName;
-  int i = 1, j, n = studies.size();
-  while ( newName.isEmpty() ){
-    curName = prefix.arg( i );
-    for ( j = 0 ; j < n; j++ ){
-      if ( !strcmp( studies[j].c_str(), curName.toLatin1() ) )
-        break;
-    }
-    if ( j == n )
-      newName = curName;
-    else
-      i++;
-  }
-  return newName;
-}
-
-/*!
   Note that this method does not create or activate SalomeApp_Engine_i instance,
   therefore it can be called safely for any kind of module, but for full
   modules it returns an empty list.
@@ -1163,7 +1064,7 @@ std::vector<std::string> SalomeApp_Study::GetListOfFiles( const char* theModuleN
   // Issue 21377 - using separate engine for each type of light module
   SalomeApp_Engine_i* aDefaultEngine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
   if (aDefaultEngine)
-    return aDefaultEngine->GetListOfFiles(id());
+    return aDefaultEngine->GetListOfFiles();
 
   std::vector<std::string> aListOfFiles;
   return aListOfFiles;
@@ -1183,7 +1084,7 @@ void SalomeApp_Study::SetListOfFiles ( const char* theModuleName,
   // Issue 21377 - using separate engine for each type of light module
   SalomeApp_Engine_i* aDefaultEngine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
   if (aDefaultEngine)
-    aDefaultEngine->SetListOfFiles(theListOfFiles, id());
+    aDefaultEngine->SetListOfFiles(theListOfFiles);
 }
 
 /*!
@@ -1204,17 +1105,17 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bo
   if (isMultiFile)
     return;
 
-  std::vector<std::string> aListOfFiles = GetListOfFiles( theModuleName );
+  SALOMEDS_Tool::ListOfFiles aListOfFiles = GetListOfFiles( theModuleName );
   if (aListOfFiles.size() > 0) {
     std::string aTmpDir = aListOfFiles[0];
 
     const int n = aListOfFiles.size() - 1;
-    SALOMEDS::ListOfFileNames_var aSeq = new SALOMEDS::ListOfFileNames;
-    aSeq->length(n);
+    std::vector<std::string> aSeq;
+    aSeq.reserve(n);
     for (int i = 0; i < n; i++)
-      aSeq[i] = CORBA::string_dup(aListOfFiles[i + 1].c_str());
+      aSeq.push_back(CORBA::string_dup(aListOfFiles[i + 1].c_str()));
 
-    SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq.in(), true);
+    SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
   }
 }
 
@@ -1226,7 +1127,7 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bo
 void SalomeApp_Study::updateFromNotebook( const QString& theFileName, bool isSaved )
 {
   setStudyName(theFileName);
-  studyDS()->Name(theFileName.toStdString());
+  studyDS()->URL(theFileName.toStdString());
   setIsSaved( isSaved );
 }
 #endif

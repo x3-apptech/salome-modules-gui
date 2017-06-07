@@ -26,7 +26,7 @@ import salome
 
 import GEOM
 from salome.geom import geomBuilder
-geompy = geomBuilder.New(salome.myStudy)
+geompy = geomBuilder.New()
 
 # Create the objects
 Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)

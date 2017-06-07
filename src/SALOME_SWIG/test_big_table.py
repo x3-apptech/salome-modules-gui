@@ -66,6 +66,6 @@ for i in range(1,myVerNb+1):
 ARealTable.SetTitle("Very useful data")
 
 # >>> Updating Object Browser ================================================
-salome.sg.updateObjBrowser(True)
+salome.sg.updateObjBrowser()
 
 # ============================================================================

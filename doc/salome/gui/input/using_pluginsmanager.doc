@@ -100,7 +100,7 @@ training course):
 import salome
 import GEOM
 from salome.geom import geomBuilder
-geompy = geomBuilder.New(salome.myStudy)
+geompy = geomBuilder.New()
 
 # Create the objects
 Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
@@ -122,10 +122,10 @@ import salome_pluginsmanager
 def trihedron(context):
     import GEOM
     from salome.geom import geomBuilder
-    geompy = geomBuilder.New(salome.myStudy)
+    geompy = geomBuilder.New()
     # Intialize the geompy factory with the active study
     activeStudy = context.study
-    geompy.init_geom(activeStudy)
+    geompy.init_geom()
     # Create the objects
     Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
     Vy = geompy.MakeVectorDXDYDZ(0, 10, 0)

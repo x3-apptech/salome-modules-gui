@@ -142,7 +142,7 @@ void Session_ServerThread::Init()
         }
       case 4:  // Session
         {
-          NamingService_WaitForServerReadiness(_NS,"/myStudyManager");
+          NamingService_WaitForServerReadiness(_NS,"/Study");
           std::string containerName = "/Containers/";
           containerName = containerName + Kernel_Utils::GetHostname();
           containerName = containerName + "/FactoryServer";
@@ -215,7 +215,7 @@ void Session_ServerThread::ActivateSALOMEDS(int argc,
     // counted objects, they will be deleted by the POA when they are no
     // longer needed.    
     
-    ClientFactory::createStudyManager(_orb,_root_poa);
+    ClientFactory::createStudy(_orb,_root_poa);
   }
   catch(CORBA::SystemException&) {
     INFOS( "Caught CORBA::SystemException." );

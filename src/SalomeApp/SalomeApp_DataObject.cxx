@@ -291,7 +291,7 @@ QString SalomeApp_DataObject::toolTip( const int /*id*/ ) const
       if ( !CORBA::is_nil(aComponent) && aComponent->hasObjectInfo() ) {
         LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
         if ( aRoot && aRoot->study() ) {
-          CORBA::String_var data = aComponent->getObjectInfo( aRoot->study()->id(), entry().toLatin1().constData());
+          CORBA::String_var data = aComponent->getObjectInfo( entry().toLatin1().constData());
           QString objInfo = data.in();
           QStringList l;
           l << name();
@@ -405,13 +405,13 @@ bool SalomeApp_DataObject::hasChildren() const
   bool ok = false;
 
   // tmp??
-  _PTR(UseCaseBuilder) aUseCaseBuilder = myObject->GetStudy()->GetUseCaseBuilder();
+  _PTR(UseCaseBuilder) aUseCaseBuilder = SalomeApp_Application::getStudy()->GetUseCaseBuilder();
   if (aUseCaseBuilder->IsUseCaseNode(myObject)) {
     ok = aUseCaseBuilder->HasChildren(myObject);
     // TODO: check name as below?
   }
   else {
-    _PTR(ChildIterator) it ( myObject->GetStudy()->NewChildIterator( myObject ) );
+    _PTR(ChildIterator) it ( SalomeApp_Application::getStudy()->NewChildIterator( myObject ) );
     for ( ; it->More() && !ok; it->Next() ) {
       _PTR(SObject) obj = it->Value();
       if ( obj ) {
@@ -548,36 +548,28 @@ QString SalomeApp_DataObject::value( const _PTR(SObject)& obj ) const
     QString aStrings = fromUtf8( str );
     
     //Special case to show NoteBook variables in the "Value" column of the OB 
-    if ( LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() ) )
+    bool ok = false;
+    QStringList aSectionList = aStrings.split( "|" );
+    if ( !aSectionList.isEmpty() )
     {
-      if ( SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>( aRoot->study() ) )
+      QString aLastSection = aSectionList.last();
+      QStringList aStringList = aLastSection.split( ":" );
+      if ( !aStringList.isEmpty() )
       {
-        _PTR(Study) studyDS( aStudy->studyDS() );
-
-        bool ok = false;
-        QStringList aSectionList = aStrings.split( "|" );
-        if ( !aSectionList.isEmpty() )
+        ok = true;
+        for ( int i = 0, n = aStringList.size(); i < n; i++ )
         {
-          QString aLastSection = aSectionList.last();
-          QStringList aStringList = aLastSection.split( ":" );
-          if ( !aStringList.isEmpty() )
-          {
-            ok = true;
-            for ( int i = 0, n = aStringList.size(); i < n; i++ )
-            {
-              QString aStr = aStringList[i];
-              if ( studyDS->IsVariable( aStr.toStdString() ) )
-                val.append( aStr + ", " );
-            }
-
-            if ( !val.isEmpty() )
-              val.remove( val.length() - 2, 2 );
-          }
+          QString aStr = aStringList[i];
+          if ( SalomeApp_Application::getStudy()->IsVariable( aStr.toStdString() ) )
+            val.append( aStr + ", " );
         }
-        if( !ok )
-          val = aStrings;
+
+        if ( !val.isEmpty() )
+          val.remove( val.length() - 2, 2 );
       }
     }
+    if( !ok )
+      val = aStrings;
   }
   else if ( obj->FindAttribute( attr, "AttributeInteger" ) )
   {

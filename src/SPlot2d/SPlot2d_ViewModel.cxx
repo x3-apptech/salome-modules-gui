@@ -47,31 +47,6 @@
 #include <qwt_plot_curve.h>
 #include <stdlib.h>
 
-//ASL: Temporary commented in order to avoir dependency on SALOMEDS
-
-//#include "SALOMEDSClient.hxx"
-//#include "SALOMEDS_StudyManager.hxx"
-
-// in order NOT TO link with SalomeApp, here the code returns SALOMEDS_Study.
-// SalomeApp_Study::studyDS() does it as well, but -- here it is retrieved from
-// SALOMEDS::StudyManager - no linkage with SalomeApp.  
-
-/*static _PTR(Study) getStudyDS()
-{
-  SALOMEDSClient_Study* aStudy = NULL;
-  _PTR(StudyManager) aMgr( new SALOMEDS_StudyManager() );
-
-  // get id of SUIT_Study, if it's a SalomeApp_Study, it will return
-  //    id of its underlying SALOMEDS::Study
-  SUIT_Application* app = SUIT_Session::session()->activeApplication();
-  if ( !app )  return _PTR(Study)(aStudy);
-  SUIT_Study* stud = app->activeStudy();
-  if ( !stud ) return _PTR(Study)(aStudy);
-  const int id = stud->id(); // virtual method, must return SALOMEDS_Study id
-  // get SALOMEDS_Study with this id from StudyMgr
-  return aMgr->GetStudyByID( id );
-} */               
-
 /*!
   Constructor
 */

@@ -43,11 +43,9 @@
 class TOOLSGUI_EXPORT ToolsGUI  
 {
 public :
-  static bool               GetVisibility( _PTR(Study)   theStudy,
-                                           _PTR(SObject) theObj,
+  static bool               GetVisibility( _PTR(SObject) theObj,
                                            void*         theId );
-  static bool               SetVisibility( _PTR(Study) theStudy,
-                                           const char* theEntry,
+  static bool               SetVisibility( const char* theEntry,
                                            const bool  theValue,
                                            void*       theId );
 };

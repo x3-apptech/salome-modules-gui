@@ -35,9 +35,8 @@ public:
 
   bool             hasDesktop();
 
-  void             updateObjBrowser( bool );
+  void             updateObjBrowser();
 
-  int              getActiveStudyId();
   const char*      getActiveStudyName();
 
   const char*      getComponentName( const char* );

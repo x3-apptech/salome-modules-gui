@@ -24,6 +24,7 @@
 
 #include "LightApp_DataOwner.h"
 #include "SalomeApp_Study.h"
+#include "SalomeApp_Application.h"
 
 /*!
   Constructor.
@@ -48,20 +49,18 @@ bool SalomeApp_TypeFilter::isOk( const SUIT_DataOwner* sOwner ) const
 {  
   const LightApp_DataOwner* owner = dynamic_cast<const LightApp_DataOwner*> ( sOwner );
 
-  SalomeApp_Study* aDoc =  getStudy();
-  if (owner && aDoc && aDoc->studyDS())
+  if (owner)
+  {
+    QString entry = owner->entry();
+
+    _PTR(SObject) aSObj( SalomeApp_Application::getStudy()->FindObjectID( entry.toStdString() ) );
+    if (aSObj)
     {
-      _PTR(Study) aStudy = aDoc->studyDS();
-      QString entry = owner->entry();
-      
-      _PTR(SObject) aSObj( aStudy->FindObjectID( entry.toStdString() ) );
-      if (aSObj)
-        {
-          _PTR(SComponent) aComponent(aSObj->GetFatherComponent());
-          if ( aComponent && (aComponent->ComponentDataType() == myKind.toStdString()) )
-            return true;
-        }
+      _PTR(SComponent) aComponent(aSObj->GetFatherComponent());
+      if ( aComponent && (aComponent->ComponentDataType() == myKind.toStdString()) )
+        return true;
     }
+  }
 
   return false;
 }

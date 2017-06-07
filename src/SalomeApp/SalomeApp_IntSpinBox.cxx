@@ -373,38 +373,35 @@ SalomeApp_IntSpinBox::SearchState SalomeApp_IntSpinBox::findVariable( const QStr
   value = 0;
   if( SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() ) )
   {
-    if( SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( app->activeStudy() ) )
-    {
-      _PTR(Study) studyDS = study->studyDS();
+    _PTR(Study) studyDS = SalomeApp_Application::getStudy();
 
-      std::string aName = name.toStdString();
-      if( studyDS->IsVariable( aName ) )
+    std::string aName = name.toStdString();
+    if( studyDS->IsVariable( aName ) )
+    {
+      if( studyDS->IsInteger( aName ) || studyDS->IsString( aName ) )
       {
-        if( studyDS->IsInteger( aName ) || studyDS->IsString( aName ) )
+        if( studyDS->IsString( aName ) )
         {
-          if( studyDS->IsString( aName ) )
-            {
 #ifndef DISABLE_PYCONSOLE
-              PyConsole_Interp* pyInterp = app->getPyInterp();
-              PyLockWrapper aLock; // Acquire GIL
-              std::string command;
-              command  = "import salome_notebook ; ";
-              command += "salome_notebook.notebook.setAsInteger(\"";
-              command += aName;
-              command += "\")";
-              bool aResult;
-              aResult = pyInterp->run(command.c_str());
-              if(aResult)
-                {
-                  return IncorrectType;
-                }
+          PyConsole_Interp* pyInterp = app->getPyInterp();
+          PyLockWrapper aLock; // Acquire GIL
+          std::string command;
+          command  = "import salome_notebook ; ";
+          command += "salome_notebook.notebook.setAsInteger(\"";
+          command += aName;
+          command += "\")";
+          bool aResult;
+          aResult = pyInterp->run(command.c_str());
+          if(aResult)
+          {
+            return IncorrectType;
+          }
 #endif
-            }
-          value = studyDS->GetInteger( aName );
-          return Found;
         }
-        return IncorrectType;
+        value = studyDS->GetInteger( aName );
+        return Found;
       }
+      return IncorrectType;
     }
   }
   return NotFound;

@@ -206,7 +206,6 @@ void SalomeApp_Application::start()
 
     QString hdffile;
     QStringList pyfiles;
-    QString loadStudy;
 
     for (int i = 1; i < qApp->arguments().size(); i++) {
       QRegExp rxs ("--study-hdf=(.+)");
@@ -240,14 +239,8 @@ void SalomeApp_Application::start()
     SALOME_EventFilter::Init();
 
     setProperty("open_study_from_command_line", true);
-    if ( !hdffile.isEmpty() )       // open hdf file given as parameter
+    if ( !hdffile.isEmpty() ) // open hdf file given as parameter
       onOpenDoc( hdffile );
-    else if ( pyfiles.count() > 0 ) // create new study
-      onNewDoc();
-    else if (!loadStudy.isEmpty()) {// load study by name
-      if (onLoadDoc(loadStudy))
-        updateObjectBrowser(true);
-    }
     setProperty("open_study_from_command_line", QVariant());
 
 #ifndef DISABLE_PYCONSOLE
@@ -256,8 +249,7 @@ void SalomeApp_Application::start()
       SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
       PyConsole_Console* pyConsole = pythonConsole();
       if ( appStudy && pyConsole ) {
-        _PTR(Study) aStudy = appStudy->studyDS();
-        if ( !aStudy->GetProperties()->IsLocked() ) {
+        if ( !getStudy()->GetProperties()->IsLocked() ) {
           // pyfiles[j] is a dictionary: {"/absolute/path/to/script.py": [script_args]}
           // Path is absolute, script has .py extension
           for (uint j = 0; j < pyfiles.count(); j++ ) {
@@ -335,10 +327,14 @@ void SalomeApp_Application::createActions()
   createAction( ConnectId, tr( "TOT_DESK_CONNECT_STUDY" ), QIcon(),
                 tr( "MEN_DESK_CONNECT" ), tr( "PRP_DESK_CONNECT" ),
                 Qt::CTRL+Qt::Key_L, desk, false, this, SLOT( onLoadDoc() ) );
+  //no need at this action for mono-study application because study is always exists
+  action( ConnectId )->setVisible( false );
 
   createAction( DisconnectId, tr( "TOT_DESK_DISCONNECT_STUDY" ), QIcon(),
                 tr( "MEN_DESK_DISCONNECT" ), tr( "PRP_DESK_DISCONNECT" ),
                 Qt::CTRL+Qt::Key_U, desk, false, this, SLOT( onUnloadDoc() ) );
+  //no need at this action for mono-study application because study is always exists
+  action( DisconnectId )->setVisible( false );
 
 
   int fileMenu = createMenu( tr( "MEN_DESK_FILE" ), -1 );
@@ -406,8 +402,6 @@ void SalomeApp_Application::onLoadDoc()
 {
   QString studyName;
 
-  std::vector<std::string> List = studyMgr()->GetOpenStudies();
-
   // rnv: According to the single-study approach on the server side
   //      can be only one study. So if it is exists connect to them,
   //      overwise show warning message: "No active study on the server"
@@ -439,14 +433,14 @@ void SalomeApp_Application::onLoadDoc()
     return;
   */
 
-  if(List.size() <= 0) {
+  if(!activeStudy()) {
     SUIT_MessageBox::warning( desktop(),
                               QObject::tr("WRN_WARNING"),
                               QObject::tr("WRN_NO_STUDY_ON SERV") );
     return;
   }
 
-  studyName = List[0].c_str();
+  studyName = activeStudy()->studyName();
 
 #ifndef WIN32
   // this code replaces marker of windows drive and path become invalid therefore
@@ -518,10 +512,9 @@ void SalomeApp_Application::onNewWithScript()
 /*!SLOT. Load document with \a aName.*/
 bool SalomeApp_Application::onLoadDoc( const QString& aName )
 {
-#ifdef SINGLE_DESKTOP
   if ( !LightApp_Application::closeDoc() )
     return false;
-#endif
+
   bool res = true;
   if ( !activeStudy() ) {
     // if no study - load in current desktop
@@ -555,26 +548,38 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
 /*!SLOT. Parse message for desktop.*/
 void SalomeApp_Application::onDesktopMessage( const QString& message )
 {
-  if (message.indexOf("studyCreated:") == 0) {
-    // Enable 'Connect' action
-    updateCommandsStatus();
+  if (message.indexOf("studyCreated") == 0) {
+    if (!activeStudy()) {
+      onNewDoc();
+      updateCommandsStatus();
+    }
   }
-  else if (message.indexOf("studyClosed:") == 0) {
-    /* message also contains ID of the closed study,
-       but as soon as SALOME is mono-study application for the moment,
-       this ID is not needed now.*/
-    //long aStudyId = message.section(':', 1).toLong();
+  if (message.indexOf("studyCleared") == 0) {
     // Disconnect GUI from active study, because it was closed on DS side.
-    closeActiveDoc( false );
-    // Disable 'Connect' action
-    QAction* a = action( ConnectId );
-    if ( a )
-      a->setEnabled( false );
+    if (activeStudy()) {
+      closeActiveDoc( false );
+      // Disable 'Connect' action
+      QAction* a = action( ConnectId );
+      if ( a )
+        a->setEnabled( false );
+    }
   }
   else if ( message.toLower() == "connect_to_study" ) {
     onLoadDoc();
   }
+  if (message.indexOf("studyNameChanged") == 0) {
+    updateDesktopTitle();
+  }
   LightApp_Application::onDesktopMessage( message );
+}
+
+/*!On module activation action.*/
+void SalomeApp_Application::onModuleActivation( const QString& modName )
+{
+  if (!activeStudy() && !modName.isEmpty())
+    getStudy()->Init();
+
+  LightApp_Application::onModuleActivation( modName );
 }
 
 /*!SLOT. Copy objects to study maneger from selection maneger..*/
@@ -587,7 +592,7 @@ void SalomeApp_Application::onCopy()
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
   if(study == NULL) return;
 
-  _PTR(Study) stdDS = study->studyDS();
+  _PTR(Study) stdDS = getStudy();
   if(!stdDS) return;
 
   SALOME_ListIteratorOfListIO it( list );
@@ -595,7 +600,7 @@ void SalomeApp_Application::onCopy()
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
       try {
-        studyMgr()->Copy(so);
+        stdDS->Copy(so);
         onSelectionChanged();
       }
       catch(...) {
@@ -613,7 +618,7 @@ void SalomeApp_Application::onPaste()
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
   if(study == NULL) return;
 
-  _PTR(Study) stdDS = study->studyDS();
+  _PTR(Study) stdDS = getStudy();
   if(!stdDS) return;
 
   if ( stdDS->GetProperties()->IsLocked() ) {
@@ -628,7 +633,7 @@ void SalomeApp_Application::onPaste()
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
       try {
-        studyMgr()->Paste(so);
+        stdDS->Paste(so);
         updateObjectBrowser( true );
         updateActions(); //SRN: BugID IPAL9377, case 3
       }
@@ -648,20 +653,18 @@ bool SalomeApp_Application::isPossibleToClose( bool& closePermanently )
 /*! Check if the study is locked */
 void SalomeApp_Application::onCloseDoc( bool ask )
 {
-  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  if(getStudy()->IsStudyLocked()) {
+    if ( SUIT_MessageBox::question( desktop(),
+                                    QObject::tr( "WRN_WARNING" ),
+                                    QObject::tr( "CLOSE_LOCKED_STUDY" ),
+                                    SUIT_MessageBox::Yes | SUIT_MessageBox::No,
+                                    SUIT_MessageBox::No) == SUIT_MessageBox::No ) return;
 
-  if (study != NULL) {
-    _PTR(Study) stdDS = study->studyDS();
-    if(stdDS && stdDS->IsStudyLocked()) {
-      if ( SUIT_MessageBox::question( desktop(),
-                                      QObject::tr( "WRN_WARNING" ),
-                                      QObject::tr( "CLOSE_LOCKED_STUDY" ),
-                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
-                                      SUIT_MessageBox::No) == SUIT_MessageBox::No ) return;
-
-    }
   }
   LightApp_Application::onCloseDoc( ask );
+
+  // reinitialize study to have empty data
+  getStudy()->Init();
 }
 
 /*!Sets enable or disable some actions on selection changed.*/
@@ -681,21 +684,14 @@ void SalomeApp_Application::onSelectionChanged()
      canPaste = m->canPaste();
    }
 
-   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
-   if (study) {
-     _PTR(Study) stdDS = study->studyDS();
+   SALOME_ListIteratorOfListIO it ( list );
 
-     if (stdDS) {
-       SALOME_ListIteratorOfListIO it ( list );
+   if (it.More() && list.Extent() == 1) {
+     _PTR(SObject) so = getStudy()->FindObjectID(it.Value()->getEntry());
 
-       if (it.More() && list.Extent() == 1) {
-         _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
-
-         if ( so ) {
-           canCopy  = canCopy  || studyMgr()->CanCopy(so);
-           canPaste = canPaste || studyMgr()->CanPaste(so);
-         }
-       }
+     if ( so ) {
+       canCopy  = canCopy  || getStudy()->CanCopy(so);
+       canPaste = canPaste || getStudy()->CanPaste(so);
      }
    }
 
@@ -713,8 +709,7 @@ void SalomeApp_Application::onDeleteInvalidReferences()
   if( aList.IsEmpty() )
     return;
 
-  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
-  _PTR(Study) aStudyDS = aStudy->studyDS();
+  _PTR(Study) aStudyDS = getStudy();
   _PTR(StudyBuilder) aStudyBuilder = aStudyDS->NewBuilder();
   _PTR(SObject) anObj;
 
@@ -804,7 +799,7 @@ void SalomeApp_Application::updateCommandsStatus()
   // Connect study menu
   a = action( ConnectId );
   if( a )
-    a->setEnabled( !activeStudy() && studyMgr()->GetOpenStudies().size() > 0 );
+    a->setEnabled( !activeStudy() );
 
   // Disconnect study menu
   a = action( DisconnectId );
@@ -859,7 +854,6 @@ void SalomeApp_Application::onDumpStudy( )
 {
   SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
   if ( !appStudy ) return;
-  _PTR(Study) aStudy = appStudy->studyDS();
 
   QStringList aFilters;
   aFilters.append( tr( "PYTHON_FILES_FILTER" ) );
@@ -911,15 +905,11 @@ void SalomeApp_Application::onDumpStudy( )
 /*!Private SLOT. On load script.*/
 void SalomeApp_Application::onLoadScript( )
 {
-  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-  if ( appStudy ) {
-    _PTR(Study) aStudy = appStudy->studyDS();
-    if ( aStudy->GetProperties()->IsLocked() ) {
-      SUIT_MessageBox::warning( desktop(),
-                                QObject::tr("WRN_WARNING"),
-                                QObject::tr("WRN_STUDY_LOCKED") );
-      return;
-    }
+  if ( getStudy()->GetProperties()->IsLocked() ) {
+    SUIT_MessageBox::warning( desktop(),
+                              QObject::tr("WRN_WARNING"),
+                              QObject::tr("WRN_STUDY_LOCKED") );
+    return;
   }
 
   QStringList filtersList;
@@ -1060,14 +1050,11 @@ QWidget* SalomeApp_Application::createWindow( const int flag )
   }
   else if ( flag == WT_NoteBook )
   {
-    SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-    if ( appStudy ) {
-      _PTR(Study) aStudy = appStudy->studyDS();
-      setNoteBook( new SalomeApp_NoteBook( desktop(), aStudy ) );
-      //to receive signal in NoteBook that it's variable was modified
-      connect( this, SIGNAL( notebookVarUpdated( QString ) ),
-               getNoteBook(), SLOT( onVarUpdate( QString ) ) );
-    }
+    setNoteBook( new SalomeApp_NoteBook( desktop() ) );
+    //to receive signal in NoteBook that it's variable was modified
+    connect( this, SIGNAL( notebookVarUpdated( QString ) ),
+             getNoteBook(), SLOT( onVarUpdate( QString ) ) );
+
     wid = getNoteBook();
     wid->setObjectName( "noteBook" );
   }
@@ -1116,16 +1103,10 @@ void SalomeApp_Application::updateDesktopTitle() {
   {
     QString sName = SUIT_Tools::file( activeStudy()->studyName().trimmed(), false );
     if ( !sName.isEmpty() ) {
-      SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
-      if ( study ) {
-        _PTR(Study) stdDS = study->studyDS();
-        if(stdDS) {
-          if ( stdDS->GetProperties()->IsLocked() ) {
-            aTitle += QString( " - [%1 (%2)]").arg( sName ).arg( tr( "STUDY_LOCKED" ) );
-          } else {
-            aTitle += QString( " - [%1]" ).arg( sName );
-          }
-        }
+      if ( getStudy()->GetProperties()->IsLocked() ) {
+        aTitle += QString( " - [%1 (%2)]").arg( sName ).arg( tr( "STUDY_LOCKED" ) );
+      } else {
+        aTitle += QString( " - [%1]" ).arg( sName );
       }
     }
   }
@@ -1138,9 +1119,9 @@ int SalomeApp_Application::closeChoice( const QString& docName )
   QStringList buttons;
   QMap<int, int> choices;
   int idx = 0;
-  buttons << tr ("APPCLOSE_SAVE");                // Save & Close
+  buttons << tr ("APPCLOSE_SAVE");                // Save & Clear
   choices.insert( idx++, CloseSave );             // ...
-  buttons << tr ("APPCLOSE_CLOSE");               // Close w/o saving
+  buttons << tr ("APPCLOSE_CLOSE");               // Clear w/o saving
   choices.insert( idx++, CloseDiscard );          // ...
   if ( myIsCloseFromExit ) {
     buttons << tr ("APPCLOSE_UNLOAD_SAVE");       // Save & Disconnect
@@ -1151,6 +1132,8 @@ int SalomeApp_Application::closeChoice( const QString& docName )
   buttons << tr ("APPCLOSE_CANCEL");              // Cancel
   choices.insert( idx++, CloseCancel );           // ...
 
+  if( !activeStudy()->isModified() )
+    return CloseCancel;
   int answer = SUIT_MessageBox::question( desktop(), tr( "APPCLOSE_CAPTION" ),
                                           tr( "APPCLOSE_DESCRIPTION" ), buttons, 0 );
   return choices[answer];
@@ -1192,12 +1175,9 @@ int SalomeApp_Application::openChoice( const QString& aName )
   if ( QFileInfo( aName ).exists() ) {
     if ( choice == OpenNew ) { // The document isn't already open.
       bool exist = false;
-      std::vector<std::string> lst = studyMgr()->GetOpenStudies();
-      for ( uint i = 0; i < lst.size() && !exist; i++ ) {
-        if ( aName == QString( lst[i].c_str() ) )
-          exist = true;
-      }
-      // The document already exists in the study manager.
+      if ( aName == getStudy()->Name().c_str() )
+        exist = true;
+      // The document already exists in the study.
       // Do you want to reload it?
       if ( exist ) {
         int answer = SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "QUE_DOC_ALREADYEXIST" ).arg( aName ),
@@ -1226,12 +1206,7 @@ bool SalomeApp_Application::openAction( const int aChoice, const QString& aName 
   {
   case OpenRefresh:
     {
-      _PTR(Study) aStudy = studyMgr()->GetStudyByName( aName.toStdString() );
-      if ( aStudy )
-      {
-        studyMgr()->Close( aStudy );
-        choice = OpenNew;
-      }
+      choice = OpenNew;
     }
   default:
     res = LightApp_Application::openAction( choice, aName );
@@ -1304,12 +1279,16 @@ CORBA::ORB_var SalomeApp_Application::orb()
   return _orb;
 }
 
-/*!Create and return SALOMEDS_StudyManager.*/
-SALOMEDSClient_StudyManager* SalomeApp_Application::studyMgr()
+/*!Create and return SALOMEDS_Study.*/
+_PTR(Study) SalomeApp_Application::getStudy()
 {
-  static _PTR(StudyManager) _sm;
-  if(!_sm) _sm = ClientFactory::StudyManager();
-  return _sm.get();
+  static _PTR(Study) _study;
+  if(!_study) {
+    CORBA::Object_var aSObject = namingService()->Resolve("/Study");
+    SALOMEDS::Study_var aStudy = SALOMEDS::Study::_narrow(aSObject);
+    _study = ClientFactory::Study(aStudy);
+  }
+  return _study;
 }
 
 /*!Create and return SALOME_NamingService.*/
@@ -1380,72 +1359,62 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
 
   // isInvalidRefs will be true, if at least one of selected objects is invalid reference
   bool isInvalidRefs = false;
-  SalomeApp_Study* aStudy = dynamic_cast<SalomeApp_Study*>(activeStudy());
-  if ( aStudy ) {
-    _PTR(Study) aStudyDS = aStudy->studyDS();
-    _PTR(SObject) anObj;
 
-    for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
+  _PTR(SObject) anObj;
+  for( SALOME_ListIteratorOfListIO it( aList ); it.More() && !isInvalidRefs; it.Next() )
+  {
+    if( it.Value()->hasEntry() )
     {
-      if( it.Value()->hasEntry() )
-      {
-        _PTR(SObject) aSObject = aStudyDS->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
-        while( aRefObj && aRefObj->ReferencedObject( anObj ) )
-          aRefObj = anObj;
+      _PTR(SObject) aSObject = getStudy()->FindObjectID( it.Value()->getEntry() ), aRefObj = aSObject;
+      while( aRefObj && aRefObj->ReferencedObject( anObj ) )
+        aRefObj = anObj;
 
-        if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
-          isInvalidRefs = true;
-      }
+      if( aRefObj && aRefObj!=aSObject && QString( aRefObj->GetName().c_str() ).isEmpty() )
+        isInvalidRefs = true;
     }
+  }
 
-    // Add "Delete reference" item to popup
-    if ( isInvalidRefs )
-    {
-      thePopup->addSeparator();
-      thePopup->addAction( tr( "MEN_DELETE_INVALID_REFERENCE" ), this, SLOT( onDeleteInvalidReferences() ) );
-      return;
-    }
+  // Add "Delete reference" item to popup
+  if ( isInvalidRefs )
+  {
+    thePopup->addSeparator();
+    thePopup->addAction( tr( "MEN_DELETE_INVALID_REFERENCE" ), this, SLOT( onDeleteInvalidReferences() ) );
+    return;
+  }
 
-    // "Activate module" item should appear only if it's necessary
-    if ( aList.Extent() == 1 ) {
-      aList.Clear();
-      mgr->selectedObjects( aList );
+  // "Activate module" item should appear only if it's necessary
+  if ( aList.Extent() == 1 ) {
+    aList.Clear();
+    mgr->selectedObjects( aList );
 
-      Handle(SALOME_InteractiveObject) aIObj = aList.First();
+    Handle(SALOME_InteractiveObject) aIObj = aList.First();
 
-      // add extra popup menu (defined in XML)
-      if ( myExtActions.size() > 0 ) {
-        // Use only first selected object
-        SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( activeStudy() );
-        if ( study ) {
-          _PTR(Study) stdDS = study->studyDS();
-          if ( stdDS ) {
-            _PTR(SObject) aSO = stdDS->FindObjectID( aIObj->getEntry() );
-            if ( aSO ) {
-              _PTR( GenericAttribute ) anAttr;
-              std::string auid = "AttributeUserID";
-              auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
-              if ( aSO->FindAttribute( anAttr, auid ) ) {
-                _PTR(AttributeUserID) aAttrID = anAttr;
-                QString aId = aAttrID->Value().c_str();
-                if ( myExtActions.contains( aId ) ) {
-                  thePopup->addAction(myExtActions[aId]);
-                }
-              }
-            }
+    // add extra popup menu (defined in XML)
+    if ( myExtActions.size() > 0 ) {
+      // Use only first selected object
+      _PTR(SObject) aSO = getStudy()->FindObjectID( aIObj->getEntry() );
+      if ( aSO ) {
+        _PTR( GenericAttribute ) anAttr;
+        std::string auid = "AttributeUserID";
+        auid += Kernel_Utils::GetGUID(Kernel_Utils::ObjectdID);
+        if ( aSO->FindAttribute( anAttr, auid ) ) {
+          _PTR(AttributeUserID) aAttrID = anAttr;
+          QString aId = aAttrID->Value().c_str();
+          if ( myExtActions.contains( aId ) ) {
+            thePopup->addAction(myExtActions[aId]);
           }
         }
       }
+    }
 
-      // check if item is a "GUI state" item (also a first level object)
-      QString entry( aIObj->getEntry() );
-      if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
-        QString aModuleName( aIObj->getComponentDataType() );
-        QString aModuleTitle = moduleTitle( aModuleName );
-        CAM_Module* currentModule = activeModule();
-        if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
-          thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
-      }
+    // check if item is a "GUI state" item (also a first level object)
+    QString entry( aIObj->getEntry() );
+    if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
+      QString aModuleName( aIObj->getComponentDataType() );
+      QString aModuleTitle = moduleTitle( aModuleName );
+      CAM_Module* currentModule = activeModule();
+      if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
+        thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
     }
   }
 
@@ -1462,25 +1431,21 @@ void SalomeApp_Application::updateObjectBrowser( const bool updateModels )
   SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
   if ( study )
   {
-    _PTR(Study) stdDS = study->studyDS();
-    if( stdDS )
+    for ( _PTR(SComponentIterator) it ( getStudy()->NewComponentIterator() ); it->More(); it->Next() )
     {
-      for ( _PTR(SComponentIterator) it ( stdDS->NewComponentIterator() ); it->More(); it->Next() )
-      {
-        _PTR(SComponent) aComponent ( it->Value() );
+      _PTR(SComponent) aComponent ( it->Value() );
 
 #ifndef WITH_SALOMEDS_OBSERVER
-        // with GUI observers this check is not needed anymore
-        if ( aComponent->ComponentDataType() == study->getVisualComponentName().toLatin1().constData() )
-          continue; // skip the magic "Interface Applicative" component
+      // with GUI observers this check is not needed anymore
+      if ( aComponent->ComponentDataType() == study->getVisualComponentName().toLatin1().constData() )
+        continue; // skip the magic "Interface Applicative" component
 #endif
-        if ( !objectBrowser() )
-          getWindow( WT_ObjectBrowser );
-        const bool isAutoUpdate = objectBrowser()->autoUpdate();
-        objectBrowser()->setAutoUpdate( false );
-        SalomeApp_DataModel::synchronize( aComponent, study );
-        objectBrowser()->setAutoUpdate( isAutoUpdate );
-      }
+      if ( !objectBrowser() )
+        getWindow( WT_ObjectBrowser );
+      const bool isAutoUpdate = objectBrowser()->autoUpdate();
+      objectBrowser()->setAutoUpdate( false );
+      SalomeApp_DataModel::synchronize( aComponent, study );
+      objectBrowser()->setAutoUpdate( isAutoUpdate );
     }
   }
 
@@ -1908,8 +1873,6 @@ bool SalomeApp_Application::updateStudy()
   myNoteBook->setIsDumpedStudySaved( study->isSaved() );
   myNoteBook->setDumpedStudyName( study->studyName() );
 
-  _PTR(Study) studyDS = study->studyDS();
-
   // get unique temporary directory name
   QString aTmpDir = QString::fromStdString( SALOMEDS_Tool::GetTmpDir() );
   if( aTmpDir.isEmpty() )
@@ -1927,12 +1890,12 @@ bool SalomeApp_Application::updateStudy()
   int savePoint;
   _PTR(AttributeParameter) ap;
   _PTR(IParameters) ip = ClientFactory::getIParameters(ap);
-  if(ip->isDumpPython(studyDS)) ip->setDumpPython(studyDS); //Unset DumpPython flag.
+  if(ip->isDumpPython()) ip->setDumpPython(); //Unset DumpPython flag.
   if ( toSaveGUI ) { //SRN: Store a visual state of the study at the save point for DumpStudy method
-    ip->setDumpPython(studyDS);
+    ip->setDumpPython();
     savePoint = SalomeApp_VisualState( this ).storeState(); //SRN: create a temporary save point
   }
-  bool ok = studyDS->DumpStudy( aTmpDir.toStdString(), aScriptName.toStdString(), toPublish, isMultiFile );
+  bool ok = getStudy()->DumpStudy( aTmpDir.toStdString(), aScriptName.toStdString(), toPublish, isMultiFile );
   if ( toSaveGUI )
     study->removeSavePoint(savePoint); //SRN: remove the created temporary save point.
 
@@ -1991,9 +1954,6 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 {
   bool ok = true;
 
-  // create a new study
-  onNewDoc();
-
   // get active application
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
 
@@ -2019,9 +1979,8 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   if( SalomeApp_Study* newStudy = dynamic_cast<SalomeApp_Study*>( app->activeStudy() ) )
   {
 #ifndef DISABLE_PYCONSOLE
-    _PTR(Study) aStudyDS = newStudy->studyDS();
     if ( app->getNoteBook() )
-      app->getNoteBook()->Init( aStudyDS );
+      app->getNoteBook()->Init();
     newStudy->updateFromNotebook(theStudyName, theIsStudySaved);
     newStudy->Modified();
     updateDesktopTitle();
@@ -2055,18 +2014,7 @@ void SalomeApp_Application::afterCloseDoc()
 */
 bool SalomeApp_Application::checkExistingDoc()
 {
-  bool result = LightApp_Application::checkExistingDoc();
-  if ( result && !activeStudy() ) {
-    SALOMEDSClient_StudyManager* aMgr = studyMgr();
-    if ( aMgr ) {
-      std::vector<std::string> List = studyMgr()->GetOpenStudies();
-      if( List.size() > 0 ) {
-        SUIT_MessageBox::critical( desktop(), tr( "WRN_WARNING" ), tr( "ERR_ACTIVEDOC_LOAD" ));
-        result = false;
-      }
-    }
-  }
-  return result;
+  return LightApp_Application::checkExistingDoc();
 }
 
 

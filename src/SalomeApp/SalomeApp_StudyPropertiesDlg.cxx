@@ -25,6 +25,7 @@
 //  Author : Roman NIKOLAEV
 
 #include "SalomeApp_StudyPropertiesDlg.h"
+#include "SalomeApp_Application.h"
 #include "SalomeApp_Study.h"
 
 #include "SUIT_Session.h"
@@ -68,12 +69,6 @@ SalomeApp_StudyPropertiesDlg::SalomeApp_StudyPropertiesDlg(QWidget* parent)
   setSizeGripEnabled( true );
 
   setWindowFlags( windowFlags() & ~Qt::WindowContextHelpButtonHint );
-
-  // Display study properties
-  SalomeApp_Study* study =
-    dynamic_cast<SalomeApp_Study*>( SUIT_Session::session()->activeApplication()->activeStudy() );
-  if (study)
-    myStudyDoc = study->studyDS();
 
   //Author
   QLabel* authorLbl = new QLabel(tr("PRP_AUTHOR"),this);
@@ -173,10 +168,10 @@ SalomeApp_StudyPropertiesDlg::~SalomeApp_StudyPropertiesDlg()
 */
 void SalomeApp_StudyPropertiesDlg::initData()
 {
-  bool hasData = (myStudyDoc != NULL);
+  bool hasData = (SalomeApp_Application::getStudy() != NULL);
   _PTR(AttributeStudyProperties) propAttr;
   if (hasData)
-    propAttr = myStudyDoc->GetProperties();
+    propAttr = SalomeApp_Application::getStudy()->GetProperties();
   hasData = hasData && propAttr;
   
   if (hasData) {
@@ -268,7 +263,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
 */
 void SalomeApp_StudyPropertiesDlg::clickOnOk()
 {
-  _PTR(AttributeStudyProperties) propAttr = myStudyDoc->GetProperties();
+  _PTR(AttributeStudyProperties) propAttr = SalomeApp_Application::getStudy()->GetProperties();
   //Firstly, store locked flag
   if(propAttr) {
     bool bLocked = myLocked->isChecked();

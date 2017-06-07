@@ -609,7 +609,6 @@ void PyModuleHelper::XmlHandler::insertPopupItems( QDomNode& parentNode, QMenu* 
   SALOME GUI modules.
 */
 
-PyModuleHelper::InterpMap PyModuleHelper::myInterpMap;
 LightApp_Module*          PyModuleHelper::myInitModule = 0;
 
 /*!
@@ -1731,31 +1730,15 @@ QString PyModuleHelper::engineIOR() const
 /*!
   \brief Initialize python subinterpreter (one per study).
   \internal
-  \param studyId study ID
 */
-void PyModuleHelper::initInterp( int studyId )
+void PyModuleHelper::initInterp()
 {
   FuncMsg fmsg( "--- PyModuleHelper::initInterp()" );
 
-  // check study Id
-  if ( !studyId ) {
-    // Error! Study Id must not be 0!
-    myInterp = 0;
-    return;
-  }
-
   QMutexLocker ml( &myInitMutex );
-
-  // try to find the subinterpreter
-  if ( myInterpMap.contains( studyId ) ) {
-    // found!
-    myInterp = myInterpMap[ studyId ];
-    return;
-  }
 
   myInterp = new SALOME_PYQT_PyInterp();
   myInterp->initialize();
-  myInterpMap[ studyId ] = myInterp;
   
 #ifndef GUI_DISABLE_CORBA
   if ( !SUIT_PYTHON::initialized ) {
@@ -1772,7 +1755,7 @@ void PyModuleHelper::initInterp( int studyId )
     }
     // ... then call a method
     int embedded = 1;
-    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"ii", studyId, embedded ) );
+    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"i", embedded ) );
     if ( !aRes ) {
       // Error!
       PyErr_Print();
@@ -1905,10 +1888,9 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( app->activeStudy() );
   if ( !aStudy )
     return;
-  int aStudyId = aStudy ? aStudy->id() : 0;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp )
     return; // Error
 
@@ -2006,10 +1988,11 @@ void PyModuleHelper::internalActivate( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp ) {
     myLastActivateStatus = false;
     return; // Error
@@ -2058,10 +2041,11 @@ void PyModuleHelper::internalCustomize( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp ) {
     myLastActivateStatus = false;
     return; // Error
@@ -2134,7 +2118,8 @@ void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
   // Get study Id
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( theStudy );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // check that Python subinterpreter is initialized and Python module is imported
   if ( !myInterp || !myPyModule ) {
@@ -2143,7 +2128,7 @@ void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
   }
   // then call Python module's deactivate() method
   if ( PyObject_HasAttrString( myPyModule , (char*)"closeStudy" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i", aStudyId ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i" ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2202,12 +2187,11 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int id = aStudy ? aStudy->id() : 0;
-
-  fmsg.message( QString( "study id = %1" ).arg( id ) );
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( id );
+  initInterp();
   if ( !myInterp )
     return; // Error
 
@@ -2224,7 +2208,7 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
 
   // call Python module's activeStudyChanged() method
   if ( PyObject_HasAttrString( myPyModule, (char*)"activeStudyChanged" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"i", id ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"i" ) );
     if( !res ) {
       PyErr_Print();
     }

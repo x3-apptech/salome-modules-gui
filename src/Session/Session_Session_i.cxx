@@ -65,7 +65,6 @@ SALOME_Session_i::SALOME_Session_i(int argc,
   _argc = argc ;
   _argv = argv ;
   _isGUI = false ;
-  _runningStudies= 0 ;
   _orb = CORBA::ORB::_duplicate(orb) ;
   _poa = PortableServer::POA::_duplicate(poa) ;
   _GUIMutex = GUIMutex;
@@ -206,7 +205,7 @@ void SALOME_Session_i::Shutdown()
 
 /*!
   Send a SALOME::StatSession structure (see idl) to the client
-  (number of running studies and presence of GUI)
+  (presence of GUI)
 */
 /*class QtLock
 {
@@ -220,39 +219,28 @@ SALOME::StatSession SALOME_Session_i::GetStatSession()
 {
   // update Session state
   _GUIMutex->lock();
+  int activeStudy = 0;
 
-  _runningStudies = 0;
   {
     //QtLock lock;
     _isGUI = SUIT_Session::session();
     if ( _isGUI && SUIT_Session::session()->activeApplication() )
-      _runningStudies = SUIT_Session::session()->activeApplication()->getNbStudies();
+      activeStudy = SUIT_Session::session()->activeApplication()->getNbStudies();
   }
 
   // getting stat info
-  SALOME::StatSession_var myStats = new SALOME::StatSession ;
-  if (_runningStudies)
+  SALOME::StatSession_var myStats = new SALOME::StatSession;
+  if (activeStudy)
     myStats->state = SALOME::running ;
   else if (_isShuttingDown)
     myStats->state = SALOME::shutdown ;
   else
     myStats->state = SALOME::asleep ;
-  myStats->runningStudies = _runningStudies ;
   myStats->activeGUI = _isGUI ;
 
   _GUIMutex->unlock();
 
   return myStats._retn() ;
-}
-
-CORBA::Long SALOME_Session_i::GetActiveStudyId()
-{
-  long aStudyId=-1;
-  if ( SUIT_Session::session() && SUIT_Session::session()->activeApplication() ) {
-    if ( SUIT_Session::session()->activeApplication()->activeStudy() ) // mkr : IPAL12128
-      aStudyId = SUIT_Session::session()->activeApplication()->activeStudy()->id();
-  }
-  return aStudyId;
 }
 
 CORBA::Long SALOME_Session_i::getPID() {

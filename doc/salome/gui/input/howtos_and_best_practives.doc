@@ -159,12 +159,12 @@ useCaseIter->UnRegister();
 useCaseBuilder->UnRegister();
 \endcode
 
-\section use_case_compatibility Remark about compatibility with existing studies
+\section use_case_compatibility Remark about compatibility with existing study
 
 If you decide to switch your module to the use case builder approach to provide
 customization for the data tree representation, you must take care of compatibility
 with existing SALOME studies. Basically it means that you have to add
-a simple code to  \c Load() (and \c LoadASCII() if necessary) method
+a simple code to  \c Load() method
 of your module, which adds tree node attributes to all data entities
 in the data tree of your module. The simplest way to do
 this is to iterate through all data items and recursively add them to
@@ -416,7 +416,7 @@ void MyModule::copyOrMove( const MYMODULE_ORB::object_list& what,
 {
   if ( CORBA::is_nil( where ) ) return; // bad parent
 
-  SALOMEDS::Study_var study = where->GetStudy();                               // study
+  SALOMEDS::Study_var study = GUI::getStudyServant();                          // study
   SALOMEDS::StudyBuilder_var studyBuilder = study->NewBuilder();               // study builder
   SALOMEDS::UseCaseBuilder_var useCaseBuilder = study->GetUseCaseBuilder();    // use case builder
   SALOMEDS::SComponent_var father = where->GetFatherComponent();               // father component

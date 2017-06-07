@@ -56,15 +56,15 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>STUDYCLOSE_DESCRIPTION</source>
-        <translation>Une étude est déjà ouverte. Elle doit être fermée avant d&apos;en ouvrir une autre.</translation>
+        <translation>Une étude a des modifications non enregistrées. Voulez-vous les sauvegarder avant de fermer?</translation>
     </message>
     <message>
         <source>APPCLOSE_SAVE</source>
-        <translation>&amp;Sauvegarder &amp;&amp; Fermer</translation>
+        <translation>&amp;Oui</translation>
     </message>
     <message>
         <source>APPCLOSE_CLOSE</source>
-        <translation>&amp;Fermer sans sauvegarder</translation>
+        <translation>&amp;Non</translation>
     </message>
     <message>
         <source>APPCLOSE_CANCEL</source>

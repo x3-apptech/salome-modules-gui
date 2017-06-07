@@ -68,8 +68,6 @@ public:
   //! Unregister the servant from Naming Service
   void NSunregister();
 
-  CORBA::Long GetActiveStudyId();
-
   void ping(){};
   CORBA::Long getPID();
   char* getHostname();
@@ -94,7 +92,6 @@ protected:
   CORBA::Boolean _isGUI ;
   QMutex* _GUIMutex ;
   QWaitCondition* _GUILauncher;
-  int _runningStudies ;
   CORBA::ORB_var _orb;
   PortableServer::POA_var _poa;
   bool _isShuttingDown;

@@ -27,14 +27,13 @@ DEFAULT_WIDTH  = 20
 
 from salome.geom import geomtools
 
-def createGeometry(study, radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DEFAULT_WIDTH):
+def createGeometry(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DEFAULT_WIDTH):
     '''
     This function creates the geometry on the specified study and with
     given parameters.
     '''
     print "TUBE: creating the geometry ..."
-    studyId = study._get_StudyId()
-    geompy = geomtools.getGeompy(studyId)
+    geompy = geomtools.getGeompy()
 
     radius_ext = radius
     radius_int = radius_ext - width
@@ -44,17 +43,16 @@ def createGeometry(study, radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DE
     Tube = geompy.MakeCut(CylinderExt, CylinderInt)
     return Tube
     
-def createGeometryWithPartition(study, radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DEFAULT_WIDTH):
+def createGeometryWithPartition(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DEFAULT_WIDTH):
     '''
     This function create the geometrical shape with a partition so
     that the hexaedric algorithm could be used for meshing.
     '''
-    shape = createGeometry(study,radius,length,width)
+    shape = createGeometry(radius,length,width)
 
     # We have to create a partition so that we can use an hexaedric
     # meshing algorithm.
-    studyId = study._get_StudyId()
-    geompy = geomtools.getGeompy(studyId)
+    geompy = geomtools.getGeompy()
 
     print "TUBE: creating a partition ..."
     toolPlane = geompy.MakeFaceHW(2.1*length,2.1*radius,3)
@@ -62,12 +60,12 @@ def createGeometryWithPartition(study, radius=DEFAULT_RADIUS, length=DEFAULT_LEN
     entry = geompy.addToStudy( partition, "TubeWithPartition" )
     return partition
     
-def createMesh(study, shape):
-    '''This function creates the mesh of the specified shape on the specified study'''
+def createMesh(shape):
+    '''This function creates the mesh of the specified shape on the current study'''
     print "TUBE: creating the mesh ..."
     import SMESH
     from salome.smesh import smeshBuilder
-    smesh = smeshBuilder.New(study)
+    smesh = smeshBuilder.New()
 
     mesh = smesh.Mesh(shape)
     Regular_1D = mesh.Segment()
@@ -84,21 +82,21 @@ def createMesh(study, shape):
         smesh.SetName(Nb_Segments, 'Nb. Segments_1')
         smesh.SetName(Quadrangle_2D.GetAlgorithm(), 'Quadrangle_2D')
         smesh.SetName(Hexa_3D.GetAlgorithm(), 'Hexa_3D')
-        salome.sg.updateObjBrowser(False)
+        salome.sg.updateObjBrowser()
 
     return mesh
 
 
-def createModel(study, radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH,width=DEFAULT_WIDTH):
+def createModel(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH,width=DEFAULT_WIDTH):
     '''
     This function create the geomtrical shape AND the associated mesh.
     '''
     # We first create a shape with a partition so that the hexaedric
     # algorithm could be used.
-    shape = createGeometryWithPartition(study,radius,length,width)
+    shape = createGeometryWithPartition(radius,length,width)
 
     # Then the mesh can be defined and computed
-    mesh = createMesh(study,shape)
+    mesh = createMesh(shape)
     
 def exportModel(mesh, filename):
     '''
@@ -116,25 +114,21 @@ def exportModel(mesh, filename):
 #
 def TEST_createGeometry():
     salome.salome_init()
-    theStudy=salome.myStudy
-    createGeometry(theStudy)
+    createGeometry()
 
 def TEST_createMesh():
     salome.salome_init()
-    theStudy=salome.myStudy
-    shape = createGeometryWithPartition(theStudy)
-    mesh  = createMesh(theStudy, shape)
+    shape = createGeometryWithPartition()
+    mesh  = createMesh(shape)
 
 def TEST_createModel():
     salome.salome_init()
-    theStudy=salome.myStudy
-    createModel(theStudy)
+    createModel()
 
 def TEST_exportModel():
     salome.salome_init()
-    theStudy=salome.myStudy
-    shape = createGeometryWithPartition(theStudy)
-    mesh  = createMesh(theStudy, shape)
+    shape = createGeometryWithPartition()
+    mesh  = createMesh(shape)
     exportModel(mesh,"tubemesh.med")
     
 if __name__ == "__main__":

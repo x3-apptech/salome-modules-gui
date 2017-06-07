@@ -12,10 +12,7 @@ console (since SWIG library is linked directly to the GUI library).
 The example of usage:
 \code
 # update Object browser contents
-salome.sg.updateObjBrowser(True)
-
-# get the active study ID
-studyId = salome.sg.getActiveStudyId() 
+salome.sg.updateObjBrowser()
 
 # get the active study name
 studyName = salome.sg.getActiveStudyName()

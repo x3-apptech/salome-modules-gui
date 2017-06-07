@@ -189,12 +189,11 @@ public:
   static void              disableSelector();
   static SALOME_Selection* getSelection();
   static void              setSelection( const QStringList& );
-  static int               getStudyId();
   static void              putInfo( const QString&, const int = 0 );
   static const QString     getActiveComponent();
   static PyObject*         getActivePythonModule();
   static bool              activateModule( const QString& );
-  static void              updateObjBrowser( const int = 0, bool = true );
+  static void              updateObjBrowser();
 
   static bool              isModified();
   static void              setModified( bool );

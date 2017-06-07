@@ -103,7 +103,7 @@ protected:
   virtual void createModuleActions();
 
   /* Use this to create a root entry in the study for this module */
-  void createStudyComponent(SUIT_Study*);
+  void createStudyComponent();
   /* Implement this to say if study component entry should be created
      at activation step */
   virtual bool createStudyComponentAtActivation();
