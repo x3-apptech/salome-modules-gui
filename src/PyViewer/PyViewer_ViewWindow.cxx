@@ -190,7 +190,7 @@ PyViewer_ViewWindow::PyViewer_ViewWindow( SUIT_Desktop* desktop ) :
                           resMgr->loadPixmap( "PyViewer", tr( "ICON_REPLACE" ) ),
                           tr( "ACT_REPLACE" ), 0, this );
   action->setStatusTip( tr( "DSC_REPLACE" ) );
-  action->setShortcut( QKeySequence::Replace );
+  action->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+H" ) << QKeySequence( QKeySequence::Replace ) );
   action->setShortcutContext( Qt::WidgetShortcut );
   connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( replace() ) );
   toolMgr()->registerAction( action, ReplaceId );

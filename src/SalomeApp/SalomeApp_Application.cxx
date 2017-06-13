@@ -320,7 +320,7 @@ void SalomeApp_Application::createActions()
   //! Properties
   createAction( PropertiesId, tr( "TOT_DESK_PROPERTIES" ), QIcon(),
                 tr( "MEN_DESK_PROPERTIES" ), tr( "PRP_DESK_PROPERTIES" ),
-                Qt::CTRL+Qt::Key_P, desk, false, this, SLOT( onProperties() ) );
+                0, desk, false, this, SLOT( onProperties() ) );
 
   //! Catalog Generator
   createAction( CatalogGenId, tr( "TOT_DESK_CATALOG_GENERATOR" ),  QIcon(),
