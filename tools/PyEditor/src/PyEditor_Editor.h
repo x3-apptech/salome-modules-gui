@@ -31,6 +31,7 @@
 class PyEditor_Keywords;
 class PyEditor_Completer;
 class PyEditor_PyHighlighter;
+class QMenu;
 
 class PYEDITOR_EXPORT PyEditor_Editor : public QPlainTextEdit
 {
@@ -63,6 +64,7 @@ protected:
   virtual void keyPressEvent( QKeyEvent* );
   virtual void resizeEvent( QResizeEvent* );
   virtual void paintEvent( QPaintEvent* );
+  virtual void contextMenuEvent( QContextMenuEvent* );
 
   PyEditor_Keywords* userKeywords() const;
   PyEditor_Keywords* standardKeywords() const;
@@ -74,6 +76,9 @@ private Q_SLOTS:
   void updateLineNumberAreaWidth( int );
   void updateLineNumberArea( const QRect&, int );
   
+Q_SIGNALS:
+  void customizeMenu( QMenu* );
+
 private:
   bool matchLeftParenthesis( const QTextBlock&, int, int );
   bool matchRightParenthesis( const QTextBlock&, int, int );

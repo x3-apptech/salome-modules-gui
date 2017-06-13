@@ -134,6 +134,9 @@ public:
   PyEditor_Editor* editor();
   PyEditor_FindTool* findTool();
 
+  void setSettings( const PyEditor_Settings& );
+  const PyEditor_Settings& settings() const;
+
   bool isModified();
 
   QString text() const;

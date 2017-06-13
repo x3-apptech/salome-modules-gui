@@ -197,7 +197,7 @@ PyEditor_Window::PyEditor_Window( QWidget* parent ) :
                         tr( "ACT_REPLACE" ), this );
   action->setToolTip( tr( "TTP_REPLACE" ) );
   action->setStatusTip( tr( "DSC_REPLACE" ) );
-  action->setShortcut( QKeySequence::Replace );
+  action->setShortcuts( QList<QKeySequence>() << QKeySequence( "Ctrl+H" ) << QKeySequence( QKeySequence::Replace ) );
   action->setShortcutContext( Qt::WidgetShortcut );
   connect( action, SIGNAL( triggered( bool ) ), myEditor, SLOT( replace() ) );
   myActions[ ReplaceId ] = action;
