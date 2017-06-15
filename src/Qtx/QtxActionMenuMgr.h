@@ -132,6 +132,7 @@ protected:
   void         updateMenu( MenuNode* = 0, const bool = true, const bool = true );
   virtual void internalUpdate();
   virtual void updateContent();
+  virtual void actionChanged( int );
 
 private:
   bool         ownAction( QAction*, MenuNode* ) const;

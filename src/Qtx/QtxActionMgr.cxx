@@ -156,6 +156,8 @@ int QtxActionMgr::registerAction( QAction* a, const int userId )
 
   myActions.insert( theId, a );
 
+  connect( a, SIGNAL( changed() ), this, SLOT( onActionChanged() ) );
+
   return theId;
 }
 
@@ -166,8 +168,11 @@ int QtxActionMgr::registerAction( QAction* a, const int userId )
 */
 void QtxActionMgr::unRegisterAction( const int id )
 {
-  if( contains( id ) )
+  if ( contains( id ) ) {
+    disconnect( myActions[id], SIGNAL( changed() ),
+		this, SLOT( onActionChanged() ) );
     myActions.remove( id );
+  }
 }
 
 /*!
@@ -420,6 +425,13 @@ void QtxActionMgr::updateContent()
 }
 
 /*!
+  \brief Internal action changing response operation.
+*/
+void QtxActionMgr::actionChanged( int )
+{
+}
+
+/*!
   \brief Called when delayed update is performed (via timer event).
 
   Calls virtual method updateContent() which can be redefined in the
@@ -428,6 +440,21 @@ void QtxActionMgr::updateContent()
 void QtxActionMgr::onUpdateContent()
 {
   updateContent();
+}
+
+/*!
+  \brief Called when one of the registered actions changed.
+
+  Calls virtual method actionChanged() which can be redefined in the
+  subclasses to customize reaction on this.
+*/
+void QtxActionMgr::onActionChanged()
+{
+  QAction* a = ::qobject_cast<QAction*>( sender() );
+
+  int id = actionId( a );
+  if ( id != -1 )
+    actionChanged( id );
 }
 
 /*!
