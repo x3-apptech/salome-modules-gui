@@ -272,7 +272,7 @@ void SalomeApp_Application::start()
 
               script.remove( QRegExp("^python.*[\\s]+") );
               QString cmd = script+" "+args;
-              QString command = QString( "execfile(r\"%1\")" ).arg(cmd.trimmed());
+              QString command = QString( "exec(open(\"%1\").read())" ).arg(cmd.trimmed());
               pyConsole->exec(command);
             }
           } // end for loop on pyfiles QStringList
@@ -497,7 +497,7 @@ void SalomeApp_Application::onNewWithScript()
   {
     onNewDoc();
 
-    QString command = QString("execfile(r\"%1\")").arg(aFile);
+    QString command = QString("exec(open(\"%1\").read())").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
     PyConsole_Console* pyConsole = pythonConsole();
@@ -924,7 +924,7 @@ void SalomeApp_Application::onLoadScript( )
 
   if ( !aFile.isEmpty() )
   {
-    QString command = QString("execfile(r\"%1\")").arg(aFile);
+    QString command = QString("exec(open(\"%1\").read())").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
     PyConsole_Console* pyConsole = pythonConsole();
@@ -1958,7 +1958,7 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
 
   // load study from the temporary directory
-  QString command = QString( "execfile(r\"%1\")" ).arg( theDumpScript );
+  QString command = QString( "exec(open(\"%1\").read())" ).arg( theDumpScript );
 
 #ifndef DISABLE_PYCONSOLE
   PyConsole_Console* pyConsole = app->pythonConsole();

@@ -22,8 +22,8 @@
 // File   : PyConsole_Console.cxx
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 
-#include "PyConsole_Console.h"
 #include "PyConsole_Interp.h"
+#include "PyConsole_Console.h"
 #include "PyConsole_Editor.h"
 
 #include <QAction>

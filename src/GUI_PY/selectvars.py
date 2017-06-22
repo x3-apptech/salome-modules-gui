@@ -134,7 +134,7 @@ class MySelectVarsDialog(Ui_SelectVarsDialog, QDialog):
             filename = str(filename)
             exchange_variables = study_exchange_vars.loadExchangeVariablesFromXmlFile(filename)
             self.setExchangeVariables(exchange_variables)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.critical(self, self.tr("Error"),
                                  self.tr("Cannot load file %s:\n%s" % (filename, e)))
 
@@ -148,6 +148,6 @@ class MySelectVarsDialog(Ui_SelectVarsDialog, QDialog):
             filename = str(filename)
             exchange_variables = self.getSelectedExchangeVariables()
             exchange_variables.saveToXmlFile(filename)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.critical(self, self.tr("Error"),
                                  self.tr("Cannot save file %s:\n%s" % (filename, e)))

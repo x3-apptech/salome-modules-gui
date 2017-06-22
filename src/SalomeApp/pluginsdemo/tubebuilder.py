@@ -32,7 +32,7 @@ def createGeometry(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, width=DEFAULT_W
     This function creates the geometry on the specified study and with
     given parameters.
     '''
-    print "TUBE: creating the geometry ..."
+    print("TUBE: creating the geometry ...")
     geompy = geomtools.getGeompy()
 
     radius_ext = radius
@@ -54,7 +54,7 @@ def createGeometryWithPartition(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, wi
     # meshing algorithm.
     geompy = geomtools.getGeompy()
 
-    print "TUBE: creating a partition ..."
+    print("TUBE: creating a partition ...")
     toolPlane = geompy.MakeFaceHW(2.1*length,2.1*radius,3)
     partition = geompy.MakePartition([shape], [toolPlane], [], [], geompy.ShapeType["SOLID"], 0, [], 0)
     entry = geompy.addToStudy( partition, "TubeWithPartition" )
@@ -62,7 +62,7 @@ def createGeometryWithPartition(radius=DEFAULT_RADIUS, length=DEFAULT_LENGTH, wi
     
 def createMesh(shape):
     '''This function creates the mesh of the specified shape on the current study'''
-    print "TUBE: creating the mesh ..."
+    print("TUBE: creating the mesh ...")
     import SMESH
     from salome.smesh import smeshBuilder
     smesh = smeshBuilder.New()
@@ -102,7 +102,7 @@ def exportModel(mesh, filename):
     '''
     This exports the mesh to the specified filename in the med format
     '''
-    print "TUBE: exporting mesh to file %s ..."%filename
+    print("TUBE: exporting mesh to file %s ..."%filename)
     import SMESH
     mesh.ExportMED(filename, 0, SMESH.MED_V2_2, 1 )
 

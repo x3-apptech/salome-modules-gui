@@ -158,7 +158,7 @@ class XYView(View):
     if event.mouseevent.button == 1:
       selected_id = -1
       a = event.artist
-      for crv_id, cv in self._curveViews.items():
+      for crv_id, cv in list(self._curveViews.items()):
         if cv._mplLines[0] is a:
           selected_id = crv_id
       # Use the plotmanager so that other plot sets get their current reset:
@@ -301,10 +301,10 @@ class XYView(View):
       return
     action = self._curveActionGroup.checkedAction()
     if action is self._pointsAction :
-      for crv_view in self._curveViews.values():
+      for crv_view in list(self._curveViews.values()):
         crv_view.setLineStyle("None")
     elif action is self._linesAction :
-      for crv_view in self._curveViews.values():
+      for crv_view in list(self._curveViews.values()):
         crv_view.setLineStyle("-")
     else :
       raise NotImplementedError
@@ -682,7 +682,7 @@ class XYView(View):
       point = event.canvas.mapToGlobal(QtCore.QPoint(event.x,canvasSize.height()-event.y))
       self._popupMenu.exec_(point)
     else :
-      print "Press event on the other button"
+      print("Press event on the other button")
     #if event.button == 3 :
     #  canvasSize = event.canvas.geometry()
     #  point = event.canvas.mapToGlobal(QtCore.QPoint(event.x,canvasSize.height()-event.y))
@@ -690,13 +690,13 @@ class XYView(View):
     #  self._popupMenu.show()
 
   def onMotionEvent(self, event):
-    print "OnMotionEvent ",event.button
+    print("OnMotionEvent ",event.button)
     #if event.button == 3 :
     #  event.button = None
     #  return True
 
   def onReleaseEvent(self, event):
-    print "OnReleaseEvent ",event.button
+    print("OnReleaseEvent ",event.button)
     #if event.button == 3 :
     #  event.button = None
     #  return False

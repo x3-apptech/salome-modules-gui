@@ -32,7 +32,7 @@ class CurveTabsView(View):
   def mapModId2ViewId(self):
     """ Gives a map from model ID (the model behind the XYView) to view ID
     """
-    lst = [(v._model.getID(), view_id) for view_id, v in self._XYViews.items()]
+    lst = [(v._model.getID(), view_id) for view_id, v in list(self._XYViews.items())]
     return dict(lst)
   
   def update(self):
@@ -44,7 +44,7 @@ class CurveTabsView(View):
     
     # Check list of tabs:
     set_mod = set(self._model._plotSets.keys())
-    set_view = set([ v._model.getID() for v in self._XYViews.values() ])
+    set_view = { v._model.getID() for v in list(self._XYViews.values()) }
     mp = self.mapModId2ViewId()
     
     # Deleted/Added curves:
@@ -62,7 +62,7 @@ class CurveTabsView(View):
       newViews.append(self.createXYView(self._model._plotSets[a]))
     
     # Now update all tabs individually (this will trigger creation of new ones if not already there):
-    for v in self._XYViews.values() + newViews:
+    for v in list(self._XYViews.values()) + newViews:
       # The update on newViews will trigger the SALOME view creation:
       v.update() 
     

@@ -271,13 +271,13 @@ def runSalomeShellSession(context):
     elif os.path.exists("/usr/bin/xterm"):
       command = 'xterm -T "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
     else:
-      print "Neither xterm nor gnome-terminal nor konsole is installed."
+      print("Neither xterm nor gnome-terminal nor konsole is installed.")
 
     if command is not "":
       try:
         subprocess.check_call(command, shell = True)
-      except Exception, e:
-        print "Error: ",e
+      except Exception as e:
+        print("Error: ",e)
 
 
 salome_pluginsmanager.AddFunction('SALOME shell session',

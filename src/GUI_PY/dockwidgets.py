@@ -43,7 +43,7 @@ def findDockWidgetByTitle( title ):
     """
     sg = SalomePyQt.SalomePyQt()
     dwl = sg.getDesktop().findChildren( QDockWidget )
-    dw = filter(lambda a: a.windowTitle() == str( title ), dwl)
+    dw = [a for a in dwl if a.windowTitle() == str( title )]
     if dw: return dw[0]
     return None
 
