@@ -28,8 +28,10 @@
 
 #ifdef USE_TEXTURED_SHAPE
   #include <AIS_TexturedShape.hxx>
+  #define BASE_SHAPE AIS_TexturedShape
 #else
   #include <AIS_Shape.hxx>
+  #define BASE_SHAPE AIS_Shape
 #endif
 
 #include <Standard.hxx>
@@ -38,11 +40,7 @@
 #include <Basics_OCCTVersion.hxx>
 
 class ViewerData_AISShape
-#ifdef USE_TEXTURED_SHAPE
-  : public AIS_TexturedShape
-#else
-  : public AIS_Shape
-#endif
+  : public BASE_SHAPE
 {
 public:
   Standard_EXPORT ViewerData_AISShape (const TopoDS_Shape& theShape);
@@ -64,18 +62,9 @@ protected:
   bool myIsClippable;
 
 public:
-
-#ifdef USE_TEXTURED_SHAPE
-  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape,AIS_TexturedShape)
-#else
-  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape,AIS_Shape)
-#endif
+  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape, BASE_SHAPE)
 };
 
-#ifdef USE_TEXTURED_SHAPE
-  DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_TexturedShape)
-#else
-  DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_Shape)
-#endif
+DEFINE_STANDARD_HANDLE(ViewerData_AISShape, BASE_SHAPE)
 
 #endif // _ViewerData_AISShape_HeaderFile

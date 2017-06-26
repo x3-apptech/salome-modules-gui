@@ -33,11 +33,7 @@
   \param shape - TopoDS shape 
 */
 ViewerData_AISShape::ViewerData_AISShape (const TopoDS_Shape& theShape)
-#ifdef USE_TEXTURED_SHAPE
-: AIS_TexturedShape (theShape),
-#else
-: AIS_Shape (theShape),
-#endif
+: BASE_SHAPE (theShape),
   myIsClippable (true)
 {
 }

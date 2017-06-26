@@ -618,7 +618,7 @@ void PyEditor_FindTool::addCompletion( const QString& text, bool replace )
   QStringListModel& model = replace ? myReplaceCompletion : myFindCompletion;
 
   QStringList completions = model.stringList();
-  if ( !text.isEmpty() and !completions.contains( text ) )
+  if ( !text.isEmpty() && !completions.contains( text ) )
   {
     completions.prepend( text );
     model.setStringList( completions );

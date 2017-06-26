@@ -51,6 +51,10 @@
 #include <V3d_OrthographicView.hxx>
 #endif
 
+#if OCC_VERSION_LARGE > 0x07010000
+#include <Quantity_Ratio.hxx>
+#endif
+
 #include "utilities.h"
 
 #if defined WIN32
