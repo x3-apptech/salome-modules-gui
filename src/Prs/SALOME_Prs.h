@@ -36,16 +36,12 @@
 #include <string>
 #include <list>
 
-#include <Basics_OCCTVersion.hxx>
+#include <Standard_DefineHandle.hxx>
 
 class SALOME_View;
 class SALOME_Displayer;
 class SALOME_ListIO;
-#if OCC_VERSION_MAJOR >= 7
-  class SALOME_InteractiveObject;
-#else
-  class Handle_SALOME_InteractiveObject;
-#endif
+class SALOME_InteractiveObject;
 
 /*!
  \class SALOME_Prs

@@ -27,7 +27,7 @@
 
 #include "SALOME_InteractiveObject.hxx"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(SALOME_InteractiveObject, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_InteractiveObject, Standard_Transient)
 
 /*!
   Default constructor

@@ -25,13 +25,7 @@
 #include <V3d_Viewer.hxx>
 #include <V3d_View.hxx>
 
-#include <Basics_OCCTVersion.hxx>
-#if OCC_VERSION_LARGE > 0x06070200 // for OCC-6.7.3 and higher version
 #include <OpenGl_GraphicDriver.hxx>
-#else
-#include <Graphic3d.hxx>
-#include <Graphic3d_GraphicDriver.hxx>
-#endif
 #include <Aspect_DisplayConnection.hxx>
 
 #if defined(WIN32)
@@ -71,11 +65,7 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
 						     const Standard_Boolean computedMode,
 						     const Standard_Boolean defaultComputedMode )
 {
-#if OCC_VERSION_LARGE > 0x06070200 // for OCC-6.7.3 and higher version
   static Handle(OpenGl_GraphicDriver) aGraphicDriver;
-#else
-  static Handle(Graphic3d_GraphicDriver) aGraphicDriver;
-#endif
   if (aGraphicDriver.IsNull())
   {
     Handle(Aspect_DisplayConnection) aDisplayConnection;
@@ -84,25 +74,10 @@ Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString na
 #else
     aDisplayConnection = new Aspect_DisplayConnection();
 #endif
-#if OCC_VERSION_LARGE > 0x06070200 // for OCC-6.7.3 and higher version
     aGraphicDriver = new OpenGl_GraphicDriver(aDisplayConnection);
-#else
-    aGraphicDriver = Graphic3d::InitGraphicDriver( aDisplayConnection );
-#endif
   }
 
-#if OCC_VERSION_LARGE > 0x07010001
   return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
 			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD,
 			 computedMode, defaultComputedMode );
-  
-#elif OCC_VERSION_LARGE > 0x07000000
-  return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
-			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT,
-			 computedMode, defaultComputedMode );  
-#else
-  return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
-			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD, V3d_WAIT,
-			 computedMode, defaultComputedMode, V3d_TEX_NONE );
-#endif
 }

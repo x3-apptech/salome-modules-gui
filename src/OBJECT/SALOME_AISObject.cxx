@@ -22,7 +22,7 @@
 
 #include "SALOME_AISObject.hxx"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISObject, AIS_InteractiveObject)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISObject, AIS_InteractiveObject)
 
 SALOME_AISObject::SALOME_AISObject()
 {

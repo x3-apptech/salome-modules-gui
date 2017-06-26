@@ -30,14 +30,12 @@
 
 #include "VTKViewer.h"
 
-#include <MMgt_TShared.hxx>
+#include <Standard_Transient.hxx>
 #include <Standard_DefineHandle.hxx>
-
-#include <Basics_OCCTVersion.hxx>
 
 class VTKViewer_Actor;
 
-DEFINE_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared);
+DEFINE_STANDARD_HANDLE(VTKViewer_Filter, Standard_Transient);
 
 /*
   Class       : VTKViewer_Filter
@@ -45,7 +43,7 @@ DEFINE_STANDARD_HANDLE(VTKViewer_Filter, MMgt_TShared);
                 should be redefined in derived classes
 */
 
-class VTKViewer_Filter : public MMgt_TShared
+class VTKViewer_Filter : public Standard_Transient
 {
 
 public:
@@ -63,7 +61,7 @@ protected:
   VTKViewer_Actor*                             myActor;
 
 public:  
-  OCCT_DEFINE_STANDARD_RTTIEXT(VTKViewer_Filter,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(VTKViewer_Filter, Standard_Transient)
 };
 
 #endif

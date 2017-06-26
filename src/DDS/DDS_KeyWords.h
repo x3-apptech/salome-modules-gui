@@ -25,15 +25,15 @@
 
 #include "DDS.h"
 
-#include <MMgt_TShared.hxx>
+#include <Standard_Transient.hxx>
 
 #include <NCollection_DataMap.hxx>
 
-DEFINE_STANDARD_HANDLE(DDS_KeyWords, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(DDS_KeyWords, Standard_Transient)
 
 class TCollection_AsciiString;
 
-class DDS_KeyWords : public MMgt_TShared
+class DDS_KeyWords : public Standard_Transient
 {
 public:
   Standard_EXPORT static Handle(DDS_KeyWords) Get();
@@ -53,7 +53,7 @@ private:
   KeyWordMap                                  myKeyWord;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_KeyWords,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(DDS_KeyWords, Standard_Transient)
 };
 
 #endif

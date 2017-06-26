@@ -22,7 +22,7 @@
 
 #include "SALOME_TypeFilter.hxx"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(SALOME_TypeFilter, SALOME_Filter)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_TypeFilter, SALOME_Filter)
 
 /*!
   Constructor

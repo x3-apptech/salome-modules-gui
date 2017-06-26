@@ -37,8 +37,6 @@
 
 #include "ViewerData_AISShape.hxx"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include "QtxActionToolMgr.h"
 #include "QtxBackgroundTool.h"
 
@@ -54,11 +52,7 @@
 #include <QDesktopWidget>
 
 #include <AIS_Axis.hxx>
-#if OCC_VERSION_LARGE > 0x06080000
-  #include <Prs3d_Drawer.hxx>
-#else
-  #include <AIS_Drawer.hxx>
-#endif
+#include <Prs3d_Drawer.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
 
 #include <Graphic3d_Texture2Dmanual.hxx>
@@ -73,10 +67,6 @@
 
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_AmbientLight.hxx>
-
-#if OCC_VERSION_MAJOR < 7
-  #include <Visual3d_View.hxx>
-#endif
 
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats
@@ -130,15 +120,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 
   // init selector
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
-#if OCC_VERSION_LARGE > 0x07010100
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor( Quantity_NOC_WHITE );
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_Selected)->SetColor( Quantity_NOC_WHITE );
-#elif OCC_VERSION_LARGE > 0x07000000
-  const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
-  sStyle->SetColor( Quantity_NOC_WHITE );
-#else
-  myAISContext->SelectionColor( Quantity_NOC_WHITE );
-#endif
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
@@ -154,13 +137,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     //myTrihedron->SetColor( Col );
     myTrihedron->SetArrowColor( Col.Name() );
     myTrihedron->SetSize(100);
-#if OCC_VERSION_LARGE > 0x06080000
-      Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
-      if (drawer->HasOwnDatumAspect()) {
-#else
-      Handle(AIS_Drawer) drawer = myTrihedron->Attributes();
-      if (drawer->HasDatumAspect()) {
-#endif
+    Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
+    if (drawer->HasOwnDatumAspect()) {
       Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
       daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
       daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
@@ -271,9 +249,6 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     OCCViewer_ViewPort3d* vp3d = view->getViewPort();
     if ( vp3d )
     {
-#if OCC_VERSION_LARGE <= 0x07000000
-      vp3d->getView()->SetSurfaceDetail(V3d_TEX_ALL);
-#endif
       // connect signal from viewport
       connect(vp3d, SIGNAL(vpClosed(OCCViewer_ViewPort3d*)), this, SLOT(onViewClosed(OCCViewer_ViewPort3d*)));
       connect(vp3d, SIGNAL(vpMapped(OCCViewer_ViewPort3d*)), this, SLOT(onViewMapped(OCCViewer_ViewPort3d*)));
@@ -1459,7 +1434,6 @@ double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
   double aMaxSide = 0;
   double Xmin = 0, Ymin = 0, Zmin = 0, Xmax = 0, Ymax = 0, Zmax = 0;
 
-#if OCC_VERSION_LARGE > 0x06070100
   Bnd_Box aBox = view3d->View()->MinMaxValues();
   Xmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
   Ymin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
@@ -1467,9 +1441,6 @@ double OCCViewer_Viewer::computeSceneSize(const Handle(V3d_View)& view3d) const
   Xmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
   Ymax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
   Zmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
-#else
-  view3d->View()->MinMaxValues( Xmin, Ymin, Zmin, Xmax, Ymax, Zmax );
-#endif
 
   if ( Xmin != RealFirst() && Ymin != RealFirst() && Zmin != RealFirst() &&
        Xmax != RealLast()  && Ymax != RealLast()  && Zmax != RealLast() )

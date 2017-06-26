@@ -49,7 +49,7 @@
 
 #define PI   3.14159265359
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT( OCCViewer_Trihedron, AIS_InteractiveObject )
+IMPLEMENT_STANDARD_RTTIEXT( OCCViewer_Trihedron, AIS_InteractiveObject )
 
 /*!
  * Constructor
@@ -72,7 +72,6 @@ OCCViewer_Trihedron::~OCCViewer_Trihedron()
 /*!
  * Sets the bounding box (MinMax values).
  */
-#if OCC_VERSION_LARGE > 0x06070100 // for OCC-6.7.2 and higher version
 void OCCViewer_Trihedron::bounds( Graphic3d_BndBox4f& theMinMax ) const
 {
   Graphic3d_Vec4 aMinPt (-1.f, -1.f, -1.f, 1.f);
@@ -81,20 +80,6 @@ void OCCViewer_Trihedron::bounds( Graphic3d_BndBox4f& theMinMax ) const
   theMinMax.Add (aMinPt);
   theMinMax.Add (aMaxPt);
 }
-#else
-void OCCViewer_Trihedron::bounds( Graphic3d_CBounds& aMinMax ) const
-{
-  Standard_Real aXMin = -1, aYMin = -1, aZMin = -1;
-  Standard_Real aXMax =  1, aYMax =  1, aZMax =  1;
-
-  if( aMinMax.XMin > aXMin ) aMinMax.XMin = aXMin;
-  if( aMinMax.YMin > aYMin ) aMinMax.YMin = aYMin;
-  if( aMinMax.ZMin > aZMin ) aMinMax.ZMin = aZMin;
-  if( aMinMax.XMax < aXMax ) aMinMax.XMax = aXMax;
-  if( aMinMax.YMax < aYMax ) aMinMax.YMax = aYMax;
-  if( aMinMax.ZMax < aZMax ) aMinMax.ZMax = aZMax;
-}
-#endif
 
 /*!
  * Redefined method. Calculates the object presentation.
