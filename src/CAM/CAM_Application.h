@@ -74,6 +74,7 @@ public:
   static QString      moduleName( const QString& );
   static QString      moduleTitle( const QString& );
   static QString      moduleIcon( const QString& );
+  static QString      moduleLibrary( const QString&, const bool = true );
   static bool         isModuleAccessible( const QString& );
 
   virtual void        createEmptyStudy();
@@ -84,6 +85,7 @@ protected:
   virtual SUIT_Study* createNewStudy();
   virtual void        updateCommandsStatus();
 
+  virtual bool        checkModule( const QString& );
   virtual void        moduleAdded( CAM_Module* );
   virtual void        beforeCloseDoc( SUIT_Study* );
   virtual void        afterCloseDoc();
@@ -91,15 +93,18 @@ protected:
 
   virtual void        setActiveStudy( SUIT_Study* );
 
-  static QString      moduleLibrary( const QString&, const bool = true );
-
   virtual bool        abortAllOperations();
 
 private:
   void                readModuleList();
 
 private:
-  typedef struct { QString name, title, internal, icon; bool isSingleton; QString version; } ModuleInfo;
+  enum { stUnknown = 0, stNoGui, stInaccessible, stReady };
+  typedef struct { 
+    QString name, title, icon, library, version;
+    bool isSingleton;
+    int status;
+  } ModuleInfo;
   typedef QList<ModuleInfo> ModuleInfoList;
 
 private:

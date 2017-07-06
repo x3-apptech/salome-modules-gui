@@ -125,6 +125,15 @@ CAM_Application::~CAM_Application()
 */
 void CAM_Application::start()
 {
+  // check modules
+  for ( ModuleInfoList::iterator it = myInfoList.begin(); 
+        it != myInfoList.end(); ++it )
+  {
+    if ( (*it).status == stUnknown )
+      (*it).status = checkModule( (*it).title ) ? stReady : stInaccessible;
+  }
+  
+  // auto-load modules
   if ( myAutoLoad )
     loadModules();
 
@@ -396,11 +405,9 @@ bool CAM_Application::activateModule( const QString& modName )
   if ( !modName.isEmpty() )
   {
     CAM_Module* mod = module( modName );
-    if ( !mod && !moduleLibrary( modName ).isEmpty() )
-    {
+    if ( !mod )
       mod = loadModule( modName );
-      addModule( mod );
-    }
+    addModule( mod );
 
     if ( mod )
       res = activateModule( mod );
@@ -566,6 +573,19 @@ void CAM_Application::setActiveStudy( SUIT_Study* study )
 }
 
 /*!
+  \brief Check module availability.
+
+  The method can be redefined in successors. Default implementation returns \c true.
+
+  \param title module title
+  \return \c true if module is accessible; \c false otherwise
+*/
+bool CAM_Application::checkModule( const QString& )
+{
+  return true;
+}
+
+/*!
   \brief Callback function, called when the module is added to the application.
   
   This virtual method can be re-implemented in the successors. Base implementation
@@ -636,6 +656,7 @@ bool CAM_Application::isModuleAccessible( const QString& title )
 {
   bool found   = false;
   bool blocked = false;
+  bool statusOK = false;
   
   QStringList somewhereLoaded;
   QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
@@ -653,8 +674,9 @@ bool CAM_Application::isModuleAccessible( const QString& title )
   {
     found = (*it).title == title;
     blocked = (*it).isSingleton && somewhereLoaded.contains((*it).title);
+    statusOK = (*it).status == stReady;
   }
-  return found && !blocked;
+  return found && statusOK && !blocked;
 }
 
 /*!
@@ -669,7 +691,7 @@ QString CAM_Application::moduleLibrary( const QString& title, const bool full )
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isEmpty(); ++it )
   {
     if ( (*it).title == title )
-      res = (*it).internal;
+      res = (*it).library;
   }
   if ( !res.isEmpty() && full )
     res = SUIT_Tools::library( res );
@@ -755,12 +777,15 @@ void CAM_Application::readModuleList()
     if ( !moduleTitle( modName ).isEmpty() )
       continue;  // already added
 
+    if ( modName == "KERNEL" || modName == "GUI" )
+      continue; // omit KERNEL and GUI modules
+
     QString modTitle = resMgr->stringValue( *it, "name", QString() );
     if ( modTitle.isEmpty() )
     {
       printf( "****************************************************************\n" );
-      printf( "*    Warning: %s GUI resources are not found.\n", qPrintable(*it) );
-      printf( "*    %s GUI will not be available.\n", qPrintable(*it) );
+      printf( "     Warning: module %s is improperly configured!\n", qPrintable(*it) );
+      printf( "     Module %s will not be available in GUI mode!\n", qPrintable(*it) );
       printf( "****************************************************************\n" );
       continue;
     }
@@ -789,17 +814,18 @@ void CAM_Application::readModuleList()
     else
       modLibrary = modName;
 
-    bool aIsSingleton = resMgr->booleanValue(*it, "singleton", false);
-
-    QString ver = resMgr->stringValue(*it, "version", QString());
+    bool aIsSingleton = resMgr->booleanValue( *it, "singleton", false );
+    bool hasGui = resMgr->booleanValue( *it, "gui", true );
+    QString version = resMgr->stringValue( *it, "version", QString() );
 
     ModuleInfo inf;
     inf.name = modName;
     inf.title = modTitle;
-    inf.internal = modLibrary;
+    inf.status = hasGui ? stUnknown : stNoGui;
+    if ( hasGui ) inf.library = modLibrary;
     inf.icon = modIcon;
     inf.isSingleton = aIsSingleton;
-    inf.version = ver;
+    inf.version = version;
     myInfoList.append( inf );
   }
 

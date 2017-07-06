@@ -284,6 +284,8 @@ protected:
   void                                updateModuleActions();
   void                                removeModuleAction( const QString& );
 
+  bool                                checkModule( const QString& );
+
   void                                loadDockWindowsState();
   void                                saveDockWindowsState();
 
@@ -297,8 +299,6 @@ protected:
   virtual void                        currentWindows( QMap<int, int>& ) const;
   void                                currentViewManagers( QStringList& ) const;
   void                                moduleIconNames( QMap<QString, QString>& ) const;
-
-  bool                                isLibExists( const QString& ) const;
 
   QDockWidget*                        windowDock( QWidget* ) const;
   QByteArray                          dockWindowsState( const QMap<QString, bool>&, const QMap<QString, bool>& ) const;
