@@ -2281,8 +2281,18 @@ QImage OCCViewer_ViewWindow::dumpView()
 
   Image_PixMap aPix;
   view->ToPixMap(aPix, aWidth, aHeight, Graphic3d_BT_RGB);
-  QImage anImage( aPix.Data(), aWidth, aHeight, QImage::Format_RGB888 );
-  anImage = anImage.mirrored();
+  
+  QImage anImage( aWidth, aHeight, QImage::Format_ARGB32 );
+  for ( int i = 0; i < aWidth; i++ ) {
+    for ( int j = 0; j < aHeight; j++ ) {
+      Quantity_Color pixel = aPix.PixelColor( i, j );
+      QColor color = QColor::fromRgbF( pixel.Red(), pixel.Green(), pixel.Blue() );
+      anImage.setPixelColor( i, j, color );
+    }
+  }
+    
+  if ( aPix.IsTopDown() )
+    anImage = anImage.mirrored();
   return anImage;
 
 #endif // USE_OLD_IMPLEMENTATION
