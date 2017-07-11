@@ -2285,7 +2285,11 @@ QImage OCCViewer_ViewWindow::dumpView()
   QImage anImage( aWidth, aHeight, QImage::Format_ARGB32 );
   for ( int i = 0; i < aWidth; i++ ) {
     for ( int j = 0; j < aHeight; j++ ) {
-      Quantity_Color pixel = aPix.PixelColor( i, j );
+#if OCC_VERSION_LARGE > 0x07010001
+      Quantity_Color pixel = aPix.PixelColor( i, j ).GetRGB();
+#else
+      Quantity_Color pixel = aPix.PixelColor( i, j ).RGB();
+#endif
       QColor color = QColor::fromRgbF( pixel.Red(), pixel.Green(), pixel.Blue() );
       anImage.setPixelColor( i, j, color );
     }
