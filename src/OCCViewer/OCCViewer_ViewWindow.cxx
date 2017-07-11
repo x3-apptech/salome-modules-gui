@@ -2288,7 +2288,7 @@ QImage OCCViewer_ViewWindow::dumpView()
 #if OCC_VERSION_LARGE > 0x07010001
       Quantity_Color pixel = aPix.PixelColor( i, j ).GetRGB();
 #else
-      Quantity_Color pixel = aPix.PixelColor( i, j ).RGB();
+      Quantity_Color pixel = aPix.PixelColor( i, j );
 #endif
       QColor color = QColor::fromRgbF( pixel.Red(), pixel.Green(), pixel.Blue() );
       anImage.setPixelColor( i, j, color );
