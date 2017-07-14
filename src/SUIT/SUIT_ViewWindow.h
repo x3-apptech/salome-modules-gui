@@ -76,6 +76,7 @@ public:
 
 public slots:
   virtual void      onDumpView();
+  void              setVisible( bool );
 
 signals:
   void              tryClosing( SUIT_ViewWindow* );
