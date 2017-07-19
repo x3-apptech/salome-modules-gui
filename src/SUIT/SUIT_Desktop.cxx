@@ -108,10 +108,16 @@ void SUIT_Desktop::closeEvent( QCloseEvent* e )
 */
 void SUIT_Desktop::childEvent( QChildEvent* e )
 {
-  if ( e->type() == QEvent::ChildAdded && e->child()->isWidgetType() )
+  if ( e->type() == QEvent::ChildAdded && e->child()->isWidgetType() ) {
+    // The following line is a workaround to avoid showing view window as a top-level window
+    // before re-parenting it to workstack (issue #23467).
+    // See SUIT_ViewWindow::setVisible() and SUIT_Desktop::customEvent().
+    e->child()->setProperty("blockShow", true );
     QApplication::postEvent( this, new ReparentEvent( QEvent::Type( Reparent ), e->child() ) );
-  else
+  }
+  else {
     QtxMainWindow::childEvent( e );
+  }
 }
 
 void SUIT_Desktop::customEvent( QEvent* e )
@@ -126,6 +132,10 @@ void SUIT_Desktop::customEvent( QEvent* e )
     bool invis = wid->testAttribute( Qt::WA_WState_ExplicitShowHide ) &&
                  wid->testAttribute( Qt::WA_WState_Hidden );
 
+    // The following line is a workaround to avoid showing view window as a top-level window
+    // before re-parenting it to workstack (issue #23467).
+    // See SUIT_ViewWindow::setVisible() and SUIT_Desktop::childEvent().
+    wid->setProperty("blockShow", false);
     addWindow( wid );
     wid->setVisible( !invis );
   }

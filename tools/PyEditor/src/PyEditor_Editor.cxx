@@ -27,6 +27,7 @@
 #include "PyEditor_Settings.h"
 #include "PyEditor_Keywords.h"
 
+#include <QMenu>
 #include <QPainter>
 #include <QTextBlock>
 
@@ -353,6 +354,14 @@ void PyEditor_Editor::paintEvent( QPaintEvent* event )
     aPainter.setPen( QPen( Qt::lightGray, 1, Qt::SolidLine ) );
     aPainter.drawLine( aNumberColumn, aRect.top(), aNumberColumn, aRect.bottom() );
   }
+}
+
+void PyEditor_Editor::contextMenuEvent( QContextMenuEvent* event )
+{
+  QMenu* menu = createStandardContextMenu();
+  emit customizeMenu( menu );
+  menu->exec( event->globalPos() );
+  delete menu;
 }
 
 /*!

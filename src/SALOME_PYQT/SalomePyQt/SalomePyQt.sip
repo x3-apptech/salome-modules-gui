@@ -386,12 +386,14 @@ public:
   static void              addSetting    ( const QString&, const QString&, const QString& ) /ReleaseGIL/ ;
   static void              addSetting    ( const QString&, const QString&, const QColor& ) /ReleaseGIL/ ;
   static void              addSetting    ( const QString&, const QString&, const QByteArray& ) /ReleaseGIL/ ;
+  static void              addSetting    ( const QString&, const QString&, const QFont& ) /ReleaseGIL/ ;
   static int               integerSetting( const QString&, const QString&, const int = 0 ) /ReleaseGIL/ ;
   static double            doubleSetting ( const QString&, const QString&, const double = 0 ) /ReleaseGIL/ ;
   static bool              boolSetting   ( const QString&, const QString&, const bool = false ) /ReleaseGIL/ ;
   static QString           stringSetting ( const QString&, const QString&, const QString& = QString(""), const bool = true ) /ReleaseGIL/ ;
   static QColor            colorSetting  ( const QString&, const QString&, const QColor& = QColor() ) /ReleaseGIL/ ;
   static QByteArray        byteArraySetting( const QString&, const QString&, const QByteArray& = QByteArray() ) /ReleaseGIL/ ;
+  static QFont             fontSetting( const QString&, const QString&, const QFont& = QFont() ) /ReleaseGIL/ ;
   static void              removeSetting ( const QString&, const QString& ) /ReleaseGIL/ ;
   static bool              hasSetting    ( const QString&, const QString& ) /ReleaseGIL/ ;
   static QStringList       parameters    ( const QString& ) /ReleaseGIL/ ;

@@ -542,3 +542,15 @@ void SUIT_ViewWindow::synchronizeView( SUIT_ViewWindow* viewWindow, int id )
     }
   }
 }
+
+void SUIT_ViewWindow::setVisible( bool on )
+{
+  // This is a workaround to avoid showing view window as a top-level window
+  // before re-parenting it to workstack (issue #23467).
+  // See SUIT_Desktop::childEvent().
+  QApplication::sendPostedEvents( 0, QEvent::ChildRemoved );
+  QApplication::sendPostedEvents( 0, QEvent::ChildAdded );
+  QApplication::sendPostedEvents( 0, QEvent::ChildPolished );
+  if ( !property( "blockShow" ).toBool() )
+    QMainWindow::setVisible( on );
+}

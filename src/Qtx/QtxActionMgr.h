@@ -88,8 +88,10 @@ protected:
 
   void             triggerUpdate();
   virtual void     updateContent();
+  virtual void     actionChanged( int );
 
 private slots:
+  void             onActionChanged();
   void             onUpdateContent();
 
 private:

@@ -33,6 +33,7 @@ class PyEditor_Editor;
 class QAction;
 class QLabel;
 class QLineEdit;
+class QMenu;
 
 class PYEDITOR_EXPORT PyEditor_FindTool : public QWidget
 {
@@ -60,6 +61,7 @@ private slots:
   void replaceAll();
   void update();
   void activate( int );
+  void customizeMenu( QMenu* );
 
 private:
   QList<QKeySequence> shortcuts( int ) const;

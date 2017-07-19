@@ -1361,6 +1361,34 @@ void SalomePyQt::addSetting( const QString& section, const QString& name, const 
 }
 
 /*!
+  \brief Add font setting to the application preferences.
+  \param section resources file section name 
+  \param name setting name
+  \param value new setting value
+*/
+void SalomePyQt::addSetting( const QString& section, const QString& name, const QFont& value )
+{
+  class TEvent: public SALOME_Event 
+  {
+    QString    mySection;
+    QString    myName;
+    QFont      myValue;
+  public:
+    TEvent( const QString& section, const QString& name, const QFont& value ) 
+      : mySection( section ), myName( name ), myValue( value ) {}
+    virtual void Execute() 
+    {
+      if ( SUIT_Session::session() ) {
+        SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+        if ( !mySection.isEmpty() && !myName.isEmpty() )
+          resMgr->setValue( mySection, myName, myValue );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( section, name, value ) );
+}
+
+/*!
   \fn int SalomePyQt::integerSetting( const QString& section, 
                                       const QString& name, 
                                       const int def );
@@ -1536,7 +1564,7 @@ QColor SalomePyQt::colorSetting ( const QString& section, const QString& name, c
 /*!
   \fn QByteArray SalomePyQt::byteArraySetting( const QString& section, 
                                                const QString& name, 
-                                               const QByteArray def );
+                                               const QByteArray& def );
   \brief Get byte array setting from the application preferences.
   \param section resources file section name 
   \param name setting name
@@ -1565,6 +1593,40 @@ public:
 QByteArray SalomePyQt::byteArraySetting ( const QString& section, const QString& name, const QByteArray& def )
 {
   return ProcessEvent( new TGetByteArraySettingEvent( section, name, def ) );
+}
+
+/*!
+  \fn QByteArray SalomePyQt::fontSetting( const QString& section, 
+                                          const QString& name, 
+                                          const QFont& def );
+  \brief Get font setting from the application preferences.
+  \param section resources file section name 
+  \param name setting name
+  \param def default value which is returned if the setting is not found
+  \return setting value
+*/
+
+class TGetFontSettingEvent: public SALOME_Event 
+{
+public:
+  typedef QFont TResult;
+  TResult myResult;
+  QString mySection;
+  QString myName;
+  TResult myDefault;
+  TGetFontSettingEvent( const QString& section, const QString& name, const QFont& def ) 
+    : mySection( section ), myName( name ), myDefault( def ) {}
+  virtual void Execute() 
+  {
+    if ( SUIT_Session::session() ) {
+      SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
+      myResult = ( !mySection.isEmpty() && !myName.isEmpty() ) ? resMgr->fontValue( mySection, myName, myDefault ) : myDefault;
+    }
+  }
+};
+QFont SalomePyQt::fontSetting ( const QString& section, const QString& name, const QFont& def )
+{
+  return ProcessEvent( new TGetFontSettingEvent( section, name, def ) );
 }
 
 /*!

@@ -874,8 +874,6 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
   if ( !mw )
     return;
 
-  bool filled = checkWidget( mw );
-
   // first remove all own actions and collect foreign ones
   QMap< QAction*, QList<QAction*> > foreign;
   QAction* a;
@@ -966,13 +964,14 @@ void QtxActionMenuMgr::updateMenu( MenuNode* startNode, const bool rec, const bo
     foreach( a, formapit.value() )
       mw->insertAction( preva, a );
   }
-  
+
   // remove extra separators
   simplifySeparators( mw );
 
   // update parent menu if necessary
-  if ( updParent && node->parent && filled != checkWidget( mw ) )
+  if ( updParent && node->parent ) {
     updateMenu( node->parent, false );
+  }
 }
 
 /*!
@@ -1019,7 +1018,12 @@ bool QtxActionMenuMgr::checkWidget( QWidget* wid ) const
   if ( !wid )
     return false;
 
-  return !wid->actions().isEmpty();
+  bool res = false;
+  QList<QAction*> lst = wid->actions();
+  for ( QList<QAction*>::const_iterator it = lst.begin(); it != lst.end() && !res; ++it ) {
+    res = !(*it)->isSeparator() && (*it)->isVisible();
+  }
+  return res;
 }
 
 /*!
@@ -1198,6 +1202,25 @@ void QtxActionMenuMgr::triggerUpdate( const int id, const bool rec )
   myUpdateIds.insert( id, isRec );
 
   QtxActionMgr::triggerUpdate();
+}
+
+/*!
+  \brief Called when action is changed.
+
+  Schedule delayed update for parent menu of changed action.
+*/
+void QtxActionMenuMgr::actionChanged( int id )
+{
+  NodeList aNodes;
+  find( id, aNodes );
+
+  for ( NodeList::iterator it = aNodes.begin(); it != aNodes.end(); ++it )
+  {
+    MenuNode* node = *it;
+    if ( node->visible ) {
+      triggerUpdate( node->parent ? node->parent->id : myRoot->id, false );
+    }
+  }
 }
 
 /*!

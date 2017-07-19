@@ -277,26 +277,31 @@ void Qtx::simplifySeparators( QWidget* wid, const bool recursive )
   if ( items.isEmpty() )
     return;
 
-  QList<QAction*> toRemove;
-  for ( int i = 1; i < items.count(); i++ )
+  bool action = false;
+  for ( int i = 0; i < items.count(); i++ )
   {
-    if ( items[i]->isSeparator() && items[i - 1]->isSeparator() )
-      toRemove.append( items[i] );
-
-    if ( recursive && items[i]->menu() )
-      simplifySeparators( items[i]->menu(), recursive );
+    QAction* a = items[i];
+    if ( a->isSeparator() ) {
+      a->setVisible(action);
+      action = false;
+    }
+    else if ( a->isVisible() ) {
+      action = true;
+      if ( recursive && a->menu() )
+	simplifySeparators( a->menu(), recursive );
+    }
   }
 
-  for ( QList<QAction*>::iterator it = toRemove.begin(); it != toRemove.end(); ++it )
-    wid->removeAction( *it );
-
-  items = wid->actions();
-  if ( !items.isEmpty() && items[0]->isSeparator() )
-    wid->removeAction( items[0] );
-
-  items = wid->actions();
-  if ( !items.isEmpty() && items[items.count() - 1]->isSeparator() )
-    wid->removeAction( items[items.count() - 1] );
+  action = false;
+  for ( int i = items.count() - 1; i > 0; i-- ) {
+    QAction* a = items[i];
+    if ( a->isSeparator() ) {
+      a->setVisible(action);
+      action = false;
+    }
+    else if ( a->isVisible() )
+      action = true;
+  }
 }
 
 /*!

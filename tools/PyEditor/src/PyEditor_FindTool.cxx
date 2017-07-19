@@ -110,10 +110,10 @@ PyEditor_FindTool::PyEditor_FindTool( PyEditor_Editor* editor, QWidget* parent )
   addAction( new QAction( tr( "CASE_SENSITIVE_CHECK" ), this ) );
   addAction( new QAction( tr( "WHOLE_WORDS_CHECK" ), this ) );
   addAction( new QAction( tr( "REGEX_CHECK" ), this ) );
-  addAction( new QAction( tr( "Find" ), this ) );
+  addAction( new QAction( QIcon( ":/images/py_find.png" ), tr( "Find" ), this ) );
   addAction( new QAction( tr( "FindPrevious" ), this ) );
   addAction( new QAction( tr( "FindNext" ), this ) );
-  addAction( new QAction( tr( "Replace" ), this ) );
+  addAction( new QAction( QIcon( ":/images/py_replace.png" ), tr( "Replace" ), this ) );
 
   foreach ( QAction* action, actions().mid( CaseSensitive, RegExp+1 ) )
   {
@@ -135,6 +135,7 @@ PyEditor_FindTool::PyEditor_FindTool( PyEditor_Editor* editor, QWidget* parent )
   }
 
   myEditor->installEventFilter( this );
+  connect( myEditor, SIGNAL( customizeMenu( QMenu* ) ), this, SLOT( customizeMenu( QMenu* ) ) );
 
   hide();
 }
@@ -221,7 +222,10 @@ bool PyEditor_FindTool::eventFilter( QObject* o, QEvent* e )
       {
       case Qt::Key_Escape:
         if ( isVisible() )
+        {
           hide();
+          return true;
+        }
         break;
       default:
         break;
@@ -237,6 +241,16 @@ bool PyEditor_FindTool::eventFilter( QObject* o, QEvent* e )
 void PyEditor_FindTool::activateFind()
 {
   activate( Find );
+}
+
+/*!
+  \brief Customize menu for editor.
+*/
+void PyEditor_FindTool::customizeMenu( QMenu* menu )
+{
+  menu->addSeparator();
+  menu->addAction( actions()[Find] );
+  menu->addAction( actions()[Replace] );
 }
 
 /*!
@@ -406,8 +420,8 @@ QList<QKeySequence> PyEditor_FindTool::shortcuts( int action ) const
     bindings << QKeySequence( QKeySequence::FindNext );
     break;
   case Replace:
-    bindings << QKeySequence( QKeySequence::Replace );
     bindings << QKeySequence( "Ctrl+H" );
+    bindings << QKeySequence( QKeySequence::Replace );
     break;
   default:
     break;
@@ -604,7 +618,7 @@ void PyEditor_FindTool::addCompletion( const QString& text, bool replace )
   QStringListModel& model = replace ? myReplaceCompletion : myFindCompletion;
 
   QStringList completions = model.stringList();
-  if ( !text.isEmpty() and !completions.contains( text ) )
+  if ( !text.isEmpty() && !completions.contains( text ) )
   {
     completions.prepend( text );
     model.setStringList( completions );

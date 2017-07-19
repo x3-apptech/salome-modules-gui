@@ -578,7 +578,7 @@ void LightApp_Application::createActions()
   // Preferences
   createAction( PreferencesId, tr( "TOT_DESK_PREFERENCES" ), QIcon(),
                 tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
-                Qt::CTRL+Qt::Key_R, desk, false, this, SLOT( onPreferences() ) );
+                Qt::CTRL+Qt::Key_P, desk, false, this, SLOT( onPreferences() ) );
 
   // Help menu:
 
@@ -707,13 +707,10 @@ void LightApp_Application::createActions()
     QStringList::Iterator it;
     for ( it = modList.begin(); it != modList.end(); ++it )
     {
-      if ( !isLibExists( *it ) )
+      if ( !isModuleAccessible( *it ) )
         continue;
 
       QString modName = moduleName( *it );
-
-      if ( !isModuleAccessible( *it ) )
-        continue;
 
       QString iconName;
       if ( iconMap.contains( *it ) )
@@ -723,12 +720,12 @@ void LightApp_Application::createActions()
       if ( icon.isNull() )
       {
         icon = modIcon;
-        INFOS ( "\n****************************************************************" << std::endl
-                <<  "*    Icon for " << (*it).toLatin1().constData()
-                << " not found. Using the default one." << std::endl
-                << "****************************************************************" << std::endl );
+        INFOS( std::endl <<
+               "****************************************************************" << std::endl <<
+               "     Warning: icon for " << qPrintable(*it) << " is not found!" << std::endl <<
+               "     Using the default icon." << std::endl <<
+               "****************************************************************" << std::endl);
       }
-
       icon = Qtx::scaleIcon( icon, iconSize );
 
       moduleAction->insertModule( *it, icon );
@@ -2145,7 +2142,7 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
 
     for ( QStringList::const_iterator it = modNameList.begin(); it != modNameList.end(); ++it )
     {
-      if ( !app->isLibExists( *it ) || _prefs_->hasModule( *it ) )
+      if ( !app->isModuleAccessible( *it ) || _prefs_->hasModule( *it ) )
         continue;
 
       int modId = _prefs_->addPreference( *it );
@@ -3894,6 +3891,70 @@ void LightApp_Application::removeModuleAction( const QString& modName )
     moduleAction->removeModule( modName );
 }
 
+bool LightApp_Application::checkModule( const QString& title )
+{
+  if ( title.isEmpty() )
+    return false;
+
+  QString library = moduleLibrary( title, true );
+  if ( library.isEmpty() )
+    return false;
+
+  QString name = moduleName( title );
+
+  bool isPyModule = library.contains( "SalomePyQtGUI" ) || library.contains( "SalomePyQtGUILight" );
+
+  QStringList paths;
+#if defined(WIN32)
+  paths = QString( ::getenv( "PATH" ) ).split( ";", QString::SkipEmptyParts );
+#elif defined(__APPLE__)
+  paths = QString( ::getenv( "DYLD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
+#else
+  paths = QString( ::getenv( "LD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
+#endif
+
+  bool isFound = false;
+  QStringList::const_iterator it;
+  for ( it = paths.begin(); it != paths.end() && !isFound; ++it )
+  {
+    isFound = QFileInfo( Qtx::addSlash( *it ) + library ).exists();
+  }
+
+  if ( !isFound )
+  {
+    INFOS( std::endl <<
+           "****************************************************************" << std::endl <<
+           "     Warning: library " << qPrintable( library ) << " is not found!" << std::endl <<
+           "     Module " << qPrintable( title ) << " will not be available in GUI mode!" << std::endl <<
+           "****************************************************************" << std::endl);
+    return false;
+  }
+
+  if ( isPyModule )
+  {
+    QString pyModule = QString( "%1GUI.py" ).arg( name );
+    paths = QString( ::getenv( "PYTHONPATH" ) ).split( ":", QString::SkipEmptyParts );
+
+    isFound = false;
+    for ( it = paths.begin(); it != paths.end() && !isFound; ++it )
+    {
+      isFound = QFileInfo( Qtx::addSlash( *it ) + pyModule ).exists();
+    }
+
+    if ( !isFound )
+    {
+      INFOS( std::endl <<
+             "****************************************************************" << std::endl <<
+             "     Warning: Python module " << qPrintable( pyModule ) << " is not found!" << std::endl <<
+             "     Module " << qPrintable( title ) << " will not be available in GUI mode!" << std::endl <<
+             "****************************************************************" << std::endl);
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /*!
   Gets current windows.
   \param winMap - output current windows map.
@@ -4454,94 +4515,6 @@ void LightApp_Application::onGroupAllWindow()
   QtxWorkstack* wgStack = desk->workstack();
   if ( wgStack )
     wgStack->stack();
-}
-
-/*!
-  \return if the library of module exists
-  \param moduleTitle - title of module
-*/
-bool LightApp_Application::isLibExists( const QString& moduleTitle ) const
-{
-  if( moduleTitle.isEmpty() )
-    return false;
-
-  QString lib = moduleLibrary( moduleTitle );
-
-  //abd: changed libSalomePyQtGUI to SalomePyQtGUI for WIN32
-  bool isPythonModule = lib.contains("SalomePyQtGUI");
-  bool isPythonLightModule = lib.contains("SalomePyQtGUILight");
-
-  QStringList paths;
-#if defined(WIN32)
-  paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
-#elif defined(__APPLE__)
-  paths = QString(::getenv( "DYLD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
-#else
-  paths = QString(::getenv( "LD_LIBRARY_PATH" )).split( ":", QString::SkipEmptyParts );
-#endif
-
-  bool isLibFound = false;
-  QStringList::const_iterator anIt = paths.begin(), aLast = paths.end();
-  for( ; anIt!=aLast; anIt++ )
-  {
-    QFileInfo inf( Qtx::addSlash( *anIt ) + lib );
-
-    if( inf.exists() )
-      {
-        isLibFound = true;
-        break;
-      }
-  }
-
-  if ( !isLibFound )
-    {
-      INFOS( "\n****************************************************************" << std::endl
-          << "*    Warning: library " << lib.toLatin1().constData() << " cannot be found" << std::endl
-          << "*    Module " << moduleTitle.toLatin1().constData() << " will not be available in GUI mode" << std::endl
-          << "****************************************************************" << std::endl );
-    }
-  else if ( !isPythonModule && !isPythonLightModule)
-    return true;
-
-  if ( isPythonModule || isPythonLightModule)
-    {
-      QString pylib = moduleName( moduleTitle ) + QString(".py");
-      QString pylibgui = moduleName( moduleTitle ) + QString("GUI.py");
-
-      // Check the python library
-// #ifdef WIN32
-//       paths = QString(::getenv( "PATH" )).split( ";", QString::SkipEmptyParts );
-// #else
-      paths = QString(::getenv( "PYTHONPATH" )).split( ":", QString::SkipEmptyParts );
-// #endif
-      bool isPyLib = false, isPyGuiLib = false;
-      QStringList::const_iterator anIt = paths.begin(), aLast = paths.end();
-      for( ; anIt!=aLast; anIt++ )
-        {
-          QFileInfo inf( Qtx::addSlash( *anIt ) + pylib );
-          QFileInfo infgui( Qtx::addSlash( *anIt ) + pylibgui );
-
-          if(!isPythonLightModule)
-            if( !isPyLib && inf.exists() )
-              isPyLib = true;
-
-          if( !isPyGuiLib && infgui.exists() )
-            isPyGuiLib = true;
-
-          if ((isPyLib || isPythonLightModule ) && isPyGuiLib && isLibFound)
-            return true;
-        }
-
-      printf( "\n****************************************************************\n" );
-      printf( "*    Warning: python library for %s cannot be found:\n", moduleTitle.toLatin1().constData() );
-      if (!isPyLib)
-        printf( "*    No module named %s\n", moduleName( moduleTitle ).toLatin1().constData() );
-      if (!isPyGuiLib)
-        printf( "*    No module named %s\n", (moduleName( moduleTitle ) + QString("GUI")).toLatin1().constData() );
-      printf( "****************************************************************\n" );
-      return true;
-  }
-  return false;
 }
 
 /*!

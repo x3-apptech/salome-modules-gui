@@ -2219,6 +2219,7 @@ void OCCViewer_ViewWindow::setZoomingStyle( const int theStyle )
   \brief Dump view window contents to the pixmap.
   \return pixmap containing all scene rendered in the window
 */
+//#define USE_OLD_IMPLEMENTATION
 QImage OCCViewer_ViewWindow::dumpView()
 {
   Handle(V3d_View) view = myViewPort->getView();
@@ -2228,19 +2229,15 @@ QImage OCCViewer_ViewWindow::dumpView()
   int aWidth = myViewPort->width();
   int aHeight = myViewPort->height();
 
-  // rnv: An old approach to dump the OCCViewer content
-  //      Now used OCCT built-in procedure.
-  /*
-  QApplication::syncX();
-  view->Redraw(); // In order to reactivate GL context
-  //view->Update();
+#ifdef USE_OLD_IMPLEMENTATION
+  // rnv: Old approach to dump the OCCViewer content via Frame Buffer Object
+
+  view->Redraw();
 
 #ifndef DISABLE_GLVIEWER
   OpenGLUtils_FrameBuffer aFrameBuffer;
-  if( aFrameBuffer.init( aWidth, aHeight ) )
+  if ( aFrameBuffer.init( aWidth, aHeight ) )
   {
-    QImage anImage( aWidth, aHeight, QImage::Format_RGB32 );
-
     glPushAttrib( GL_VIEWPORT_BIT );
     glViewport( 0, 0, aWidth, aHeight );
     aFrameBuffer.bind();
@@ -2251,6 +2248,8 @@ QImage OCCViewer_ViewWindow::dumpView()
     aFrameBuffer.unbind();
     glPopAttrib();
 
+    QImage anImage( aWidth, aHeight, QImage::Format_RGB32 );
+
     aFrameBuffer.bind();
     glReadPixels( 0, 0, aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
     aFrameBuffer.unbind();
@@ -2259,24 +2258,48 @@ QImage OCCViewer_ViewWindow::dumpView()
     anImage = anImage.mirrored();
     return anImage;
   }
-  // if frame buffers are unsupported, use old functionality
-  //view->Redraw();
+
+  // if frame buffers are unsupported, use old approach
 
   unsigned char* data = new unsigned char[ aWidth*aHeight*4 ];
-
-  QPoint p = myViewPort->mapFromParent(myViewPort->geometry().topLeft());
-
+  QPoint p = myViewPort->mapFromParent( myViewPort->geometry().topLeft() );
   glReadPixels( p.x(), p.y(), aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE,
                 data);
-#endif
-  */
+  QImage anImage( data, aWidth, aHeight, QImage::Format_ARGB32 );
+  anImage = anImage.mirrored();
+  anImage = anImage.rgbSwapped();
+  return anImage;
+
+#else // DISABLE_GLVIEWER
+
+  return QImage();
+
+#endif // DISABLE_GLVIEWER
+
+#else // USE_OLD_IMPLEMENTATION
+  // rnv: New approach is to use OCCT built-in procedure
 
   Image_PixMap aPix;
-  view->ToPixMap(aPix,aWidth, aHeight,Graphic3d_BT_RGBA);
-
-  QImage anImage( aPix.Data(), aWidth, aHeight, QImage::Format_ARGB32 );
-  anImage = anImage.mirrored();
+  view->ToPixMap(aPix, aWidth, aHeight, Graphic3d_BT_RGB);
+  
+  QImage anImage( aWidth, aHeight, QImage::Format_ARGB32 );
+  for ( int i = 0; i < aWidth; i++ ) {
+    for ( int j = 0; j < aHeight; j++ ) {
+#if OCC_VERSION_LARGE > 0x07010001
+      Quantity_Color pixel = aPix.PixelColor( i, j ).GetRGB();
+#else
+      Quantity_Color pixel = aPix.PixelColor( i, j );
+#endif
+      QColor color = QColor::fromRgbF( pixel.Red(), pixel.Green(), pixel.Blue() );
+      anImage.setPixelColor( i, j, color );
+    }
+  }
+    
+  if ( aPix.IsTopDown() )
+    anImage = anImage.mirrored();
   return anImage;
+
+#endif // USE_OLD_IMPLEMENTATION
 }
 
 bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,

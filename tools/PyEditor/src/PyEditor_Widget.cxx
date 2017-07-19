@@ -249,3 +249,21 @@ QString PyEditor_Widget::text() const
 {
   return myEditor->toPlainText();
 }
+
+/*!
+  \brief Set editor's settings.
+  \param settings Settings object.
+*/
+void PyEditor_Widget::setSettings( const PyEditor_Settings& settings )
+{
+  myEditor->setSettings( settings );
+}
+
+/*!
+  \brief Get editor's settings.
+  \return Settings object.
+*/
+const PyEditor_Settings& PyEditor_Widget::settings() const
+{
+  return myEditor->settings();
+}
