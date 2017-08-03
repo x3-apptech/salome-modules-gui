@@ -1848,7 +1848,12 @@ void PyModuleHelper::setWorkSpace()
   }
 #if SIP_VERSION < 0x040800
   PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget) );
-#else
+#else 
+ #if SIP_VERSION >= 0x041303
+  static const sipTypeDef *sipType_QWidget = 0;
+  if (!sipType_QWidget)
+    sipType_QWidget = sipFindType("QWidget");
+ #endif
   PyObjWrapper pyws( sipBuildResult( 0, "D", aWorkspace, sipType_QWidget , NULL) );
 #endif
   // ... and finally call Python module's setWorkSpace() method (obsolete)
@@ -2265,6 +2270,11 @@ void PyModuleHelper::internalSelectionUpdated(const QStringList& entries)
 #if SIP_VERSION < 0x040800
   PyObjWrapper sipList(sipBuildResult(0, "M", theList, sipClass_QStringList));
 #else
+ #if SIP_VERSION >= 0x041303
+  static const sipTypeDef *sipType_QStringList = 0;
+  if (!sipType_QStringList)
+    sipType_QStringList = sipFindType("QStringList");
+ #endif
   PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
 #endif
   if (PyObject_HasAttrString(myPyModule, (char*) "onSelectionUpdated"))
@@ -2338,6 +2348,11 @@ void PyModuleHelper::internalContextMenu( const QString& context, QMenu* menu )
 #if SIP_VERSION < 0x040800
   PyObjWrapper sipPopup( sipBuildResult( 0, "M", menu, sipClass_QMenu ) );
 #else
+ #if SIP_VERSION >= 0x041303
+  static const sipTypeDef *sipType_QMenu = 0;
+  if (!sipType_QMenu)
+    sipType_QMenu = sipFindType("QMenu");
+ #endif
   PyObjWrapper sipPopup( sipBuildResult( 0, "D", menu, sipType_QMenu, NULL ) );
 #endif
 
@@ -2558,6 +2573,11 @@ void PyModuleHelper::internalLoad( const QStringList& files, const QString& url,
 #if SIP_VERSION < 0x040800
   PyObjWrapper sipList( sipBuildResult( 0, "M", theList, sipClass_QStringList ) );
 #else
+ #if SIP_VERSION >= 0x041303
+  static const sipTypeDef *sipType_QStringList = 0;
+  if (!sipType_QStringList)
+    sipType_QStringList = sipFindType("QStringList");
+ #endif
   PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
 #endif
   if ( PyObject_HasAttrString(myPyModule , (char*)"openFiles") ) {
@@ -2721,6 +2741,11 @@ void PyModuleHelper::internalDropObjects( const DataObjectList& what, SUIT_DataO
 #if SIP_VERSION < 0x040800
   PyObjWrapper sipList( sipBuildResult( 0, "M", theList, sipClass_QStringList) );
 #else
+ #if SIP_VERSION >= 0x041303
+  static const sipTypeDef *sipType_QStringList = 0;
+  if (!sipType_QStringList)
+    sipType_QStringList = sipFindType("QStringList");
+ #endif
   PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL) );
 #endif
   if ( PyObject_HasAttrString(myPyModule, (char*)"dropObjects") ) {
