@@ -68,6 +68,7 @@ PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desk) :
   sourcesMenu(0),
   filtersMenu(0),
   macrosMenu(0),
+  catalystMenu(0),
   myPVWidgetsFlag(false)
 {
 }
@@ -116,6 +117,12 @@ void PVViewer_GUIElements::buildPVWidgets()
     if (!macrosMenu) {
       macrosMenu = new QMenu(0);
       pqParaViewMenuBuilders::buildMacrosMenu(*macrosMenu);
+    }
+
+    // Catalyst Menu
+    if (!catalystMenu) {
+      catalystMenu = new QMenu(0);
+      pqParaViewMenuBuilders::buildCatalystMenu(*catalystMenu);
     }
 
     mainToolBar = new pqMainControlsToolbar(myDesktop)
@@ -334,6 +341,11 @@ QMenu* PVViewer_GUIElements::getSourcesMenu() {
 QMenu* PVViewer_GUIElements::getMacrosMenu()  {
   buildPVWidgets();
   return macrosMenu;
+}
+
+QMenu* PVViewer_GUIElements::getCatalystMenu()  {
+  buildPVWidgets();
+  return catalystMenu;
 }
 
 void PVViewer_GUIElements::publishExistingSources() {

@@ -53,6 +53,7 @@ public:
   QMenu* getFiltersMenu();
   QMenu* getSourcesMenu();
   QMenu* getMacrosMenu();
+  QMenu* getCatalystMenu();
 
   pqVCRToolbar* getVCRToolbar();
   pqAnimationTimeToolbar* getTimeToolbar();
@@ -82,6 +83,7 @@ private:
   QMenu* sourcesMenu;
   QMenu* filtersMenu;
   QMenu* macrosMenu;
+  QMenu* catalystMenu;
 
   // Toolbars also need to be instanciated early:
   QToolBar* mainToolBar;
