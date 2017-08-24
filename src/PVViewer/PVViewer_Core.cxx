@@ -65,7 +65,7 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
       char** argv = 0;
       QString aOptions = getenv("PARAVIEW_OPTIONS");
       QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
-      argv = new char*[aOptList.size() + 1];
+      argv = new char*[aOptList.size() + 2];
       QStringList args = QApplication::arguments();
       argv[0] = (args.size() > 0)? strdup(args[0].toLatin1().constData()) : strdup("paravis");
       argc++;
@@ -74,6 +74,7 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
         argv[argc] = strdup( aStr.toLatin1().constData() );
         argc++;
       }
+      argv[argc++] = strdup("--multi-servers");
       MyCoreApp = new pqPVApplicationCore (argc, argv);
       if (MyCoreApp->getOptions()->GetHelpSelected() ||
           MyCoreApp->getOptions()->GetUnknownArgument() ||
