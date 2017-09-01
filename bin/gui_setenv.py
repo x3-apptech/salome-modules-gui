@@ -28,7 +28,7 @@ def set_env( args ):
     vtk_overloads_dir = os.path.join( os.getenv( "GUI_ROOT_DIR" ), "lib", "paraview" )
     dirs = re.split( ":|;", os.getenv( 'VTK_AUTOLOAD_PATH', vtk_overloads_dir ) )
     if vtk_overloads_dir not in dirs: dirs[0:0] = [vtk_overloads_dir]
-    os.environ['VTK_AUTOLOAD_PATH'] = os.pathsep.join(dirs)
+    #os.environ['VTK_AUTOLOAD_PATH'] = os.pathsep.join(dirs)
     #print 'QT_PLUGIN_PATH: ', os.environ['QT_PLUGIN_PATH']
     qt_plugin_dir = os.path.join( os.getenv( "QTDIR" ), "plugins" )
     dirs = re.split( ":|;", os.getenv( 'QT_PLUGIN_PATH', qt_plugin_dir ) )
