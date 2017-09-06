@@ -362,7 +362,7 @@ ENDIF(SALOME_USE_GLVIEWER)
 # VTK specific targets:
 IF(SALOME_USE_VTKVIEWER)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets 
-       VTKViewer vtkTools vtkEDFOverloads)
+       VTKViewer )
   IF(SALOME_USE_SALOMEOBJECT)
     LIST(APPEND _${PROJECT_NAME}_exposed_targets 
          SVTK)
