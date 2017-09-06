@@ -55,7 +55,9 @@ public:
     DraggingByMiddleButton = 0x0010,
     ImmediateContextMenu   = 0x0020,
     ImmediateSelection     = 0x0040,
-    Sketching              = 0x0080
+    Sketching              = 0x0080,
+
+    GlobalWheelScaling     = 0x0100
   };
   Q_DECLARE_FLAGS( InteractionFlags, InteractionFlag )
 
