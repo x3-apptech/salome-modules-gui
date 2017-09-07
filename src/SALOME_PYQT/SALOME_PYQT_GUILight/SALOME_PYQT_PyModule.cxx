@@ -1846,16 +1846,12 @@ void PyModuleHelper::setWorkSpace()
     if ( d )
       aWorkspace = d->workstack();
   }
-#if SIP_VERSION < 0x040800
-  PyObjWrapper pyws( sipBuildResult( 0, "M", aWorkspace, sipClass_QWidget) );
-#else 
- #if SIP_VERSION >= 0x041303
+#if SIP_VERSION >= 0x041300
   static const sipTypeDef *sipType_QWidget = 0;
   if (!sipType_QWidget)
     sipType_QWidget = sipFindType("QWidget");
- #endif
-  PyObjWrapper pyws( sipBuildResult( 0, "D", aWorkspace, sipType_QWidget , NULL) );
 #endif
+  PyObjWrapper pyws( sipBuildResult( 0, "D", aWorkspace, sipType_QWidget , NULL) );
   // ... and finally call Python module's setWorkSpace() method (obsolete)
   if ( PyObject_HasAttrString( myPyModule, (char*)"setWorkSpace" ) ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"setWorkSpace", (char*)"O", pyws.get() ) );
@@ -2267,16 +2263,12 @@ void PyModuleHelper::internalSelectionUpdated(const QStringList& entries)
 
   QStringList* theList = new QStringList(entries);
 
-#if SIP_VERSION < 0x040800
-  PyObjWrapper sipList(sipBuildResult(0, "M", theList, sipClass_QStringList));
-#else
- #if SIP_VERSION >= 0x041303
+#if SIP_VERSION >= 0x041300
   static const sipTypeDef *sipType_QStringList = 0;
   if (!sipType_QStringList)
     sipType_QStringList = sipFindType("QStringList");
- #endif
-  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
 #endif
+  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
   if (PyObject_HasAttrString(myPyModule, (char*) "onSelectionUpdated"))
     {
       MESSAGE("call onSelectionUpdated");
@@ -2345,16 +2337,12 @@ void PyModuleHelper::internalContextMenu( const QString& context, QMenu* menu )
   if ( myXmlHandler )
     myXmlHandler->createPopup( menu, aContext, aParent, aObject );
 
-#if SIP_VERSION < 0x040800
-  PyObjWrapper sipPopup( sipBuildResult( 0, "M", menu, sipClass_QMenu ) );
-#else
- #if SIP_VERSION >= 0x041303
+#if SIP_VERSION >= 0x041300
   static const sipTypeDef *sipType_QMenu = 0;
   if (!sipType_QMenu)
     sipType_QMenu = sipFindType("QMenu");
- #endif
-  PyObjWrapper sipPopup( sipBuildResult( 0, "D", menu, sipType_QMenu, NULL ) );
 #endif
+  PyObjWrapper sipPopup( sipBuildResult( 0, "D", menu, sipType_QMenu, NULL ) );
 
   // then call Python module's createPopupMenu() method (for new modules)
   if ( PyObject_HasAttrString( myPyModule, (char*)"createPopupMenu" ) ) {
@@ -2570,16 +2558,12 @@ void PyModuleHelper::internalLoad( const QStringList& files, const QString& url,
 
   QStringList* theList = new QStringList( files );
 
-#if SIP_VERSION < 0x040800
-  PyObjWrapper sipList( sipBuildResult( 0, "M", theList, sipClass_QStringList ) );
-#else
- #if SIP_VERSION >= 0x041303
+#if SIP_VERSION >= 0x041300
   static const sipTypeDef *sipType_QStringList = 0;
   if (!sipType_QStringList)
     sipType_QStringList = sipFindType("QStringList");
- #endif
-  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
 #endif
+  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL ) );
   if ( PyObject_HasAttrString(myPyModule , (char*)"openFiles") ) {
 
     // try with two parameters (new syntax)
@@ -2738,16 +2722,12 @@ void PyModuleHelper::internalDropObjects( const DataObjectList& what, SUIT_DataO
     if ( dataObject ) theList->append( dataObject->entry() );
   }
 
-#if SIP_VERSION < 0x040800
-  PyObjWrapper sipList( sipBuildResult( 0, "M", theList, sipClass_QStringList) );
-#else
- #if SIP_VERSION >= 0x041303
+#if SIP_VERSION >= 0x041300
   static const sipTypeDef *sipType_QStringList = 0;
   if (!sipType_QStringList)
     sipType_QStringList = sipFindType("QStringList");
- #endif
-  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL) );
 #endif
+  PyObjWrapper sipList( sipBuildResult( 0, "D", theList, sipType_QStringList, NULL) );
   if ( PyObject_HasAttrString(myPyModule, (char*)"dropObjects") ) {
       PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"dropObjects", (char*)"Osii",
                         sipList.get(),
