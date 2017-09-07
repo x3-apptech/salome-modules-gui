@@ -3815,3 +3815,16 @@ void OCCViewer_ViewWindow::onLightSource()
       aDlg->show();
   }
 }
+
+bool OCCViewer_ViewWindow::isActionVisible( ActionId theId ) const
+{
+  QAction* a = toolMgr()->action( theId );
+  return a && a->isVisible();
+}
+
+void OCCViewer_ViewWindow::setActionVisible( ActionId theId, bool isVisible )
+{
+  QAction* a = toolMgr()->action( theId );
+  if( a )
+    a->setVisible( isVisible );
+}

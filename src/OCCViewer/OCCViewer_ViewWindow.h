@@ -143,7 +143,7 @@ class OCCVIEWER_EXPORT OCCViewer_ViewWindow : public SUIT_ViewWindow
   Q_OBJECT
 
 public:
-  enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
+  enum ActionId { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
          ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
 	 ResetId, CloneId, ClippingId, MemId, RestoreId,
@@ -269,6 +269,9 @@ public:
   virtual void                    clearViewAspects();
 
   virtual SUIT_CameraProperties   cameraProperties();
+
+  bool isActionVisible( ActionId theId ) const;
+  void setActionVisible( ActionId theId, bool isVisible );
 
 public slots:
   virtual void onFrontView();

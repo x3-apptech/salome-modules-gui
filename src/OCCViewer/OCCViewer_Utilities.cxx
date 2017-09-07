@@ -116,7 +116,10 @@ OCCViewer_ViewWindow::Mode2dType OCCViewer_Utilities::setViewer2DMode
   for ( int i = 0, aNb = aNo2dActions.size(); i < aNb; i++ ) {
     anAction = aToolMgr->action( aNo2dActions[i] );
     if ( anAction )
+    {
       anAction->setEnabled( !is2dMode );
+      anAction->setVisible( !is2dMode );
+    }
   }
   QAction* aTop = aToolMgr->action( OCCViewer_ViewWindow::TopId );
   QtxMultiAction* aMulti = dynamic_cast<QtxMultiAction*>( aTop->parent() );
