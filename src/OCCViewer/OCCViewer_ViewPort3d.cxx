@@ -628,6 +628,7 @@ void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
     QApplication::syncX();
 #endif
   QTimer::singleShot( 0, this, SLOT( repaintViewAfterMove() ) );
+  emit vpResizeEvent( e );
 }
 
 /*!
