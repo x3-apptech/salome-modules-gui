@@ -604,10 +604,6 @@ SVTK_RenderWindowInteractor
     aStyle->SetInteractor(NULL);
     myInteractorStyles.pop();
   }
-
-  SetRenderer(NULL);
-
-  GetDevice()->SetRenderWindow(NULL);
 }
 
 /*!
