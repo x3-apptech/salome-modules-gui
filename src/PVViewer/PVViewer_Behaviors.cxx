@@ -36,7 +36,6 @@
 #include <pqDataTimeStepBehavior.h>
 #include <pqDefaultViewBehavior.h>
 #include <pqObjectPickingBehavior.h>
-#include <pqPersistentMainWindowStateBehavior.h>
 #include <pqPipelineContextMenuBehavior.h>
 #include <pqPluginActionGroupBehavior.h>
 #include <pqPluginDockWidgetsBehavior.h>
@@ -111,7 +110,9 @@ void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
       new pqAutoLoadPluginXMLBehavior(this);  // auto load plugins GUI stuff
       new pqPluginDockWidgetsBehavior(desk);
       new pqPluginActionGroupBehavior(desk);
-      new pqPersistentMainWindowStateBehavior(desk);
+      // rnv: Disable ParaView main window persistance mechanism,
+      //      because SALOME has own functionality for store/restore windows state.
+      //  new pqPersistentMainWindowStateBehavior(desk);
       new pqObjectPickingBehavior(desk);
       new pqCollaborationBehavior(this);
       new pqViewStreamingBehavior(this);
