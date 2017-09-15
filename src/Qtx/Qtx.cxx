@@ -38,6 +38,9 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtDebug>
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+#include <QSurfaceFormat>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2180,6 +2183,41 @@ Qt::HANDLE Qtx::getVisual()
 }
 
 #endif // WIN32
+
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+/*!
+  \brief Set default QSurfaceFormat for an application.
+
+  This application property should be set before a creation of the QApplication.
+*/  
+void Qtx::initDefaultSurfaceFormat()
+{
+  // Settings from Paraview: 
+  // This piece of code was taken from QVTKOpenGLWidget::defaultFormat() method in
+  // order to avoid dependency of the SALOME_Session_Server on vtk libraries
+  QSurfaceFormat fmt;
+  fmt.setRenderableType(QSurfaceFormat::OpenGL);
+  fmt.setVersion(3, 2);
+  fmt.setProfile(QSurfaceFormat::CoreProfile);
+  fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+  fmt.setRedBufferSize(1);
+  fmt.setGreenBufferSize(1);
+  fmt.setBlueBufferSize(1);
+  fmt.setDepthBufferSize(1);
+  fmt.setStencilBufferSize(0);
+  fmt.setAlphaBufferSize(1);
+  fmt.setStereo(false);
+  fmt.setSamples(0);
+  
+  // Settings for OCCT viewer window:
+  fmt.setDepthBufferSize(16);
+  fmt.setStencilBufferSize(1);
+  //  fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+  QSurfaceFormat::setDefaultFormat(fmt);
+}
+#endif
 
 /*!
   \class Qtx::CmdLineArgs
