@@ -371,12 +371,36 @@ int main( int argc, char **argv )
   }
   
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-  // initialization of the X11 visual on Linux
-  QSurfaceFormat format;
-  format.setDepthBufferSize(16);
-  format.setStencilBufferSize(1);
-  format.setProfile(QSurfaceFormat::CompatibilityProfile);
-  QSurfaceFormat::setDefaultFormat(format);
+
+  // RNV: setup the default format:
+  // QSurfaceFormat should be set before creation of QApplication,  
+  // so to avoid conflicts beetween SALOME and ParaView QSurfaceFormats we should merge theirs formats
+  // (see comments below) and set the resultant format here.
+  
+  // Settings from Paraview: 
+  // This piece of code was taken from QVTKOpenGLWidget::defaultFormat() method in
+  // order to avoid dependency of the SALOME_Session_Server on vtk libraries
+  QSurfaceFormat fmt;
+  fmt.setRenderableType(QSurfaceFormat::OpenGL);
+  fmt.setVersion(3, 2);
+  fmt.setProfile(QSurfaceFormat::CoreProfile);
+  fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+  fmt.setRedBufferSize(1);
+  fmt.setGreenBufferSize(1);
+  fmt.setBlueBufferSize(1);
+  fmt.setDepthBufferSize(1);
+  fmt.setStencilBufferSize(0);
+  fmt.setAlphaBufferSize(1);
+  fmt.setStereo(false);
+  fmt.setSamples(0);
+
+  // Settings for OCCT viewer window:
+  fmt.setDepthBufferSize(16);
+  fmt.setStencilBufferSize(1);
+  //  fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
+
+  QSurfaceFormat::setDefaultFormat(fmt);
+
 #endif
 
   // Create Qt application instance;

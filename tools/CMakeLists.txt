@@ -19,10 +19,6 @@
 
 ADD_SUBDIRECTORY(dlgfactory)
 
-IF(SALOME_USE_VTKVIEWER)
-  ADD_SUBDIRECTORY(vtkEDFOverloads)            
-ENDIF()
-
 ##
 # Python-based packages, part 1 (generic)
 ##

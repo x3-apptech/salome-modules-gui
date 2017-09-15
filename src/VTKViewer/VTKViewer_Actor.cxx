@@ -74,8 +74,8 @@ VTKViewer_Actor
   myIsPreselected(false),
   myIsHighlighted(false)
 {
-  vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-                                                                 myPolygonOffsetUnits);
+  VTKViewer_Actor::GetDefaultPolygonOffsetParameters(myPolygonOffsetFactor,
+						     myPolygonOffsetUnits);
 
   for(int i = 0; i < 6; i++)
     myPassFilter.push_back(vtkPassThroughFilter::New());
@@ -271,6 +271,19 @@ VTKViewer_Actor
 {
   factor = myPolygonOffsetFactor;
   units = myPolygonOffsetUnits;
+}
+
+/*!
+  Get polygon offset parameters
+  \param factor, units  - Opengl polygon offset parameters
+*/
+void
+VTKViewer_Actor
+::GetDefaultPolygonOffsetParameters(double& factor, 
+				    double& units)
+{
+  factor = 2.0;
+  units = 2.0;
 }
 
 /*!

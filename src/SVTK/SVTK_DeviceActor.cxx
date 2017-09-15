@@ -62,8 +62,8 @@ SVTK_DeviceActor
   myRepresentation = VTKViewer::Representation::Surface;
 
   myIsResolveCoincidentTopology = true;
-  vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-                                                                 myPolygonOffsetUnits);
+  VTKViewer_Actor::GetDefaultPolygonOffsetParameters(myPolygonOffsetFactor,
+                                                     myPolygonOffsetUnits);
 
   myMapper = VTKViewer_DataSetMapper::New();
 
