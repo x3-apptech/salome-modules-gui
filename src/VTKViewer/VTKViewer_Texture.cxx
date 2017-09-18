@@ -534,7 +534,7 @@ void VTKViewer_Texture::Load(vtkRenderer *ren)
 
       // make sure using unsigned char data of color scalars type
       if (this->IsDepthTexture != 1 &&
-        (this->ColorMode ||
+        (this->MapColorScalarsThroughLookupTable ||
          scalars->GetDataType() != VTK_UNSIGNED_CHAR ))
         {
         dataPtr = this->MapScalarsToColors (scalars);
