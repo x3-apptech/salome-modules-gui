@@ -308,6 +308,7 @@ public slots:
   virtual void onRayTracing();
   virtual void onEnvTexture();
   virtual void onLightSource();
+  virtual void onPanning();
 
   virtual void activateSetRotationGravity();
   virtual void activateSetRotationSelected( double theX, double theY, double theZ );
@@ -430,6 +431,7 @@ private:
   Handle(V3d_Plane) myReserveClipPlane;
 
   viewAspectList myViewAspects;
+  bool myPanningByBtn;
 };
 
 #ifdef WIN32

@@ -276,6 +276,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   mySelectionEnabled = true;
 
   myCursorIsHand = false;
+  myPanningByBtn = false;
 
   clearViewAspects();
 }
@@ -624,6 +625,12 @@ void OCCViewer_ViewWindow::activateZoom()
   }
 }
 
+
+void OCCViewer_ViewWindow::onPanning()
+{
+  myPanningByBtn = true;
+  activatePanning();
+}
 
 /*!
   \brief Start panning operation.
@@ -1072,7 +1079,7 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
     {
       OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager() );
       bool isChained = aMgr->isChainedOperations();
-      bool isReset = !( myOperation==PANVIEW && isChained ) || theEvent->button() == Qt::RightButton;
+      bool isReset = !( myOperation==PANVIEW && myPanningByBtn && isChained ) || theEvent->button() == Qt::RightButton;
       if( isReset )
         resetState();
       break;
@@ -1242,7 +1249,7 @@ void OCCViewer_ViewWindow::createActions()
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_PAN" ) ),
                            tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
-  connect(aAction, SIGNAL(triggered()), this, SLOT(activatePanning()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onPanning()));
   toolMgr()->registerAction( aAction, PanId );
 
   // Global Panning
