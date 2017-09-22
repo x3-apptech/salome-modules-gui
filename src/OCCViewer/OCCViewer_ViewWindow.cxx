@@ -1069,8 +1069,14 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 #if OCC_VERSION_LARGE <= 0x07000000
     myViewPort->getView()->ZFitAll();
 #endif
-    resetState();
-    break;
+    {
+      OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager() );
+      bool isChained = aMgr->isChainedOperations();
+      bool isReset = !( myOperation==PANVIEW && isChained ) || theEvent->button() == Qt::RightButton;
+      if( isReset )
+        resetState();
+      break;
+    }
 
   case PANGLOBAL:
     if ( theEvent->button() == Qt::LeftButton ) {
