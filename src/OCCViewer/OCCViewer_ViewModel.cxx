@@ -125,6 +125,11 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
+
+  // create color scale
+  myColorScale = new AIS_ColorScale();
+  myColorScale->SetZLayer( Graphic3d_ZLayerId_TopOSD );
+  myColorScale->SetTransformPersistence( Graphic3d_TransformPers::FromDeprecatedParams( Graphic3d_TMF_2d, gp_Pnt(-1, -1, 0) ) );
   
   /* create trihedron */
   if ( DisplayTrihedron )
@@ -1227,6 +1232,28 @@ void OCCViewer_Viewer::setTransparency( const Handle(AIS_InteractiveObject)& obj
   myAISContext->Redisplay( obj, Standard_False, Standard_True );
   if( update )
     myV3dViewer->Update();
+}
+
+bool OCCViewer_Viewer::isColorScaleVisible() const
+{
+  return !myColorScale.IsNull() && !myAISContext.IsNull() && myAISContext->IsDisplayed( myColorScale );
+}
+
+void OCCViewer_Viewer::setColorScaleShown( const bool on )
+{
+  if ( myColorScale.IsNull() )
+    return;
+  if ( on )
+  {
+    if ( !myAISContext->IsDisplayed( myColorScale ) )
+      myAISContext->Display( myColorScale, Standard_True );
+    myAISContext->Redisplay( myColorScale, Standard_True, Standard_True );
+  }
+  else
+  {
+    if ( myAISContext->IsDisplayed( myColorScale ) )
+      myAISContext->Erase( myColorScale, Standard_True );
+  }
 }
 
 /*!
