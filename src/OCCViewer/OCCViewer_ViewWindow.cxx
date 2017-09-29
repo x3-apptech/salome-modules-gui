@@ -2248,15 +2248,28 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
 {
   bool res = false;
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  if ( format != "PS" && format != "EPS")
-   res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
 
   Handle(Graphic3d_CView) a3dView = myViewPort->getView()->View();
 
-  if (format == "PS")
+  if (format == "PS") {
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(myViewPort->getViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    int prev = aCaps->ffpEnable;
+    aCaps->ffpEnable = 1;
     res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
-  else if (format == "EPS")
+    aCaps->ffpEnable = prev;
+  }
+  else if (format == "EPS") {
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(myViewPort->getViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    int prev = aCaps->ffpEnable;
+    aCaps->ffpEnable = 1;
     res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
+    aCaps->ffpEnable = prev;
+  }
+  else {
+    res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
+  }
 
   QApplication::restoreOverrideCursor();
   return res;
