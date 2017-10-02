@@ -53,16 +53,18 @@ SalomeApp_ExceptionHandler::SalomeApp_ExceptionHandler( const bool floatSignal )
 /*!Try to call SUIT_ExceptionHandler::internalHandle(o, e), catch if failure.*/
 bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
+  bool result = true;
+
   try {
     OCC_CATCH_SIGNALS;
-    SUIT_ExceptionHandler::internalHandle( o, e );
+    result = SUIT_ExceptionHandler::internalHandle( o, e );
   }
   catch(Standard_Failure) {
     Handle(Standard_Failure) aFail = Standard_Failure::Caught();
     throw Standard_Failure( aFail->GetMessageString() );
   }
 
-  return true;
+  return result;
 }
 
 /*!Try to call handleSignals( o, e ), catch and show error message.*/
