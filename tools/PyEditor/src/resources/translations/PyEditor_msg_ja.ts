@@ -33,27 +33,27 @@
     </message>
     <message>
       <source>GR_EDIT_SET</source>
-      <translation type="unfinished">Editor settings</translation>
+      <translation>エディタの設定</translation>
     </message>
     <message>
       <source>LBL_COMPLETION_MODE</source>
-      <translation type="unfinished">Completion mode</translation>
+      <translation>完全モード</translation>
     </message>
     <message>
       <source>LBL_NONE</source>
-      <translation type="unfinished">None</translation>
+      <translation>なし</translation>
     </message>
     <message>
       <source>LBL_AUTO</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>自動</translation>
     </message>
     <message>
       <source>LBL_MANUAL</source>
-      <translation type="unfinished">Manual</translation>
+      <translation>手動</translation>
     </message>
     <message>
       <source>LBL_ALWAYS</source>
-      <translation type="unfinished">Always</translation>
+      <translation>常時</translation>
     </message>
     <message>
       <source>GR_TAB_SET</source>
@@ -252,27 +252,27 @@
     </message>
     <message>
       <source>ACT_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <source>TTP_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <source>DSC_FIND</source>
-      <translation type="unfinished">Find text</translation>
+      <translation>テキストの検索</translation>
     </message>
     <message>
       <source>ACT_REPLACE</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>置換</translation>
     </message>
     <message>
       <source>TTP_REPLACE</source>
-      <translation type="unfinished">Find &amp; Replace</translation>
+      <translation>検索と置換</translation>
     </message>
     <message>
       <source>DSC_REPLACE</source>
-      <translation type="unfinished">Find and replace text</translation>
+      <translation>テキストの検索と置換</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>
@@ -332,13 +332,11 @@
     </message>
     <message>
       <source>WRN_READ_FILE</source>
-      <translation>ファイルが読めません %1:
-%2.</translation>
+      <translation>ファイルが読めません %1:\n%2.</translation>
     </message>
     <message>
       <source>WRN_WRITE_FILE</source>
-      <translation>ファイルが書き込めません %1:
-%2.</translation>
+      <translation>ファイルが書き込めません %1:\n%2.</translation>
     </message>
     <message>
       <source>STS_READY</source>
@@ -361,50 +359,50 @@
     <name>PyEditor</name>
     <message>
       <source>PROGRAM_DESCRIPTION</source>
-      <translation>Pythonのエディタ</translation>
+      <translation>簡易 Python エディタ</translation>
     </message>
     <message>
       <source>FILE_PARAM_NAME</source>
-      <translation type="unfinished">file</translation>
+      <translation>ファイル</translation>
     </message>
     <message>
       <source>FILE_PARAM_DESCRIPTION</source>
-      <translation type="unfinished">File to edit.</translation>
+      <translation>ファイルの編集</translation>
     </message>
   </context>
   <context>
     <name>PyEditor_FindTool</name>
     <message>
       <source>FIND_LABEL</source>
-      <translation type="unfinished">Find:</translation>
+      <translation>Find:</translation>
     </message>
     <message>
       <source>REPLACE_LABEL</source>
-      <translation type="unfinished">Replace with:</translation>
+      <translation>Replace with:</translation>
     </message>
     <message>
       <source>REPLACE_BTN</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>置換</translation>
     </message>
     <message>
       <source>REPLACE_ALL_BTN</source>
-      <translation type="unfinished">Replace All</translation>
+      <translation>全て置換</translation>
     </message>
     <message>
       <source>CASE_SENSITIVE_CHECK</source>
-      <translation type="unfinished">Case Sensitive</translation>
+      <translation>大文字と小文字を区別</translation>
     </message>
     <message>
       <source>WHOLE_WORDS_CHECK</source>
-      <translation type="unfinished">Whole Words Only</translation>
+      <translation>完全に同一な単語のみ</translation>
     </message>
     <message>
       <source>REGEX_CHECK</source>
-      <translation type="unfinished">Use Regular Expressions</translation>
+      <translation>正規表現を使用</translation>
     </message>
     <message>
       <source>NB_MATCHED_LABEL</source>
-      <translation type="unfinished">%1 of %2 matches</translation>
+      <translation>%1 of %2 matches</translation>
     </message>
   </context>
 </TS>

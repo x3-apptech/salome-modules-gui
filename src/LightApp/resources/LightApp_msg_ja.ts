@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>ABOUT_COPYRIGHT</source>
-      <translation>Copyright (C) 2007-2017 CEA/DEN, EDF R&amp;D, OPEN CASCADE
+      <translation>Copyright (C) 2007-2013 CEA/DEN, EDF R&amp;D, OPEN CASCADE
 
 Copyright (C) 2003-2007 OPEN CASCADE, EADS/CCR, LIP6,
 CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translation>
@@ -1041,28 +1041,28 @@ Pythonファイルは、文字、数字、アンダースコアが含まれて�
       <translation>ライン数エリアの表示</translation>
     </message>
     <message>
-        <source>PREF_GROUP_PY_EDITOR</source>
-	<translation type="unfinished">Editor settings</translation>
+      <source>PREF_GROUP_PY_EDITOR</source>
+      <translation>エディタ設定</translation>
     </message>
     <message>
-        <source>PREF_PY_COMPLETION_MODE</source>
-	<translation type="unfinished">Completion mode</translation>
+      <source>PREF_PY_COMPLETION_MODE</source>
+      <translation>完了モード</translation>
     </message>
     <message>
-        <source>PREF_PY_NONE</source>
-	<translation type="unfinished">None</translation>
+      <source>PREF_PY_NONE</source>
+      <translation>なし</translation>
     </message>
     <message>
-        <source>PREF_PY_AUTO</source>
-	<translation type="unfinished">Auto</translation>
+      <source>PREF_PY_AUTO</source>
+      <translation>自動</translation>
     </message>
     <message>
-        <source>PREF_PY_MANUAL</source>
-	<translation type="unfinished">Manual</translation>
+      <source>PREF_PY_MANUAL</source>
+      <translation>手動</translation>
     </message>
     <message>
-        <source>PREF_PY_ALWAYS</source>
-	<translation type="unfinished">Always</translation>
+      <source>PREF_PY_ALWAYS</source>
+      <translation>常に</translation>
     </message>
     <message>
       <source>PREF_GROUP_PY_TAB</source>
