@@ -168,7 +168,7 @@
     </message>
     <message>
       <source>DSC_REPLACE</source>
-      <translation">Cherche et remplace le texte</translation>
+      <translation>Cherche et remplace le texte</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>

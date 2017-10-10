@@ -1047,7 +1047,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_PY_COMPLETION_MODE</source>
-        <translation">Mode de complétion</translation>
+        <translation>Mode de complétion</translation>
     </message>
     <message>
         <source>PREF_PY_NONE</source>
