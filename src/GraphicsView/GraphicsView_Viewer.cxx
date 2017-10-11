@@ -37,6 +37,8 @@
 #include <QKeyEvent>
 #include <QMenu>
 
+#include <math.h>
+
 // testing ImageViewer
 /*
 #include "GraphicsView_PrsImage.h"
