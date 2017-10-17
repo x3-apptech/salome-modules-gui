@@ -111,6 +111,7 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
     SalomeApp_Study* study = getStudyById( studyId );
     if ( !study )
       return aStreamFile._retn();
+    QString url = QString::fromStdString(study->studyDS()->URL());
     // - Get app
     SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( study->application() );
     if ( !app )
@@ -125,7 +126,9 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
       return aStreamFile._retn();
     // - Save data files
     QStringList dataFiles;
-    dataModel->saveAs( theURL, study, dataFiles );
+    // we use 'url' instead of 'theURL' as latter normally contains path to the tmp dir,
+    // but not actual study's URL
+    dataModel->saveAs( url, study, dataFiles );
     std::vector<std::string> names;
     foreach ( QString name, dataFiles ) {
       if ( !name.isEmpty() )
