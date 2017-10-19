@@ -17,13 +17,15 @@
   <Proxy group="sources" name="OutlineSource" />
   <Proxy group="sources" name="PlaneSource" />
   <Proxy group="sources" name="PointSource" />
+  <Proxy group="sources" name="PolyLineSource" />
   <Proxy group="sources" name="ProgrammableSource" />
+  <Proxy group="sources" name="Ruler" />
   <Proxy group="sources" name="SphereSource" />
   <Proxy group="sources" name="SplineSource" />
   <Proxy group="sources" name="SuperquadricSource" />
   <Proxy group="sources" name="TextSource" />
   <Proxy group="sources" name="TimeSource" />
-  <Proxy group="sources" name="Ruler" />
+  <Proxy group="sources" name="UnstructuredCellTypes" />
   <Proxy group="sources" name="RTAnalyticSource" />
   <Proxy group="sources" name="AMRGaussianPulseSource" />
 </ParaViewSources>
