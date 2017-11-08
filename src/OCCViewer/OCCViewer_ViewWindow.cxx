@@ -85,6 +85,7 @@
 #if OCC_VERSION_LARGE > 0x06090000
 #include <Graphic3d_StereoMode.hxx>
 #include <Graphic3d_RenderingParams.hxx>
+#include <Graphic3d_BndBox3d.hxx>
 #endif
 
 #if OCC_VERSION_MAJOR < 7
@@ -244,8 +245,8 @@ const char* imageCrossCursor[] = {
   "................................",
   "................................"};
 
-
-/*!
+ 
+  /*!
   \brief Constructor
   \param theDesktop main window of application
   \param theModel OCC 3D viewer
@@ -277,6 +278,7 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
 
   myCursorIsHand = false;
   myPanningByBtn = false;
+  myAutomaticZoom = true;
 
   clearViewAspects();
 }
@@ -714,13 +716,16 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
       continue;
 
 #if OCC_VERSION_LARGE > 0x06070100
-    Bnd_Box aBox = aStructure->MinMaxValues();
-    aXmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
-    aYmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
-    aZmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Z();
-    aXmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
-    aYmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
-    aZmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
+    Bnd_Box aBox1 = aStructure->MinMaxValues();
+    const Graphic3d_BndBox3d& aBox = aStructure->CStructure()->BoundingBox();
+    if (!aBox.IsValid())
+      continue;
+    aXmin = /*aBox.IsVoid() ? RealFirst() :*/ aBox.CornerMin().x();
+    aYmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().y();
+    aZmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().z();
+    aXmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().x();
+    aYmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().y();
+    aZmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().z();
 #else
     aStructure->MinMaxValues( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
 #endif
@@ -771,8 +776,85 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     theX /= aPointsNb;
     theY /= aPointsNb;
     theZ /= aPointsNb;
+    return true;
   }
-  return true;
+  else
+    return false;
+}
+
+bool OCCViewer_ViewWindow::computeGravityCenter1(gp_XYZ& gravityCenter)
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  Graphic3d_MapOfStructure aSetOfStructures;
+  aView3d->View()->DisplayedStructures (aSetOfStructures);
+
+  Standard_Boolean hasSelection = Standard_False;
+  for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
+    aStructIter.More(); aStructIter.Next())
+  {
+    if (aStructIter.Key()->IsHighlighted()
+      && aStructIter.Key()->IsVisible())
+    {
+      hasSelection = Standard_True;
+      break;
+    }
+  }
+
+  Standard_Real Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+  Standard_Integer aNbPoints = 0;
+  gravityCenter.SetCoord(0,0,0);
+  for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
+    aStructIter.More(); aStructIter.Next())
+  {
+    const Handle(Graphic3d_Structure)& aStruct = aStructIter.Key();
+    if (!aStruct->IsVisible()
+      || aStruct->IsInfinite()
+      || (hasSelection && !aStruct->IsHighlighted()))
+    {
+      continue;
+    }
+
+    const Graphic3d_BndBox3d& aBox = aStruct->CStructure()->BoundingBox();
+    if (!aBox.IsValid())
+    {
+      continue;
+    }
+
+    // skip transformation-persistent objects
+    if (!aStruct->TransformPersistence().IsNull())
+      continue;
+
+    // use camera projection to find gravity point
+    Xmin = aBox.CornerMin().x();
+    Ymin = aBox.CornerMin().y();
+    Zmin = aBox.CornerMin().z();
+    Xmax = aBox.CornerMax().x();
+    Ymax = aBox.CornerMax().y();
+    Zmax = aBox.CornerMax().z();
+    gp_Pnt aPnts[8] =
+    {
+      gp_Pnt (Xmin, Ymin, Zmin), gp_Pnt (Xmin, Ymin, Zmax),
+      gp_Pnt (Xmin, Ymax, Zmin), gp_Pnt (Xmin, Ymax, Zmax),
+      gp_Pnt (Xmax, Ymin, Zmin), gp_Pnt (Xmax, Ymin, Zmax),
+      gp_Pnt (Xmax, Ymax, Zmin), gp_Pnt (Xmax, Ymax, Zmax)
+    };
+
+    for (Standard_Integer aPntIt = 0; aPntIt < 8; ++aPntIt)
+    {
+      const gp_Pnt& aBndPnt    = aPnts[aPntIt];
+      const gp_Pnt  aProjected = aView3d->Camera()->Project (aBndPnt);
+      if (Abs (aProjected.X()) <= 1.0
+        && Abs (aProjected.Y()) <= 1.0)
+      {
+        gravityCenter += aBndPnt.XYZ();
+        ++aNbPoints;
+      }
+    }
+  }
+  if (aNbPoints > 0)
+    return true;
+  else 
+    return false;
 }
 
 /*!
@@ -1612,8 +1694,14 @@ void OCCViewer_ViewWindow::onFrontView()
 {
   emit vpTransformationStarted ( FRONTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xpos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Xpos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Xpos);
   emit vpTransformationFinished ( FRONTVIEW );
 }
 
@@ -1624,8 +1712,14 @@ void OCCViewer_ViewWindow::onBackView()
 {
   emit vpTransformationStarted ( BACKVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Xneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Xneg);
   emit vpTransformationFinished ( BACKVIEW );
 }
 
@@ -1636,8 +1730,14 @@ void OCCViewer_ViewWindow::onTopView()
 {
   emit vpTransformationStarted ( TOPVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zpos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Zpos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Zpos);
   emit vpTransformationFinished ( TOPVIEW );
 }
 
@@ -1648,8 +1748,14 @@ void OCCViewer_ViewWindow::onBottomView()
 {
   emit vpTransformationStarted ( BOTTOMVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Zneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Zneg);
   emit vpTransformationFinished ( BOTTOMVIEW );
 }
 
@@ -1660,8 +1766,14 @@ void OCCViewer_ViewWindow::onLeftView()
 {
   emit vpTransformationStarted ( LEFTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Yneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Yneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Yneg);
   emit vpTransformationFinished ( LEFTVIEW );
 }
 
@@ -1672,8 +1784,14 @@ void OCCViewer_ViewWindow::onRightView()
 {
   emit vpTransformationStarted ( RIGHTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Ypos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Ypos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Ypos);
   emit vpTransformationFinished ( RIGHTVIEW );
 }
 
@@ -3416,7 +3534,6 @@ bool OCCViewer_ViewWindow::isQuadBufferSupport() const
   return enable;
 }
 
-
 bool OCCViewer_ViewWindow::isOpenGlStereoSupport() const
 {
   GLboolean support[1];
@@ -3805,3 +3922,48 @@ void OCCViewer_ViewWindow::onLightSource()
       aDlg->show();
   }
 }
+
+void OCCViewer_ViewWindow::ProjAndPanToGravity(V3d_TypeOfOrientation CamOri)
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if (aView3d.IsNull())
+    return;
+  double X = 0, Y = 0, Z = 0;
+  //bool IsGr = computeGravityCenter1(gc);
+  bool IsGr = computeGravityCenter(X, Y, Z);
+  if ( !IsGr )
+    IsGr = OCCViewer_Utilities::computeSceneBBCenter(aView3d, X, Y, Z);
+  aView3d->SetProj(CamOri);
+  if (IsGr)
+  {
+    //aView3d->Update();
+    Handle(Graphic3d_Camera) Cam = aView3d->Camera();
+    gp_XYZ gp(X, Y, Z);
+    gp_Vec dir (Cam->Direction());
+    gp_Pnt eye = Cam->Eye();
+    gp_Vec V1(eye, gp);
+    Standard_Real D = dir.Dot(V1);
+    gp_Pnt ppdir = eye.Translated(D*dir);
+    gp_Vec V2(ppdir, gp);
+    gp_XYZ trEye = eye.XYZ() + V2.XYZ();
+
+    double xat, yat, zat;
+    aView3d->At(xat, yat, zat);
+    gp_Pnt At(xat, yat, zat);
+    gp_XYZ trAt = At.XYZ() + V2.XYZ();
+    aView3d->SetEye(trEye.X(), trEye.Y(), trEye.Z());
+    aView3d->SetAt(trAt.X(), trAt.Y(), trAt.Z());
+  }
+}
+
+
+bool OCCViewer_ViewWindow::isAutomaticZoom() const
+{
+  return myAutomaticZoom;
+}
+
+void OCCViewer_ViewWindow::setAutomaticZoom(const bool isOn)
+{
+  myAutomaticZoom = isOn;
+}
+
