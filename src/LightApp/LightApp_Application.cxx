@@ -246,6 +246,14 @@ int LightApp_Application::lastStudyId = 0;
 //since the 'toolbar marker' is not unique, find index of first occurrence of the
 //'toolbar marker' in the array and check that next string is name of the toolbar
 
+void LightAppCleanUpAppResources()
+{
+  if ( LightApp_Application::_prefs_ ) {
+    delete LightApp_Application::_prefs_;
+    LightApp_Application::_prefs_ = 0;
+  }
+}
+
 namespace
 {
   int getToolbarMarkerIndex( QByteArray input, const QStringList& aFlags ) {
@@ -439,6 +447,7 @@ LightApp_Application::~LightApp_Application()
   savePreferences();
   delete mySelMgr;
   delete myScreenHelper;
+  myPrefs = 0;
 }
 
 /*!Start application.*/
@@ -2128,6 +2137,7 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
   {
     _prefs_ = new LightApp_Preferences( resourceMgr() );
     that->createPreferences( _prefs_ );
+    qAddPostRoutine( LightAppCleanUpAppResources );
   }
 
   that->myPrefs = _prefs_;
