@@ -93,6 +93,11 @@ QImage SUIT_ViewWindow::dumpView()
   return QImage();
 }
 
+bool SUIT_ViewWindow::dumpViewToPSFormat(const QString& fileName)
+{
+  return false;
+}
+
 /*!
   Saves image to file according to the format
   \param image - image
@@ -171,9 +176,16 @@ void SUIT_ViewWindow::onDumpView()
 /*!
   \return filters for image files
 */
-QString SUIT_ViewWindow::filter() const
+QString SUIT_ViewWindow::filter(bool includePS) const
 {
-  return tr( "TLT_IMAGE_FILES" );
+  QString aFilter = tr( "TLT_IMAGE_FILES" );
+  if (!includePS)
+    return aFilter;
+  else
+  {
+    aFilter+=";;"+tr( "POSTSCRIPT_FILES" );
+    return aFilter;
+  }
 }
 
 /*! Reaction view window on event \a e.
@@ -187,13 +199,19 @@ bool SUIT_ViewWindow::event( QEvent* e )
     {
       // get file name
       SUIT_Application* app = myManager->study()->application();
-      QString fileName = app->getFileName( false, QString(), filter(), tr( "TLT_DUMP_VIEW" ), 0 );
+      bool IncludePs = true; //TODO for oscar only
+      QString fileName = app->getFileName( false, QString(), filter(IncludePs), tr( "TLT_DUMP_VIEW" ), 0 );
       if ( !fileName.isEmpty() )
       {
-        QImage im = dumpView();
-	QString fmt = SUIT_Tools::extension( fileName ).toUpper();
-	Qtx::Localizer loc;
-	bOk = dumpViewToFormat( im, fileName, fmt );
+        QString fmt = SUIT_Tools::extension( fileName ).toUpper();
+        if (fmt == "PS" || fmt == "EPS" )
+          bOk = dumpViewToPSFormat(fileName);
+        else
+        {
+          QImage im = dumpView();	
+          Qtx::Localizer loc;
+          bOk = dumpViewToFormat( im, fileName, fmt );
+        }
       }
       else
 	bOk = true; // cancelled

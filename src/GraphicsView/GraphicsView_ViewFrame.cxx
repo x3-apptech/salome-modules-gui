@@ -212,6 +212,15 @@ QImage GraphicsView_ViewFrame::dumpView()
 }
 
 //================================================================
+// Function : dumpViewToPSFormat
+// Purpose  : 
+//================================================================
+bool GraphicsView_ViewFrame::dumpViewToPSFormat(const QString& fileName)
+{
+  return myViewPort->dumpViewToPSFormat(fileName);
+}
+
+//================================================================
 // Function : getVisualParameters
 // Purpose  : 
 //================================================================

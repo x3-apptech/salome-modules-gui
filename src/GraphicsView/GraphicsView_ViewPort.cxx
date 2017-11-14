@@ -34,6 +34,8 @@
 #include <QRectF>
 #include <QRubberBand>
 #include <QScrollBar>
+#include <QPrinter>
+#include <QPainter>
 
 #include <math.h>
 
@@ -455,6 +457,18 @@ QImage GraphicsView_ViewPort::dumpView( bool theWholeScene,
   myScene->render( &aPainter, aTargetRect, aRect );
 
   return anImage;
+}
+
+bool GraphicsView_ViewPort::dumpViewToPSFormat(const QString& fileName)
+{
+  QPrinter printer(QPrinter::HighResolution);
+  printer.setOutputFileName(fileName);
+  QPainter painter;  
+  if (!painter.begin(&printer))
+    return false;
+  myScene->render(&painter);
+  if (!painter.end())
+    return false;;
 }
 
 //================================================================

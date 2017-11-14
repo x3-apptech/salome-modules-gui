@@ -93,6 +93,8 @@ public:
   QImage                           dumpView( bool theWholeScene = false,
                                              QSizeF theSize = QSizeF() );
 
+  bool                             dumpViewToPSFormat(const QString& fileName);
+
 public:
   // scene
   void                             setSceneGap( double theSceneGap );
