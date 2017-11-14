@@ -19,6 +19,8 @@
 
 # --- options ---
 
+INCLUDE(UseQt4Ext)
+
 # additional include directories
 INCLUDE_DIRECTORIES(${QT_INCLUDES})
 

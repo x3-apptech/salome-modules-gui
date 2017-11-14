@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQt4Ext)
+
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
