@@ -1,6 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
+    <name>GraphicsView_ViewFrame</name>
     <message>
         <source>ICON_GV_DUMP</source>
         <translation>graphics_view_dump.png</translation>
