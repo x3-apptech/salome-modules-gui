@@ -60,7 +60,7 @@ public:
   virtual QString         getVisualParameters();
   virtual void            setVisualParameters( const QString& theParameters );
 
-  void                    expandToolBarActions();
+  virtual void            expandToolBarActions();
   int                     getToolBarId();
 
 protected slots:
@@ -89,9 +89,9 @@ signals:
 
   void                    sketchingFinished( QPainterPath );
 
-private:
-  void                    createActions();
-  int                     createToolBar();
+protected:
+  virtual void            createActions();
+  virtual int             createToolBar();
 
 private:
   GraphicsView_Viewer*    myViewer;
