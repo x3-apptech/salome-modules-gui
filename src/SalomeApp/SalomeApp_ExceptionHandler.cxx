@@ -23,8 +23,6 @@
 #include "SalomeApp_ExceptionHandler.h"
 #include "Utils_CorbaException.hxx"
 
-#include "CASCatch.hxx"
-
 #include <OSD.hxx>
 
 #include <stdexcept>
@@ -55,13 +53,14 @@ bool SalomeApp_ExceptionHandler::handleSignals( QObject* o, QEvent* e )
 {
   bool result = true;
 
-  try {
+  try
+  {
     OCC_CATCH_SIGNALS;
     result = SUIT_ExceptionHandler::internalHandle( o, e );
   }
-  catch(Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    throw Standard_Failure( aFail->GetMessageString() );
+  catch( Standard_Failure& e )
+  {
+    throw Standard_Failure( e.GetMessageString() );
   }
 
   return result;
