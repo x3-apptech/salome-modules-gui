@@ -3925,14 +3925,37 @@ void OCCViewer_ViewWindow::onLightSource()
 
 void OCCViewer_ViewWindow::ProjAndPanToGravity(V3d_TypeOfOrientation CamOri)
 {
+  const bool USE_XY = true;
+
   Handle(V3d_View) aView3d = myViewPort->getView();
   if (aView3d.IsNull())
     return;
+
+  bool IsGr = false;
   double X = 0, Y = 0, Z = 0;
-  //bool IsGr = computeGravityCenter1(gc);
-  bool IsGr = computeGravityCenter(X, Y, Z);
+  if( USE_XY )
+  {
+    const double EPS = 1E-6;
+    int xp = myViewPort->width()/2, yp = myViewPort->height()/2, xp1, yp1;
+    aView3d->Convert( xp, yp, X, Y, Z );
+
+    gp_Dir d = aView3d->Camera()->Direction();
+    if( fabs( d.Z() ) > EPS )
+    {
+      double t = -Z/d.Z();
+      X += t*d.X();
+      Y += t*d.Y();
+      Z += t*d.Z();
+    }
+  }
+
+  // It is really necessary to compute gravity center even if it is not used in part of code below.
+  // Without this calculation the SetProj() method and other methods are not correct.
+  double X2, Y2, Z2;
+  IsGr = computeGravityCenter(X2, Y2, Z2);
   if ( !IsGr )
-    IsGr = OCCViewer_Utilities::computeSceneBBCenter(aView3d, X, Y, Z);
+    IsGr = OCCViewer_Utilities::computeSceneBBCenter(aView3d, X2, Y2, Z2);
+
   aView3d->SetProj(CamOri);
   if (IsGr)
   {
