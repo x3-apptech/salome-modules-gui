@@ -630,8 +630,18 @@ void OCCViewer_ViewWindow::activateZoom()
 
 void OCCViewer_ViewWindow::onPanning()
 {
-  myPanningByBtn = true;
-  activatePanning();
+  OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager() );
+  bool isChained = aMgr->isChainedOperations();
+  bool isReset = ( myPanningByBtn && isChained );
+  if( isReset )
+  {
+    resetState();
+  }
+  else
+  {
+    myPanningByBtn = true;
+    activatePanning();
+  }
 }
 
 /*!
@@ -1230,6 +1240,8 @@ void OCCViewer_ViewWindow::resetState()
 
   setTransformInProcess( false );
   setTransformRequested( NOTHING );
+
+  myPanningByBtn = false;
 }
 
 
