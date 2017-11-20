@@ -426,3 +426,27 @@ void GraphicsView_ViewFrame::contextMenuEvent( QGraphicsSceneContextMenuEvent* e
   emit contextMenuRequested( anEvent );
   delete anEvent;
 }
+
+/*!
+  \brief Handle show event.
+
+  Emits Show() signal.
+
+  \param theEvent show event
+*/
+void GraphicsView_ViewFrame::showEvent( QShowEvent* theEvent )
+{
+  emit Show( theEvent );
+}
+
+/*!
+  \brief Handle hide event.
+
+  Emits Hide() signal.
+
+  \param theEvent hide event
+*/
+void GraphicsView_ViewFrame::hideEvent( QHideEvent* theEvent )
+{
+  emit Hide( theEvent );
+}

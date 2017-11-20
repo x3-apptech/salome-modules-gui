@@ -50,7 +50,6 @@ public:
   GraphicsView_ViewFrame( SUIT_Desktop*, GraphicsView_Viewer*, QWidget* w = NULL );
   ~GraphicsView_ViewFrame();
 
-public:
   GraphicsView_Viewer*    getViewer() const { return myViewer; }
   GraphicsView_ViewPort*  getViewPort() const  { return myViewPort; }
 
@@ -62,6 +61,10 @@ public:
 
   virtual void            expandToolBarActions();
   int                     getToolBarId();
+
+public slots:
+  virtual void showEvent( QShowEvent* );
+  virtual void hideEvent( QHideEvent* );
 
 protected slots:
   void                    onViewPan();
@@ -88,6 +91,9 @@ signals:
   void                    wheeling( QGraphicsSceneWheelEvent* );
 
   void                    sketchingFinished( QPainterPath );
+
+  void Show( QShowEvent* );
+  void Hide( QHideEvent* );
 
 protected:
   virtual void            createActions();
