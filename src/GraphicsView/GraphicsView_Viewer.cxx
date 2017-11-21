@@ -66,13 +66,18 @@ GraphicsView_Viewer::~GraphicsView_Viewer()
   delete mySelector;
 }
 
+GraphicsView_ViewFrame* GraphicsView_Viewer::createViewFrame( SUIT_Desktop* theDesktop, QWidget* theWidget )
+{
+  return new GraphicsView_ViewFrame( theDesktop, this, theWidget );
+}
+
 //================================================================
 // Function : createView
 // Purpose  : 
 //================================================================
 SUIT_ViewWindow* GraphicsView_Viewer::createView( SUIT_Desktop* theDesktop )
 {
-  GraphicsView_ViewFrame* aViewFrame = new GraphicsView_ViewFrame( theDesktop, this, myWidget );
+  GraphicsView_ViewFrame* aViewFrame = createViewFrame( theDesktop, myWidget );
 
   connect( aViewFrame, SIGNAL( keyPressed( QKeyEvent* ) ),
            this, SLOT( onKeyEvent( QKeyEvent* ) ) );

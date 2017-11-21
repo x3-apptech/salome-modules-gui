@@ -81,6 +81,7 @@ signals:
 
 protected:
   virtual GraphicsView_ViewTransformer* createTransformer( int );
+  virtual GraphicsView_ViewFrame* createViewFrame( SUIT_Desktop* theDesktop, QWidget* theWidget );
 
   virtual void                  onTransformationStarted();
   virtual void                  onTransformationFinished();

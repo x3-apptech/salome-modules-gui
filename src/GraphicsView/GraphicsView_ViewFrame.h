@@ -28,7 +28,7 @@ class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
-class QtxMultiAction;
+class QAction;
 
 class SUIT_Desktop;
 
@@ -48,7 +48,7 @@ public:
 
 public:
   GraphicsView_ViewFrame( SUIT_Desktop*, GraphicsView_Viewer*, QWidget* w = NULL );
-  ~GraphicsView_ViewFrame();
+  virtual ~GraphicsView_ViewFrame();
 
   GraphicsView_Viewer*    getViewer() const { return myViewer; }
   GraphicsView_ViewPort*  getViewPort() const  { return myViewPort; }
@@ -104,8 +104,8 @@ private:
   GraphicsView_ViewPort*  myViewPort;
 
   int                     myToolBarId;
-  QtxMultiAction*         myScaleAction;
-  QtxMultiAction*         myPanAction;
+  QAction*                myScaleAction;
+  QAction*                myPanAction;
 };
 
 #endif

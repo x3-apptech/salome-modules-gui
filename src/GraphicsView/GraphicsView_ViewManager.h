@@ -36,7 +36,8 @@ class GRAPHICSVIEW_API GraphicsView_ViewManager : public SUIT_ViewManager
 
 public:
   GraphicsView_ViewManager( SUIT_Study* theStudy,
-                            SUIT_Desktop* theDesktop );
+                            SUIT_Desktop* theDesktop,
+                            SUIT_ViewModel* theModel = 0 );
   virtual ~GraphicsView_ViewManager();
 
   GraphicsView_Viewer* getViewer();
