@@ -462,13 +462,26 @@ QImage GraphicsView_ViewPort::dumpView( bool theWholeScene,
 bool GraphicsView_ViewPort::dumpViewToPSFormat(const QString& fileName)
 {
   QPrinter printer(QPrinter::HighResolution);
+  printer.setOutputFormat(QPrinter::PostScriptFormat);
   printer.setOutputFileName(fileName);
   QPainter painter;  
   if (!painter.begin(&printer))
     return false;
-  myScene->render(&painter);
+
+  QRect view( 0, 0, printer.pageRect().width(), printer.paperRect().height() );
+  QRectF bounds = myScene->itemsBoundingRect();
+    
+  if( !view.isEmpty() && !bounds.isEmpty() )
+  {
+    float SCALE = 0.5;//qMin( view.width()/bounds.width(), view.height()/bounds.height() );
+    painter.setViewport( view );
+    painter.scale( SCALE, SCALE );
+  }
+  myScene->render( &painter, QRectF( view ), bounds );
+
   if (!painter.end())
-    return false;;
+    return false;
+  return true;
 }
 
 //================================================================

@@ -57,8 +57,11 @@ SUIT_ViewManager::SUIT_ViewManager( SUIT_Study* theStudy,
 
   myId = useNewId( getType() );
 
-  connect( theDesktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-           this,       SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
+  if( theDesktop )
+  {
+    connect( theDesktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+             this,       SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
+  }
 
   myStudy = theStudy;
   if ( myStudy )
