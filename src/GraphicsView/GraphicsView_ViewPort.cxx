@@ -461,7 +461,7 @@ QImage GraphicsView_ViewPort::dumpView( bool theWholeScene,
 
 bool GraphicsView_ViewPort::dumpViewToPSFormat(const QString& fileName)
 {
-  QPrinter printer(QPrinter::HighResolution);
+  QPrinter printer(QPrinter::ScreenResolution);
   printer.setOutputFormat(QPrinter::PostScriptFormat);
   printer.setOutputFileName(fileName);
   QPainter painter;  
