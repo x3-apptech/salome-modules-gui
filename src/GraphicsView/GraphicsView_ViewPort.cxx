@@ -312,6 +312,15 @@ void GraphicsView_ViewPort::removeItem( QGraphicsItem* theItem )
   onBoundingRectChanged();
 }
 
+void GraphicsView_ViewPort::clearItems()
+{
+  myHighlightedObject = 0;
+  mySelectedObjects.clear();
+  myObjects.clear();
+  myScene->clear();
+  onBoundingRectChanged();
+}
+
 //================================================================
 // Function : getObjects
 // Purpose  : 

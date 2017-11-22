@@ -84,6 +84,7 @@ public:
   void                             addItem( QGraphicsItem* theItem );
   bool                             isItemAdded( QGraphicsItem* theItem );
   void                             removeItem( QGraphicsItem* theItem );
+  void                             clearItems();
 
   enum SortType { NoSorting, SelectedFirst, SortByZLevel };
   GraphicsView_ObjectList          getObjects( SortType theSortType = NoSorting ) const;
