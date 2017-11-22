@@ -32,6 +32,7 @@
 #include "SUIT_Application.h"
 #include "SUIT_ViewManager.h"
 #include "SUIT_ResourceMgr.h"
+#include "SUIT_FileDlg.h"
 #include "QtxActionToolMgr.h"
 #include "QtxMultiAction.h"
 
@@ -195,27 +196,33 @@ bool SUIT_ViewWindow::event( QEvent* e )
   if ( e->type() == DUMP_EVENT )
   {
     bool bOk = false;
-    if ( myManager && myManager->study() && myManager->study()->application() )
+    SUIT_Application* app = NULL;
+    if (myManager && myManager->study() && myManager->study()->application())
+      app = myManager->study()->application();
+    bool IncludePs = true;
+    QString fileName;
+    if (app)
+      fileName = app->getFileName( false, QString(), filter(IncludePs), tr( "TLT_DUMP_VIEW" ), 0 ); //old way
+    else
     {
-      // get file name
-      SUIT_Application* app = myManager->study()->application();
-      bool IncludePs = true; //TODO for oscar only
-      QString fileName = app->getFileName( false, QString(), filter(IncludePs), tr( "TLT_DUMP_VIEW" ), 0 );
-      if ( !fileName.isEmpty() )
-      {
-        QString fmt = SUIT_Tools::extension( fileName ).toUpper();
-        if (fmt == "PS" || fmt == "EPS" )
-          bOk = dumpViewToPSFormat(fileName);
-        else
-        {
-          QImage im = dumpView();	
-          Qtx::Localizer loc;
-          bOk = dumpViewToFormat( im, fileName, fmt );
-        }
-      }
-      else
-	bOk = true; // cancelled
+      QStringList fls = filter(IncludePs).split( ";;", QString::SkipEmptyParts );
+      fileName = SUIT_FileDlg::getFileName( NULL, QString(), fls, tr( "TLT_DUMP_VIEW" ), false, true );
     }
+    if ( !fileName.isEmpty() )
+    {
+      QString fmt = SUIT_Tools::extension( fileName ).toUpper();
+      if (fmt == "PS" || fmt == "EPS" )
+        bOk = dumpViewToPSFormat(fileName);
+      else
+      {
+        QImage im = dumpView();	
+        Qtx::Localizer loc;
+        bOk = dumpViewToFormat( im, fileName, fmt );
+      }
+    }
+    else
+      bOk = true; // cancelled
+
     if ( !bOk )
       SUIT_MessageBox::critical( this, tr( "ERROR" ), tr( "ERR_CANT_DUMP_VIEW" ) );
 
