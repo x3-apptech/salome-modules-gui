@@ -267,3 +267,13 @@ const PyEditor_Settings& PyEditor_Widget::settings() const
 {
   return myEditor->settings();
 }
+
+/*!
+  \brief Move editor's cursor to the given line.
+  \note Line count starts from 1.
+  \param line Line number.
+*/
+void PyEditor_Widget::setCurrentLine( int line )
+{
+  myEditor->setCurrentLine( line );
+}

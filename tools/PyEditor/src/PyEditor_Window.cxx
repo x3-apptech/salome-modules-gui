@@ -471,6 +471,16 @@ bool PyEditor_Window::saveFile( const QString& filePath, bool verbose )
   return true;
 }
 
+
+/*!
+  Get editor.
+  \return Editor widget.
+*/
+PyEditor_Widget* PyEditor_Window::editor()
+{
+  return myEditor;
+}
+
 /*!
   Slot, called when user clicks "Help" button in "Preferences" dialog box.
 */
