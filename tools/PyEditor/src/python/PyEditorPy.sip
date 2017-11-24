@@ -93,6 +93,7 @@ public slots:
   void deleteSelected();
   void append( const QString& );  
   void setText( const QString& text );
+  void setCurrentLine( int );
 
 protected:
   virtual void keyPressEvent( QKeyEvent* );
@@ -164,6 +165,8 @@ public slots:
   void setModified( bool );
 
   void setText( const QString& );
+
+  void setCurrentLine( int );
 
 signals:
   void modificationChanged( bool );

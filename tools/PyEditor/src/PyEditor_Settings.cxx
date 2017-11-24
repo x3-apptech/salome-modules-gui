@@ -64,7 +64,7 @@ PyEditor_Settings::PyEditor_Settings()
     myTabSpaceVisible( true ),
     myTabSize( 4 ),
     myFont( "Courier", 10 ),
-    myCompletionPolicy( PyEditor_Editor::Always )
+    myCompletionPolicy( PyEditor_Editor::None )
 {
 }
 

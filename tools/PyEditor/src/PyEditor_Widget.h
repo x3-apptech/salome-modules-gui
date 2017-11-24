@@ -72,6 +72,8 @@ public slots:
 
   void setText( const QString& );
 
+  void setCurrentLine( int );
+
 signals:
   void modificationChanged( bool );
   void undoAvailable( bool );
