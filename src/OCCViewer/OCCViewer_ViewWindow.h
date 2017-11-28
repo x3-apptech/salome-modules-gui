@@ -39,6 +39,7 @@ class OCCViewer_SetRotationPointDlg;
 class OCCViewer_Viewer;
 class OCCViewer_CubeAxesDlg;
 class QtxAction;
+class gp_XYZ;
 
 struct viewAspect
 {
@@ -242,6 +243,9 @@ public:
   virtual bool                    isQuadBufferSupport() const;
   virtual void                    setQuadBufferSupport( const bool );
 
+  virtual bool                    isAutomaticZoom() const;
+  virtual void                    setAutomaticZoom( const bool );
+
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
 
@@ -311,6 +315,7 @@ public slots:
   virtual void onRayTracing();
   virtual void onEnvTexture();
   virtual void onLightSource();
+  virtual void onPanning();
 
   virtual void activateSetRotationGravity();
   virtual void activateSetRotationSelected( double theX, double theY, double theZ );
@@ -370,6 +375,10 @@ protected:
 
   bool computeGravityCenter( double& theX, double& theY, double& theZ );
 
+  bool computeGravityCenter1(gp_XYZ& gravityCenter);
+
+  void ProjAndPanToGravity(V3d_TypeOfOrientation CamOri);
+
   virtual void                          onSketchingStarted();
   virtual void                          onSketchingFinished();
 
@@ -408,7 +417,7 @@ protected:
   bool                  myPaintersRedrawing;  // set to draw with external painters  
   bool                  IsSketcherStyle;
   bool                  myIsKeyFree;
-  
+  bool                  myAutomaticZoom;
   QCursor               myCursor;
 
   double myCurScale;
@@ -433,6 +442,7 @@ private:
   Handle(V3d_Plane) myReserveClipPlane;
 
   viewAspectList myViewAspects;
+  bool myPanningByBtn;
 };
 
 #ifdef WIN32

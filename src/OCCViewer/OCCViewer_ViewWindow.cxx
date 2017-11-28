@@ -82,6 +82,7 @@
 #include <Graphic3d_ExportFormat.hxx>
 #include <Graphic3d_StereoMode.hxx>
 #include <Graphic3d_RenderingParams.hxx>
+#include <Graphic3d_BndBox3d.hxx>
 
 #include <V3d_Plane.hxx>
 #include <V3d_Light.hxx>
@@ -236,8 +237,8 @@ const char* imageCrossCursor[] = {
   "................................",
   "................................"};
 
-
-/*!
+ 
+  /*!
   \brief Constructor
   \param theDesktop main window of application
   \param theModel OCC 3D viewer
@@ -268,6 +269,8 @@ OCCViewer_ViewWindow::OCCViewer_ViewWindow( SUIT_Desktop*     theDesktop,
   mySelectionEnabled = true;
 
   myCursorIsHand = false;
+  myPanningByBtn = false;
+  myAutomaticZoom = true;
 
   clearViewAspects();
 }
@@ -614,6 +617,22 @@ void OCCViewer_ViewWindow::activateZoom()
 }
 
 
+void OCCViewer_ViewWindow::onPanning()
+{
+  OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager() );
+  bool isChained = aMgr->isChainedOperations();
+  bool isReset = ( myPanningByBtn && isChained );
+  if( isReset )
+  {
+    resetState();
+  }
+  else
+  {
+    myPanningByBtn = true;
+    activatePanning();
+  }
+}
+
 /*!
   \brief Start panning operation.
 
@@ -688,13 +707,16 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     if ( aStructure->IsEmpty() || !aStructure->IsVisible() || aStructure->CStructure()->IsForHighlight )
       continue;
 
-    Bnd_Box aBox = aStructure->MinMaxValues();
-    aXmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
-    aYmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
-    aZmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Z();
-    aXmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
-    aYmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
-    aZmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
+    Bnd_Box aBox1 = aStructure->MinMaxValues();
+    const Graphic3d_BndBox3d& aBox = aStructure->CStructure()->BoundingBox();
+    if (!aBox.IsValid())
+      continue;
+    aXmin = /*aBox.IsVoid() ? RealFirst() :*/ aBox.CornerMin().x();
+    aYmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().y();
+    aZmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().z();
+    aXmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().x();
+    aYmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().y();
+    aZmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().z();
 
     // Infinite structures are skipped
     Standard_Real aLIM = ShortRealLast() - 1.0;
@@ -735,8 +757,85 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     theX /= aPointsNb;
     theY /= aPointsNb;
     theZ /= aPointsNb;
+    return true;
   }
-  return true;
+  else
+    return false;
+}
+
+bool OCCViewer_ViewWindow::computeGravityCenter1(gp_XYZ& gravityCenter)
+{
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  Graphic3d_MapOfStructure aSetOfStructures;
+  aView3d->View()->DisplayedStructures (aSetOfStructures);
+
+  Standard_Boolean hasSelection = Standard_False;
+  for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
+    aStructIter.More(); aStructIter.Next())
+  {
+    if (aStructIter.Key()->IsHighlighted()
+      && aStructIter.Key()->IsVisible())
+    {
+      hasSelection = Standard_True;
+      break;
+    }
+  }
+
+  Standard_Real Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+  Standard_Integer aNbPoints = 0;
+  gravityCenter.SetCoord(0,0,0);
+  for (Graphic3d_MapIteratorOfMapOfStructure aStructIter (aSetOfStructures);
+    aStructIter.More(); aStructIter.Next())
+  {
+    const Handle(Graphic3d_Structure)& aStruct = aStructIter.Key();
+    if (!aStruct->IsVisible()
+      || aStruct->IsInfinite()
+      || (hasSelection && !aStruct->IsHighlighted()))
+    {
+      continue;
+    }
+
+    const Graphic3d_BndBox3d& aBox = aStruct->CStructure()->BoundingBox();
+    if (!aBox.IsValid())
+    {
+      continue;
+    }
+
+    // skip transformation-persistent objects
+    if (!aStruct->TransformPersistence().IsNull())
+      continue;
+
+    // use camera projection to find gravity point
+    Xmin = aBox.CornerMin().x();
+    Ymin = aBox.CornerMin().y();
+    Zmin = aBox.CornerMin().z();
+    Xmax = aBox.CornerMax().x();
+    Ymax = aBox.CornerMax().y();
+    Zmax = aBox.CornerMax().z();
+    gp_Pnt aPnts[8] =
+    {
+      gp_Pnt (Xmin, Ymin, Zmin), gp_Pnt (Xmin, Ymin, Zmax),
+      gp_Pnt (Xmin, Ymax, Zmin), gp_Pnt (Xmin, Ymax, Zmax),
+      gp_Pnt (Xmax, Ymin, Zmin), gp_Pnt (Xmax, Ymin, Zmax),
+      gp_Pnt (Xmax, Ymax, Zmin), gp_Pnt (Xmax, Ymax, Zmax)
+    };
+
+    for (Standard_Integer aPntIt = 0; aPntIt < 8; ++aPntIt)
+    {
+      const gp_Pnt& aBndPnt    = aPnts[aPntIt];
+      const gp_Pnt  aProjected = aView3d->Camera()->Project (aBndPnt);
+      if (Abs (aProjected.X()) <= 1.0
+        && Abs (aProjected.Y()) <= 1.0)
+      {
+        gravityCenter += aBndPnt.XYZ();
+        ++aNbPoints;
+      }
+    }
+  }
+  if (aNbPoints > 0)
+    return true;
+  else 
+    return false;
 }
 
 /*!
@@ -1037,8 +1136,14 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 
   case PANVIEW:
   case ZOOMVIEW:
-    resetState();
-    break;
+    {
+      OCCViewer_ViewManager* aMgr = dynamic_cast<OCCViewer_ViewManager*>( getViewManager() );
+      bool isChained = aMgr->isChainedOperations();
+      bool isReset = !( myOperation==PANVIEW && myPanningByBtn && isChained ) || theEvent->button() == Qt::RightButton;
+      if( isReset )
+        resetState();
+      break;
+    }
 
   case PANGLOBAL:
     if ( theEvent->button() == Qt::LeftButton ) {
@@ -1103,6 +1208,8 @@ void OCCViewer_ViewWindow::resetState()
 
   setTransformInProcess( false );
   setTransformRequested( NOTHING );
+
+  myPanningByBtn = false;
 }
 
 
@@ -1204,7 +1311,7 @@ void OCCViewer_ViewWindow::createActions()
   aAction = new QtxAction(tr("MNU_PAN_VIEW"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_VIEW_PAN" ) ),
                            tr( "MNU_PAN_VIEW" ), 0, this);
   aAction->setStatusTip(tr("DSC_PAN_VIEW"));
-  connect(aAction, SIGNAL(triggered()), this, SLOT(activatePanning()));
+  connect(aAction, SIGNAL(triggered()), this, SLOT(onPanning()));
   toolMgr()->registerAction( aAction, PanId );
 
   // Global Panning
@@ -1563,8 +1670,14 @@ void OCCViewer_ViewWindow::onFrontView()
 {
   emit vpTransformationStarted ( FRONTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xpos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Xpos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Xpos);
   emit vpTransformationFinished ( FRONTVIEW );
 }
 
@@ -1575,8 +1688,14 @@ void OCCViewer_ViewWindow::onBackView()
 {
   emit vpTransformationStarted ( BACKVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Xneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Xneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Xneg);
   emit vpTransformationFinished ( BACKVIEW );
 }
 
@@ -1587,8 +1706,14 @@ void OCCViewer_ViewWindow::onTopView()
 {
   emit vpTransformationStarted ( TOPVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zpos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Zpos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Zpos);
   emit vpTransformationFinished ( TOPVIEW );
 }
 
@@ -1599,8 +1724,14 @@ void OCCViewer_ViewWindow::onBottomView()
 {
   emit vpTransformationStarted ( BOTTOMVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Zneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Zneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Zneg);
   emit vpTransformationFinished ( BOTTOMVIEW );
 }
 
@@ -1611,8 +1742,14 @@ void OCCViewer_ViewWindow::onLeftView()
 {
   emit vpTransformationStarted ( LEFTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Yneg);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Yneg);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Yneg);
   emit vpTransformationFinished ( LEFTVIEW );
 }
 
@@ -1623,8 +1760,14 @@ void OCCViewer_ViewWindow::onRightView()
 {
   emit vpTransformationStarted ( RIGHTVIEW );
   Handle(V3d_View) aView3d = myViewPort->getView();
-  if ( !aView3d.IsNull() ) aView3d->SetProj (V3d_Ypos);
-  onViewFitAll();
+  if (myAutomaticZoom)
+  {
+    if ( !aView3d.IsNull() ) 
+      aView3d->SetProj (V3d_Ypos);
+    onViewFitAll();
+  }
+  else
+    ProjAndPanToGravity(V3d_Ypos);
   emit vpTransformationFinished ( RIGHTVIEW );
 }
 
@@ -3314,7 +3457,6 @@ bool OCCViewer_ViewWindow::isQuadBufferSupport() const
   return enable;
 }
 
-
 bool OCCViewer_ViewWindow::isOpenGlStereoSupport() const
 {
   GLboolean support[1];
@@ -3606,3 +3748,71 @@ void OCCViewer_ViewWindow::setActionVisible( ActionId theId, bool isVisible )
   if( a )
     a->setVisible( isVisible );
 }
+
+void OCCViewer_ViewWindow::ProjAndPanToGravity(V3d_TypeOfOrientation CamOri)
+{
+  const bool USE_XY = true;
+
+  Handle(V3d_View) aView3d = myViewPort->getView();
+  if (aView3d.IsNull())
+    return;
+
+  bool IsGr = false;
+  double X = 0, Y = 0, Z = 0;
+  if( USE_XY )
+  {
+    const double EPS = 1E-6;
+    int xp = myViewPort->width()/2, yp = myViewPort->height()/2, xp1, yp1;
+    aView3d->Convert( xp, yp, X, Y, Z );
+
+    gp_Dir d = aView3d->Camera()->Direction();
+    if( fabs( d.Z() ) > EPS )
+    {
+      double t = -Z/d.Z();
+      X += t*d.X();
+      Y += t*d.Y();
+      Z += t*d.Z();
+    }
+  }
+
+  // It is really necessary to compute gravity center even if it is not used in part of code below.
+  // Without this calculation the SetProj() method and other methods are not correct.
+  double X2, Y2, Z2;
+  IsGr = computeGravityCenter(X2, Y2, Z2);
+  if ( !IsGr )
+    IsGr = OCCViewer_Utilities::computeSceneBBCenter(aView3d, X2, Y2, Z2);
+
+  aView3d->SetProj(CamOri);
+  if (IsGr)
+  {
+    //aView3d->Update();
+    Handle(Graphic3d_Camera) Cam = aView3d->Camera();
+    gp_XYZ gp(X, Y, Z);
+    gp_Vec dir (Cam->Direction());
+    gp_Pnt eye = Cam->Eye();
+    gp_Vec V1(eye, gp);
+    Standard_Real D = dir.Dot(V1);
+    gp_Pnt ppdir = eye.Translated(D*dir);
+    gp_Vec V2(ppdir, gp);
+    gp_XYZ trEye = eye.XYZ() + V2.XYZ();
+
+    double xat, yat, zat;
+    aView3d->At(xat, yat, zat);
+    gp_Pnt At(xat, yat, zat);
+    gp_XYZ trAt = At.XYZ() + V2.XYZ();
+    aView3d->SetEye(trEye.X(), trEye.Y(), trEye.Z());
+    aView3d->SetAt(trAt.X(), trAt.Y(), trAt.Z());
+  }
+}
+
+
+bool OCCViewer_ViewWindow::isAutomaticZoom() const
+{
+  return myAutomaticZoom;
+}
+
+void OCCViewer_ViewWindow::setAutomaticZoom(const bool isOn)
+{
+  myAutomaticZoom = isOn;
+}
+

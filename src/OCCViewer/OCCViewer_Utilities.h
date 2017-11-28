@@ -80,6 +80,8 @@ public:
    * \return \c true if the bounding box center is computed
    */
   static bool computeVisibleBBCenter( const Handle(V3d_View) theView, double& theX, double& theY, double& theZ );
+
+  static bool computeSceneBBCenter( const Handle(V3d_View) theView, double& theX, double& theY, double& theZ );
 };
 
 #endif // OCCVIEWER_UTILITIES_H

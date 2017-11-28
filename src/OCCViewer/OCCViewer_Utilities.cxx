@@ -211,3 +211,36 @@ bool OCCViewer_Utilities::computeVisibleBBCenter( const Handle(V3d_View) theView
 
   return true;
 }
+
+bool OCCViewer_Utilities::computeSceneBBCenter( const Handle(V3d_View) theView,
+                                                double& theX, double& theY, double& theZ )
+{
+  theX = 0, theY = 0, theZ = 0;
+  Bnd_Box aBox = theView->View()->MinMaxValues();
+  if (!aBox.IsVoid())
+  {
+    double Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    aBox.Get (Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+    gp_Pnt aPnts[8] =
+    {
+      gp_Pnt (Xmin, Ymin, Zmin), gp_Pnt (Xmin, Ymin, Zmax),
+      gp_Pnt (Xmin, Ymax, Zmin), gp_Pnt (Xmin, Ymax, Zmax),
+      gp_Pnt (Xmax, Ymin, Zmin), gp_Pnt (Xmax, Ymin, Zmax),
+      gp_Pnt (Xmax, Ymax, Zmin), gp_Pnt (Xmax, Ymax, Zmax)
+    };
+
+    for (Standard_Integer i = 0; i < 8; i++)
+    {
+      const gp_Pnt& aCornPnt = aPnts[i];
+      theX += aCornPnt.X();
+      theY += aCornPnt.Y();
+      theZ += aCornPnt.Z();
+    }
+
+    theX /= 8;
+    theY /= 8;
+    theZ /= 8;
+    return true;
+  }
+  return false;
+}
