@@ -18,10 +18,6 @@
         <translation>graphics_view_glpan.png</translation>
     </message>
     <message>
-        <source>ICON_GV_CURSOR_ZOOM</source>
-        <translation>graphics_view_cursor_zoom.png</translation>
-    </message>
-    <message>
         <source>ICON_GV_FITALL</source>
         <translation>graphics_view_fitall.png</translation>
     </message>
@@ -40,6 +36,13 @@
     <message>
         <source>ICON_GV_ROTATE</source>
         <translation>graphics_view_rotate.png</translation>
+    </message>
+</context>
+<context>
+    <name>GraphicsView_ViewPort</name>
+    <message>
+        <source>ICON_GV_CURSOR_ZOOM</source>
+        <translation>graphics_view_cursor_zoom.png</translation>
     </message>
 </context>
 </TS>
