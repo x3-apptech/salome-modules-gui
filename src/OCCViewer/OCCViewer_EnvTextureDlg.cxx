@@ -169,11 +169,7 @@ void OCCViewer_EnvTextureDlg::onEnvTexture( bool theIsChecked )
     onTextureChanged();
   else {
     Handle(Graphic3d_TextureEnv) aTexture;
-#if OCC_VERSION_LARGE > 0x07000000
     setEnvTexture( aTexture );
-#else
-    setEnvTexture( aTexture, V3d_TEX_ALL );
-#endif
   }
 }
 
@@ -200,11 +196,7 @@ void OCCViewer_EnvTextureDlg::onTextureChanged()
     		  << Graphic3d_NOT_ENV_LINES  << Graphic3d_NOT_ENV_ROAD;
     aTexture = new Graphic3d_TextureEnv( aTextures.at( myEnvTextureId->currentIndex() ) );
   }
-#if OCC_VERSION_LARGE > 0x07000000
   setEnvTexture( aTexture );
-#else
-  setEnvTexture( aTexture, V3d_TEX_ENVIRONMENT );
-#endif
 }
 
 /*!
@@ -232,19 +224,12 @@ void OCCViewer_EnvTextureDlg::ClickOnHelp()
 /*!
   Sets current texture environment for all view in the viewer
 */
-#if OCC_VERSION_LARGE > 0x07000000
 void OCCViewer_EnvTextureDlg::setEnvTexture( Handle(Graphic3d_TextureEnv) theTexture)
-#else
-void OCCViewer_EnvTextureDlg::setEnvTexture( Handle(Graphic3d_TextureEnv) theTexture, V3d_TypeOfSurfaceDetail theMode )
-#endif
 {
   for ( int i = OCCViewer_ViewFrame::BOTTOM_RIGHT; i <= OCCViewer_ViewFrame::TOP_RIGHT; i++ ) {
     if ( OCCViewer_ViewWindow* aViewWindow = myViewFrame->getView(i) ) {
       Handle(V3d_View) aView = aViewWindow->getViewPort()->getView();
       aView->SetTextureEnv( theTexture );
-#if OCC_VERSION_LARGE <= 0x07000000
-      aView->SetSurfaceDetail( theMode );
-#endif
       aView->Redraw();
     }
   }

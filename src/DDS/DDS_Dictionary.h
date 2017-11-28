@@ -27,14 +27,14 @@
 
 #include <LDOMString.hxx>
 
-#include <MMgt_TShared.hxx>
+#include <Standard_Transient.hxx>
 
 class LDOM_Element;
 class TCollection_AsciiString;
 
-DEFINE_STANDARD_HANDLE(DDS_Dictionary, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(DDS_Dictionary, Standard_Transient)
 
-class DDS_Dictionary : public MMgt_TShared
+class DDS_Dictionary : public Standard_Transient
 {
 public:
   Standard_EXPORT static Handle(DDS_Dictionary)  Get();
@@ -92,7 +92,7 @@ private:
   static Handle(DDS_Dictionary)                  myDictionary;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_Dictionary,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(DDS_Dictionary, Standard_Transient)
 };
 
 #endif

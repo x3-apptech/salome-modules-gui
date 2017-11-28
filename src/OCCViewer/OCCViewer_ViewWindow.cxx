@@ -52,8 +52,6 @@
 #include <QtxMultiAction.h>
 #include <QtxRubberBand.h>
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <QPainter>
 #include <QTime>
 #include <QImage>
@@ -82,14 +80,8 @@
 #include <Graphic3d_MapOfStructure.hxx>
 #include <Graphic3d_Structure.hxx>
 #include <Graphic3d_ExportFormat.hxx>
-#if OCC_VERSION_LARGE > 0x06090000
 #include <Graphic3d_StereoMode.hxx>
 #include <Graphic3d_RenderingParams.hxx>
-#endif
-
-#if OCC_VERSION_MAJOR < 7
-  #include <Visual3d_View.hxx>
-#endif
 
 #include <V3d_Plane.hxx>
 #include <V3d_Light.hxx>
@@ -410,9 +402,6 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
           int x1 = (int)( aEvent->x() + width()*delta/100 );
           int y1 = (int)( aEvent->y() + height()*delta/100 );
           myViewPort->zoom( x, y, x1, y1 );
-#if OCC_VERSION_LARGE <= 0x07000000
-          myViewPort->getView()->ZFitAll();
-#endif
           emit vpTransformationFinished ( ZOOMVIEW );
         }
       }
@@ -675,18 +664,11 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
   // the ones which lie within the screen limits
   Standard_Real aScreenLimits[4] = { 0.0, 0.0, 0.0, 0.0 };
 
-#if OCC_VERSION_LARGE > 0x06070100
   // NDC space screen limits
   aScreenLimits[0] = -1.0;
   aScreenLimits[1] =  1.0;
   aScreenLimits[2] = -1.0;
   aScreenLimits[3] =  1.0;
-#else
-  aView3d->View()->ViewMapping().WindowLimit( aScreenLimits[0],
-                                              aScreenLimits[1],
-                                              aScreenLimits[2],
-                                              aScreenLimits[3] );
-#endif
 
   Standard_Integer aPointsNb = 0;
 
@@ -706,7 +688,6 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     if ( aStructure->IsEmpty() || !aStructure->IsVisible() || aStructure->CStructure()->IsForHighlight )
       continue;
 
-#if OCC_VERSION_LARGE > 0x06070100
     Bnd_Box aBox = aStructure->MinMaxValues();
     aXmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
     aYmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
@@ -714,9 +695,6 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     aXmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
     aYmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
     aZmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
-#else
-    aStructure->MinMaxValues( aXmin, aYmin, aZmin, aXmax, aYmax, aZmax );
-#endif
 
     // Infinite structures are skipped
     Standard_Real aLIM = ShortRealLast() - 1.0;
@@ -735,16 +713,9 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     for ( Standard_Integer aPointIt = 0; aPointIt < 8; ++aPointIt ) {
       const gp_Pnt& aBBPoint = aPoints[aPointIt];
 
-#if OCC_VERSION_LARGE > 0x06070100
       gp_Pnt aProjected = aView3d->Camera()->Project( aBBPoint );
       const Standard_Real& U = aProjected.X();
       const Standard_Real& V = aProjected.Y();
-#else
-      Standard_Real U = 0.0;
-      Standard_Real V = 0.0;
-      Standard_Real W = 0.0;
-      aView3d->View()->Projects( aBBPoint.X(), aBBPoint.Y(), aBBPoint.Z(), U, V, W );
-#endif
 
       if (U >= aScreenLimits[0]
        && U <= aScreenLimits[1]
@@ -1066,9 +1037,6 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 
   case PANVIEW:
   case ZOOMVIEW:
-#if OCC_VERSION_LARGE <= 0x07000000
-    myViewPort->getView()->ZFitAll();
-#endif
     resetState();
     break;
 
@@ -1335,7 +1303,7 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setStatusTip(tr("DSC_PERSPECTIVE_MODE"));
   aAction->setCheckable(true);
   toolMgr()->registerAction( aAction, PerspectiveId );
-#if OCC_VERSION_LARGE > 0x06090000
+
   // - stereo projection
   aAction = new QtxAction(tr("MNU_STEREO_MODE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_STEREO" ) ),
                           tr( "MNU_STEREO_MODE" ), 0, this);
@@ -1343,7 +1311,7 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setCheckable(true);
   toolMgr()->registerAction( aAction, StereoId );
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onStereoType(bool)));
-#endif
+
   // - add exclusive action group
   QActionGroup* aProjectionGroup = new QActionGroup( this );
   aProjectionGroup->addAction( toolMgr()->action( OrthographicId ) );
@@ -1525,9 +1493,7 @@ void OCCViewer_ViewWindow::createToolBar()
   QtxMultiAction* aScaleAction = new QtxMultiAction( this );
   aScaleAction->insertAction( toolMgr()->action( FitAllId ) );
   aScaleAction->insertAction( toolMgr()->action( FitRectId ) );
-#if OCC_VERSION_LARGE > 0x06090000
   aScaleAction->insertAction( toolMgr()->action( FitSelectionId ) );
-#endif
   aScaleAction->insertAction( toolMgr()->action( ZoomId ) );
   toolMgr()->append( aScaleAction, tid );
 
@@ -1554,9 +1520,7 @@ void OCCViewer_ViewWindow::createToolBar()
 
     toolMgr()->append( OrthographicId, tid );
     toolMgr()->append( PerspectiveId, tid );
-#if OCC_VERSION_LARGE > 0x06090000
     toolMgr()->append( StereoId, tid );
-#endif
 
     toolMgr()->append( ResetId, tid );
   }
@@ -1721,12 +1685,10 @@ void OCCViewer_ViewWindow::onProjectionType( QAction* theAction )
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Perspective );
       aCamera->SetFOVy(30.0);
     }
-#if OCC_VERSION_LARGE > 0x06090000
     if (toolMgr()->action( StereoId )->isChecked()) {
       aCamera->SetProjectionType ( Graphic3d_Camera::Projection_Stereo );
       aCamera->SetFOVy(30.0);
     }
-#endif
     aView3d->Redraw();
     onViewFitAll();
   }
@@ -1739,7 +1701,6 @@ void OCCViewer_ViewWindow::onProjectionType( QAction* theAction )
 */
 void OCCViewer_ViewWindow::onStereoType( bool activate )
 {
-#if OCC_VERSION_LARGE > 0x06090000
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
@@ -1774,7 +1735,6 @@ void OCCViewer_ViewWindow::onStereoType( bool activate )
   if ( isQuadBufferSupport() && !isOpenGlStereoSupport() && stereoType() == QuadBuffer &&
        toolMgr()->action( StereoId )->isChecked() )
     SUIT_MessageBox::warning( 0, tr( "WRN_WARNING" ),  tr( "WRN_SUPPORT_QUAD_BUFFER" ) );
-#endif
 }
 
 /*!
@@ -1789,10 +1749,8 @@ void OCCViewer_ViewWindow::onProjectionType()
     setProjectionType( Orthographic );
   if (toolMgr()->action( PerspectiveId )->isChecked())
     setProjectionType( Perspective );
-#if OCC_VERSION_LARGE > 0x06090000
   if (toolMgr()->action( StereoId )->isChecked())
     setProjectionType( Stereo );
-#endif
   emit vpTransformationFinished( PROJECTION );
 }
 
@@ -1800,9 +1758,7 @@ void OCCViewer_ViewWindow::setProjectionType( int mode )
 {
   QtxAction* anOrthographicAction = dynamic_cast<QtxAction*>( toolMgr()->action( OrthographicId ) );
   QtxAction* aPerspectiveAction = dynamic_cast<QtxAction*>( toolMgr()->action( PerspectiveId ) );
-#if OCC_VERSION_LARGE > 0x06090000
   QtxAction* aStereoAction = dynamic_cast<QtxAction*>( toolMgr()->action( StereoId ) );
-#endif
   switch ( mode ) {
     case Orthographic:
       onProjectionType( anOrthographicAction );
@@ -1817,17 +1773,12 @@ void OCCViewer_ViewWindow::setProjectionType( int mode )
   // update action state if method is called outside
   if ( mode == Orthographic && !anOrthographicAction->isChecked() ) {
 	  anOrthographicAction->setChecked( true );
-    #if OCC_VERSION_LARGE > 0x06090000
 	  aStereoAction->setChecked( false );
-    #endif
   }
   if ( mode == Perspective && !aPerspectiveAction->isChecked() ) {
 	  aPerspectiveAction->setChecked( true );
-    #if OCC_VERSION_LARGE > 0x06090000
 	  aStereoAction->setChecked( false );
-    #endif
   }
-#if OCC_VERSION_LARGE > 0x06090000
   if ( mode == Stereo ) {
     aStereoAction->setChecked( true );
     if ( anOrthographicAction->isEnabled() ) {
@@ -1860,7 +1811,6 @@ void OCCViewer_ViewWindow::setProjectionType( int mode )
     if ( !aPerspectiveAction->isEnabled() )
       aPerspectiveAction->setEnabled( true );
   }
-#endif
 }
 
 /*!
@@ -1879,9 +1829,7 @@ void OCCViewer_ViewWindow::onFitAll()
 void OCCViewer_ViewWindow::onFitSelection()
 {
   emit vpTransformationStarted( FITSELECTION );
-#if OCC_VERSION_LARGE > 0x06090000
   myModel->getAISContext()->FitSelected( getViewPort()->getView() );
-#endif
   emit vpTransformationFinished( FITSELECTION );
 }
 
@@ -2012,7 +1960,6 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
   aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   aView3d->SetAxialScale( anItem.scaleX, anItem.scaleY, anItem.scaleZ );
 
-#if OCC_VERSION_LARGE > 0x06070100
   if ( anItem.centerX != 0.0 || anItem.centerY != 0.0 )
   {
     double anUpX = 0.0, anUpY = 0.0, anUpZ = 0.0;
@@ -2034,9 +1981,6 @@ void OCCViewer_ViewWindow::performRestoring( const viewAspect& anItem, bool base
     aView3d->SetAt( anAt.X(), anAt.Y(), anAt.Z() );
     aView3d->SetProj( anItem.projX, anItem.projY, anItem.projZ );
   }
-#else
-  aView3d->SetCenter( anItem.centerX, anItem.centerY );
-#endif
 
   if ( !baseParamsOnly ) {
 
@@ -2285,11 +2229,7 @@ QImage OCCViewer_ViewWindow::dumpView()
   QImage anImage( aWidth, aHeight, QImage::Format_ARGB32 );
   for ( int i = 0; i < aWidth; i++ ) {
     for ( int j = 0; j < aHeight; j++ ) {
-#if OCC_VERSION_LARGE > 0x07010001
       Quantity_Color pixel = aPix.PixelColor( i, j ).GetRGB();
-#else
-      Quantity_Color pixel = aPix.PixelColor( i, j );
-#endif
       QColor color = QColor::fromRgbF( pixel.Red(), pixel.Green(), pixel.Blue() );
       anImage.setPixelColor( i, j, color );
     }
@@ -2308,19 +2248,28 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
 {
   bool res = false;
   QApplication::setOverrideCursor( Qt::WaitCursor );
-  if ( format != "PS" && format != "EPS")
-   res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
 
-#if OCC_VERSION_MAJOR < 7
-  Handle(Visual3d_View) a3dView = myViewPort->getView()->View();
-#else
   Handle(Graphic3d_CView) a3dView = myViewPort->getView()->View();
-#endif
 
-  if (format == "PS")
+  if (format == "PS") {
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(myViewPort->getViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    int prev = aCaps->ffpEnable;
+    aCaps->ffpEnable = 1;
     res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
-  else if (format == "EPS")
+    aCaps->ffpEnable = prev;
+  }
+  else if (format == "EPS") {
+    Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(myViewPort->getViewer()->Driver());
+    OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
+    int prev = aCaps->ffpEnable;
+    aCaps->ffpEnable = 1;
     res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
+    aCaps->ffpEnable = prev;
+  }
+  else {
+    res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
+  }
 
   QApplication::restoreOverrideCursor();
   return res;
@@ -2360,15 +2309,9 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     gp_Pln pln (gp_Pnt(x, y, z), gp_Dir(dx, dy, dz));
     double a, b, c, d;
     pln.Coefficients(a, b, c, d);
-#if OCC_VERSION_LARGE > 0x07000000 
     Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
     Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
     if(aPlanes->Size() > 0 ) {
-#else
-    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
-    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
-    if(aPlanes.Size() > 0 ) {
-#endif
       Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetEquation(pln);
       aClipPlane->SetOn(Standard_True);
@@ -2377,13 +2320,8 @@ void OCCViewer_ViewWindow::setCuttingPlane( bool on, const double x,  const doub
     }
   }
   else {
-#if OCC_VERSION_LARGE > 0x07000000 
     Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
     Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
-#else
-    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
-    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
-#endif
     for( ;anIter.More();anIter.Next() ){
       Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
       aClipPlane->SetOn(Standard_False);
@@ -2410,13 +2348,8 @@ bool OCCViewer_ViewWindow::isCuttingPlane()
 {
   Handle(V3d_View) view = myViewPort->getView();
   bool res = false;
-#if OCC_VERSION_LARGE > 0x07000000 
   Handle(Graphic3d_SequenceOfHClipPlane) aPlanes = view->ClipPlanes();
   Graphic3d_SequenceOfHClipPlane::Iterator anIter (*aPlanes);
-#else
-    Graphic3d_SequenceOfHClipPlane aPlanes = view->GetClipPlanes();
-    Graphic3d_SequenceOfHClipPlane::Iterator anIter (aPlanes);
-#endif
   for( ;anIter.More();anIter.Next() ) {
     Handle(Graphic3d_ClipPlane) aClipPlane = anIter.Value();
     if(aClipPlane->IsOn()) {
@@ -2469,10 +2402,6 @@ viewAspect OCCViewer_ViewWindow::getViewParams() const
   params.name     = aName;
   params.isVisible= isShown;
   params.size     = size;
-
-#if OCC_VERSION_LARGE <= 0x06070100 // the property is deprecated after OCCT 6.7.1
-  aView3d->Center( params.centerX, params.centerY );
-#endif
 
   // graduated trihedron
   bool anIsVisible = false;
@@ -2534,10 +2463,6 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   QStringList data;
 
   data << QString( "scale=%1" )    .arg( params.scale,   0, 'e', 12 );
-#if OCC_VERSION_LARGE <= 0x06070100 // the property is deprecated after OCCT 6.7.1
-  data << QString( "centerX=%1" )  .arg( params.centerX, 0, 'e', 12 );
-  data << QString( "centerY=%1" )  .arg( params.centerY, 0, 'e', 12 );
-#endif
   data << QString( "projX=%1" )    .arg( params.projX,   0, 'e', 12 );
   data << QString( "projY=%1" )    .arg( params.projY,   0, 'e', 12 );
   data << QString( "projZ=%1" )    .arg( params.projZ,   0, 'e', 12 );
@@ -2836,9 +2761,6 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
             aTexture = new Graphic3d_TextureEnv( TCollection_AsciiString( et_paramValue.toStdString().c_str() ) );
           Handle(V3d_View) aView = this->getViewPort()->getView();
           aView->SetTextureEnv( aTexture );
-#if OCC_VERSION_LARGE <= 0x07000000
-          aView->SetSurfaceDetail( V3d_TEX_ENVIRONMENT );
-#endif
         }
       }
       else if ( paramName == "lightSource" )
@@ -3210,10 +3132,8 @@ int OCCViewer_ViewWindow::projectionType() const
       mode = Perspective;
     if (aCamera->ProjectionType() == Graphic3d_Camera::Projection_Orthographic)
       mode = Orthographic;
-  #if OCC_VERSION_LARGE > 0x06090000
     if (aCamera->ProjectionType() == Graphic3d_Camera::Projection_Stereo)
       mode = Stereo;
-  #endif
   }
   return mode;
 }
@@ -3222,10 +3142,8 @@ void OCCViewer_ViewWindow::setStereoType( int type )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     aParams->StereoMode = (Graphic3d_StereoMode)type;
-  #endif
   }
 }
 
@@ -3234,10 +3152,8 @@ int OCCViewer_ViewWindow::stereoType() const
   int type = QuadBuffer;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     type = (OCCViewer_ViewWindow::StereoType)aParams->StereoMode;
-  #endif
   }
   return type;
 }
@@ -3246,7 +3162,6 @@ void OCCViewer_ViewWindow::setAnaglyphFilter( int type )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     if (type == RedCyan)
       aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_RedCyan_Optimized;
@@ -3254,7 +3169,6 @@ void OCCViewer_ViewWindow::setAnaglyphFilter( int type )
       aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_YellowBlue_Optimized;
     if (type == GreenMagenta)
       aParams->AnaglyphFilter = Graphic3d_RenderingParams::Anaglyph_GreenMagenta_Simple;
-  #endif
   }
 }
 
@@ -3263,7 +3177,6 @@ int OCCViewer_ViewWindow::anaglyphFilter() const
   int type = RedCyan;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     if (aParams->AnaglyphFilter == Graphic3d_RenderingParams::Anaglyph_RedCyan_Optimized)
       type = RedCyan;
@@ -3271,7 +3184,6 @@ int OCCViewer_ViewWindow::anaglyphFilter() const
       type = YellowBlue;
     if (aParams->AnaglyphFilter == Graphic3d_RenderingParams::Anaglyph_GreenMagenta_Simple)
       type = GreenMagenta;
-  #endif
   }
   return type;
 }
@@ -3280,10 +3192,8 @@ void OCCViewer_ViewWindow::setStereographicFocus( int type, double value )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     aCamera->SetZFocus( (Graphic3d_Camera::FocusType) type, value );
-  #endif
   }
 }
 
@@ -3292,10 +3202,8 @@ int OCCViewer_ViewWindow::stereographicFocusType() const
   int type = Relative;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     type = (OCCViewer_ViewWindow::FocusIODType)aCamera->ZFocusType();
-  #endif
   }
   return type;
 }
@@ -3305,10 +3213,8 @@ double OCCViewer_ViewWindow::stereographicFocusValue() const
   double value = 1.0;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     value = aCamera->ZFocus();
-  #endif
   }
   return value;
 }
@@ -3317,10 +3223,8 @@ void OCCViewer_ViewWindow::setInterocularDistance( int type, double value )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     aCamera->SetIOD( (Graphic3d_Camera::IODType) type, value );
-  #endif
   }
 }
 
@@ -3329,10 +3233,8 @@ int OCCViewer_ViewWindow::interocularDistanceType() const
   int type = Relative;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     type = (OCCViewer_ViewWindow::FocusIODType)aCamera->GetIODType();
-  #endif
   }
   return type;
 }
@@ -3342,10 +3244,8 @@ double OCCViewer_ViewWindow::interocularDistanceValue() const
   double value = 0.05;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(Graphic3d_Camera) aCamera = aView3d->Camera();
     value = aCamera->IOD();
-  #endif
   }
   return value;
 }
@@ -3354,10 +3254,8 @@ void OCCViewer_ViewWindow::setReverseStereo( bool reverse )
 {
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     aParams->ToReverseStereo = reverse;
-  #endif
   }
 }
 
@@ -3366,10 +3264,8 @@ bool OCCViewer_ViewWindow::isReverseStereo() const
   int reverse = false;
   Handle(V3d_View) aView3d = myViewPort->getView();
   if ( !aView3d.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Graphic3d_RenderingParams* aParams = &aView3d->ChangeRenderingParams();
     reverse = aParams->ToReverseStereo;
-  #endif
   }
   return reverse;
 }
@@ -3378,11 +3274,9 @@ void OCCViewer_ViewWindow::setVSync( bool enable )
 {
   Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
   if ( !anIntCont.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     aCaps->swapInterval = enable;
-  #endif
   }
 }
 
@@ -3391,11 +3285,9 @@ bool OCCViewer_ViewWindow::isVSync() const
   int enable = true;
   Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
   if ( !anIntCont.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     enable = aCaps->swapInterval;
-  #endif
   }
   return enable;
 }
@@ -3404,11 +3296,9 @@ void OCCViewer_ViewWindow::setQuadBufferSupport( bool enable )
 {
   Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
   if ( !anIntCont.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     aCaps->contextStereo = enable;
-  #endif
   }
 }
 
@@ -3417,11 +3307,9 @@ bool OCCViewer_ViewWindow::isQuadBufferSupport() const
   int enable = true;
   Handle(AIS_InteractiveContext) anIntCont = myModel->getAISContext();
   if ( !anIntCont.IsNull() ) {
-  #if OCC_VERSION_LARGE > 0x06090000
     Handle(OpenGl_GraphicDriver) aDriver = Handle(OpenGl_GraphicDriver)::DownCast(anIntCont->CurrentViewer()->Driver());
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     enable = aCaps->contextStereo;
-  #endif
   }
   return enable;
 }
@@ -3532,7 +3420,6 @@ SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
   aProps.setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
   aProps.setViewUp( anUp[0], anUp[1], anUp[2] );
 
-#if OCC_VERSION_LARGE > 0x06070100
   aSourceView->Eye( anEye[0], anEye[1], anEye[2] );
 
   // store camera properties "as is": it is up to synchronized
@@ -3551,50 +3438,6 @@ SUIT_CameraProperties OCCViewer_ViewWindow::cameraProperties()
     aProps.setViewAngle( aSourceView->Camera()->FOVy() );
   }
   aProps.setMappingScale( aSourceView->Camera()->Scale() );
-#else
-  Standard_Real aCameraDepth = aSourceView->Depth() + aSourceView->ZSize() * 0.5;
-
-  // generate view orientation matrix for transforming OCC projection reference point
-  // into a camera (eye) position.
-  gp_Dir aLeftDir = gp_Dir( anUp[0], anUp[1], anUp[2] ) ^ gp_Dir( aProj[0], aProj[1], aProj[2] );
-
-  gp_GTrsf aTrsf;
-  aTrsf.SetValue( 1, 1, aLeftDir.X() );
-  aTrsf.SetValue( 2, 1, aLeftDir.Y() );
-  aTrsf.SetValue( 3, 1, aLeftDir.Z() );
-
-  aTrsf.SetValue( 1, 2, anUp[0] );
-  aTrsf.SetValue( 2, 2, anUp[1] );
-  aTrsf.SetValue( 3, 2, anUp[2] );
-
-  aTrsf.SetValue( 1, 3, aProj[0] );
-  aTrsf.SetValue( 2, 3, aProj[1] );
-  aTrsf.SetValue( 3, 3, aProj[2] );
-
-  aTrsf.SetValue( 1, 4, anAt[0] );
-  aTrsf.SetValue( 2, 4, anAt[1] );
-  aTrsf.SetValue( 3, 4, anAt[2] );
-
-  Graphic3d_Vertex aProjRef = aSourceView->ViewMapping().ProjectionReferencePoint();
-
-  // transform to world-space coordinate system
-  gp_XYZ aPosition( aProjRef.X(), aProjRef.Y(), aCameraDepth );
-  aTrsf.Transforms( aPosition );
-
-  // compute focal point
-  double aFocalPoint[3];
-
-  aFocalPoint[0] = aPosition.X() - aProj[0] * aCameraDepth;
-  aFocalPoint[1] = aPosition.Y() - aProj[1] * aCameraDepth;
-  aFocalPoint[2] = aPosition.Z() - aProj[2] * aCameraDepth;
-
-  aProps.setFocalPoint( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
-  aProps.setPosition( aPosition.X(), aPosition.Y(), aPosition.Z() );
-
-  Standard_Real aViewScale[2];
-  aSourceView->Size( aViewScale[0], aViewScale[1] );
-  aProps.setMappingScale( aViewScale[1] );
-#endif
 
   return aProps;
 }
@@ -3630,77 +3473,12 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   aProps.getViewUp( anUpDir[0], anUpDir[1], anUpDir[2] );
   aProps.getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
 
-#if OCC_VERSION_LARGE > 0x06070100
   aDestView->SetAt( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
   aDestView->SetEye( aPosition[0], aPosition[1], aPosition[2] );
   aDestView->SetUp( anUpDir[0], anUpDir[1], anUpDir[2] );
   aDestView->Camera()->SetScale( aProps.getMappingScale() );
-#else
-  gp_Dir aProjDir( aPosition[0] - aFocalPoint[0],
-                   aPosition[1] - aFocalPoint[1],
-                   aPosition[2] - aFocalPoint[2] );
-
-  // get custom view translation
-  Standard_Real aTranslation[3];
-  aDestView->At( aTranslation[0], aTranslation[1], aTranslation[2] );
-
-  gp_Dir aLeftDir = gp_Dir( anUpDir[0], anUpDir[1], anUpDir[2] )
-                  ^ gp_Dir( aProjDir.X(), aProjDir.Y(), aProjDir.Z() );
-
-  gp_GTrsf aTrsf;
-  aTrsf.SetValue( 1, 1, aLeftDir.X() );
-  aTrsf.SetValue( 2, 1, aLeftDir.Y() );
-  aTrsf.SetValue( 3, 1, aLeftDir.Z() );
-
-  aTrsf.SetValue( 1, 2, anUpDir[0] );
-  aTrsf.SetValue( 2, 2, anUpDir[1] );
-  aTrsf.SetValue( 3, 2, anUpDir[2] );
-
-  aTrsf.SetValue( 1, 3, aProjDir.X() );
-  aTrsf.SetValue( 2, 3, aProjDir.Y() );
-  aTrsf.SetValue( 3, 3, aProjDir.Z() );
-
-  aTrsf.SetValue( 1, 4, aTranslation[0] );
-  aTrsf.SetValue( 2, 4, aTranslation[1] );
-  aTrsf.SetValue( 3, 4, aTranslation[2] );
-  aTrsf.Invert();
-
-  // transform to view-space coordinate system
-  gp_XYZ aProjRef( aPosition[0], aPosition[1], aPosition[2] );
-  aTrsf.Transforms( aProjRef );
-
-  // set view camera properties using low-level approach. this is done
-  // in order to avoid interference with static variables in v3d view used
-  // when rotation is in process in another view.
-  Visual3d_ViewMapping aMapping = aDestView->View()->ViewMapping();
-  Visual3d_ViewOrientation anOrientation = aDestView->View()->ViewOrientation();
-
-  Graphic3d_Vector aMappingProj( aProjDir.X(), aProjDir.Y(), aProjDir.Z() );
-  Graphic3d_Vector aMappingUp( anUpDir[0], anUpDir[1], anUpDir[2] );
-
-  aMappingProj.Normalize();
-  aMappingUp.Normalize();
-
-  anOrientation.SetViewReferencePlane( aMappingProj );
-  anOrientation.SetViewReferenceUp( aMappingUp );
-
-  aDestView->SetViewMapping( aMapping );
-  aDestView->SetViewOrientation( anOrientation );
-
-  // set panning
-  aDestView->SetCenter( aProjRef.X(), aProjRef.Y() );
-
-  // set mapping scale
-  double aMapScaling = aProps.getMappingScale();
-  Standard_Real aWidth, aHeight;
-  aDestView->Size( aWidth, aHeight );
-  aDestView->SetSize ( aWidth > aHeight ? aMapScaling * (aWidth / aHeight) : aMapScaling );
-#endif
 
   getViewPort()->setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
-#if OCC_VERSION_LARGE <= 0x07000000
-  aDestView->ZFitAll();
-#endif
   aDestView->SetImmediateUpdate( Standard_True );
   aDestView->Redraw();
 

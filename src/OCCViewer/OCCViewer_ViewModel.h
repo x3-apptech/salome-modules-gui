@@ -34,6 +34,7 @@
 #include "SUIT_ViewModel.h"
 
 #include <V3d_View.hxx>
+#include <AIS_ColorScale.hxx>
 #include <AIS_Trihedron.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -111,6 +112,9 @@ public:
   Qtx::BackgroundData             background(int theViewId) const;
   void                            setBackground( int theViewId, const Qtx::BackgroundData& );
 
+  bool                            isColorScaleVisible() const;
+  virtual void                    setColorScaleShown( const bool );
+
   //! returns true if 3d Trihedron in viewer was created
   bool                            trihedronActivated() const { return !myTrihedron.IsNull(); }
 
@@ -138,6 +142,7 @@ public:
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
   Handle(AIS_InteractiveContext)  getAISContext()  const { return myAISContext; }
+  Handle(AIS_ColorScale)          getColorScale()  const { return myColorScale; }
   Handle(AIS_Trihedron)           getTrihedron()   const { return myTrihedron; }
 
   int                             getTopLayerId();
@@ -240,7 +245,7 @@ protected slots:
 protected:
 
   Handle(V3d_Viewer)              myV3dViewer;
-
+  Handle(AIS_ColorScale)          myColorScale;
   Handle(AIS_Trihedron)           myTrihedron;
   Handle(AIS_InteractiveContext)  myAISContext;
 

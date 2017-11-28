@@ -68,6 +68,7 @@ void VTKViewer_OpenGLRenderer::SetGradientType( const int theGradientType )
 
 void VTKViewer_OpenGLRenderer::Clear(void)
 {
+  vtkOpenGLRenderer::Clear();
 #ifdef VTK_OPENGL2
   if (this->OpenGLHelper.IsInitialized())
   {

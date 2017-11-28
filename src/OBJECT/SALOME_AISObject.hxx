@@ -42,7 +42,7 @@ public:
   Standard_EXPORT virtual void setName(const Standard_CString aName) = 0;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_AISObject,AIS_InteractiveObject)
+  DEFINE_STANDARD_RTTIEXT(SALOME_AISObject, AIS_InteractiveObject)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_AISObject, AIS_InteractiveObject)

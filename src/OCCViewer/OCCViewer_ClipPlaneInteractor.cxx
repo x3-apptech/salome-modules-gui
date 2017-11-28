@@ -220,10 +220,10 @@ bool OCCViewer_ClipPlaneInteractor::startDragging( const QPoint& thePickPos,
 
   gp_Pnt aPickPoint = aFindPick.Point( 1 );
 
-  const gp_Dir& aPlaneN      = aPlanePln.Axis().Direction();
-  const gp_Dir& aPlaneX      = aPlanePln.XAxis().Direction();
-  const gp_Dir& aPlaneY      = aPlanePln.YAxis().Direction();
-  const gp_Pnt& aPlaneCenter = aPlanePln.Location();
+  gp_Dir aPlaneN      = aPlanePln.Axis().Direction();
+  gp_Dir aPlaneX      = aPlanePln.XAxis().Direction();
+  gp_Dir aPlaneY      = aPlanePln.YAxis().Direction();
+  gp_Pnt aPlaneCenter = aPlanePln.Location();
 
   switch ( theDragOp )
   {
@@ -615,6 +615,7 @@ bool OCCViewer_ClipPlaneInteractor::mouseRelease( QMouseEvent* theEvent,
   myInteractedPlane = NULL;
   myIsDraggable     = false;
   myIsClickable     = false;
+  myViewer->getAISContext()->ClearSelected( Standard_True );
   return true;
 }
 

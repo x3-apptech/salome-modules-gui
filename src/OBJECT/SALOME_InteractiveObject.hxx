@@ -23,18 +23,16 @@
 #ifndef SALOME_INTERACTIVEOBJECT_HXX
 #define SALOME_INTERACTIVEOBJECT_HXX
 
-#include <MMgt_TShared.hxx>
 #include <Standard.hxx>
+#include <Standard_Transient.hxx>
 #include <Standard_DefineHandle.hxx>
-
-#include <Basics_OCCTVersion.hxx>
 
 #include <string>
 
 class SALOME_InteractiveObject;
-DEFINE_STANDARD_HANDLE(SALOME_InteractiveObject, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(SALOME_InteractiveObject, Standard_Transient)
 
-class SALOME_InteractiveObject : public MMgt_TShared
+class SALOME_InteractiveObject : public Standard_Transient
 {
 public:
   Standard_EXPORT   SALOME_InteractiveObject();
@@ -71,7 +69,7 @@ protected:
   std::string myReference;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_InteractiveObject,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(SALOME_InteractiveObject, Standard_Transient)
 };
 
 #endif // SALOME_INTERACTIVEOBJECT_HXX

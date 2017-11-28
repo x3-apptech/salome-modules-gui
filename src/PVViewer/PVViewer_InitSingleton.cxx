@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2016  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,28 +16,23 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony GEAY (EDF R&D)
 
-#ifndef __vtkEDFFactory_h
-#define __vtkEDFFactory_h
+#include "PVViewer_InitSingleton.h"
+#include "PVViewer_Core.h"
+#include "PVViewer_ViewManager.h"
 
-#include "vtkEDFOverloadsDefines.h"
-#include "vtkObjectFactory.h"
+bool PVViewer_InitSingleton::IS_INIT=false;
 
-class VTKEDF_OVERLOADS_EXPORT vtkEDFFactory : public vtkObjectFactory
+void PVViewer_InitSingleton::Init(QMainWindow *aDesktop, LogWindow *logWindow)
 {
-public:
-// Methods from vtkObject
-  vtkTypeMacro(vtkEDFFactory,vtkObjectFactory);
-  static vtkEDFFactory *New();
-
-  virtual const char* GetVTKSourceVersion();
-  virtual const char* GetDescription();
-protected:
-  vtkEDFFactory();
-private:
-  vtkEDFFactory(const vtkEDFFactory&);  // Not implemented.
-  void operator=(const vtkEDFFactory&);  // Not implemented.
-};
-
-extern "C" VTK_EXPORT vtkObjectFactory* vtkLoad();
-#endif
+  if(IS_INIT)
+    return ;
+  PVViewer_Core::ParaviewInitApp(aDesktop,logWindow);
+  // Finish ParaView set up: behaviors, connection and configurations.
+  const QString configPath(PVViewer_ViewManager::GetPVConfigPath());
+  PVViewer_Core::ParaviewInitBehaviors(true,aDesktop);
+  PVViewer_ViewManager::ConnectToExternalPVServer(aDesktop);
+  PVViewer_Core::ParaviewLoadConfigurations(configPath);
+  IS_INIT=true;
+}

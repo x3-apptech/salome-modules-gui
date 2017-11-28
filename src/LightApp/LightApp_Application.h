@@ -343,6 +343,8 @@ protected:
 
   static int                          lastStudyId;
   QStringList                         myUserWmTypes;
+
+  friend void LightAppCleanUpAppResources();
 };
 
 #ifdef WIN32

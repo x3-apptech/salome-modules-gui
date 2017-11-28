@@ -148,27 +148,27 @@
     </message>
     <message>
       <source>ACT_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <source>TTP_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <source>DSC_FIND</source>
-      <translation type="unfinished">Find text</translation>
+      <translation>テキストの検索</translation>
     </message>
     <message>
       <source>ACT_REPLACE</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>置換</translation>
     </message>
     <message>
       <source>TTP_REPLACE</source>
-      <translation type="unfinished">Find &amp; Replace</translation>
+      <translation>検索と置換</translation>
     </message>
     <message>
       <source>DSC_REPLACE</source>
-      <translation type="unfinished">Find and replace text</translation>
+      <translation>テキストの検索と置換</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>

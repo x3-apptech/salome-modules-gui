@@ -22,7 +22,7 @@
 
 #include "DDS_KeyWords.h"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, Standard_Transient)
 
 /*!
   \class DDS_KeyWords
@@ -87,7 +87,7 @@ OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_KeyWords, MMgt_TShared)
   Use Get() method instead.
 */
 DDS_KeyWords::DDS_KeyWords()
-: MMgt_TShared()
+: Standard_Transient()
 {
   SetKeyWord( "D_URI",                "dictionary" );
 

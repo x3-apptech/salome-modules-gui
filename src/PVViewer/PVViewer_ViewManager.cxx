@@ -23,6 +23,7 @@
 #include "PVViewer_ViewModel.h"
 #include "PVViewer_GUIElements.h"
 #include "PVViewer_Core.h"
+#include "PVViewer_InitSingleton.h"
 #include "PVServer_ServiceWrapper.h"
 
 #include <utilities.h>
@@ -49,7 +50,7 @@ PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* des
   setTitle( tr( "PARAVIEW_VIEW_TITLE" ) );
 
   // Initialize minimal paraview stuff (if not already done)
-  PVViewer_Core::ParaviewInitApp(desk, logWindow);
+  PVViewer_InitSingleton::Init(desk, logWindow);
 
   connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );

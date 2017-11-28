@@ -27,15 +27,9 @@
 #include "QtxActionToolMgr.h"
 #include "QtxMultiAction.h"
 
-// KERNEL includes
-#include <Basics_OCCTVersion.hxx>
-
 // OCC includes
 #include <V3d_View.hxx>
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
-#if OCC_VERSION_LARGE < 0x07000000
-#include <Visual3d_View.hxx>
-#endif
 
 // QT includes
 #include <QImage>
@@ -52,7 +46,6 @@ Handle(Image_PixMap) OCCViewer_Utilities::imageToPixmap( const QImage& anImage )
     const uchar* aImageBytes = anImage.bits();
       
     for ( int aLine = anImage.height() - 1; aLine >= 0; --aLine ) {
-#if OCC_VERSION_LARGE > 0x06070100
       // convert pixels from ARGB to renderer-compatible RGBA
       for ( int aByte = 0; aByte < anImage.width(); ++aByte ) {
 	    Image_ColorBGRA& aPixmapBytes = aPixmap->ChangeValue<Image_ColorBGRA>(aLine, aByte);
@@ -62,18 +55,6 @@ Handle(Image_PixMap) OCCViewer_Utilities::imageToPixmap( const QImage& anImage )
 	    aPixmapBytes.r() = (Standard_Byte) *aImageBytes++;
 	    aPixmapBytes.a() = (Standard_Byte) *aImageBytes++;
 	  }
-#else
-	  Image_ColorBGRA* aPixmapBytes = aPixmap->EditData<Image_ColorBGRA>().ChangeRow(aLine);
-	
-      // convert pixels from ARGB to renderer-compatible RGBA
-      for ( int aByte = 0; aByte < anImage.width(); ++aByte ) {
-	    aPixmapBytes->b() = (Standard_Byte) *aImageBytes++;
-	    aPixmapBytes->g() = (Standard_Byte) *aImageBytes++;
-	    aPixmapBytes->r() = (Standard_Byte) *aImageBytes++;
-	    aPixmapBytes->a() = (Standard_Byte) *aImageBytes++;
-	    aPixmapBytes++;
-      }
-#endif
     }
   }
   return aPixmap;
@@ -173,7 +154,6 @@ bool OCCViewer_Utilities::computeVisibleBounds( const Handle(V3d_View) theView,
          aStructure->IsInfinite() || aStructure->CStructure()->IsForHighlight )
       continue;
     double aBounds[6];
-#if OCC_VERSION_LARGE > 0x06070100
     Bnd_Box aBox = aStructure->MinMaxValues();
     aBounds[0] = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
     aBounds[2] = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
@@ -181,10 +161,6 @@ bool OCCViewer_Utilities::computeVisibleBounds( const Handle(V3d_View) theView,
     aBounds[1] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
     aBounds[3] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
     aBounds[5] = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
-#else
-    aStructure->MinMaxValues( aBounds[0], aBounds[2], aBounds[4],
-                              aBounds[1], aBounds[3], aBounds[5] );
-#endif
 
     if ( aBounds[0] > -DBL_MAX && aBounds[1] < DBL_MAX &&
          aBounds[2] > -DBL_MAX && aBounds[3] < DBL_MAX &&

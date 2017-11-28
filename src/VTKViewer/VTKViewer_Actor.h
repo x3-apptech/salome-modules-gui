@@ -257,6 +257,12 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   void
   GetPolygonOffsetParameters(double& factor, 
                              double& units);
+  
+  //! Get default ResolveCoincidentTopology parameters
+  static 
+  void
+  GetDefaultPolygonOffsetParameters(double& factor, 
+				    double& units);
 
   virtual
   void

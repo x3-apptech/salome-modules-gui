@@ -22,26 +22,21 @@
 
 #include "ViewerData_AISShape.hxx"
 
-#ifdef USE_TEXTURED_SHAPE
-  OCCT_IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_TexturedShape)
-#else
-  OCCT_IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_Shape)
-#endif
+IMPLEMENT_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_ColoredShape)
 
 /*!
-  Constructor
-  \param shape - TopoDS shape 
+  Constructor.
+  \param shape Shape to manage.
 */
-ViewerData_AISShape::ViewerData_AISShape (const TopoDS_Shape& theShape)
-: BASE_SHAPE (theShape),
-  myIsClippable (true)
+ViewerData_AISShape::ViewerData_AISShape(const TopoDS_Shape& theShape)
+: AIS_ColoredShape(theShape),
+  myIsClippable(true)
 {
 }
 
 /*!
-  Destructor
+  Destructor.
 */
 ViewerData_AISShape::~ViewerData_AISShape()
 {
 }
-
