@@ -36,7 +36,7 @@ class GRAPHICSVIEW_API GraphicsView_Object : public QGraphicsItemGroup
 {
 public:
   GraphicsView_Object( QGraphicsItem* theParent = 0 );
-  ~GraphicsView_Object();
+  virtual ~GraphicsView_Object();
 
   virtual void               compute() = 0;
 

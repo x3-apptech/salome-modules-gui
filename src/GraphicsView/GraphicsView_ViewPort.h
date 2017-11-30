@@ -77,7 +77,7 @@ public:
 
 public:
   GraphicsView_ViewPort( QWidget* theParent );
-  ~GraphicsView_ViewPort();
+  virtual ~GraphicsView_ViewPort();
 
 public:
   GraphicsView_Scene*              getScene() { return myScene; }

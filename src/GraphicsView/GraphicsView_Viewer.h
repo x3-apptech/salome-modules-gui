@@ -53,7 +53,7 @@ public:
                        Zoom, PanGlobal, Pan, FitWidth, UserTransform = 100 };
 public:
   GraphicsView_Viewer( const QString& title, QWidget* widget = NULL );
-  ~GraphicsView_Viewer();
+  virtual ~GraphicsView_Viewer();
 
 public:
   virtual SUIT_ViewWindow*      createView( SUIT_Desktop* );
