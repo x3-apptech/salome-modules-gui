@@ -149,7 +149,8 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
   myIsDragPositionInitialized( false ),
   myIsPulling( false ),
   myPullingObject( 0 ),
-  myStoredCursor( Qt::ArrowCursor )
+  myStoredCursor( Qt::ArrowCursor ),
+  myZoomCoeff( 100 )
 {
   // scene
   myScene = new GraphicsView_Scene( this );
@@ -888,7 +889,7 @@ void GraphicsView_ViewPort::zoom( double theX1, double theY1, double theX2, doub
   double aM22 = aTransform.m22();
   // increasing of diagonal coefficients (>300) leads to a crash sometimes
   // at the values of 100 some primitives are drawn incorrectly
-  if( qMax( aM11, aM22 ) < 100 )
+  if( myZoomCoeff < 0 || qMax( aM11, aM22 ) < myZoomCoeff )
     setTransform( aTransform );
 
   myIsTransforming = false;
@@ -1000,6 +1001,15 @@ void GraphicsView_ViewPort::applyTransform()
   while( anIter.hasNext() )
     if( GraphicsView_Object* anObject = anIter.next() )
       anObject->setViewTransform( transform() );
+}
+
+//================================================================
+// Function : setZoomCoeff
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setZoomCoeff( const int& theZoomCoeff )
+{
+  myZoomCoeff = theZoomCoeff;
 }
 
 //================================================================

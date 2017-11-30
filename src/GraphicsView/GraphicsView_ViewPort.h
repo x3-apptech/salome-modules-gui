@@ -161,6 +161,9 @@ public:
 
   void                             applyTransform();
 
+  int                              zoomCoeff() const { return myZoomCoeff; }
+  void                             setZoomCoeff( const int& theZoomCoeff );
+
   // block status
   BlockStatus                      currentBlock();
 
@@ -331,6 +334,9 @@ private:
 
   // cursor
   QCursor                          myStoredCursor;
+
+  // zoom diagonal coefficient
+  int                              myZoomCoeff;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( GraphicsView_ViewPort::InteractionFlags )
