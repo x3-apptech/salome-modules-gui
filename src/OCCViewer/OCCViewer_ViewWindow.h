@@ -274,6 +274,8 @@ public:
 
   virtual SUIT_CameraProperties   cameraProperties();
 
+  void resetState();
+
 public slots:
   virtual void onFrontView();
   virtual void onViewFitAll();
@@ -359,7 +361,6 @@ protected:
   void vpMouseReleaseEvent(QMouseEvent* theEvent);
   void vpMouseMoveEvent(QMouseEvent* theEvent);
 
-  void resetState();
   void drawRect();
   void endDrawRect();
 
