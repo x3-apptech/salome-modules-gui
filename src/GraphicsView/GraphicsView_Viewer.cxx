@@ -404,7 +404,9 @@ void GraphicsView_Viewer::handleMousePress( QGraphicsSceneMouseEvent* e )
       }
       else if( e->button() == Qt::LeftButton &&
                !( aViewPort->currentBlock() & GraphicsView_ViewPort::BS_Selection ) &&
-               !aViewPort->getHighlightedObject() )
+               !aViewPort->getHighlightedObject() &&
+               ( !aViewPort->isDraggingSelectedByLeftButton() ||
+                 aViewPort->isDraggingSelectedByLeftButton() && aViewPort->nbSelected() == 0 ) )
       {
         // Start rectangular selection if pulling was not started
         QPoint p = aViewPort->mapFromScene( e->scenePos() );

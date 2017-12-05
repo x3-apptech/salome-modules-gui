@@ -205,6 +205,9 @@ public:
   // dragging
   bool                             isDragging() { return myIsDragging; }
 
+  bool                             isDraggingSelectedByLeftButton() const { return myDraggingSelectedByLeftButton; }
+  void                             setDraggingSelectedByLeftButton( const bool& theValue );
+
   // pulling
   bool                             startPulling( const QPointF& );
   void                             drawPulling( const QPointF& );
@@ -327,6 +330,7 @@ private:
   int                              myIsDragging;
   QPointF                          myDragPosition;
   bool                             myIsDragPositionInitialized;
+  bool                             myDraggingSelectedByLeftButton;
 
   // pulling
   bool                             myIsPulling;

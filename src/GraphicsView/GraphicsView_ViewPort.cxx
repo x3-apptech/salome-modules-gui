@@ -147,6 +147,7 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
   myIsSketchingByPath( false ),
   myIsDragging( false ),
   myIsDragPositionInitialized( false ),
+  myDraggingSelectedByLeftButton( false ),
   myIsPulling( false ),
   myPullingObject( 0 ),
   myStoredCursor( Qt::ArrowCursor ),
@@ -1509,6 +1510,15 @@ bool GraphicsView_ViewPort::isSketching( bool* theIsPath ) const
 }
 
 //================================================================
+// Function : setDraggingSelectedByLeftButton
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setDraggingSelectedByLeftButton( const bool& theValue )
+{
+  myDraggingSelectedByLeftButton = theValue;
+}
+
+//================================================================
 // Function : dragObjects
 // Purpose  : 
 //================================================================
@@ -1535,8 +1545,9 @@ void GraphicsView_ViewPort::dragObjects( QGraphicsSceneMouseEvent* e )
     else
       anObjectsToMove.append( anObject );
   }
-  else if( hasInteractionFlag( DraggingByMiddleButton ) &&
-           nbSelected() && ( e->buttons() & Qt::MidButton ) )
+  else if( ( hasInteractionFlag( DraggingByMiddleButton ) && ( e->buttons() & Qt::MidButton ) ||
+             isDraggingSelectedByLeftButton() && ( e->buttons() & Qt::LeftButton ) ) &&
+           nbSelected() )
   {
     for( initSelected(); moreSelected(); nextSelected() )
       if( GraphicsView_Object* aMovingObject = selectedObject() )
@@ -1731,8 +1742,9 @@ void GraphicsView_ViewPort::onMouseEvent( QGraphicsSceneMouseEvent* e )
         if( ( getHighlightedObject() &&
               getHighlightedObject()->isMovable() &&
               !( anAccel || e->button() != Qt::LeftButton ) ) ||
-            ( hasInteractionFlag( DraggingByMiddleButton ) &&
-              nbSelected() && !anAccel && e->button() == Qt::MidButton ) )
+            ( ( hasInteractionFlag( DraggingByMiddleButton ) && e->button() == Qt::MidButton ||
+                isDraggingSelectedByLeftButton() && e->button() == Qt::LeftButton ) &&
+              nbSelected() && !anAccel ) )
         {
           myIsDragging = true;
           myStoredCursor = cursor();
