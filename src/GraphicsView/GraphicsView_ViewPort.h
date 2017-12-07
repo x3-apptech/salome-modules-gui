@@ -164,6 +164,9 @@ public:
   int                              zoomCoeff() const { return myZoomCoeff; }
   void                             setZoomCoeff( const int& theZoomCoeff );
 
+  bool                             isUnlimitedPanning() const { return myUnlimitedPanning; }
+  void                             setUnlimitedPanning( const bool& theValue );
+
   // block status
   BlockStatus                      currentBlock();
 
@@ -302,6 +305,10 @@ private:
   // transformation
   bool                             myIsTransforming;
   QTransform                       myCurrentTransform;
+
+  bool                             myUnlimitedPanning;
+  Qt::ScrollBarPolicy              myHBarPolicy;
+  Qt::ScrollBarPolicy              myVBarPolicy;
 
   // highlighting
   GraphicsView_Object*             myHighlightedObject;

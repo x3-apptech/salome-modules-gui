@@ -134,6 +134,7 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
   myForegroundItem( 0 ),
   myGridItem( 0 ),
   myIsTransforming( false ),
+  myUnlimitedPanning( false ),
   myHighlightedObject( 0 ),
   myHighlightX( 0 ),
   myHighlightY( 0 ),
@@ -194,6 +195,9 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
                   QPainter::TextAntialiasing |
                   QPainter::SmoothPixmapTransform |
                   QPainter::HighQualityAntialiasing );
+
+  myHBarPolicy = horizontalScrollBarPolicy();
+  myVBarPolicy = verticalScrollBarPolicy();
 
   connect( myScene, SIGNAL( gsKeyEvent( QKeyEvent* ) ),
            this, SLOT( onKeyEvent( QKeyEvent* ) ) );
@@ -843,9 +847,29 @@ void GraphicsView_ViewPort::pan( double theDX, double theDY )
     myViewLabel->setAcceptMoveEvents( false );
 
   if( QScrollBar* aHBar = horizontalScrollBar() )
+  {
+    if( isUnlimitedPanning() )
+    {
+      int aNewValue = aHBar->value() - theDX;
+      if( aNewValue < aHBar->minimum() )
+        aHBar->setMinimum( aNewValue );
+      if( aNewValue > aHBar->maximum() )
+        aHBar->setMaximum( aNewValue );
+    }
     aHBar->setValue( aHBar->value() - theDX );
+  }
   if( QScrollBar* aVBar = verticalScrollBar() )
+  {
+    if( isUnlimitedPanning() )
+    {
+      int aNewValue = aVBar->value() + theDY;
+      if( aNewValue < aVBar->minimum() )
+        aVBar->setMinimum( aNewValue );
+      if( aNewValue > aVBar->maximum() )
+        aVBar->setMaximum( aNewValue );
+    }
     aVBar->setValue( aVBar->value() + theDY );
+  }
 
   if( myViewLabel )
     myViewLabel->setAcceptMoveEvents( true );
@@ -1011,6 +1035,29 @@ void GraphicsView_ViewPort::applyTransform()
 void GraphicsView_ViewPort::setZoomCoeff( const int& theZoomCoeff )
 {
   myZoomCoeff = theZoomCoeff;
+}
+
+//================================================================
+// Function : setUnlimitedPanning
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setUnlimitedPanning( const bool& theValue )
+{
+  myUnlimitedPanning = theValue;
+
+  if( myUnlimitedPanning )
+  {
+    myHBarPolicy = horizontalScrollBarPolicy();
+    myVBarPolicy = verticalScrollBarPolicy();
+
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+  }
+  else
+  {
+    setHorizontalScrollBarPolicy( myHBarPolicy );
+    setVerticalScrollBarPolicy( myVBarPolicy );
+  }
 }
 
 //================================================================
