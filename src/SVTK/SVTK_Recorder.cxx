@@ -396,7 +396,7 @@ SVTK_Recorder
     return;
   }
   myFilter->UpdateInformation();
-  myFilter->SetUpdateExtentToWholeExtent();
+  //myFilter->SetUpdateExtentToWholeExtent();
   myFilter->Update();
 }
 
