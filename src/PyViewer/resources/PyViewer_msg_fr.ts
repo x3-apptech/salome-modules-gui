@@ -148,27 +148,27 @@
     </message>
     <message>
       <source>ACT_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>Cherche</translation>
     </message>
     <message>
       <source>TTP_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>Cherche</translation>
     </message>
     <message>
       <source>DSC_FIND</source>
-      <translation type="unfinished">Find text</translation>
+      <translation>Cherche le text</translation>
     </message>
     <message>
       <source>ACT_REPLACE</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>Remplace</translation>
     </message>
     <message>
       <source>TTP_REPLACE</source>
-      <translation type="unfinished">Find &amp; Replace</translation>
+      <translation>Cherche &amp; Remplace</translation>
     </message>
     <message>
       <source>DSC_REPLACE</source>
-      <translation type="unfinished">Find and replace text</translation>
+      <translation>Cherche et remplace le texte</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>

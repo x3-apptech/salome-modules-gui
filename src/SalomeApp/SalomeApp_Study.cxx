@@ -1119,6 +1119,8 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
     // for this module by LightApp_Engine_i::Load()
     bool isMultiFile = false; // TODO: decide, how to access this parameter
     RemoveTemporaryFiles( dm->module()->name().toStdString().c_str(), isMultiFile );
+    std::vector<std::string> listOfFiles   ;
+    SetListOfFiles( dm->module()->name().toStdString().c_str(), listOfFiles );
 
     // Something has been read -> create data model tree
     LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>( dm );

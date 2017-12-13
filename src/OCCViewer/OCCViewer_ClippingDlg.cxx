@@ -37,8 +37,6 @@
 #include "OCCViewer_ViewManager.h"
 #include "OCCViewer_ClipPlaneInteractor.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <V3d_View.hxx>
 #include <Geom_Plane.hxx>
 #include <Prs3d_Presentation.hxx>
@@ -47,11 +45,7 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <AIS_InteractiveObject.hxx>
 #include <AIS_InteractiveContext.hxx>
-#if OCC_VERSION_LARGE > 0x06080000
-  #include <Prs3d_Drawer.hxx>
-#else
-  #include <AIS_Drawer.hxx>
-#endif
+#include <Prs3d_Drawer.hxx>
 #include <IntAna_IntConicQuad.hxx>
 #include <gp_Lin.hxx>
 #include <gp_Pln.hxx>
@@ -99,7 +93,6 @@ void getMinMaxFromContext( Handle(AIS_InteractiveContext) ic,
       if ( !aPrs->IsEmpty() && !aPrs->IsInfinite() ) {
         isFound = true;
         double xmin, ymin, zmin, xmax, ymax, zmax;
-#if OCC_VERSION_LARGE > 0x06070100
 	Bnd_Box aBox = aPrs->MinMaxValues();
 	xmin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().X();
 	ymin = aBox.IsVoid() ? RealFirst() : aBox.CornerMin().Y();
@@ -107,9 +100,6 @@ void getMinMaxFromContext( Handle(AIS_InteractiveContext) ic,
 	xmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().X();
 	ymax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Y();
 	zmax = aBox.IsVoid() ? RealLast()  : aBox.CornerMax().Z();
-#else
-        aPrs->MinMaxValues( xmin, ymin, zmin, xmax, ymax, zmax );
-#endif
         aXMin = qMin( aXMin, xmin );  aXMax = qMax( aXMax, xmax );
         aYMin = qMin( aYMin, ymin );  aYMax = qMax( aYMax, ymax );
         aZMin = qMin( aZMin, zmin );  aZMax = qMax( aZMax, zmax );
@@ -646,8 +636,10 @@ OCCViewer_ClippingDlg::OCCViewer_ClippingDlg(OCCViewer_ViewWindow* parent , OCCV
 
   OCCViewer_ViewManager* aViewMgr = (OCCViewer_ViewManager*) myModel->getViewManager();
   myInteractor = new OCCViewer_ClipPlaneInteractor( aViewMgr, this );
-  connect( myInteractor, SIGNAL( planeClicked( const Handle(AIS_Plane)& ) ), SLOT( onPlaneClicked( const Handle(AIS_Plane)& ) ) );
-  connect( myInteractor, SIGNAL( planeDragged( const Handle(AIS_Plane)& ) ), SLOT( onPlaneDragged( const Handle(AIS_Plane)& ) ) );
+  connect( myInteractor, SIGNAL( planeClicked( const Handle_AIS_Plane& ) ),
+	   SLOT( onPlaneClicked( const Handle_AIS_Plane& ) ) );
+  connect( myInteractor, SIGNAL( planeDragged( const Handle_AIS_Plane& ) ),
+	   SLOT( onPlaneDragged( const Handle_AIS_Plane& ) ) );
 
   myLocalPlanes = myModel->getClipPlanes();
   synchronize();

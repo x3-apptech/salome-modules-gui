@@ -33,27 +33,27 @@
     </message>
     <message>
       <source>GR_EDIT_SET</source>
-      <translation type="unfinished">Editor settings</translation>
+      <translation>Paramètres de l'éditeur</translation>
     </message>
     <message>
       <source>LBL_COMPLETION_MODE</source>
-      <translation type="unfinished">Completion mode</translation>
+      <translation>Mode de complétion</translation>
     </message>
     <message>
       <source>LBL_NONE</source>
-      <translation type="unfinished">None</translation>
+      <translation>Auncun</translation>
     </message>
     <message>
       <source>LBL_AUTO</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>LBL_MANUAL</source>
-      <translation type="unfinished">Manual</translation>
+      <translation>Manuel</translation>
     </message>
     <message>
       <source>LBL_ALWAYS</source>
-      <translation type="unfinished">Always</translation>
+      <translation>Toujours</translation>
     </message>
     <message>
       <source>GR_TAB_SET</source>
@@ -252,27 +252,27 @@
     </message>
     <message>
       <source>ACT_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>Cherche</translation>
     </message>
     <message>
       <source>TTP_FIND</source>
-      <translation type="unfinished">Find</translation>
+      <translation>Cherche</translation>
     </message>
     <message>
       <source>DSC_FIND</source>
-      <translation type="unfinished">Find text</translation>
+      <translation>Cherche le texte</translation>
     </message>
     <message>
       <source>ACT_REPLACE</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>Remplace</translation>
     </message>
     <message>
       <source>TTP_REPLACE</source>
-      <translation type="unfinished">Find &amp; Replace</translation>
+      <translation>Cherche &amp; Remplace</translation>
     </message>
     <message>
       <source>DSC_REPLACE</source>
-      <translation type="unfinished">Find and replace text</translation>
+      <translation>Cherche et remplace le texte</translation>
     </message>
     <message>
       <source>ACT_PREFERENCES</source>
@@ -365,46 +365,46 @@
     </message>
     <message>
       <source>FILE_PARAM_NAME</source>
-      <translation type="unfinished">file</translation>
+      <translation>fichier</translation>
     </message>
     <message>
       <source>FILE_PARAM_DESCRIPTION</source>
-      <translation type="unfinished">File to edit.</translation>
+      <translation>Fichier à éditer.</translation>
     </message>
   </context>
   <context>
     <name>PyEditor_FindTool</name>
     <message>
       <source>FIND_LABEL</source>
-      <translation type="unfinished">Find:</translation>
+      <translation>Cherche:</translation>
     </message>
     <message>
       <source>REPLACE_LABEL</source>
-      <translation type="unfinished">Replace with:</translation>
+      <translation>Remplace avec:</translation>
     </message>
     <message>
       <source>REPLACE_BTN</source>
-      <translation type="unfinished">Replace</translation>
+      <translation>Remplace</translation>
     </message>
     <message>
       <source>REPLACE_ALL_BTN</source>
-      <translation type="unfinished">Replace All</translation>
+      <translation>Remplace tout</translation>
     </message>
     <message>
       <source>CASE_SENSITIVE_CHECK</source>
-      <translation type="unfinished">Case Sensitive</translation>
+      <translation>Sensible à la casse</translation>
     </message>
     <message>
       <source>WHOLE_WORDS_CHECK</source>
-      <translation type="unfinished">Whole Words Only</translation>
+      <translation>Mots entiers uniquement</translation>
     </message>
     <message>
       <source>REGEX_CHECK</source>
-      <translation type="unfinished">Use Regular Expressions</translation>
+      <translation>Utilise des expressions régulières</translation>
     </message>
     <message>
       <source>NB_MATCHED_LABEL</source>
-      <translation type="unfinished">%1 of %2 matches</translation>
+      <translation>%1 sur %2 correspond</translation>
     </message>
   </context>
 </TS>

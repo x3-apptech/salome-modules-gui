@@ -26,6 +26,10 @@
 
 #include "SalomeApp_Engine_i.h"
 #include "SalomeApp_Application.h"
+#include "SalomeApp_Study.h"
+#include "SUIT_Session.h"
+#include "CAM_Module.h"
+#include "LightApp_DataModel.h"
 
 #include <SALOME_NamingService.hxx>
 #include <SALOMEDS_Tool.hxx>
@@ -40,14 +44,30 @@
 
 #include <iostream>
 
+namespace
+{
+  SalomeApp_Study* getStudyById( int id )
+  {
+    SalomeApp_Study* study = 0;
+    QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
+    for ( int i = 0; i < apps.count() && !study; i++ )
+    {
+      SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*>( apps[i]->activeStudy() );
+      if ( appStudy && appStudy->id() == id )
+        study = appStudy;
+    }
+    return study;
+  }
+}
+
 /*!
   Constructor
 */
 SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
+  : myComponentName( theComponentName )
 {
-  myComponentName = theComponentName;
   MESSAGE("SalomeApp_Engine_i::SalomeApp_Engine_i(): myComponentName = " <<
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
 }
 
 /*!
@@ -56,7 +76,7 @@ SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
 SalomeApp_Engine_i::~SalomeApp_Engine_i()
 {
   MESSAGE("SalomeApp_Engine_i::~SalomeApp_Engine_i(): myComponentName = " << 
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
 }
 
 SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theComponent,
@@ -65,21 +85,63 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 {
   SALOMEDS::TMPFile_var aStreamFile = new SALOMEDS::TMPFile;
 
-  if (CORBA::is_nil(theComponent) || CORBA::is_nil(theComponent->GetStudy()))
+  if ( CORBA::is_nil(theComponent) || CORBA::is_nil( theComponent->GetStudy() ) )
     return aStreamFile._retn();
 
+  // Component type
+  QString componentName = theComponent->ComponentDataType();
+  // Error somewhere outside - Save() called with wrong SComponent instance
+  if ( myComponentName != componentName )
+    return aStreamFile._retn();
+
+  // Get study ID
   const int studyId = theComponent->GetStudy()->StudyId();
+
+  bool manuallySaved = false;
+
+  if ( !myMap.count( studyId ) ) {
+    // Save was probably called from outside GUI, so SetListOfFiles was not called!
+    // Try to get list of files from directly from data model
+
+    MESSAGE("SalomeApp_Engine_i::Save(): myComponentName = " <<
+            qPrintable( myComponentName ) <<
+            "it seems Save() was called from outside GUI" );
+
+    // - Get study
+    SalomeApp_Study* study = getStudyById( studyId );
+    if ( !study )
+      return aStreamFile._retn();
+    QString url = QString::fromStdString(study->studyDS()->URL());
+    // - Get app
+    SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( study->application() );
+    if ( !app )
+      return aStreamFile._retn();
+    // - Get module
+    CAM_Module* module = app->module( SalomeApp_Application::moduleTitle( componentName ) );
+    if ( !module ) // load module???
+      return aStreamFile._retn();
+    // - Get data model
+    LightApp_DataModel* dataModel = dynamic_cast<LightApp_DataModel*>( module->dataModel() );
+    if ( !dataModel )
+      return aStreamFile._retn();
+    // - Save data files
+    QStringList dataFiles;
+    // we use 'url' instead of 'theURL' as latter normally contains path to the tmp dir,
+    // but not actual study's URL
+    dataModel->saveAs( url, study, dataFiles );
+    std::vector<std::string> names;
+    foreach ( QString name, dataFiles ) {
+      if ( !name.isEmpty() )
+        names.push_back(name.toUtf8().data());
+    }
+    SetListOfFiles( names, studyId );
+    manuallySaved = true;
+  }
 
   // Get a temporary directory to store a file
   //std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
 
-  if (myMap.count(studyId)) {
-    std::string componentName (theComponent->ComponentDataType());
-
-    // Error somewhere outside - Save() called with
-    // wrong SComponent instance
-    if ( myComponentName != componentName )
-      return aStreamFile._retn();
+  if ( myMap.count( studyId ) ) {
 
     const ListOfFiles& listOfFiles = myMap[studyId];
 
@@ -104,6 +166,9 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
     }
   }
 
+  if ( manuallySaved )
+    SetListOfFiles( ListOfFiles(), studyId );
+
   return aStreamFile._retn();
 }
 
@@ -118,7 +183,7 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
 
   // Error somewhere outside - Load() called with
   // wrong SComponent instance
-  std::string componentName (theComponent->ComponentDataType());
+  QString componentName = theComponent->ComponentDataType();
   if ( myComponentName != componentName )
     return false;
 
@@ -159,7 +224,10 @@ SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles (const int th
 void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles& theListOfFiles,
                                          const int          theStudyId)
 {
-  myMap[theStudyId] = theListOfFiles;
+  if ( theListOfFiles.empty() )
+    myMap.erase( theStudyId );
+  else
+    myMap[theStudyId] = theListOfFiles;
 }
 
 /*! 
@@ -171,7 +239,7 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy,
 						 CORBA::Boolean& isValidScript)
 {
   MESSAGE("SalomeApp_Engine_i::DumpPython(): myComponentName = "<<
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
   
   // Temporary solution: returning a non-empty sequence
   // even if there's nothing to dump, to avoid crashes in SALOMEDS
@@ -276,7 +344,7 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Object_ptr theStudy,
 */
 char* SalomeApp_Engine_i::ComponentDataType()
 {
-  return const_cast<char*>( myComponentName.c_str() );
+  return CORBA::string_dup( myComponentName.toLatin1().constData() );
 }
 
 /*!
@@ -288,7 +356,7 @@ char* SalomeApp_Engine_i::getVersion()
   QString version;
   SalomeApp_Application::ModuleShortInfo version_info;
   foreach ( version_info, versions ) {
-    if ( SalomeApp_Application::moduleName( version_info.name ) == myComponentName.c_str() ) {
+    if ( SalomeApp_Application::moduleName( version_info.name ) == myComponentName ) {
       version = version_info.version;
       break;
     }

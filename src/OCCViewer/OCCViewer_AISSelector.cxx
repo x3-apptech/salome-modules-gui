@@ -22,8 +22,6 @@
 
 #include "OCCViewer_AISSelector.h"
 
-#include <Basics_OCCTVersion.hxx>
-
 /*!
   Constructor
 */
@@ -72,12 +70,8 @@ void OCCViewer_AISSelector::setHilightColor ( Quantity_NameOfColor color )
 {
   myHilightColor = color;
   if ( !myAISContext.IsNull() ) {
-#if OCC_VERSION_LARGE > 0x07000000    
     const Handle(Graphic3d_HighlightStyle)& hStyle = myAISContext->HighlightStyle();
     hStyle->SetColor( myHilightColor );
-#else
-  myAISContext->SetHilightColor( myHilightColor );
-#endif  
   }
 }
 
@@ -88,12 +82,8 @@ void OCCViewer_AISSelector::setSelectColor ( Quantity_NameOfColor color )
 {
   mySelectColor = color;
   if ( !myAISContext.IsNull() ) {
-#if OCC_VERSION_LARGE > 0x07000000
     const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
     sStyle->SetColor( mySelectColor );
-#else    
-    myAISContext->SelectionColor( mySelectColor );
-#endif
   }
 }
 
@@ -104,15 +94,10 @@ void OCCViewer_AISSelector::setAISContext ( const Handle (AIS_InteractiveContext
 {
   myAISContext = aisContext;
   if ( ! myAISContext.IsNull() ) { 
-#if OCC_VERSION_LARGE > 0x07000000
     const Handle(Graphic3d_HighlightStyle)& hStyle = myAISContext->HighlightStyle();
     const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
     hStyle->SetColor( myHilightColor );
     sStyle->SetColor( mySelectColor );
-#else
-    myAISContext->SetHilightColor( myHilightColor );
-    myAISContext->SelectionColor( mySelectColor );
-#endif    
     myAISContext->SetSubIntensityColor( Quantity_NOC_CYAN1 );
   }
 }

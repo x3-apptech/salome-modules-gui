@@ -31,6 +31,7 @@
 
 #include "SALOME_Component_i.hxx"
 
+#include <QString>
 #include <vector> 
 #include <map> 
 
@@ -101,7 +102,7 @@ private:
   typedef std::map<int, ListOfFiles> MapOfListOfFiles;
   MapOfListOfFiles                   myMap;
 
-  std::string                        myComponentName;
+  QString                            myComponentName;
 };
 
 #endif

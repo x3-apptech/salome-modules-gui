@@ -484,7 +484,7 @@ void SALOMEGUI_Swig::DisplayOnly( const char* theEntry )
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), true );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
 
@@ -594,7 +594,7 @@ void SALOMEGUI_Swig::EraseAll()
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), true );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
       }

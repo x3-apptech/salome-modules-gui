@@ -29,11 +29,7 @@
 #include "QtxAction.h"
 #include "QtxIntSpinBox.h"
 
-#include <Basics_OCCTVersion.hxx>
-
-#if OCC_VERSION_LARGE > 0x06080000
 #include <Graphic3d_GraduatedTrihedron.hxx>
-#endif
 
 #include <QCheckBox>
 #include <QGroupBox>
@@ -264,7 +260,6 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     // font support will be introduced in OCC-6.4)
     int aGap = 20;
 
-#if OCC_VERSION_LARGE > 0x06080000
     Graphic3d_GraduatedTrihedron gt;
     // main params
     gt.SetDrawGrid(Standard_True);       // to draw grid
@@ -292,60 +287,6 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     }
     // draw trihedron
     theView->GraduatedTrihedronDisplay(gt);
-#else
-    theView->GraduatedTrihedronDisplay(
-      anAxisData[0].Name.toLatin1().constData(),
-      anAxisData[1].Name.toLatin1().constData(),
-      anAxisData[2].Name.toLatin1().constData(),
-      anAxisData[0].DrawName,
-      anAxisData[1].DrawName,
-      anAxisData[2].DrawName,
-      anAxisData[0].DrawValues,
-      anAxisData[1].DrawValues,
-      anAxisData[2].DrawValues,
-      Standard_True, // draw grid
-      Standard_False, // draw axes
-      anAxisData[0].NbValues - 1,
-      anAxisData[1].NbValues - 1,
-      anAxisData[2].NbValues - 1,
-      anAxisData[0].Offset,
-      anAxisData[1].Offset,
-      anAxisData[2].Offset,
-      anAxisData[0].Offset + aGap, // see above
-      anAxisData[1].Offset + aGap, // see above
-      anAxisData[2].Offset + aGap, // see above
-      anAxisData[0].DrawTickmarks,
-      anAxisData[1].DrawTickmarks,
-      anAxisData[2].DrawTickmarks,
-      anAxisData[0].TickmarkLength,
-      anAxisData[1].TickmarkLength,
-      anAxisData[2].TickmarkLength,
-      Quantity_NOC_WHITE, // grid color
-      Quantity_Color( anAxisData[0].NameColor.redF(),
-                      anAxisData[0].NameColor.greenF(),
-                      anAxisData[0].NameColor.blueF(),
-                      Quantity_TOC_RGB ),
-      Quantity_Color( anAxisData[1].NameColor.redF(),
-                      anAxisData[1].NameColor.greenF(),
-                      anAxisData[1].NameColor.blueF(),
-                      Quantity_TOC_RGB ),
-      Quantity_Color( anAxisData[2].NameColor.redF(),
-                      anAxisData[2].NameColor.greenF(),
-                      anAxisData[2].NameColor.blueF(),
-                      Quantity_TOC_RGB ),
-      Quantity_Color( anAxisData[0].Color.redF(),
-                      anAxisData[0].Color.greenF(),
-                      anAxisData[0].Color.blueF(),
-                      Quantity_TOC_RGB ),
-      Quantity_Color( anAxisData[1].Color.redF(),
-                      anAxisData[1].Color.greenF(),
-                      anAxisData[1].Color.blueF(),
-                      Quantity_TOC_RGB ),
-      Quantity_Color( anAxisData[2].Color.redF(),
-                      anAxisData[2].Color.greenF(),
-                      anAxisData[2].Color.blueF(),
-                      Quantity_TOC_RGB ) );
-#endif // OCC_VERSION_LARGE > 0x06080000
   }
   else
     theView->GraduatedTrihedronErase();
