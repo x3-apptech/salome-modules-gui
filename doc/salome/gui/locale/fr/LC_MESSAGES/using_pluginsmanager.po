@@ -1,0 +1,330 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# fac521da706d4ebb9d6f86e06d860776
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:7
+msgid "Extend SALOME gui functions using python plugins"
+msgstr ""
+
+# 6bedc75f15914ac78daf8d3b20834cda
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:9
+msgid ":ref:`S1_SALOMEPLUGINS`"
+msgstr ""
+
+# 31ec006356a64dc6a113775f4ef7e5cf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:10
+msgid ":ref:`S2_SALOMEPLUGINS`"
+msgstr ""
+
+# 8f3cd214d2434d2d852eed5056139b3c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:11
+msgid ":ref:`S3_SALOMEPLUGINS`"
+msgstr ""
+
+# 29123f4f61fa4c5aa2e0d9616df2326c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:12
+msgid ":ref:`S4_SALOMEPLUGINS`"
+msgstr ""
+
+# 45b824aecfa946da9d283d1a3e66f0ba
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:13
+msgid ":ref:`S5_SALOMEPLUGINS`"
+msgstr ""
+
+# b9426ec23eb64c7eaf689185424e8578
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:18
+msgid "Objectives"
+msgstr ""
+
+# d0ea0c8031684393966faa00b62d1229
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:20
+msgid ""
+"The SALOME python plugin manager allows the end user to extend the "
+"graphic interface of SALOME with custom functions written as python "
+"modules. The screenshots below show the example of a tool that creates a "
+"mesh from a set of geometrical parameters with the support of simple "
+"graphical interface:"
+msgstr ""
+
+# b7c4d33464114470be65435be3379556
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:26
+msgid "The default menu for plugins is \"Tool->Extensions\":"
+msgstr ""
+
+# a1d7cfbc27334752b1ae0e6c0df97af3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:31
+msgid ""
+"In this example, the plugin provides a small interface to input the "
+"parameters (not provided by the plugin manager):"
+msgstr ""
+
+# 2bef5c0de8de46e5a7fb7e3ffa302216
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:37
+msgid "Then creates the mesh model:"
+msgstr ""
+
+# 8a6e226ea68a498d811f4a2eb0ec2069
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:42
+msgid "In this example, the end user has to write:"
+msgstr ""
+
+# 448a48535b234a1bb4ddbf2642d80330
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:44
+msgid ""
+"the python script that creates the mesh from the parameters, using the "
+"GEOM and SMESH python interface, as in a classic use case,"
+msgstr ""
+
+# 358ec05bec7e471499d8bb820c9db398
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:45
+msgid "the dialog box in PyQt to input the parameters,"
+msgstr ""
+
+# 8868d589a2644d528f45e0dd372390ae
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:46
+msgid "the file salome_plugins.py that declares the plugins."
+msgstr ""
+
+# 94f97b4bf9a449fda1b6073f0f074ebd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:48
+msgid "This page explains only the last point."
+msgstr ""
+
+# 8b28f1e86ee34aa694ca06ba10418c01
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:53
+msgid "Principles"
+msgstr ""
+
+# 85e23efe12994b58a2d4e02f43a9c1cd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:55
+msgid "The general form of the file salome_plugins.py is:"
+msgstr ""
+
+# 903c22f87b0f473e8b0a998b81e3a503
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:78
+msgid ""
+"The procedure is to define a function that implements the plugin, and to "
+"declare this function to the plugins manager. The implementation can be "
+"very variable. It is advisable to consider this function as a proxy to "
+"your code that you can manage in a python package installed in the "
+"standard SALOME python directories."
+msgstr ""
+
+# 46702664320040e29ff11d8ffebbaeb9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:84
+msgid ""
+"In this code, the variable \"context\" is automatically transmitted by "
+"the pluginmanager when you request the plugin. This context provides you "
+"with at least the following attributes:"
+msgstr ""
+
+# cb906cc66148475ea939d85fb1d2941a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:94
+msgid ""
+"Once written, this script salome_plugin.py has to be moved to a specific "
+"place on your filesystem where SALOME is programmed to search for "
+"plugins. The possible directories are (in search order):"
+msgstr ""
+
+# 311b4fba4836457a8186c3226c874d87
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:98
+msgid ""
+"The directory <\\*_ROOT_DIR>/share/salome/plugins/<module_name>, when "
+"this plugin is developped in the framework of a SALOME module "
+"(<\\*_ROOT_DIR> is the root installation directory of the module, and "
+"<module_name> is the name of the module in low letters)."
+msgstr ""
+
+# d09ccefa4f01400ba7f1c33f0c2025d6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:99
+msgid "The directory ~/.config/salome/Plugins for personnal end user plugins."
+msgstr ""
+
+# 275f37e4ed81451aa8746d3e6730ec89
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:100
+msgid ""
+"Any path in the shell variable SALOME_PLUGINS_PATH (each path must be "
+"separated by a comma \":\" for unix and \";\" for windows). This variable"
+" should be set and exported before running the SALOME application."
+msgstr ""
+
+# 9415324d8c644fc3b2c1e13e97c526ed
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:105
+msgid "A complete example"
+msgstr ""
+
+# 227244433b9447b99930f0c45faf1d3a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:107
+msgid ""
+"Suppose that you write a SALOME script that creates a trihedron for each "
+"of your studies (a simple and standard SALOME script, that every end user"
+" is capable to write if he reads the documentation and follows the "
+"training course):"
+msgstr ""
+
+# 9801da957d8548cc92d225cacd647d9b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:133
+msgid "The job consists in creating the file salome_plugins.py as follows:"
+msgstr ""
+
+# b20c95556cd34b73884767d7d7ab9949
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:163
+msgid ""
+"Move this script in the directory ~/.config/salome/Plugins, run SALOME "
+"and enjoy your new function."
+msgstr ""
+
+# 5bbb2f7c6dd34fef84b3f5be514e4161
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:168
+msgid "How to select an object of the object browser"
+msgstr ""
+
+# 31a077eed83d4b9ebc8576e94aa2a3de
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:170
+msgid ""
+"Sometimes it can be useful to retrieve an object of the object browser to"
+" perform an action on it, for example, to select a mesh and display some "
+"information related to it."
+msgstr ""
+
+# bb78ad76697d4e9aa77791f28b3581bb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:173
+msgid "Some important methods and objects to use are as follows:"
+msgstr ""
+
+# df343d6c2f054b7aae25905a24a48ad6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:175
+msgid ""
+"context.sg.getObjectBrowser():  to connect the signal event "
+"`selectionChanged()` to a custom slot"
+msgstr ""
+
+# 6bd95666e09242968766e619f82671bd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:176
+msgid ""
+"context.salome.sg.getAllSelected(): to get the list of selected object in"
+" the object browser"
+msgstr ""
+
+# 4107479424604782afe3763a57e74cda
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:177
+msgid ""
+"objId = context.salome.sg.getSelected(0): to get the first selected "
+"object in the object browser"
+msgstr ""
+
+# 941477c6f92e432ab3615243eda78e28
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:178
+msgid ""
+"salomeObj = context.salome.study.FindObjectID(objId).GetObject(): to "
+"retrieve the salome object from selection. It can be a GEOM, SMESH, or "
+"any other module object."
+msgstr ""
+
+# 0fc2ff4710624da0b67fa094afe6c4f0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:180
+msgid ""
+"If it is a mesh, then it is possible to call methods of the "
+"SMESH::SMESH_Mesh interface on the object, for example GetShapeToMesh(). "
+"If it is not a mesh, this call will raise an exception. So it is possible"
+" to write the code retrieving the shape a mesh is built on in the "
+"following way:"
+msgstr ""
+
+# 9efdb1c1d2fd430d9c22028cf04c594a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:194
+msgid ""
+"An example of those methods is available with the demo examples. See the "
+"next chapter :ref:`S5_SALOMEPLUGINS`."
+msgstr ""
+
+# 43d1764cfa014448af15e2670a728097
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:200
+msgid "Other examples"
+msgstr ""
+
+# 961e1f6f48cb444b8c00461428403355
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:202
+msgid ""
+"The GUI module provides you with some basic demo examples located in the "
+"directory src/SalomeApp/pluginsdemo of the source space and installed in "
+"the directory $GUI_ROOT_DIR/share/salome/plugins/gui/demo."
+msgstr ""
+
+# fdff83713d974345aa6dede472940f72
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:206
+msgid ""
+"These examples are automatically installed when you install the GUI but "
+"are not activated. To activate the plugins, edit the file "
+"$GUI_ROOT_DIR/share/salome/plugins/gui/demo/salome_plugins.py and turn "
+"the variable DEMO_IS_ACTIVATED to True."
+msgstr ""
+
+# 5fdf88deea164af2b094fb7f845ea94e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:208
+msgid "The demo examples are:"
+msgstr ""
+
+# f869117eeca44e0eac45eeee21e781de
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:210
+msgid "**trihedron:** create a trihedron and display it with fit on the size"
+msgstr ""
+
+# ddc5d778d7164af28339ba0ee400a56e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:211
+msgid ""
+"**tube_shapewithgui:** create a geom object from parameters given by a "
+"dialog box."
+msgstr ""
+
+# dc888994da8744189e62959b71d3446f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:212
+msgid ""
+"**tube_meshwithgui:** create a mesh object from parameters given by a "
+"dialog box. This illustrates that a plugin can work with more than one "
+"SALOME module."
+msgstr ""
+
+# c826fed95a1649139f958591d1eefdc6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:213
+msgid ""
+"**tube_shapewithguiAndPreview:** same than tube_shapewithgui but with an "
+"additionnal preview function (button apply in the dialog box)."
+msgstr ""
+
+# fb48766a628049c49b36a42e7d41ad89
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:214
+msgid "**runSalomeShellSession:** run a SALOME prepared shell session in a xterm."
+msgstr ""
+
+# 9d68bcbfa8364e6e9b121beb7904e6f7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:217
+msgid ""
+"**minmax:** computes the min and max values of a control on a selected "
+"mesh."
+msgstr ""
+
+# 53ab7eb332db4706bc09a0b56aa5c91a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_pluginsmanager.rst:216
+msgid ""
+"This plugin is available in the SMESH module only. To activate it, edit "
+"the file $GUI_ROOT_DIR/share/salome/plugins/gui/demo/smesh_plugins.py and"
+" turn the variable DEMO_IS_ACTIVATED to True."
+msgstr ""
+

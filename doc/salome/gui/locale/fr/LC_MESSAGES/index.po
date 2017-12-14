@@ -1,0 +1,33 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# a50311d338ef4a5288430b2756e113d5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/index.rst:7
+msgid "Welcome to GUI's documentation!"
+msgstr "Bienvenue dans la documentation de GUI!"
+
+# a15abe2a621c41429afdbbdfddef4677
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/index.rst:15
+msgid "Indices and tables"
+msgstr "Indices et tableaux"
+
+# df759101e57f457993794f9028b1e682
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/index.rst:17
+msgid ":ref:`search`"
+msgstr ""
+

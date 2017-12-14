@@ -1,0 +1,139 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 02b3795ebe1d40f180c036d5d13c0f29
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:5
+msgid "Using Object Browser"
+msgstr ""
+
+# d75392795fc84bb7a7e6fdca606c1e85
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:7
+msgid ""
+"The **Object Browser** in SALOME is destined for displaying the structure"
+" of the current study in a tree-like form. It contains:"
+msgstr ""
+
+# e156a14fa62743c395c22893d802f0b0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:10
+msgid "components, loaded during the current session"
+msgstr ""
+
+# 646b4009cda6499f8a52317d6374eda7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:11
+msgid ""
+"objects created with the help of different components (The objects "
+"created with the help of a definite component are located in the folder "
+"having the name of this component)"
+msgstr ""
+
+# 82c1565fc45148ae83fdee41f8fbe91f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:12
+msgid "references to different objects (they are highlighted in red)"
+msgstr ""
+
+# b997408b927246d2ae052effab26e0a8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:18
+msgid ""
+"The **Object Browser** is destined to getting quick access to different "
+"objects created during SALOME session. All pop-up menus associated with "
+"the objects displayed in the Object Browser are context-sensitive. So it "
+"depends on a definite currently loaded SALOME component what options you "
+"will see in the pop-up menu, if you right-click on a definite object in "
+"the Object Browser."
+msgstr ""
+
+# 7f0f39cf83c74ff282b3d1e79b2ff4b1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:20
+msgid ""
+"The Object Browser may contain supplementary attributes of the objects "
+"displayed in additional columns. By default, these columns are not "
+"displayed -  displaying/hiding these columns is possible through "
+":ref:`setting_preferences_page` or right-clicking on the attributes bar "
+"and toggling the necessary attributes."
+msgstr ""
+
+# 38c13237bbd44b168d0ab345d606c7a7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:29
+msgid "**Name**;"
+msgstr ""
+
+# 5b94cc5a14c847bfbb731972999b4a63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:30
+msgid ""
+"**Entry**  - Identification index of the object in the structure of the "
+"study;"
+msgstr ""
+
+# f76fbe23174c4e18bf789177611c5060
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:31
+msgid "**IOR** -  Interoperable Object Reference;"
+msgstr ""
+
+# cb7d7851195941dab0caf35244579acd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:32
+msgid ""
+"**Reference entry**  -  Identification index of the references to the "
+"objects;"
+msgstr ""
+
+# c0f0ede9930b48d39d4bf6d4dbe6774a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:33
+msgid "**Value**  -  Displays the value of the first object attribute."
+msgstr ""
+
+# 3043d3dc914840cbbbc3af574aa0dfde
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:35
+msgid ""
+"**Entry, IOR and Reference entry** attributes are displayed for debugging"
+" purposes only."
+msgstr ""
+
+# 792e0054b3bf4c9fbad9e3657e4ae056
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:38
+msgid "Sorting"
+msgstr ""
+
+# 2a12f95626284eb0b6f94c145e1c9265
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:40
+msgid ""
+"By default the objects in the object browser are sorted in the creation "
+"order."
+msgstr ""
+
+# 21ebe6c02ba4470eba31ebe7868f546c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:42
+msgid ""
+"However, it is possible to enable sorting in the alphabetical order (or "
+"the reverse alphabetical order) by right clicking in the header of the "
+"tree (near the **Name** field) and checking \"enable sorting\" in the "
+"context menu."
+msgstr ""
+
+# f226f911c37f4e728f656da44c96de4f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:44
+msgid "It is possible to use the arrow near \"Name\" to reverse the order."
+msgstr ""
+
+# c8c7301d736a42d3a1a3e3366b5383d2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_object_browser.rst:46
+msgid ""
+"If \"enable sorting\" is unchecked, the objects are sorted in the default"
+" order again."
+msgstr ""
+

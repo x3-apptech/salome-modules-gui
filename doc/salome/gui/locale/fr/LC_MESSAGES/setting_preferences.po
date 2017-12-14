@@ -1,0 +1,1226 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# b84af266090546d98bf39f1f03a10e95
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:5
+msgid "Setting Preferences"
+msgstr ""
+
+# e9a1760127164987be8b96969e7a8d44
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:7
+msgid ""
+"All user preferences of **SALOME** application can be customized using "
+"the common **Preferences** dialog box. This dialog can be open using the "
+"***File > Preferences...*** menu item."
+msgstr ""
+
+# 133190bcd9a84e6bb470db721ae11fe3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:11
+msgid "The **Preferences** dialog box consists of two parts:"
+msgstr ""
+
+# 105d8682936a4172910fe2f540c8cff1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:13
+msgid ""
+"Available preferences sections are listed in the left part of the dialog "
+"box; usually this list contains \"SALOME\" item that specifies general "
+"application preferences and a separate section for each SALOME module "
+"available in the current session."
+msgstr ""
+
+# fcf8f422e51f4606a4ce2db696a83802
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:14
+msgid ""
+"The tabbed widget at the right side of the dialog box provides controls "
+"that can be used to customize the preferences."
+msgstr ""
+
+# 07ed76e9acec4fc28c52483cf424ab35
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:16
+msgid ""
+"The preferences for modules become accessible only after explicit loading"
+" of these modules. Until then the dialog box will show the corresponding "
+"warning message."
+msgstr ""
+
+# 5d2cb65e363a4d1aa184192a454cb791
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:18
+msgid ""
+"More detailed information about preferences for certain modules can be "
+"found in the User's guide of the corresponding module."
+msgstr ""
+
+# 5b8a4c5920c8430fad3971090ba6e053
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:20
+msgid ""
+"General application preferences are specified in the **SALOME** section "
+"of the **Preferences** dialog box. These preferences affect on the "
+"application look-n-feel and common functionality."
+msgstr ""
+
+# 3a22ce4da4af4545b381ab47f2ca8f2b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:24
+msgid ""
+"If the study has just been started and other modules have not been loaded"
+" yet, it will be possible to change only the settings which refer to the "
+"whole GUI SALOME session."
+msgstr ""
+
+# 3fef0d64380e4b4f9a45e24b54697d72
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:29
+msgid "General Preferences"
+msgstr ""
+
+# afa87ab972174f52b73869118e771da5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:34
+msgid "**Language**"
+msgstr ""
+
+# 429d3474db9249f996e536d28b8aa482
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:36
+msgid ""
+"**Current language** - the language used by the application GUI. The "
+"language change will come in force only after the application is "
+"restarted."
+msgstr ""
+
+# 5b0ad5452578470cb4fdd8501f78dd3e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:37
+msgid ""
+"**Use C locale**  - when checked, the C locale will be set for the "
+"application, otherwise a system locale will be used. The locale change "
+"will come in force only after the application is restarted."
+msgstr ""
+
+# 9545dbc3160641a598798232e2705552
+# f7087d6e559d47a58ea257d8195821ff
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:39
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:338
+msgid "**Look and feel**"
+msgstr ""
+
+# 29be3055dfa54199b14a56db0475fc88
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:41
+msgid ""
+"**Show splash screen at start-up** - allows showing or hiding the splash "
+"screen at start-up."
+msgstr ""
+
+# 1d7a8fdcc3f047dcae39f4c66f67c9cc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:42
+msgid ""
+"**Opaque resize** - force opaque resize mode for viewers area (tabbed "
+"workspace). Clear this checkbox for less perfomant workstations."
+msgstr ""
+
+# fc85ab02915a4c99ad1405516f7abca8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:43
+msgid ""
+"**Drop-down buttons in toolbars for action groups** - when checked, the "
+"action groups are represented in the viewer toolbars as a single drop-"
+"down button, switchable by the user. Otherwise, all the buttons from the "
+"action groups are displayed in the toolbar."
+msgstr ""
+
+# 08e51837fbea488e842a08eb7056ef19
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:45
+msgid "**Study Properties**"
+msgstr ""
+
+# 593e999ecaa04d428cc6181833d5d71c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:47
+msgid ""
+"**Multi file save** - if checked in, your study will be saved in several "
+"HDF files (one basic HDF file which will store the main information about"
+" the saved study and several other files for the data created by each "
+"component used during the study session). Opening of this study requires "
+"that **ALL** saved files should be stored in the **SAME** directory. If "
+"you would like to copy your saved study in another directory or machine, "
+"you should copy all stored files. Otherwise, if you try to open this "
+"study, some data will be lost and it will lead to invalid functioning of "
+"the SALOME platform."
+msgstr ""
+
+# 9b93090f390c474b90d96dc651ec9b81
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:48
+msgid ""
+"**ASCII save** - if checked in, your study will be saved in ASCII format "
+"file (or files)."
+msgstr ""
+
+# 462e11e50d744afcab78664d37ac7fbe
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:49
+msgid ""
+"**Automatic loading of light modules when opening study** -  if checked "
+"in, Light Modules of the current study will be automatically loaded at "
+"the next study opening, allowing completion of object browser."
+msgstr ""
+
+# 41a1d3d7bab94506b1adfebe44b8f474
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:50
+msgid ""
+"**Store positions of windows** -  if checked in, positions of windows "
+"will be saved in a special file at the end of the current session and "
+"then restored for a new session."
+msgstr ""
+
+# f2b0bffd76bd4d929ff0df1e348299ee
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:51
+msgid ""
+"**Store positions of toolbars** -  if checked in, positions of toolbars "
+"will be saved in a special file at the end of the current session and "
+"then restored for a new session."
+msgstr ""
+
+# 6554c7fac50b469988e29c97107c60c3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:52
+msgid ""
+"**Auto-save interval (min)** - allows to specify the time interval (in "
+"minutes) for automatic study saving operation. If the time interval is "
+"equal to 0 (\"Disabled\" value is shown) the automatic saving is not "
+"performed."
+msgstr ""
+
+# f13a4806fe484cc8b06ae7f1d297bf1a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:53
+msgid ""
+"**Store/restore last GUI state** - if checked in, all GUI settings are "
+"saved with the rest of the data whenever you save the study. When the "
+"study is reopened, the GUI state is restored."
+msgstr ""
+
+# ae3f8fcca5aa4faeba22ba751afcadaa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:54
+msgid ""
+"**Publish in study in python dump** - if this option is switched on, the "
+"Python script resulting from Dump Python operation will include commands "
+"related to the publication of the data in the study (if this option is "
+"supported by specific module)."
+msgstr ""
+
+# e9d3a453a58e4bc186fb26ed5994e801
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:55
+msgid ""
+"**Multi file python dump** - allows to generate multiple files "
+"(separately for each component) for dumping of a study to a python "
+"script. If the option is disabled, the study is dumped to a single python"
+" script."
+msgstr ""
+
+# 3ec4e09393d048968f3ba295bd5c6f90
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:56
+msgid ""
+"**Save GUI state in python dump** - if this option is switched on, the "
+"Python script resulting from Dump Python operation will include commands "
+"related to the GUI state."
+msgstr ""
+
+# d5cab3b226b24ff4874f7a132f4bc0ec
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:58
+msgid ""
+"**External browser** - allows to define what browser will be used to show"
+" SALOME reference manuals: internal (built-in SALOME browser) or external"
+" (IE, Netscape, Mozilla, ...). In addition, it is possible to specify"
+msgstr ""
+
+# f18682451fdb44adbac62383bbc4038a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:60
+msgid ""
+"**Application** - this option allows you to set an external browser (IE, "
+"Netscape) which will be used for viewing SALOME reference manuals. By "
+"default, Mozilla is used."
+msgstr ""
+
+# 30af2c474568432791d235487f49ef56
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:61
+msgid ""
+"**Parameters** - additional parameters required for launching of the "
+"external browser (if applicable)."
+msgstr ""
+
+# 98de952b7ae341b98c8634a642db6330
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:63
+msgid "**Python console**"
+msgstr ""
+
+# d5af74ab68764d3a90a5dec85c85f9a1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:65
+msgid ""
+"**Font** - allows quickly setting the parameters (style, size, face) of "
+"the :ref:`font_color_dlg` used in embedded Python console."
+msgstr ""
+
+# 5467aba25d2c4c4eb3dd4d8ae894aba4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:66
+msgid ""
+"**Show banner** - this option allows to show/hide the Python banner on "
+"top of the console window."
+msgstr ""
+
+# dfd7dbfa319348bd841d7559671ceeb5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:68
+msgid ""
+"**Show MRU items** - allows to define the maximum **Number** of items in "
+"**Most Recently Used** list and the **Link type**:"
+msgstr ""
+
+# 55923747d46141d691fe8747c063c34e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:70
+msgid "**Long** - shows the full path to the file."
+msgstr ""
+
+# 1ebb15bac13d4a7c9c64963fae033b66
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:71
+msgid "**Short** - shows the file name only."
+msgstr ""
+
+# 9398ca73c31b4420b99979722557e71a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:72
+msgid ""
+"**Auto** - shows full paths to the files only if some files from "
+"different locations have the same name."
+msgstr ""
+
+# c168bce2a2a94e488f0078f6b882147f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:74
+msgid "**Full-screen**"
+msgstr ""
+
+# 5fdb1e1d55504d84aec2cb0685a150a4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:76
+msgid ""
+"**Hide object browser and viewers toolbars** - switches automatic hiding "
+"of Object Browser and OCC viewer toolbar in full-screen mode."
+msgstr ""
+
+# c3df5b6638cd40f9a5d995945324821e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:79
+msgid "3D Viewer Preferences"
+msgstr ""
+
+# e34be8d3ea6445758ab0158ae58732ce
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:84
+msgid ""
+"**Navigation style** - this option allows to choose one of the modes of "
+"work with mouse in OCC and VTK 3D viewers."
+msgstr ""
+
+# 2e5976b643a94596bbfe628b63b901df
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:86
+msgid ""
+"**Salome Standard Controls** - allows to manipulate objects in the viewer"
+" with the mouse and locked Ctrl button: increase or decrease the zoom "
+"ratio with the left mouse button, translate object in any direction with "
+"the central mouse button or rotate it with the right mouse button."
+msgstr ""
+
+# e946a369edd848f7a811f3de8e4c5b5e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:87
+msgid ""
+"**Keyboard Free** - allows to manipulate objects in the viewer with the "
+"mouse without locking Ctrl button. In this case the operations are "
+"assigned to the buttons differently: rotation is made with the left "
+"button, translation with the right and zoom with both pressed in the same"
+" time."
+msgstr ""
+
+# 1169f991e7c1471786c47280ba2acf7f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:89
+msgid "**Zooming style** - this option allows to choose a zooming mode."
+msgstr ""
+
+# a9551f9404414d3d8e9cfc53828a9dac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:91
+msgid ""
+"**Relative to the view's center** - allows to zoom the view relatively to"
+" its center."
+msgstr ""
+
+# 97471e8b8abe4717ac28116c0cf2b411
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:92
+msgid ""
+"**Relative to the cursor** - allows to zoom the view relatively to the "
+"current cursor position."
+msgstr ""
+
+# 572c3dc3310d4551975f92f14b9a3813
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:94
+msgid "**Trihedron** - viewer trihedron settings:"
+msgstr ""
+
+# ced44597b2bd4efda1b91443c32d0e80
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:96
+msgid ""
+"**Size** - size of the coordinate axes (global trihedron) displayed in "
+"the viewer."
+msgstr ""
+
+# 6f7fa11e49084a3c89705aa05508db77
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:97
+msgid ""
+"**Relative** - if this option is switched on, trihedron axes scale to fit"
+" the size of the scene displayed in 3D viewer."
+msgstr ""
+
+# ce8c5815b33a4b2f866c04ce4fe7e5bc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:98
+msgid ""
+"**Show static trihedron** - allows to show/hide the static mini-trihedron"
+" located in the bottom-left corner of the viewer."
+msgstr ""
+
+# d2b09f87c4e9429ba85e0a5050627138
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:103
+msgid "OCC 3D Viewer Preferences"
+msgstr ""
+
+# f4fe138ab7d34a9b9dd3ce06d5d63023
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:108
+msgid ""
+"**Projection mode** - sets the default projection mode for the viewers: "
+"Orthogonal or Perpective."
+msgstr ""
+
+# 5fac8579bf214846928d3c36a6f6b74a
+# 6c1fd770d5da4beea990694168ea1e55
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:109
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:189
+msgid "**Stereo render** - stereoscopic view settings:"
+msgstr ""
+
+# 27f69a2d716f47feb7e90dafaaf5964c
+# f10c91a7bf374ceebf36faaff62e6b87
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:111
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:191
+msgid "**Stereo type** - specifies a stereo pair type:"
+msgstr ""
+
+# d4ba4434b49c4225806d4ae01acd0549
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:113
+msgid "Shutter glasses (OpenGL quad-buffer)"
+msgstr ""
+
+# 6dbd8483a40748238eb022174009f39f
+# 1c266e5e12a14601909afb564ca10965
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:114
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:199
+msgid "Anaglyph"
+msgstr ""
+
+# 09e9c626d89245cc85e357b6bd5f7a0f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:115
+msgid "Row-interlaced"
+msgstr ""
+
+# d80fcaa5668445bd813354f6c30db86e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:116
+msgid "Column-interlaced"
+msgstr ""
+
+# d107b71a59a64fd986299e648af6fd0d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:117
+msgid "Chess-board stereo for DLP TVs"
+msgstr ""
+
+# 9bef4f54f0034c0c8d2136b79664fd70
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:118
+msgid "Horizontal-anamorphic (side-by-side)"
+msgstr ""
+
+# fd4931d307db4b30ae3eff7a851379f8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:119
+msgid "Vertical-anamorphic (Half OverUnder)"
+msgstr ""
+
+# bbc58bb83186414fae7ff4162288b4f3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:122
+msgid ""
+"The stereo pair type selected in this combobox is applied for all "
+"existing OCC 3D views with stereo rendering already turned on within the "
+"same SALOME GUI session. It is not possible to use different stereo modes"
+" in several OCC 3D views at the same time within the same SALOME GUI "
+"session."
+msgstr ""
+
+# 4b419e54c88b48a3afe449bc772e2373
+# 0a6290a6055a43409b6cce7b2f67d55a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:124
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:206
+msgid "**Anaglyph filter** - specifies the format of anaglyph stereo pair:"
+msgstr ""
+
+# af83b1ddd165433299ffa6683d66934e
+# 01e6ee14147f4ab6993ca931cd18d216
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:126
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:208
+msgid "Red-Cyan (default)"
+msgstr ""
+
+# 3ac63d966e5f458a9014b76076acf365
+# c761c6f9f48d45399feac71ac710a2d0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:127
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:209
+msgid "Yellow-Blue"
+msgstr ""
+
+# 7386ba7984714462a59a14512a9c3f6f
+# 356e40b83b3a4e76b1caacdaac3e14e3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:128
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:210
+msgid "Green-Magenta"
+msgstr ""
+
+# 1bee844a3d844df89a7e0c7ab41de697
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:130
+msgid "**Convergence distance type**: Absolute or Relative (default)."
+msgstr ""
+
+# 86cfd4cac8044588b53425c05b54d49a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:131
+msgid "**Stereographic focus value** - 1 by default."
+msgstr ""
+
+# 76f699c9bb4f4c0385973bed2e310fe2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:132
+msgid "**IOD type** - Absolute or Relative (default)."
+msgstr ""
+
+# 9a6071f0b6e74425a75748b60e8df1b3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:133
+msgid "**Interocular distance (IOD) value** - 0.05 by default."
+msgstr ""
+
+# 1366b93e63284b5ab49024d3a8d6c64f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:134
+msgid "**Reverse stereo** - option to swap left and right frames."
+msgstr ""
+
+# 3539391546974b1182b713e730678478
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:135
+msgid "**Enable V-Sync** - activates vertical synchronization."
+msgstr ""
+
+# b9fa24ffbab74a7b98302152e74f2b62
+# 7cee7e406e9742adbeee5f9b7eb20a97
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:136
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:212
+msgid "**Enable quad-buffer support** - allows quad-buffered rendering."
+msgstr ""
+
+# 5522f9ba3e9b43bb9b554c9aae4008a7
+# d3bfd165fb6942ee957088e779b9cfa6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:139
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:215
+msgid ""
+"It is neccessary to enable quad-buffered stereoscopic rendering manually "
+"in graphic driver settings. SALOME does not do it automatically."
+msgstr ""
+
+# 7ba739649e644279a0fb8e103aaf13a8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:142
+msgid "All existing OCC 3D views should be re-created for quad-buffer support."
+msgstr ""
+
+# d152e19107cd42a5882f78ebf0da6fa3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:144
+msgid ""
+"**Background** - specifies the default background for the viewers, "
+"separately for (for more details, refer to the :ref:`viewer_background` "
+"page\"):"
+msgstr ""
+
+# 6cd1aaf3842c48bab80da2f056fdc919
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:146
+msgid "**3D View**"
+msgstr ""
+
+# 9dd96ddd360d458597ee924fda26fc0c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:147
+msgid "**XZ View**"
+msgstr ""
+
+# b680bc43b87b48c0a99ab9d1eeb70b59
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:148
+msgid "**YZ View**"
+msgstr ""
+
+# 29c96adc8d13438c8ac2cf4428ca6373
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:149
+msgid "**XY View**"
+msgstr ""
+
+# 00260bf6550b42f7b580e37c46cc4415
+# 7eaccd954b1d457aa8957b9d0e77ad5e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:151
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:219
+msgid "**Selection**"
+msgstr ""
+
+# 802bee84151f4802b0ad655176b4bcc9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:153
+msgid "**Enable preselection** - switches preselection on/off."
+msgstr ""
+
+# ea9db45ba35f4c6c86950476f9f8b068
+# c5c19003135740d68a9df304116e72b7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:154
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:227
+msgid "**Enable selection** - switches selection on/off."
+msgstr ""
+
+# 19394846299d44d8a5b99c0b44cb7833
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:156
+msgid "**Clipping parameters** - specifies the default clipping plane parameters."
+msgstr ""
+
+# ea6c8e8b84e44db7b9d7fe5eed79164d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:158
+msgid "**Color** - allows to change the color of the clipped region."
+msgstr ""
+
+# fc31c43de7ad4076bf41bb5f561810f5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:159
+msgid ""
+"**Use default texture** - if this option is switched on, the default "
+"texture will be used for clipping texture, otherwise - the texture "
+"specified in \"Texture\" field."
+msgstr ""
+
+# 90cfff3246064c8599da1ca361bba5bc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:160
+msgid ""
+"**Texture** - allows to change the texture of the clipped region (enable "
+"if \"Use default texture\" is switched off)."
+msgstr ""
+
+# 374d643e79224e1aba766b40eb1c05f8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:161
+msgid ""
+"**Modulate** - controls if \"Texture\" should be mixed with \"Color\" "
+"parameter or not."
+msgstr ""
+
+# ee49b1a6ff2c4832b5f42c837104eb2a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:162
+msgid "**Scale factor** - sets the scale factor for default and custom textures."
+msgstr ""
+
+# 3112e68958934d729f6e1db8750a28b4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:164
+msgid "**Ray tracing** - specifies the default GPU ray-tracing parameters."
+msgstr ""
+
+# 2d9433c3698f4d1295e835f8532474fa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:166
+msgid "**Depth** - defines maximum ray-tracing depth."
+msgstr ""
+
+# e4a2c52669234c60b6cc427ab528bbcd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:167
+msgid "**Specular reflections** - enables/disables specular reflections."
+msgstr ""
+
+# 186feecaabbf46a8b64e4687465f31aa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:168
+msgid "**Adaptive anti-aliasing** - enables/disables adaptive anti-aliasing."
+msgstr ""
+
+# 129021758f304b98ae91d5579deca1bc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:169
+msgid "**Shadows rendering** - enables/disables shadows rendering."
+msgstr ""
+
+# 5fe1fb512b974594bb49d6d7d5e90df8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:170
+msgid ""
+"**Transparent shadow** - enables/disables light propagation through "
+"transparent media."
+msgstr ""
+
+# 9f92d9a57f734ff5b4b1befb9a3ab2b3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:172
+msgid ""
+"**Light source** - allows to set default parameters for directional light"
+" source."
+msgstr ""
+
+# b51fe5c5800547829e7497e49a22b707
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:174
+msgid "**Color** - allows to change the color of light source."
+msgstr ""
+
+# eff8115cc9744172bbf3500e1c415920
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:175
+msgid "**Dx, Dy, Dz** - sets direction coordinates."
+msgstr ""
+
+# 6771aac8a3bf4f44aebaf1f9b0bf0d35
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:180
+msgid "VTK 3D Viewer Preferences"
+msgstr ""
+
+# e4f2936bece344f8aa31dcf5eb71d724
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:185
+msgid ""
+"**Projection mode** - allows choosing between **Orthogonal** and "
+"**Perspective** projection mode."
+msgstr ""
+
+# 709327bd7a8b405991ca412af9e7227d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:186
+msgid ""
+"**Background** - specifies the default background for the viewer; for "
+"more details, refer to the :ref:`viewer_background`."
+msgstr ""
+
+# aedb26e3136e4bf1ac7378340983e046
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:187
+msgid ""
+"**Speed Increment** - defines the number of units by which the speed "
+"increases or respectively decreases after pressing [+] or [-] keyboard "
+"buttons."
+msgstr ""
+
+# 569c00e566db45d18c57f26609cd6889
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:188
+msgid ""
+"**Modification Mode** - allows choosing between **Arithmetic** and "
+"**Geometrical** progression used for zooming."
+msgstr ""
+
+# 8e9737bb1d314c4086a541e0ecfe3d83
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:193
+msgid "Crystal Eyes"
+msgstr ""
+
+# 4ba6884209874eeb9db759e79d20db6f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:194
+msgid "Red-Blue"
+msgstr ""
+
+# e18bc26133784a4ab256a7a83914f23c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:195
+msgid "Interlaced"
+msgstr ""
+
+# 8e0aa0ce0b12452abdefff10eae8ec7d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:196
+msgid "Left"
+msgstr ""
+
+# f5391f1e40ee4ed3ab0c97a35bcc0704
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:197
+msgid "Right"
+msgstr ""
+
+# 3f5a34ae8ab6442ebd6dac384cc1e446
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:198
+msgid "Dresden"
+msgstr ""
+
+# b3e30bebbabf4d9aa64dd2dbc120f4f2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:200
+msgid "Checkerboard"
+msgstr ""
+
+# d9fe6b61e0c547af9cd1f891181b988c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:201
+msgid "Split View Port Horizontal"
+msgstr ""
+
+# bae72857293c44ee8fd2c5da4854eda7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:204
+msgid ""
+"The stereo pair type selected in this combobox is applied for all "
+"existing VTK 3D views with stereo rendering already turned on within the "
+"same SALOME GUI session. It is not possible to use different stereo modes"
+" in several VTK 3D views at the same time within the same SALOME GUI "
+"session."
+msgstr ""
+
+# d92fbfe06d3d4d54a181362d488d3e88
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:217
+msgid "All existing VTK 3D views should be re-created for quad-buffer support."
+msgstr ""
+
+# 03399cda6a744053b0e205f8e068bb9e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:221
+msgid ""
+"**Preselection** - allows to choose among three possible preselection "
+"modes:"
+msgstr ""
+
+# 7323d9b906ee40008bd28b6aa8083478
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:223
+msgid ""
+"**Standard** - this mode works quickly, by checking only bounding boxes "
+"of objects. It does not deal with the order of actors in the view or with"
+" their data (points/ cells)."
+msgstr ""
+
+# c117803945ad4c4a8d39686f7fa4dba9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:224
+msgid ""
+"**Dynamic** - works directly with cells of actors, which provides the "
+"exact area of preselection. This mode is much more slower."
+msgstr ""
+
+# 44f7d3d0fa3d41b487066f7f83009cef
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:225
+msgid "**Disabled** - switches off the preselection."
+msgstr ""
+
+# a62400672b104214a330bdd85627a122
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:229
+msgid ""
+"**Spacemouse** - a mouse-like manipulator device specially designed for "
+"working with 3D presentations, objects, etc. You can reassign the actions"
+" listed below to any of its buttons."
+msgstr ""
+
+# 91f208679dce4ce9ad83a9e24a08411a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:231
+msgid ""
+"**Decrease Speed Increment** - decreases by 1 the speed increment used "
+"for the keyboard (same as [-] key)."
+msgstr ""
+
+# 1d84f31169574e28b7e4833ddd286e3e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:232
+msgid ""
+"**Increase Speed Increment** - increase by 1 the speed increment used for"
+" the keyboard (same as [+] key)."
+msgstr ""
+
+# 1980608125614934820ef3ba21166a18
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:233
+msgid ""
+"**Dominant / combined switch** - toggles button to switch to dominant or "
+"combined movements."
+msgstr ""
+
+# 1b2f0cb1b65d4899b7ee053ac7d38cab
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:235
+msgid "**AVI Recording**"
+msgstr ""
+
+# 766b30a3acea49f88442958cee8bff86
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:237
+msgid "**Mode** - allows to choose from two recording regimes:"
+msgstr ""
+
+# 329b8009133a44ab92b567abd745b6b1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:239
+msgid ""
+"**Recording all displayed frames** - records exactly at the FPS rate "
+"specified by the user."
+msgstr ""
+
+# 148b1c4ea3ec48d2bd4fcc122502a201
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:240
+msgid ""
+"**Recording at a given FPS** - records only when the contents of the "
+"viewer change (some activity is performed).  In the AVI file non-recorded"
+" images are substituted with the copies of the latest recorded image, "
+"which produces files with lower quality but requires less system "
+"resources."
+msgstr ""
+
+# c9075652112c4e3786b1663ee79df24d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:242
+msgid ""
+"**FPS** - allows to define the FPS (frames per second) rate for the clip."
+" Set greater value for better quality."
+msgstr ""
+
+# 1c961a8b04d2433ea70d977a555499cb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:243
+msgid ""
+"**Quality** - allows to set the quality of the clip in the interval "
+"between 0 and 100."
+msgstr ""
+
+# 5d6d65b9ec5d4ce3ab4f47e43cf26cd2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:244
+msgid "**Progressive** - allows to record a progressive API file."
+msgstr ""
+
+# 83119d186f7a4f6a9e19b4ca800e87fa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:246
+msgid ""
+"**Names of groups** - allows to specify parameters of the titles "
+"displayed in the viewer:"
+msgstr ""
+
+# d552c5d2cab24590b98b250fc1fab4ec
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:248
+msgid "**Text color** - allows selecting the text color;"
+msgstr ""
+
+# 2f7fd9ff3b1842f3b83578acf8eb3389
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:249
+msgid "**Transparency** - allows selecting the text transparency."
+msgstr ""
+
+# e37e81d21cea4799a2b6a257117dc222
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:254
+msgid "Plot 2D Viewer Preferences"
+msgstr ""
+
+# 371f8cfddd5e4f82a93f73f369537f79
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:260
+msgid ""
+"**Background color** - this submenu allows to select the background "
+"color. Click on the colored line to access to the "
+":ref:`select_color_and_font_page` dialog box."
+msgstr ""
+
+# 96d75a21b7104b309f0a09cbbd368cee
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:261
+msgid ""
+"**Selection color** - this submenu allows to select the color of selected"
+" object in the viewer."
+msgstr ""
+
+# a83718e044e04194b5b4364098665d4b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:262
+msgid "**Viewer** - allows specifying the properties of the Plot 2D Viewer."
+msgstr ""
+
+# 69f2719887324886bf3d827da2147d24
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:264
+msgid ""
+"**Curve Type** - this allows to set the representation of graphs in your "
+"presentations. You can see only **Points**, points connected with "
+"**Lines** or points connected with smooth **Splines**."
+msgstr ""
+
+# 5f8b8c9fc6ea47a9ab8cf638c23c2e72
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:265
+msgid ""
+"**Marker Size** - this submenu allows you to set the size of markers in "
+"your graphs."
+msgstr ""
+
+# 129c0c94991c49689b89d488a67fce71
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:266
+msgid ""
+"**Horizontal** and **Vertical axis scale** - this submenus allow you to "
+"set the scale for vertical and horizontal axes. It can be either "
+"**Linear** or **Logarithmic**. Note that the **Logarithmic** scale can be"
+" used only if the minimum value of corresponding component (abscissa or "
+"ordinate) of all points displayed in the viewer is greater than zero. If "
+"this condition is not met, the scale is switched to **Linear** "
+"automatically, even if it is set to **Logarithmic**."
+msgstr ""
+
+# 7b767f32b7b94258984fac4db9c0f542
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:267
+msgid ""
+"**Deviation marker color** - this submenu allows to select the color of "
+"the deviation marker."
+msgstr ""
+
+# af4be0c82eb149049a8c4573ecb0ac0f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:268
+msgid ""
+"**Deviation marker line width** allows to define line width of the "
+"deviation marker."
+msgstr ""
+
+# 35480b5cdb6b4ade9284150e236dccaa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:269
+msgid ""
+"**Deviation marker tick size** allows to define size of the upper and "
+"lower horizontal lines of the deviation marker."
+msgstr ""
+
+# 760cff26bb7f46d8bd97c8674c4e4d14
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:271
+msgid "**Legend** - allows specifying the properties of the legend."
+msgstr ""
+
+# d1d9bf98fe71431fad83c73b84c5977c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:273
+msgid ""
+"**Show legend** - this options specifies if it's necessary to show legend"
+" by default."
+msgstr ""
+
+# ccb5dd3aba1d4f5db3a4a47119572c1c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:274
+msgid ""
+"**Legend Position** - this submenu allows to set the default position of "
+"the legend, it can be located to the left, to the right, on top or on "
+"bottom of the graph."
+msgstr ""
+
+# 68773c7e19594882b009a4de657ffa98
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:275
+msgid ""
+"**Symbol type** you can select the type of legend item symbol from "
+"\"Marker on line\" or \"Marker above line\""
+msgstr ""
+
+# 425fe67711294fc48e4dee06c3a5a79b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:276
+msgid ""
+"**Legend font** - this allows to set type and face for the font of Legend"
+" item."
+msgstr ""
+
+# 1f4104e03d8146b18f6dede2c54adff0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:277
+msgid ""
+"**Legend font color** - this allows to select the color of the font of "
+"the legend item."
+msgstr ""
+
+# b9ba0545068e4d3dad2a0bc917f473fd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:278
+msgid ""
+"**Highlighted legend font color** - this submenu allows to select the "
+"color of the font of the selected legend item."
+msgstr ""
+
+# 325e3a4cf33b4059a82854854146b4db
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:283
+msgid "Python Viewer Preferences"
+msgstr ""
+
+# fba9e050191c437f9759d742c4f9aed9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:289
+msgid ""
+"The following settings are default and will be applied only for newly "
+"created Python viewers. Customization of already opened viewers can be "
+"done using local :ref:`custom_python_preferences` called by clicking on "
+"the corresponding icon of :ref:`python_viewer_page`."
+msgstr ""
+
+# 905d601787624dc4a2055b1aa9f47d09
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:291
+msgid "**Font settings** allows setting font variant, size and style."
+msgstr ""
+
+# 1de289804ca2490185f3c50ef27cde52
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:292
+msgid "**Display settings** specifies the script representation in the viewer:"
+msgstr ""
+
+# 56ce71e58de04c9aa3286565338647d8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:294
+msgid ""
+"**Enable current line highlight** switches on background coloring of the "
+"current line."
+msgstr ""
+
+# ec277ce3752c4501ba58284bc8bf7222
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:295
+msgid "**Enable text wrapping** wraps lines at the view border of the editor."
+msgstr ""
+
+# 003b3091f67347e198d876417e3bfcaa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:296
+msgid ""
+"**Center cursor on scroll** scrolls the script vertically to make the "
+"cursor visible at the center of the viewer."
+msgstr ""
+
+# e326648b352a44f7ae7dec8af06b7f16
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:297
+msgid ""
+"**Display line numbers area** shows a panel with line numbers of the "
+"script at the left border of the editor."
+msgstr ""
+
+# c82b994b70b248f19e083b177717dc41
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:299
+msgid ""
+"**Tab settings** allows displaying tab indentation as a certain number of"
+" white-spaces."
+msgstr ""
+
+# c69c91f1ba1448e6869acfa5e1c211a1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:300
+msgid ""
+"**Vertical edge settings** manages drawing of a vertical line at the "
+"specified column of the viewer."
+msgstr ""
+
+# b12b9e82dec04b9295cb81118c2452cd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:303
+msgid "Directories Preferences"
+msgstr ""
+
+# 40d15ac7d9c942f8a482ddfbab12e2e5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:308
+msgid ""
+"**Quick Directory List** - this section allows to create and manage a "
+"custom quick directory list. To add a directory in the list, press the "
+"\"Add directory\" button:"
+msgstr ""
+
+# e725b3c2e57a49fda021a910b0fdb3cf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:313
+msgid ""
+"then the **\"...\"** button and browse the data tree for the directory "
+"you need. The \"Up\" and \"Down\" buttons(see the picture below) help you"
+" to sort the directories in the list:"
+msgstr ""
+
+# fea3a943cefe489790b9628be0dc2a13
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:322
+msgid ""
+"To remove the selected directory from the list, press the \"Delete\" "
+"button:"
+msgstr ""
+
+# dd60db969e5c45329b9c0294eb2256e4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:329
+msgid "Object Browser Preferences"
+msgstr ""
+
+# a930816a7839449c9ff1c34811765fb6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:334
+msgid "**Search Tool** - specifies behavior of the :ref:`using_find_tool_page`."
+msgstr ""
+
+# 3967790fde4e40d9a61e362c8a081f97
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:336
+msgid ""
+"**Enable auto-hiding** checkbox - hides the search tool automatically "
+"after short perioud of time when it is not used."
+msgstr ""
+
+# 687c4ce9fe13485bb360ba2dcb85c8f1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:340
+msgid ""
+"**Auto size for \"Name\" column** - this checkbox enables automatic "
+"resizing for the \"Name\" column."
+msgstr ""
+
+# 42d3dfcadedc4c5099b1514195200dee
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:341
+msgid ""
+"**Auto size for other columns** - this checkbox enables automatic "
+"resizing for the other columns."
+msgstr ""
+
+# 27e1625dbb8d45b3938cc5e13aabb674
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:342
+msgid ""
+"**Resize columns on expand item** - this checkbox enables resizing "
+"columns on expanding an object browser item."
+msgstr ""
+
+# 296c630f910946afab11935baff315be
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:343
+msgid ""
+"**Browse to the published object** - this combobox allows to enable "
+"automatic browsing to the objects just published to the study (using GUI "
+"dialogs only). It means that the object browser will be scrolled to the "
+"published objects, make them visible if they are collapsed and select the"
+" first of them. Three modes are allowed for activating this feature:"
+msgstr ""
+
+# 6c84b50131594b13b9dd718aba90b073
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:345
+msgid "**Never** - automatic browsing is disabled."
+msgstr ""
+
+# d1b2f93d69464f3d8f97e19449607f94
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:346
+msgid ""
+"**After Apply & Close only** - browsing is activated when the dialog is "
+"accepted by **Apply & Close** or **Ok** buttons (or if the objects are "
+"published without using a dialog, for example, by clicking a context menu"
+" button) and not activated when the **Apply** button is pressed and "
+"therefore the dialog remains visible."
+msgstr ""
+
+# 164ffa430c5d456ebdfa8ca5caa43111
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:347
+msgid "**Always** - automatic browsing is always enabled."
+msgstr ""
+
+# 4bf12cac54d04892ae9b046f39a4d7c3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:349
+msgid ""
+"**Default columns** - these checkboxes allow to display or hide "
+"**Value**, **Entry**, **IOR** and **Reference entry** columns in the "
+"Object Browser."
+msgstr ""
+
+# 8f5b32b2b30e431db7eaa22a72203b2c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:352
+msgid "Shortcuts Preferences"
+msgstr ""
+
+# e081f044dacf408690aa128eca010f21
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:357
+msgid ""
+"**Shortcuts settings** widget allows to define custom shortcuts for "
+"various operations. To change keyboard sequence for a certain action - "
+"select the action and press the custom keys combination."
+msgstr ""
+
+# b92effbcdf6240a1aa0b92349c31f60f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:360
+msgid ""
+":ref:`select_color_and_font_page`: \"Font and color preferences\" are "
+"most oftenly used types of user settings."
+msgstr ""
+
+# 4592c7a570f5405ba61b720caf16b4b3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:363
+msgid ""
+"When you change settings (click **OK** or **Apply** button) each module "
+"receives the notification about what preferences are changed. You can "
+"also click **Defaults** button to restore default preferences or "
+"**Close** button to quit the dialog box without any changes."
+msgstr ""
+
+# 6d9a4a3b874a438caebb458c37023766
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:368
+msgid ""
+"**Import** button allows loading specific user file containing "
+"preferences from any location at the computer through a standard Import "
+"dialog box."
+msgstr ""
+
+# 8400fd1b7e244f378c3bc72230433fe0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:375
+msgid ""
+"The preferences files usually have \\*.xml extension. Also, preferences "
+"files automatically saved by the application (stored in the "
+"~/.config/salome directory) have no extension and by default start with "
+".SalomeApprc. followed by SALOME version number. Usually there is a "
+"separate preferences file for each SALOME version in use. Preferences are"
+" saved to the file in the end of the working session and restored at the "
+"application start-up."
+msgstr ""
+
+# 8bf9524d3b064fa6bcdd1132288666cb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/setting_preferences.rst:384
+msgid ""
+"The preferences you set will be default preferences for all **new** "
+"objects, but they are not retroactive and do not automatically apply to "
+"the existing objects."
+msgstr ""
+

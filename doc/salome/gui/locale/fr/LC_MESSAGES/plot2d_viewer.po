@@ -1,0 +1,405 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 8c0d38178ed04c1f9a930b89c94aa46f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:5
+msgid "Plot 2D viewer"
+msgstr ""
+
+# ef36f53d766a41ce8caf1464c73b9843
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:7
+msgid ""
+"The functionalities of Plot2d viewer are available via its Viewer "
+"Toolbar. Buttons marked with small downward triangles have extended "
+"functionality which can be accessed by locking on them with left mouse "
+"button."
+msgstr ""
+
+# 286c07e6d77a4a7c96dd6811bff9d6ee
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:21
+msgid ""
+"**Dump View** - exports an object from the viewer in bmp, png or jpeg "
+"image format."
+msgstr ""
+
+# 037d30c9f0164c54b90b2825330367a4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:30
+msgid ""
+"**Fit all** - scales the display to show the entire scene. Use this to "
+"resize the scene so that it could fit within the Viewer boundary."
+msgstr ""
+
+# 09a7a02a0cd948de9fd02d80c3fe752a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:39
+msgid ""
+"**Fit area** - resizes the view to place in the visible area only the "
+"contents of a frame drawn with pressed left mouse button."
+msgstr ""
+
+# 5cf87a0cd45043958eff998309e7b3cd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:48
+msgid "**Zoom** - allows to zoom in and out."
+msgstr ""
+
+# 7058322dbbc34986838cda040a555389
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:56
+msgid ""
+"**Panning** - if the represented objects are greater that the visible "
+"area and you don't wish to use Fit all functionality, click on this "
+"button and you'll be able to drag the scene to see its remote parts."
+msgstr ""
+
+# e5a76f3d95314094bc5c95d25d25a14c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:66
+msgid ""
+"**Global panning** - allows to define the center of the scene presenting "
+"all displayed objects in the visible area."
+msgstr ""
+
+# 1d4caeea0d744b5f935af9d48dc9fdf0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:75
+msgid ""
+"**Draw Points** - switches display mode to *Points*. In this mode, each "
+"curve is displayed as a set of points."
+msgstr ""
+
+# e8cc1dce5c234d9da7c8e37a45582e4d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:84
+msgid ""
+"**Draw Lines** - switches display mode to *Lines*. In this mode, each "
+"curve is represented as a set of plain line segments."
+msgstr ""
+
+# 31b0ff6ce63a481cb5482809a68392d0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:93
+msgid ""
+"**Draw Splines** - switches display mode to *Splines*. In this mode, each"
+" curve is represented as a spline."
+msgstr ""
+
+# 485ddf22635d43d590410a87d071bda3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:102
+msgid ""
+"**Normalization to global minimum by left Y axis** - switches "
+"normalization mode to **Left Y Axis: Minimum normalization**. In this "
+"mode, all curves are normalized to the global minimum by the left Y axis."
+msgstr ""
+
+# cf25abc058734656b17f15628423fd72
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:109
+msgid ""
+"**Normalization to global maximum by left Y axis** - switches "
+"normalization mode to **Left Y Axis: Maximum normalization**. In this "
+"mode, all curves are normalized to the global maximum by the left Y axis."
+msgstr ""
+
+# 5bdfd7eb7b7c45288490201f878d89d1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:119
+msgid ""
+"**Normalization to global minimum by right Y axis** - switches "
+"normalization mode to **Right Y Axis: Minimum normalization**. In this "
+"mode, all curves are normalized to the global minimum by the right Y "
+"axis."
+msgstr ""
+
+# a2a4677fb39148f190e689c31ea1b0a7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:127
+msgid ""
+"**Normalization to global maximum by right Y axis** - switch "
+"normalization mode to **Right Y Axis: Maximum normalization**. In this "
+"mode, all curves are normalized to the global maximum by the right Y "
+"axis."
+msgstr ""
+
+# 84ecddf888234b289ce0a52ed2701d36
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:143
+msgid ""
+"These buttons allow to switch horizontal axis scale to the linear or "
+"logarithmic mode."
+msgstr ""
+
+# 9fdfd781226744c28e6a89fcc4dcf4d5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:147
+msgid ""
+"The logarithmic mode of the horizontal axis scale is allowed only if the "
+"minimum value of abscissa component of displayed points is greater than "
+"zero."
+msgstr ""
+
+# 6e56c9986bd6478590128e41cf656c73
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:161
+msgid ""
+"These buttons allow to switch vertical axis scale to the linear or "
+"logarithmic mode."
+msgstr ""
+
+# e20197d909a7417eb9ecc2cbd242a6d2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:165
+msgid ""
+"The logarithmic mode of the vertical axis scale is allowed only if the "
+"minimum value of ordinate component of displayed points is greater than "
+"zero."
+msgstr ""
+
+# f90c69fbbec54121ab8e0553d2b20303
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:174
+msgid ""
+"**Show Legend** - Shows / hides information about the displayed objects "
+"in a legend."
+msgstr ""
+
+# ea94f1330a9d41038576093a48e3fa10
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:183
+msgid ""
+"**Settings** - provides an access to the settings dialog box, that allows"
+" to specify advanced parameters for the Plot 2d Viewer."
+msgstr ""
+
+# aef50596d9c24800bb06b9718da86b3f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:189
+msgid "Settings"
+msgstr ""
+
+# 60408d27f9c44133b944c12c3f21fc01
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:194
+msgid "The following options are available:"
+msgstr ""
+
+# a2063a4e4e9b4b9f9c21ed8485c91054
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:196
+msgid ""
+"**Main title** is the XY plot title. By default, it contains the names of"
+" tables, from which the curve lines are constructed."
+msgstr ""
+
+# 97f866596e4f47dc862a670d7a876b81
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:199
+msgid "**Curve type** allows selecting from *Points*, *Lines* or *Spline*."
+msgstr ""
+
+# 9a4bcdfc50cf486ab11abfad42f05e1c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:201
+msgid "**Marker size** - size of the points (markers) forming curve lines."
+msgstr ""
+
+# 5455c3afb7e64c6390b9d35bc04a5e2c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:203
+msgid "**Background color** of the XY plot."
+msgstr ""
+
+# 4b49de357ced4af9b5e681ecbb56e6fa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:205
+msgid "**Selection color** - defines the color of selected object in the viewer."
+msgstr ""
+
+# ba98d69138874dc39de99e561d943f2c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:207
+msgid "**Legend** specifies the legend properties."
+msgstr ""
+
+# e4d35770ac70493caee6313d4155fd3f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:209
+msgid "**Show legend** - specifies if the legend is shown by default."
+msgstr ""
+
+# 8397b47c5d834bd9aa588bab5c554814
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:211
+msgid ""
+"**Legend Position** allows positioning the description table on XY plot "
+"(to the *Left*, to the *Right*,  on *Top* or on *Bottom*)."
+msgstr ""
+
+# 2cbde1d0af7d4de1bd4904d07396f0d7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:213
+msgid ""
+"**Symbol type** allows positioning the legend item symbol: \"Marker on "
+"line\" or \"Marker above line\"."
+msgstr ""
+
+# ff49c61e8aa94c958fe83dee7eb6538d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:215
+msgid ""
+"**Legend font** allows setting font variant, size and style for legend "
+"items."
+msgstr ""
+
+# d872cd85da9845bd9a0c879a24dc5f9e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:217
+msgid "**Legend font color** allows selecting the font color for legend items."
+msgstr ""
+
+# c4d35834ddff44debf47418c12d8ae42
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:219
+msgid ""
+"**Highlighted legend font color** allows selecting font color for "
+"selected legend items."
+msgstr ""
+
+# 269c4c52de004cdd97dfddabcece3baa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:221
+msgid ""
+"**Deviation marker** specifies the properties of the marker, which is "
+"used for drawing deviations data."
+msgstr ""
+
+# af9725dea6ff4f3fbf63f4d182fec0b7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:223
+msgid "**Line width** line width of the marker."
+msgstr ""
+
+# a1fff69dabe444c896ee4a5e33aa0b3a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:225
+msgid "**Tick size** size of the upper and lower horizontal lines of the marker."
+msgstr ""
+
+# 1102c359f861404883737634b626c609
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:227
+msgid "**Color** color of the marker."
+msgstr ""
+
+# 3850208e44054228acb9006e6bf01d7a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:229
+msgid ""
+"**Normalization** allows selecting the type of normalization (*minimum* "
+"or/and *maximum*) for the displayed presentations of 2d curves in the "
+"view."
+msgstr ""
+
+# 39a8b8bd3f7a4707b3d726b0c718ec72
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:233
+msgid ""
+"**Scale mode** allows selecting the type of scaling (*Linear* or "
+"*Logarithmic*) for **X (Horizontal)** or **Y (Vertical)** axes "
+"separately. Note that the *Logarithmic* scale can be used only if the "
+"minimum value of corresponding component (abscissa or ordinate) of all "
+"points displayed in the viewer is greater than zero."
+msgstr ""
+
+# 2eb9009b66464c70b3adcbf299cfd932
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:240
+msgid ""
+"**Axis ...** options group allows specifying additional settings for each"
+" axis separately:"
+msgstr ""
+
+# 04c4ba169b6646289c203122d7e495d8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:243
+msgid "**Axis title** - an axis title."
+msgstr ""
+
+# 90e6dc0e19584b53993a994c54401333
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:245
+msgid ""
+"**Grid / Axes marks** allows defining the maximum number of major and "
+"minor scale divisions for a given axis. The real number of intervals fits"
+" to {1,2,5}*10^N, where N is a natural number, and does not exceed the "
+"maximum."
+msgstr ""
+
+# 7d5bbac7fc0247c58b2896069bea8d63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:250
+msgid ""
+"**Save settings as default** If this check box is marked, all XY plots "
+"will be displayed with these defined properties."
+msgstr ""
+
+# efeb2353babb47688f8a1c8e5bb19a86
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:260
+msgid "Analytical curves"
+msgstr ""
+
+# 1efa3d36ad5b4621bb47544e38e4b805
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:265
+msgid ""
+"**Analytical curves** - provides an access to the analytical curves "
+"dialog box that allows to add, remove and modify analytical curves for "
+"the Plot 2d Viewer."
+msgstr ""
+
+# 27352ab37f524f1ba7a170bbf027b484
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:272
+msgid "The options are as follows:"
+msgstr ""
+
+# 87177ed06e404e5c9a4df7393231ea87
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:274
+msgid "Curve parameters:"
+msgstr ""
+
+# 51d5677fe5604ae6ab4657b5fe2af338
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:276
+msgid ""
+"**y(x)=** allows specifying a python expression, which is used to "
+"calculate the coordinates of the curve points, where **x** corresponds to"
+" the horizontal range, shown in plot 2D viewer."
+msgstr ""
+
+# 195b0ee5151547699c5c46d9f0a3103c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:280
+msgid "**Nb. itervals** allows specifying the number of the curve points."
+msgstr ""
+
+# c6422998f3b64f399d318bc4eb1f4fb7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:282
+msgid "Curve properties:"
+msgstr ""
+
+# aa21cb8d6b2140f183da3bb06c192d20
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:284
+msgid ""
+"**Auto assign** if checked, the properties (*Line type*, *Line width*, "
+"*Marker type* and *Color*) are assigned to curves automatically. To "
+"define the curve properties manually, uncheck this control."
+msgstr ""
+
+# 609fc2350634443ebe1231e3e4c9021f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:289
+msgid ""
+"**Line type** allows to choose curve line type from *None*, *Solid*, "
+"*Dash*, *Dot*, *Dash - Dot* and *Dash - Dot - Dot*."
+msgstr ""
+
+# 19d1bb34aacb4e30819e7115aa1750cf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:293
+msgid "**Line width** allows to specify line width of the curve."
+msgstr ""
+
+# 7ff4a059e07f4af389a2361fc0ab9f20
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:295
+msgid ""
+"**Marker type** allows to choose curve marker type from *Circle*, "
+"*Rectangle*, *Diamond*, *Rightward Triangle*, *Leftward Triangle*, "
+"*Downward Triangle*, *Upward Triangle*, *Cross* and *Diagonal Cross*)."
+msgstr ""
+
+# ba737f113d544994ac556ff4e410e335
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:300
+msgid "**Color** allows specifying the curve color."
+msgstr ""
+
+# 4276c0e2859f4792ba99274b557edc73
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:309
+msgid "**Clone view** - opens a new duplicate scene."
+msgstr ""
+
+# 3469e239d507416f9cc55310361a17e1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/plot2d_viewer.rst:317
+msgid "**Print view** - prints the current view scene."
+msgstr ""
+

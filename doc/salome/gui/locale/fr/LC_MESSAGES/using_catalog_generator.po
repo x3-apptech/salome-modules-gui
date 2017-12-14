@@ -1,0 +1,147 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# ca413d61997041c48748754d9dbc4999
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:5
+msgid "Using Catalog Generator"
+msgstr ""
+
+# f72fd1f7fa76431ca63b0d6b6e50e072
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:7
+msgid ""
+"SALOME platform is an open platform for integration of your custom "
+"components, which can used in the same way as typical modules provided in"
+" the standard installed package. The **Catalog Generator** tool serves "
+"for implementation of the interface of your custom component. It allows "
+"to generate from IDL description of your component interface its xml "
+"description.  The component xml description allows SALOME application to "
+"know about the component and its services and provides the possibility to"
+" call the component services, for example, inside Supervisor module."
+msgstr ""
+
+# 6a3b5cdc4acc4adcadcf69c66b301996
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:17
+msgid ""
+"If you have a look at runSalome, runSalomeWithPort scripts running SALOME"
+" application, which are stored in build/bin directory you will see that "
+"SALOME_ModuleCatalog_Server is started with two xml files as its input "
+"parameters: **CatalogModuleGeneral.xml** and "
+"**CatalogModulePersonnel.xml**. These two files store the descriptions of"
+" interfaces and services of all components, provided with typical SALOME "
+"package. To add a new component into SALOME platform you should either "
+"update one of these existing xml files with generated xml description of "
+"your component or create a new one."
+msgstr ""
+
+# cf27325c458642ff9b6e02f86073a0dd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:28
+msgid "*To open the Catalog Generator:*"
+msgstr ""
+
+# cfd82896bc744c2ea9deb7c9bd1b1472
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:30
+msgid ""
+"From the main menu choose **Tools > Catalog Generator**, the following "
+"dialog box will appear:"
+msgstr ""
+
+# c39d278080f640db98913577cc760828
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:36
+msgid "In this dialog box you can specify:"
+msgstr ""
+
+# 1ad43600b0754365a776f048ce50bcb3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:38
+msgid ""
+"Name and location of the IDL file describing the interface of your "
+"component (Click the **Browse** button to find it using the data tree)."
+msgstr ""
+
+# 5cb26b517b3d4b7db2d36a0a733577d1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:39
+msgid ""
+"Name and location of an existing XML file, which will be updated with the"
+" interface of you component or name and desired location of a new XML "
+"file, which will be generated (Click the **Browse** button to find it "
+"using the data tree)."
+msgstr ""
+
+# a1205640dd024faca5e0443621dd9c75
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:40
+msgid "Name of the author."
+msgstr ""
+
+# bd6a2b4417884b3480de0519b36019db
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:41
+msgid "Name of the component."
+msgstr ""
+
+# fa59aa40e5b640ebbd691011e35da2f1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:42
+msgid "Name of the user."
+msgstr ""
+
+# c64f5a8333834dd5943fd35adae95bcb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:43
+msgid "Version."
+msgstr ""
+
+# 44ed1a6885ba4f20a1eb5c0b19b7a02f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:44
+msgid "Capability of multi study support."
+msgstr ""
+
+# ace23e61c47b495289c6b343c7f9a32a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:45
+msgid "Type of the component."
+msgstr ""
+
+# 85f6edd727824fb39c3e4a0ce5891c46
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:46
+msgid ""
+"Icon of your component (Click the **Browse** button to find it using the "
+"data tree)."
+msgstr ""
+
+# ade8197d740c4396b53cd5e557c91040
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:50
+msgid ""
+"If you have chosen to create a new xml file containing the description of"
+" your component, don't forget to specify it as input parameter for "
+"SALOME_ModuleCatalog_Server in the file, you are using as a running "
+"script of SALOME platform (in runSalomeWithPort, for example)."
+msgstr ""
+
+# d6dbc919e0a54457bf682d81fb7dcae1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:52
+msgid ""
+"When launching SALOME next time you will see your module alongside other "
+"components."
+msgstr ""
+
+# 18fd1b5b5c43492c97ee5476e6b292a4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_catalog_generator.rst:54
+msgid ""
+"**Tip:** You can use the **Catalog Generator** tool, if you would like to"
+" **test** the functionality of your new component. After implementation "
+"of your component interface, launch SUPERVISION module where you can try "
+"using the services of your new component. (see also: Adding factory "
+"nodes)"
+msgstr ""
+

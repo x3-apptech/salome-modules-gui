@@ -47,6 +47,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation>Version %1</translation>
     </message>
     <message>
+        <source>SALOME_SITE</source>
+        <translation>SALOME Website</translation>
+    </message>
+    <message>
+        <source>SALOME_FORUM</source>
+        <translation>SALOME Forum</translation>
+    </message>
+    <message>
+        <source>SALOME_VIDEO_TUTORIALS</source>
+        <translation>Video Tutorials</translation>
+    </message>
+    <message>
         <source>ENTRY_COLUMN</source>
         <translation>Entry</translation>
     </message>

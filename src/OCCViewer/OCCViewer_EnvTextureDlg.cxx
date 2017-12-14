@@ -218,7 +218,7 @@ void OCCViewer_EnvTextureDlg::ClickOnHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "occ_3d_viewer_page.html", "env_texture" );
+    app->onHelpContextModule( "GUI", "occ_3d_viewer.html", "env-texture" );
 }
 
 /*!

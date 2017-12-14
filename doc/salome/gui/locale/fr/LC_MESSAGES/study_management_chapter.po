@@ -1,0 +1,277 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# e8b419e370784719a04b09169115e194
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:5
+msgid "Study management"
+msgstr ""
+
+# ff27b50ec309457db9c642d72a70a73b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:7
+msgid ""
+"Study is a document within the application, where you can carry out all "
+"operations provided by the SALOME functionality. This is a certain "
+"abstraction layer between actual document data (probably, remote data "
+"available through CORBA) and data presentation (in the Object Browser). "
+"The study is composed of Data Object instances, combined into a tree-like"
+" structure."
+msgstr ""
+
+# 0ea617e2befe42b2882390b15f9aa068
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:14
+msgid "All operations with study are available from the **File** menu."
+msgstr ""
+
+# a82fdd9d2a444a45a0236c9fbc0a43de
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:16
+msgid ""
+"SALOME is a single-study application. It means that only one study can be"
+" opened at the moment."
+msgstr ""
+
+# a2fbe607915c4cb3a71b64bdc67ede31
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:18
+msgid ""
+"Immediately after the application is launched there is (normally) no "
+"active study. However, you have access to the embedded Python console, "
+"that can be used to initialize a study by means of Python API (see "
+"documentation on SALOME KERNEL module for more details)."
+msgstr ""
+
+# b38a0a79d98141fab8b0ca80c66a4e19
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:22
+msgid "The following operations are available from the **File** menu:"
+msgstr ""
+
+# 0d79c41e80594334924befb32e595367
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:27
+msgid ""
+"As soon as a study is created or loaded from a file or a data server, "
+"additional operations become available from the **File** menu:"
+msgstr ""
+
+# 152f1d0a7ebd409097fb6593af2d8513
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:33
+msgid ""
+"**New** - creates a new study. The study will be created with default "
+"name **Study1**. If there is an already opened study, you will be asked "
+"to close it before creating new one."
+msgstr ""
+
+# d26a0983226c40c0895b8a99cf0a9143
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:37
+msgid ""
+"**Open** - allows to open an existing study by browsing for it in a "
+"standard Open File dialog box, choosing the required *.hdf file and "
+"clicking *Open* button. If there is already opened study, you will be "
+"asked to close it before opening new one."
+msgstr ""
+
+# 3ed224d5fa884a4c922393cf892c456f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:43
+msgid ""
+"**Reopen** - reloads the current study from the associated \\*.hdf file. "
+"This menu command can be used to reverse the study to the latest saved "
+"state."
+msgstr ""
+
+# 461f84d8074e46448cf4a0a715c95bac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:46
+msgid ""
+"**Save** - saves the current study. Saving a study you also save its "
+"layout, i.e. all positions and sizes of dockable windows. It means that "
+"the difference in settings of the same windows (for example Python "
+"console) is possible between different modules (the same window can have "
+"different size and position when other module is activated). Also each "
+"module can indicate which common windows are necessary for working, and "
+"only they will be displayed when this module is active."
+msgstr ""
+
+# 44d5ab19400840e1be26e8d0f8b71eb3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:54
+msgid ""
+"If the study hasn't been previously saved, **Save** will call the "
+"standard Save File dialog box where you can enter the name for your study"
+" and save it."
+msgstr ""
+
+# 3a100b8e93e34b29b43e5ffb6d947dd9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:56
+msgid ""
+"**Save as** - allows to save the current study with a new name. Input a "
+"new name for the study in the standard Search File dialog box and click "
+"*Save* button."
+msgstr ""
+
+# f5727ac6d29940359c7e0496e8fa942e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:60
+msgid ""
+"**Close** - closes the current study; alternatively closing of the study "
+"can be done by clicking on the cross in the upper right corner of the "
+"desktop window."
+msgstr ""
+
+# 1e2135da3b984be6bbb84b5c13e51ab5
+# b02293ff7d224cae8512057e75e4d608
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:77
+msgid ""
+"If the study has not been previously saved, you will be prompted by the "
+"following dialog box with several options:"
+msgstr ""
+
+# aa6f420e138b44d48f57a36bc29fa6c4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:68
+msgid "**Connect** - allows to open an unloaded or created outside GUI study."
+msgstr ""
+
+# f6d15463a7804518966ea9469cf6a706
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:70
+msgid "Connect is available only if there is an opened study on the data server."
+msgstr ""
+
+# 0e260a1a36074eabafa16966a1a53712
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:72
+msgid ""
+"**Disconnect** - unloads the current study from the desktop. The study "
+"stays opened in the data server; it can be then reloaded in the same "
+"working session (using **Connect** operation), but if you quit SALOME "
+"application, all changes in the unloaded study can be lost."
+msgstr ""
+
+# 207789bcd2ba4ff1b19f74c34aeee0de
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:82
+msgid ""
+"**Dump study** - allows to Dump a SALOME Study in one or several Python "
+"scripts. The following dialog box allows to browse for the location and "
+"define the name for a Python file."
+msgstr ""
+
+# cbf3d01b882b4353b26ae3ceb2df18d8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:90
+msgid ""
+"**Publish in study** - if checked in, the component objects created by "
+"Python commands will be published in the created Study when the script is"
+" played, otherwise the objects will not be published in the Study."
+msgstr ""
+
+# c28297a2177442f09a29989653a28595
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:92
+msgid ""
+"**Save GUI state** - if checked in, the current application layout will "
+"be saved in the Python file."
+msgstr ""
+
+# 6ee970eeab874f6482f5f724e98acd86
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:95
+msgid "To confirm your choice click *Save*."
+msgstr ""
+
+# d72902d062634c0a818022e86edbf056
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:97
+msgid "**Load Script** - allows to load a saved Python Script."
+msgstr ""
+
+# bc5ba2bb04444997b524181d28028017
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:102
+msgid "To confirm your choice click *Open*."
+msgstr ""
+
+# c6f666b62a424137938f141b297643bb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:104
+msgid "**Properties** - allows to show/edit the properties of the current study."
+msgstr ""
+
+# bea99405842a46d68ac63eddc0cde9f8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:109
+msgid "**Author** - allows to change the name of the study author."
+msgstr ""
+
+# b370cbb1b2184bb7b989358bb9cb463a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:110
+msgid "**Creation date** - gives the date and time of Study creation."
+msgstr ""
+
+# 6222734e665a45f5a15c44eda2727cc3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:111
+msgid ""
+"**Locked** - allows to lock the study for modifications. In case if "
+"**Locked** checkbox is checked your study will be locked for any "
+"modifications for all users. Next time you try to edit it, you will see "
+"the following warning message:"
+msgstr ""
+
+# 43f6f629b9ec4cf9b02e5d7204f6fcfc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:116
+msgid ""
+"**Modified/Not Modified** - allows to see if any modifications have been "
+"introduced into study since its last save."
+msgstr ""
+
+# 02aec2d893974cca87b0cd2a0659f5b0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:117
+msgid "**Length units** - allows to change the units of the study."
+msgstr ""
+
+# 375675ee183c4013bc8a9d6f29251c56
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:118
+msgid "**Comment** - allows to add arbitrary comment for the study."
+msgstr ""
+
+# ca5ea9e84598488cb422cf2eafebfa95
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:119
+msgid ""
+"**Modifications** - allows to  view the list of changes made in the "
+"study. Each record contains the date and time of the modification and the"
+" name of the user, who has introduced it."
+msgstr ""
+
+# aa9eecb09d8c48c9a41693a84301dd52
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:120
+msgid ""
+"**Stored data** - Shows the versions of data currently stored in the "
+"study. Note, that this information does not concern the current versions "
+"of SALOME modules, it shows the version in which the data has been "
+"initially created. If the study is re-saved in the version of SALOME, "
+"different from the initial one, the version information is highlighted by"
+" the red-colored font, which means that the version information is not "
+"actually valid."
+msgstr ""
+
+# 15711f895f8b4204aef358f0cf85b4c3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:122
+msgid ""
+"**Preferences** - allows :ref:`setting_preferences_page` applicable to "
+"Salome in general and its modules."
+msgstr ""
+
+# 1198a9e91ae043d4b763b706cebc9259
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:124
+msgid ""
+"**Most recently used** - contains a list of recently opened studies, "
+"giving the possibility to fast load the required study."
+msgstr ""
+
+# 7617140e81a34367af8934a673aab006
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/study_management_chapter.rst:127
+msgid ""
+"**Exit** - unlike **Close**, closes not only the current, but all opened "
+"Salome studies."
+msgstr ""
+

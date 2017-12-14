@@ -122,7 +122,7 @@ void LightApp_PreferencesDlg::onHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "setting_preferences_page.html" );
+    app->onHelpContextModule( "GUI", "setting_preferences.html" );
 }
 
 /*!Store preferences on apply.*/

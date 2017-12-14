@@ -184,5 +184,5 @@ void OCCViewer_RayTracingDlg::ClickOnHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "occ_3d_viewer_page.html", "ray_tracing" );
+    app->onHelpContextModule( "GUI", "occ_3d_viewer.html", "ray-tracing" );
 }

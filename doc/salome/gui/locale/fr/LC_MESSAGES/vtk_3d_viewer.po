@@ -1,0 +1,459 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 3a48480d05004b6488b7cb5677bf2a3d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:5
+msgid "VTK 3D Viewer"
+msgstr ""
+
+# f6a45f2e426c413a8edb084280d8cc23
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:8
+msgid "Operations"
+msgstr ""
+
+# c36810575ae74b16849882ad9b378d93
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:10
+msgid ""
+"The functionalities of VTK viewer are available via its Viewer Toolbar. "
+"Buttons marked with small downward triangles have extended functionality,"
+" which can be accessed by locking on them with left mouse button."
+msgstr ""
+
+# 8a9ca03dea5149ae84d3746be9b24d63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:25
+msgid ""
+"**Dump View** - exports an object snap-shot from the viewer in bmp, png "
+"or jpeg image format."
+msgstr ""
+
+# 71386da91d6c444cbc09a3ac140c5a0c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:33
+msgid ""
+"**Interaction style switch** - allows to switch between \"Salome standard"
+" controls\" and \"Keyboard free\" :ref:`viewer_navigation_modes`."
+msgstr ""
+
+# 9e7b494762a94cc3928c57eef624789d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:43
+msgid ""
+"**Zooming style switch** - allows to switch between standard (zooming at "
+"the center of the view) and advanced (zooming at the current cursor "
+"position) zooming styles. The second mode is available only for parallel "
+"(non-perspective) view's mode."
+msgstr ""
+
+# 0fa73d58a65342aaaf39cbab3d8c9833
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:54
+msgid ""
+"These buttons allow switching between three pre-selection (highlighting) "
+"modes:"
+msgstr ""
+
+# 798585a5982f423fb050e40944145be8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:56
+msgid ""
+"**Static pre-selection mode** - pre-selection is done in terms of "
+"bounding boxes;"
+msgstr ""
+
+# 19eb06cc5bb44a37b373470b3bc5c2c1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:57
+msgid ""
+"**Dynamic pre-selection mode** - pre-selection is done in terms of cells,"
+" i.e. an object can be selected by clicking the point/cell belonging to "
+"this object. This mode causes some performance loss. It is advisable to "
+"switch dynamic pre-selection off to have a good performance on big "
+"objects (for example, huge meshes);"
+msgstr ""
+
+# cf6164a49abd44d8ab453a59f7bb964a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:58
+msgid "**Disable pre-selection** - pre-selection is disabled."
+msgstr ""
+
+# 847c82712fe342789db13ab3d42c9520
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:67
+msgid "**Enable/Disable selection** - enables or disables selection in the view."
+msgstr ""
+
+# 7445990def5c4f8fa48059e7d84b8d4e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:75
+msgid "**Show/Hide Trihedron** - shows or hides coordinate axes."
+msgstr ""
+
+# 2df2f66194d44a6dad1fa3cbb4ca2931
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:83
+msgid ""
+"**Fit all** - scales the presentation so that it could fit within the "
+"Viewer boundaries."
+msgstr ""
+
+# f015550a2e3c4ef0aa1448fa7242f8ac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:92
+msgid ""
+"**Fit area** - resizes the view to place in the visible area only the "
+"contents of a frame drawn with pressed left mouse button."
+msgstr ""
+
+# fe79e168fa1d4a279750e8598a25aec6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:101
+msgid "**Fit selection** - fits view contents to the current selection."
+msgstr ""
+
+# ab1137726884400db979dc517c7780ac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:109
+msgid "**Zoom** - allows to zoom in and out."
+msgstr ""
+
+# 755188d148b5480a9b03e34b4f55fecc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:117
+msgid ""
+"**Panning** - if the represented objects are greater that the visible "
+"area and you do not wish to use **Fit all** functionality, click on this "
+"button to drag the scene to see its remote parts."
+msgstr ""
+
+# 4ce7bd1d7daf449894cff22f65294953
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:127
+msgid ""
+"**Global panning** - allows to select a point to be the center of the "
+"presentation showing all displayed objects in the visible area."
+msgstr ""
+
+# 4ae4a21184e04093895bcbafe79d7514
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:136
+msgid ""
+"**Change rotation point** - allows to to choose the point around which "
+"the rotation is performed."
+msgstr ""
+
+# 0373c8ac75094a5ca212f99a7be69903
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:142
+msgid ""
+"By default the rotation point is located in the Center of the bounding "
+"box of an object."
+msgstr ""
+
+# 4b32a7f25de948ddb62d4cb4995483e4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:148
+msgid ""
+"Unchecking **Use Bounding Box Center** check-box allows you to define the"
+" coordinates of the rotation point manually."
+msgstr ""
+
+# d8ac091748044da2be694936296eca97
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:151
+msgid "**Set to Origin** button restores the default rotation point coordinates."
+msgstr ""
+
+# e46849d67fe54ab99378f2ebf150399c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:153
+msgid ""
+"**Gravity Center of Selected Object** button allows using the gravity "
+"center of the object selected in the viewer as the center of the rotation"
+" point. When you click this button, you should first choose the type of "
+"selectable object: Point, Edge, Face or Solid and only then proceed with "
+"selection in the viewer."
+msgstr ""
+
+# d86cb8e9447d483daca0ab3d23d00852
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:162
+msgid "**Rotation** - allows to rotate the selected object using the mouse."
+msgstr ""
+
+# 319b76c242654997addd352006c91d38
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:186
+msgid ""
+"These buttons orientate the scene strictly about coordinate axes: "
+"**Front**, **Back**, **Top**, **Bottom**, **Left** or **Right** side."
+msgstr ""
+
+# 4aa43bdd15284f328d5733cdda008307
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:195
+msgid ""
+"**Rotate counter-clockwise** - rotates view 90 @htmlonly &deg; "
+"@endhtmlonly counter-clockwise."
+msgstr ""
+
+# 53fe5737d7644fc986dc5f8ad5428b45
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:203
+msgid ""
+"**Rotate clockwise** - rotates view 90 @htmlonly &deg; @endhtmlonly "
+"clockwise."
+msgstr ""
+
+# 79faf7dc61a24ee7be3b844d5a85cbbf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:211
+msgid ""
+"**Reset** - restores the default position (isometric) of objects in the "
+"scene."
+msgstr ""
+
+# 0570456b70ff41c089313e9837f8f5a1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:220
+msgid ""
+"**Update Rate** - allows to define the Update Rate for the presentations "
+"displayed in the viewer."
+msgstr ""
+
+# 7622b93c90bd44498b193adb24f86480
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:226
+msgid "**Desired Update Rate, FPS** - allows to set the target Update Rate"
+msgstr ""
+
+# 349dc763ba194d14b6fd61c91512a37c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:228
+msgid ""
+"**Still Update Rate, FPS** - allows to set the Update Rate for the "
+"periods when both the user and the application do not perform any actions"
+" in the viewer"
+msgstr ""
+
+# 94d760f73c9a4df3b4708d9de19e3231
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:230
+msgid ""
+"**Current Update Rate, FPS** - shows the Update Rate currently available "
+"on your configuration"
+msgstr ""
+
+# a22d4e67fd024827a7be984f4ee1890a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:232
+msgid "**Number of Cells** - shows the number of cells currently in display"
+msgstr ""
+
+# ab7919b315fb4fca8951044c329cfc96
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:241
+msgid ""
+"**Scaling** - represents objects deformed (stretched or stuffed) along "
+"the axes of coordinates."
+msgstr ""
+
+# a67c15bfb2474e888d148b2e60c6783d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:249
+msgid ""
+"**Graduated axes** - allows to define parameters of axes and graduate "
+"them."
+msgstr ""
+
+# 7b256cab465c4880b630e62517e0e597
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:254
+msgid "**Axis name** - if checked the axis name is displayed in the viewer."
+msgstr ""
+
+# 50fdbf6c654f40b49e3080bbc5b06d48
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:256
+msgid "**Name** - allows to redefine the name of the axis."
+msgstr ""
+
+# 9473ee7e5631410daa9e9bd45687b5d3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:258
+msgid "**Font** - allows to define color and properties of the font of axis name."
+msgstr ""
+
+# c43b6b6ba3a94a098f5521307f929767
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:260
+msgid "**Labels** - if checked the labels are displayed in the viewer."
+msgstr ""
+
+# 3817b92d21db449bbce6b834a3dbeeaf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:262
+msgid "**Number** - allows to define the number of labels."
+msgstr ""
+
+# 13ca6c6b429f4ba5899b9b164247dac5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:264
+msgid "**Offset** - allows to define the distance between labels."
+msgstr ""
+
+# 1b73f054b13941c395ac032d49b53a12
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:266
+msgid ""
+"**Font** - allows to define color and properties of the font of labels "
+"names."
+msgstr ""
+
+# 3116afbb662846d8b45886a7fae2ee53
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:268
+msgid "**Tick marks** - if checked the tick marks are displayed in the viewer."
+msgstr ""
+
+# 9c32c2784b53477baf8d659a8bcfb7d9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:270
+msgid "**Length** - allows to define the length of tick marks."
+msgstr ""
+
+# ad775ee4301747acbd9c1baaf58ebf0e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:272
+msgid "**Is visible** - if checked the axis is displayed in the viewer."
+msgstr ""
+
+# c8ebc4d053fb4a5ba460d8db269b0e7e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:281
+msgid ""
+"**Change View Parameters** - this button gives access to the dialog for "
+"customization of various view parameters."
+msgstr ""
+
+# d8eb365044ee4321934e5930ee09f1ef
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:287
+msgid ""
+"**Projection Mode** - switches between the **Orthogonal** and "
+"**Perspective** projection modes."
+msgstr ""
+
+# cc73c89b0407427d8238c4f26488831d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:289
+msgid "**Focal Point** - allows to specify the focal point of the view"
+msgstr ""
+
+# 6f4fcf6f410040d7b09c6a2c0e7823b0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:291
+msgid ""
+"**Set to Bounding Box Center** - chooses the center of the bounding box "
+"of the current scene as the focal point;"
+msgstr ""
+
+# f22c594f762e406dba86a17d00d9440f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:292
+msgid ""
+"**Set to Origin** - chooses the global coordinates system origin as the "
+"focal point;"
+msgstr ""
+
+# 79d5e3a52f4543dd8a9f2ff72795dcbd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:293
+msgid ""
+"**Select Point from View** - allows to specify the focal point by the "
+"direct selection of a point in the view window;"
+msgstr ""
+
+# 0ff3ae1886094ad0aaa7668a2c86d412
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:294
+msgid ""
+"**X**, **Y**, **Z** - allows to input the coordinates of the focal point "
+"directly."
+msgstr ""
+
+# 40ab2dcd2eb14d149eb6186917df9cdc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:296
+msgid "**Camera Position** - allows to specify the position of the view camera:"
+msgstr ""
+
+# 557a2ab9dee14e82a6e8d2f6898aa4b2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:298
+msgid "**Absolute Coordinates** - in absolute coordinates;"
+msgstr ""
+
+# 2254b40b26a94f90b6f07d39721e709a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:299
+msgid "**Relative to Focal Point** - as a offset to the focal point;"
+msgstr ""
+
+# f5c164287b194e6fb6d0c76a0a2dc973
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:300
+msgid ""
+"**Projection Direction** - allows specify the direction of the projection"
+" vector;"
+msgstr ""
+
+# bb6bdb260dc84facbca68ae61d4d8a87
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:301
+msgid "**Focal Distance** - the focal distance value."
+msgstr ""
+
+# 57b9a58e799945128e412b155ff4f868
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:303
+msgid "**View Up Direction** - direction of the \"view up\" vector."
+msgstr ""
+
+# 93971003bb384e2e8212394fdb935267
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:305
+msgid "**Zooming**"
+msgstr ""
+
+# f1ddd3eef47043c7afedc5df8078f626
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:307
+msgid ""
+"**Scale** - the current zoom factor (available in the **Orthogonal mode**"
+" only);"
+msgstr ""
+
+# 5aa65046b1e24b4ba58f0f53eba6a4a8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:308
+msgid ""
+"**View Angle** - the current view angle (available in the **Perspective "
+"mode** only)."
+msgstr ""
+
+# 093375939da14fafa0c4dce4c616df22
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:317
+msgid ""
+"**Synchronize view** - allows to synchronize 3d view parameters. This "
+"button has two states - checked and unchecked. Clicking on this button "
+"opens a drop-down menu listing compatible 3d views. When a view is "
+"selected in the list , the parameters (view point, position, zoom "
+"coefficient, etc.) of the current view are synchronized with the selected"
+" view (static synchronization)."
+msgstr ""
+
+# 0aa7b4a340904754a02fb17f6082f86f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:323
+msgid ""
+"In addition, when this button is \"checked\", the views are synchronized "
+"dynamically, i.e. any zoom, pan, rotate or other view operation done in "
+"one view is automatically applied to the other view."
+msgstr ""
+
+# 3fea394d277f432eab0aca38d2dbf26e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:333
+msgid "**Orthogonal mode** - Switches the view to the orthogonal mode."
+msgstr ""
+
+# a6a941bc363a44119c6f3b5d03d58c15
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:341
+msgid "**Perspective mode** - Switches the view to the perspective mode."
+msgstr ""
+
+# 63f3c1e950e64a86a4d1eed5a4d2bb45
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:358
+msgid ""
+"These buttons allow recording viewing operations as a video file in the "
+"AVI format using external software (jpeg2yuv):"
+msgstr ""
+
+# 1e9e05ecfb5545b18cc0317bef4e44e2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:361
+msgid "**Start recording** - specify parameters and start recording;"
+msgstr ""
+
+# 27c558d1229b436bb26a0d2d214ff16d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:363
+msgid "**Pause recording** - suspend recording;"
+msgstr ""
+
+# e553f80a57ee4dc692bfc67887a04a95
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:365
+msgid "**Continue recording** - resume recording;"
+msgstr ""
+
+# b8477725e26e44fab4ab33e41881fd70
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/vtk_3d_viewer.rst:367
+msgid "**Stop recording** - stop recording."
+msgstr ""
+

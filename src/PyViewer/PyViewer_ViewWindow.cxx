@@ -423,9 +423,9 @@ void PyViewer_ViewWindow::onHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app ) {
-    QString page = "python_viewer_page.html";
+    QString page = "python_viewer.html";
     if ( qobject_cast<QWidget*>( sender() ) )
-      page += "#custom_python_preferences";
+      page += "#custom-python-preferences";
     app->onHelpContextModule( "GUI", page );
   }
 }

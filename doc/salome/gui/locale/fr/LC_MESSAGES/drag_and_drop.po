@@ -1,0 +1,232 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 9200d6a2d1844c9481302767e7661566
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:5
+msgid "Implementing Drag and Drop functionality in SALOME module"
+msgstr ""
+
+# b9c1f0ead041494ebf746296d4668aa4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:0
+msgid "Table of Contents"
+msgstr ""
+
+# d3f4d8edbcea4ad8bcbf33ccd91e48a6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:9
+msgid ""
+"**Drag and Drop** provides a simple visual mechanism to transfer "
+"information between and within applications."
+msgstr ""
+
+# ecb0ca211c3c4bf69244e773643da3d4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:12
+msgid ""
+"In some aspects Drag and drop operates similarly to the clipboard "
+"copy/cut/paste mechanism."
+msgstr ""
+
+# 69fe06b44d4744dea55a3b93ad4581c0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:15
+msgid ""
+"Since SALOME GUI is implemented on Qt, the drag and drop functionality "
+"support is provided by means of the corresponding Qt mechanisms."
+msgstr ""
+
+# ca821ed8f6f740349bc7ac1f7da0316e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:18
+msgid ""
+"Currently dragging and dropping of the items can be done within Object "
+"browser only, however this functionality can be extended to other GUI "
+"elements as well."
+msgstr ""
+
+# ad2feb0b721e4e09a4ccc300e4c23a78
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:24
+msgid "Enabling drag and drop in SALOME module"
+msgstr ""
+
+# cd261b7b6164434193df4d9b53872acd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:26
+msgid ""
+"The Drag and drop functionality is enabled by default in the Object "
+"browser. However, to allow dragging of a data object or dropping data on "
+"it, it is necessary to redefine **isDraggable()** and "
+"**isDropAccepted()** methods of the corresponding class, a successor of "
+"the **SUIT_DataObject**. These methods are defined in the base class "
+"**SUIT_DataObject** and default implementation of both functions returns "
+"**false**, which prevents dragging and dropping:"
+msgstr ""
+
+# 36fda16fb1274be1b22c0615dec21862
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:45
+msgid ""
+"If your data model is based on the **SUIT_DataObject** and "
+"**SUIT_TreeModel**, just re-implement these functions in your successor "
+"data object class and return **true** when it is needed (for example, "
+"depending on the data object type, state, etc)."
+msgstr ""
+
+# 09b5c44e19e5480892ee2531656bfecb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:49
+msgid ""
+"Another alternative is available if your module is directly inherited "
+"from **LightApp_Module** or **SalomeApp_Module** class (as the majority "
+"of existing SALOME modules). The class **LightApp_Module** (and thus "
+"**SalomeApp_Module** also) already provides high-level API that can be "
+"used for enabling drag and drop functionality."
+msgstr ""
+
+# 03e22c0bffef45798f6db41024442b63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:54
+msgid ""
+"To enable dragging, redefine **isDraggable()** method of your module "
+"class. In this method you can analyze the data object subject to the drag"
+" operation and decide if it is necessary to enable or prevent its "
+"dragging:"
+msgstr ""
+
+# 7b0b499d1be04f09b345b1f4dc41c1f2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:71
+msgid ""
+"Note, that you should not invoke here method **isDragEnabled()** of your "
+"data object class (in case if it inherits **LightApp_DataObject** or "
+"**SalomeApp_DataObject**), unless you redefine methods **isDraggable()** "
+"and **isDropAccepted()** in your data object class. The reason is that "
+"the implementation of these methods in **LightApp_DataObject** class "
+"redirects calls to the **LightApp_Module** - be careful to avoid entering"
+" endless recursion loop."
+msgstr ""
+
+# d1ad6f043a0644baab90c8263486b29b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:78
+msgid ""
+"To allow data dropping to an object (the object under the mouse cursor in"
+" the Object browser during the drag operation) redefine "
+"**isDropAccepted()** method of your module class:"
+msgstr ""
+
+# b0a027ba1eb0472c85de792798b6b3ae
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:95
+msgid ""
+"The caution about avoiding recursive loop mentioned above is also valid "
+"for **isDropAccepted()** method."
+msgstr ""
+
+# dd17374552fa4090b7c523afe1003891
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:101
+msgid "Handling data dropping"
+msgstr ""
+
+# 6ef963370b9b425b85518b84a0779bf1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:103
+msgid ""
+"When dragging operation is completed (the data is dropped to an object) "
+"the module owning the item on which the data is dropped is notified by "
+"invoking its **dropObjects()** method:"
+msgstr ""
+
+# 8030f81706f045198257acf181a5e82b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:115
+msgid ""
+"The default implementation does nothing. However, this method can be "
+"redifined in the successor class and handle the operation properly. The "
+"list of dropped data objects is passed via **what** parameter. The data "
+"object on which the data is dropped is passed via **where** parameter. "
+"The parameter **row** specifies in the children list the position of "
+"object where data is dropped; if this parameter is equal to -1, the data "
+"is dropped to the end of the children list. Performed drop action is "
+"passed via **action** parameter; possible values are **Qt::CopyAction** "
+"and **Qt::MoveAction** (other actions are currently unsupported)."
+msgstr ""
+
+# b7d1e488938b44898da6a1055ae1689b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:124
+msgid ""
+"The method **dropObjects()** should analyze the parameters and apply the "
+"corresponding actions for rearrangement of the data tree, copying or "
+"moving the data items depending on the operation performed. For example:"
+msgstr ""
+
+# bedf284048f746cb831166b8a3c39df2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:155
+msgid ""
+"In the above code the function **copyOrMove()** performs actual data tree"
+" rearrangement."
+msgstr ""
+
+# 3cd2ffe9e3ac46e7ba0bcdcf4fa3bcc2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:161
+msgid "Drag and Drop in \"light\" modules"
+msgstr ""
+
+# 94e7ece95ee04d38bdf6b7ac0f17cfc0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:163
+msgid ""
+"The data model of the **light** (not having CORBA engine) SALOME module "
+"is usually based on the custom tree of data objects. The general approach"
+" is to inherit a custom data object class from the "
+"**LightApp_DataObject** and a custom data model from the "
+"**LightApp_DataModel** class. The data model class is responsible for "
+"building the appropriate presentation of the data tree in the Object "
+"browser."
+msgstr ""
+
+# ca44d8e18ff94f42b2846cc60f67d477
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:170
+msgid ""
+"Thus, the implementation of the drag and drop functionality in a "
+"**light** module (more precisely, the method **dropObjects()** as "
+"described above), consists in copying data entities (by creating new "
+"instances of the corresponding data object class) or moving existing data"
+" objects to the new position in a tree. The Object browser will update "
+"the tree representation automatically, as soon as "
+"**updateObjectBrowser()** function is called."
+msgstr ""
+
+# 1d318a4887a34b2cbb7e12001811d719
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:180
+msgid "Using UseCaseBuilder for Drag and Drop handling in \"full\" modules"
+msgstr ""
+
+# fdfc12e87b64442d9425ea353db7d2d7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:182
+msgid ""
+"Drag and drop operation requires underlying data model to allow flexible "
+"re-arrangement of the data entities inside the data tree. In a **full** "
+"(CORBA engine based) SALOME module, which data model is usually based on "
+"the hierarchy of **SALOMEDS::SObject** entities provided by the data "
+"server functionality, re-arrangement of the data tree is not a trivial "
+"task."
+msgstr ""
+
+# 1f82a0376c4043bda778a3c0447d7ee5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:188
+msgid ""
+"However, SALOME data server (**SALOMEDS**) CORBA module proposes a "
+"mechanism that can be used to customize data tree representation in a "
+"simple and flexible way - :ref:`use_case_builder`."
+msgstr ""
+
+# 80f9647465a6412d91ea0ef85855913b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/drag_and_drop.rst:192
+msgid ""
+"With use case builder, the **dropObjects()** function can be easily "
+"implemented. For example:"
+msgstr ""
+

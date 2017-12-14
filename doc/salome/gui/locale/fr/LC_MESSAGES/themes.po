@@ -1,0 +1,100 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# e0c99cf8f8574011997d8b162fb35341
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:5
+msgid "Theme"
+msgstr ""
+
+# 0b56865b8a3d43d0b4741436753ce68f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:7
+msgid ""
+"The look and feel of the SALOME desktop can be customized by the user via"
+" SALOME style preferences."
+msgstr ""
+
+# 479b374ec27e4632a9f0cd3ae168885c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:10
+msgid ""
+"**SALOME style prefereces** dialog box is used for customization of the "
+"look and feel of SALOME style. To open it, select in the Main menu **View"
+" -> Theme** item."
+msgstr ""
+
+# ac92f1bcc6e34afcac71d5c85e11cd40
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:17
+msgid ""
+"It is possible to choose a predefined scheme in the list to the left or "
+"to create a custom scheme using the controls to the right."
+msgstr ""
+
+# fab657eaace04188a60d888adb9ef502
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:20
+msgid "The dialog box contains two pages."
+msgstr ""
+
+# 1021be42657d4256af0b2b068cad6c11
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:22
+msgid ""
+"The first page allows specifying the color palette. - **Quick** button "
+"allows automatic color palette definition basing on the main color "
+"specified by the user."
+msgstr ""
+
+# ff71dbaebe814b2b966175b4604cb55b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:29
+msgid "The second page allows specifying different properties of the theme:"
+msgstr ""
+
+# 82660cf256ad42a68f832c7c8852aca2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:31
+msgid "**Font** group allows to edit the font used in menus, dialog boxes, etc."
+msgstr ""
+
+# c354e73f1fa240f6851b7569a46e379a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:32
+msgid "**Lines** group allows to apply dashing to Salome elements."
+msgstr ""
+
+# 00a68948431d46d9b6cd81efde6f1644
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:33
+msgid ""
+"**Widgets rounding** allows to round corners of Salome dialog boxes and "
+"define their parameters."
+msgstr ""
+
+# 03cb624bdbb64401827c698350e1042f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:34
+msgid "**Handle** allows to define parameters of the handle."
+msgstr ""
+
+# a08f1bccf0bf4ce395c3592dd011e27b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:35
+msgid "**Widget effect** allows to apply special effects to Salome dialog boxes."
+msgstr ""
+
+# 3590008e8bf94add9770ea0348424fa0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/themes.rst:37
+msgid ""
+"If SALOME Theme is not used (**Use SALOME Style** checkbox is switched "
+"off), the global system settings are applied (for example, KDE settings)."
+" So, the look and feel of the application (for example, palette and/or "
+"font) can be customized by using the Qt utility *qtconfig*."
+msgstr ""
+

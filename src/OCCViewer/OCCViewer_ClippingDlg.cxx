@@ -1169,7 +1169,7 @@ void OCCViewer_ClippingDlg::ClickOnHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "occ_3d_viewer_page.html", "clipping_planes" );
+    app->onHelpContextModule( "GUI", "occ_3d_viewer.html", "clipping-planes" );
 }
 
 /*!

@@ -1,0 +1,116 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# a5167baf83bb4cb3a90463915ed6e3b8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:5
+msgid "Using Registry tool"
+msgstr ""
+
+# 8707a15c5d924f5698deaa7c967bd220
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:7
+msgid ""
+"**Registry** tool is in the SALOME platform is destined for providing "
+"information about the processes (components), which have ever been "
+"launched in the current study session."
+msgstr ""
+
+# f115064f996740c99cda1debefafa162
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:11
+msgid "*To view the Registry:*"
+msgstr ""
+
+# d2bc2f614ba848608dc1100c83e9fa8a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:13
+msgid ""
+"From the main menu choose **Tools > Registry display**, the following "
+"dialog box will appear:"
+msgstr ""
+
+# 99a4fc0c60a849c688403eb598fddc96
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:19
+msgid ""
+"**Running** tab of this dialog box displays a list of the currently "
+"started processes (components) with supplementary information on each of "
+"them divided into columns:"
+msgstr ""
+
+# 5d59f2e44abe48739c14a94ed62466b1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:23
+msgid "**Component:** name of the started component"
+msgstr ""
+
+# 6814386c374e43c3a55022f5741ee5ac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:24
+msgid "**PID:** process identification number"
+msgstr ""
+
+# 2590b3d0cc634290b02fca9dd86edecf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:25
+msgid "**User Name:** name of the user launching the component"
+msgstr ""
+
+# ee4d89f6cf4544349d658a8fbfdcce6d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:26
+msgid "**Machine:** name of the machine, on which the process has been started"
+msgstr ""
+
+# 4b7ea862bc784569966452683dfa3cb2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:27
+msgid "**begins:** date and time of the starting of the component"
+msgstr ""
+
+# 8b7faf33c2a44a28bd6c6cfa60236620
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:28
+msgid "**hello:** date and time of the last call to the component"
+msgstr ""
+
+# 41f729b6a117488e8a29f33de58ada37
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:30
+msgid ""
+"**History** tab displays a list of all processes, which have ever been "
+"launched within this study session. It contains the same supplementary "
+"information on each of the processes (components)."
+msgstr ""
+
+# 3531979cf62d431d8096b1889ac48b07
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:34
+msgid ""
+"**Refresh** button allows to refresh the current list of processes "
+"(components)."
+msgstr ""
+
+# 6dbc5e05090c41d8957384e76d672f07
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:37
+msgid ""
+"**Interval** button allows to set an interval for refreshment of the "
+"current list of processes (components)."
+msgstr ""
+
+# 3a4cd3d6c43741d5b140d210f1bc3027
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:43
+msgid "*To display complete information on a definite process (component):*"
+msgstr ""
+
+# 3555664b9750495991910f10ecedd7d4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_registry_tool.rst:45
+msgid ""
+"Double-click on this process (component). The following window will "
+"appear:"
+msgstr ""
+

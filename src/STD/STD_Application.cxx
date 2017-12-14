@@ -203,7 +203,8 @@ void STD_Application::createActions()
   createAction( NewWindowId, tr( "TOT_DESK_NEWWINDOW" ), QIcon(),
                 tr( "MEN_DESK_NEWWINDOW" ), tr( "PRP_DESK_NEWWINDOW" ), 0, desk  );
 
-  createAction( HelpAboutId, tr( "TOT_DESK_HELP_ABOUT" ), QIcon(),
+  createAction( HelpAboutId, tr( "TOT_DESK_HELP_ABOUT" ),
+                resMgr->loadPixmap( "STD", tr( "ICON_DESK_ABOUT" ) ),
                 tr( "MEN_DESK_HELP_ABOUT" ), tr( "PRP_DESK_HELP_ABOUT" ),
                 Qt::ALT+Qt::SHIFT+Qt::Key_A, desk, false, this, SLOT( onHelpAbout() ) );
 

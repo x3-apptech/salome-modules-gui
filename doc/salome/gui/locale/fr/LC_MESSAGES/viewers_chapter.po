@@ -1,0 +1,80 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 29fc99c994c8492084b8d1865d0f34ef
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:5
+msgid "Viewers"
+msgstr ""
+
+# 419c3d124ebd47a4a680be422bcc6bbf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:7
+msgid ""
+"SALOME GUI module includes several 2D and 3D viewers, that are used for "
+"different purposes within the platform:"
+msgstr ""
+
+# 2d475bf5307e43b8bb4a939305519126
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:10
+msgid ""
+":ref:`occ_3d_viewer_page` has been developed on the basis of Open CASCADE"
+" Technology (http://www.opencascade.org). This is the default viewer for "
+"SALOME Geometry module, it provides good representation of construction "
+"and transformation of geometrical objects."
+msgstr ""
+
+# 5ed35c4a2382479bb5eca338b3af9af1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:12
+msgid ""
+":ref:`vtk_3d_viewer_page` has been developed basing on Kitware "
+"Visualization ToolKit library (http://www.vtk.org). This is the default "
+"viewer for SALOME Mesh module, where it is used for visualization of "
+"meshes. OCC and VTK 3d viewers share some  "
+":ref:`common_functionality_page`."
+msgstr ""
+
+# 8836722eacab4c88a628dd1857943a3a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:14
+msgid ""
+":ref:`plot2d_viewer_page` has been developed basing on the open-source "
+"Qwt library (http://qwt.sourceforge.net). It can be used, for example, "
+"for the representation of 2D plots and graphs."
+msgstr ""
+
+# 99032759ce854da2825691ac278458da
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:16
+msgid ""
+":ref:`gl_2d_viewer_page` is a general purpose OpenGL-based viewer, which "
+"can be used for visualization of 2D scenes. This type of viewer is not "
+"currently used in SALOME platform directly, but can be used in custom "
+"modules for 2D visualization purposes."
+msgstr ""
+
+# 25edfbc06c184805a60bf0e2c59b6fab
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:18
+msgid ""
+":ref:`qxscene_2d_viewer_page` has been developed on the basis of Qt "
+"QGraphicsView scene. This viewer is used in SALOME YACS module for "
+"visualization of computation schemes."
+msgstr ""
+
+# 17e68ec8e7724c5197c17a98f7d483e9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/viewers_chapter.rst:20
+msgid ":ref:`python_viewer_page` is an editor for Python scripts."
+msgstr ""
+

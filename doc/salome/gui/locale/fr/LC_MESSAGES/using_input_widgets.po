@@ -1,0 +1,151 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 4c2c8f38a513439d9ba5b24679725af5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:5
+msgid "Using input widgets"
+msgstr ""
+
+# d60e24f551624fda9e900f3c804b9584
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:7
+msgid ""
+"This section contains some hints that might be useful when working with "
+"SALOME GUI input widgets."
+msgstr ""
+
+# dbd5e9989a5a4edb84d8d08167251523
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:11
+msgid "Spin boxes"
+msgstr ""
+
+# b0e319ba17924dd782a498102c74b572
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:13
+msgid ""
+"This type of widgets is used for numeric (integer or floating-point) data"
+" input. Spin boxes are used in standard **SALOME** modules if the input "
+"value has a clearly defined input range (and precision in case of a "
+"floating-point value)."
+msgstr ""
+
+# 57b307c7cf7349a9a7df974903abf9cd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:18
+msgid ""
+"Input precision has a specific semantics in **SALOME** floating-point "
+"spin boxes:"
+msgstr ""
+
+# a84c98f63a9b40fcbaca5a418c614115
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:21
+msgid ""
+"Positive precision value means that a number in the fixed-point format "
+"(corresponding to the \"f\" format specifier for C printf function) is "
+"expected. Positive precision value is the maximum allowed number of "
+"digits after the decimal separator."
+msgstr ""
+
+# 9d8cebacdf8a4a87978a8837f238742a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:22
+msgid ""
+"Negative precision value means that a number either in the fixed-point or"
+" the scientific (exponetial) format is expected. This is similar to the "
+"behavior of the \"g\" format specifier for C printf function. Negative "
+"precision value is the maximum allowed number of significant digits in "
+"mantissa (note that one digit is always before the decimal separator)."
+msgstr ""
+
+# a036c66b36f2485a98e8688e2ea23018
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:24
+msgid ""
+"To make the user aware of an input value constraints applied by some "
+"**SALOME** operations, the following basic capabilties are provided by "
+"spin boxes:"
+msgstr ""
+
+# ce86daca78834249ac292b267e9a1f4c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:27
+msgid ""
+"The text input manually in a spin box by the user is checked to be a "
+"number of valid type (integer or floating-point)."
+msgstr ""
+
+# e79825a4b67e42b7b33da70831f0b1de
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:28
+msgid ""
+"The text is converted to a number and checked to be within the valid "
+"range."
+msgstr ""
+
+# 0f90ba6be8054d45a4fdd97e7963501c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:29
+msgid ""
+"Additionally, for floating-point data the input text is checked against "
+"the precision rules described above."
+msgstr ""
+
+# d91dcec54e78452092df82bb9badbc18
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:31
+msgid ""
+"If the input text in a spin box does not meet the constraints, the user "
+"is shown a message in a tooltip near the spin box just as he types in it."
+" The tooltip contains information about the valid data range. For a "
+"floating-point input, the tooltip also contains information about the "
+"expected precision."
+msgstr ""
+
+# dbf514f6b6fa43a9a9b7b93971f3fe68
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:37
+msgid ""
+"In standard **SALOME** modules the precision value can be adjusted "
+"through :ref:`setting_preferences_page` of the correspodning  modules, "
+"and the tooltip contains a reference to the corresponding parameter in "
+"the preferences."
+msgstr ""
+
+# a03a793f703f459ea3bb9fc3899f2ed3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:41
+msgid ""
+"On-line documentation for each standard SALOME module contains the list "
+"of user preferences that can be used for tuning floating-point precision "
+"for different types of input quantities."
+msgstr ""
+
+# bb281ad16915462da96ef5c32af96f9c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:46
+msgid "Spin boxes and SALOME Notebook"
+msgstr ""
+
+# f8dc175032e74afe976c056bbeba657d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:48
+msgid ""
+"Apart from the numeric input, spin boxes in some **SALOME** modules "
+"accept the names of **Notebook** variables (see :ref:`using_notebook` "
+"page for more details about **Notebook**)."
+msgstr ""
+
+# 6cef1d0b55aa4b93946c8b1dd0a8dcfc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_input_widgets.rst:52
+msgid ""
+"If a spin box accepts variable names, then it is additionally checked "
+"whether the manually input text represents a variable name. Variable "
+"names should comply with the common naming rules for **Python** "
+"variables. If the input is neither a valid number nor a variable name, "
+"the tooltip informs the user that variable names are also acceptable in "
+"this spin box."
+msgstr ""
+

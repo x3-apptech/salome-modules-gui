@@ -1,0 +1,158 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 1c9b0f33340d4a8aa86b13de5fcc773a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:5
+msgid ""
+"Customize data tree representation in the Object browser by means of use "
+"case builder"
+msgstr ""
+
+# 387eafa373f3470f850a25f2360af6d6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:0
+msgid "Table of Contents"
+msgstr ""
+
+# be2ab450af3d46f980daef4f4a17151a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:9
+msgid ""
+"In SALOME, the representation of the data tree in the Object browser for "
+"the *full* (CORBA-based) module is done basing on the study contents as "
+"it is supplied by SALOME data server (SALOMEDS). In contrast to the "
+"*light* module which data tree is completely defined and can be easily "
+"attuned by the module specific implementation, *full* module must publish"
+" its data in the CORBA study by means of the corresponding API of SALOME "
+"data server, namely **SALOMEDS::StudyBuilder**."
+msgstr ""
+
+# f160e822421d45a88250706c150521b6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:16
+msgid ""
+"As soon as data entities are published in the study, they are shown in "
+"the Object browser, in the same order as they appear in the study tree. "
+"Re-arrangement of the data entities with such approach is not a trivial "
+"task: for example, when copying/moving any data entity at the new "
+"position within the tree, it is necessary to copy all its attributes as "
+"well and to clear (in case of move operation) the data entity at the "
+"original position. Also, it is not possible to make some data items in "
+"the tree \"invisible\" for the user (though it might be useful)."
+msgstr ""
+
+# 0b7753bf1fe94c04bc2bc4590b365083
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:24
+msgid ""
+"Use case builder provides an alternative and more flexible way for "
+"customizing the data tree representation. It implements another approach "
+"to the data tree hierarchy, based on the tree node attributes. With use "
+"case builder it is possible to arrange and easily re-arrange the data "
+"items in the data tree in any appropriate way."
+msgstr ""
+
+# ba0a7c8d383945bc9a27083409be5d59
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:29
+msgid ""
+"For example, with use case builder it is easy to implement such "
+"operations as :ref:`drag_and_drop` and Copy/Cut/Paste. With use case "
+"builder approach it is not important how data entities are arranged in "
+"the study tree, they even may lie on the same level - use case builder "
+"allows providing custom data tree representation, completely indepedent "
+"on the study data tree itself. It is even possible to hide some data "
+"entities in the tree representation while still keeping them in the study"
+" (to store specific module data)."
+msgstr ""
+
+# 648fa68d44e24a8ea419114da4fafa4e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:37
+msgid ""
+"Object browser automatically checks it the module root data object "
+"contains a tree node attribute and switches to the browsing of the data "
+"tree for such module using the use case builder. Otherwise, it browses "
+"data using an ordinary study tree iterator. Thus, it is possible to have "
+"in the same study some modules based on use case builder approach and "
+"others not using it."
+msgstr ""
+
+# cafa736d3f2e4994a8e2aaba20adc014
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:47
+msgid "Use case builder"
+msgstr ""
+
+# 8b847b497fd149aeb2c8b99d0c2fc142
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:49
+msgid ""
+"To obtain a reference to the use case builder, the function "
+"**GetUseCaseBuilder()** of the **SALOMEDS::Study** interface can be used:"
+msgstr ""
+
+# 6963f9b61fa54a3b99e813f3d79df7f3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:60
+msgid ""
+"**SALOMEDS::UseCaseBuilder** interface of the **SALOMEDS CORBA** module "
+"provides several methods that can be used to build a custom data tree. "
+"Its API is similar to the API of **SALOMEDS::StudyBuilder** interface - "
+"it operates with terms  *\"father object\"* and *\"child object\"*. In "
+"addition, use case builder uses term *\"current object\"* that is used as"
+" a parent of the children objects added if the parent is not explicitly "
+"specified."
+msgstr ""
+
+# 0ec81aecb8d645b5b84969e2782ba30f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:107
+msgid "Browsing use case data tree"
+msgstr ""
+
+# 7dc27b0f0b1e4976bd0753a829a874c9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:109
+msgid ""
+"Browsing the use case tree can be done by means of the use case iterator,"
+" that is provided by the  **SALOMEDS::UseCaseIterator** interface of the "
+"**SALOMEDS CORBA** module. Access to the use case iterator can be done "
+"via **SALOMEDS::UseCaseBuilder** interface:"
+msgstr ""
+
+# a69dc38a978145d18c72b133a7a75ab5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:124
+msgid ""
+"The API of the **SALOMEDS::UseCaseIterator** interface is similar to the "
+"**SALOMEDS::ChildIterator**:"
+msgstr ""
+
+# 9b465eb573d54949b895d6a556ce9062
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:143
+msgid "Typical usage of the **UseCaseIterator** is as follows:"
+msgstr ""
+
+# b63e224d85514b1ca72c2d4628f7b3c9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:167
+msgid "Remark about compatibility with existing studies"
+msgstr ""
+
+# 3b7a7820691942da989ad96dedc90a8c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/use_case_builder.rst:169
+msgid ""
+"If you decide to switch your module to the use case builder approach to "
+"provide customization for the data tree representation, you must take "
+"care of compatibility with existing SALOME studies. Basically it means "
+"that you have to add a simple code to  **Load()** (and **LoadASCII()** if"
+" necessary) method of your module, which adds tree node attributes to all"
+" data entities in the data tree of your module. The simplest way to do "
+"this is to iterate through all data items and recursively add them to the"
+" use case builder:"
+msgstr ""
+

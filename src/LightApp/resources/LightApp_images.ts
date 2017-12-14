@@ -31,5 +31,13 @@
         <source>APP_MODULE_ICO</source>
         <translation>icon_module.png</translation>
     </message>
+        <message>
+        <source>ICON_WWW</source>
+        <translation>icon_earth.png</translation>
+    </message>
+    <message>
+        <source>ICON_LIFE_RIGN</source>
+        <translation>icon_life_ring.png</translation>
+    </message>
 </context>
 </TS>

@@ -427,5 +427,5 @@ void OCCViewer_LightSourceDlg::ClickOnHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "occ_3d_viewer_page.html", "light_source" );
+    app->onHelpContextModule( "GUI", "occ_3d_viewer.html", "light-source" );
 }

@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# d490c2e7f4224812aa4fe41839c4aed0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/working_with_python_scripts.rst:5
+msgid "Python Interpreter"
+msgstr ""
+
+# 131b7e98293e4bff8fd0c8dea9755869
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/working_with_python_scripts.rst:7
+msgid ""
+"**SALOME** Platform can be launched in the batch mode, without Graphical "
+"User Interface, and operated with the use of Python scripts, which can "
+"fulfill most of the necessary tasks, however, the process of scripting is"
+" quite time consuming and rather error-prone."
+msgstr ""
+
+# 996ca944dfb64590b9db96fabf4325f6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/working_with_python_scripts.rst:12
+msgid ""
+"This problem has been resolved by the possibility to automatically "
+"generate a set of Python scripts from data created with SALOME GUI, which"
+" greatly increases the productivity of using SALOME platform in the batch"
+" mode. This mechanism can convert a SALOME Study in one or several Python"
+" scripts, which can be stored and imported later to re-create the content"
+" of the original study. The first script is a SALOME document, which re-"
+"creates the SALOME Study, adds the stored Salome components to the SALOME"
+" and automatically calls Python scripts of the second type containing "
+"component specific Python function calls. This architecture gives great "
+"flexibility in manual modification of the generated scripts because you "
+"can modify only one of the component specific Python scripts without "
+"touching others, thus avoiding expert knowledge of Python API of unused "
+"components."
+msgstr ""
+
+# 9774ea709d84415fb515c0ff9c816117
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/working_with_python_scripts.rst:26
+msgid ""
+"To Dump a  SALOME Study in one or several scripts, in the main menu "
+"select **File --> Dump study**. Reversibly, it is possible to load a "
+"saved Python Script selecting in the main menu **File -> Load Script**."
+msgstr ""
+

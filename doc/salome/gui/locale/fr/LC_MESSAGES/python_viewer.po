@@ -1,0 +1,186 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# f6244ffeeaff426898421d055ae33fb5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:5
+msgid "Python viewer"
+msgstr ""
+
+# 1174fa6c6dda4a52bd2b61d73d1cdad0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:7
+msgid "The functionalities of Python viewer are available via its Toolbar."
+msgstr ""
+
+# a1376c5f66df43f084070784a91b78c2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:18
+msgid ""
+"**New** - clears the viewer to create a new script. If viewer was "
+"modified, you will be asked to close it before removing."
+msgstr ""
+
+# 6a597d803a8e42d2be4dcb9df351652a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:26
+msgid ""
+"**Open** - allows opening an existing script by browsing for it in a "
+"standard **Open File** dialog box, choosing the required .py file and "
+"clicking **Open** button. If there is an already opened script, you will "
+"be asked to close it before opening new one."
+msgstr ""
+
+# 220cc8ba1dd44761bc811a5649f1c032
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:34
+msgid "**Save** - saves the current script."
+msgstr ""
+
+# e4a837ad1a16464e89abfa8d581fc018
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:37
+msgid ""
+"If the script has not been previously saved, Save calls the standard "
+"**Save File** dialog, where you can enter the script name and save it."
+msgstr ""
+
+# e62ab7725b884bea8b6b25270a01ee17
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:46
+msgid ""
+"**Save As...** - allows saving the current script with a new name. Input "
+"a new name for the script in the standard **Save file as ** dialog box "
+"and click **Save** button."
+msgstr ""
+
+# 716b5a5e4ddf4863985c66d233214f34
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:54
+msgid "**Undo** - undoes the last action in Python viewer."
+msgstr ""
+
+# 88e98226d11b4aa5b1e9b3324e574c41
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:62
+msgid "**Redo** - redoes the previously undone action in Python viewer."
+msgstr ""
+
+# ac2dfecde2d9467e875010472bed308b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:70
+msgid ""
+"**Cut** - saves the selected text into the clipboard and removes it from "
+"the viewer."
+msgstr ""
+
+# c4a1d09477f4458584be16fbb275ac6c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:78
+msgid "**Copy** - saves the selected text into the clipboard."
+msgstr ""
+
+# ed4adbcf50a742de948f60d45fb3a6c7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:86
+msgid "**Paste** - restores the saved text from the clipboard."
+msgstr ""
+
+# 4f5abff86cd24ad58e7d712b020bda27
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:94
+msgid "**Delete** - removes the selected text."
+msgstr ""
+
+# 548a96f1e3e1483bb5bee328680b6956
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:102
+msgid "**Select All** - selects the whole text."
+msgstr ""
+
+# f6c0d97349e94477bbf8f6ba47de7b43
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:110
+msgid ""
+"**Preferences** - provides  access to the preferences dialog box, that "
+"allows specifying advanced parameters for the Python Viewer."
+msgstr ""
+
+# 7802522587db489f8e55a20a72b02314
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:115
+msgid "Custom Python preferences"
+msgstr ""
+
+# ed70730ae9af45fcb807096860ad037a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:120
+msgid "The following options are available:"
+msgstr ""
+
+# 3711af50fc6141f08c397b4e7d126af2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:122
+msgid "**Font settings** allows setting font variant and its size."
+msgstr ""
+
+# b5c85bfd65a542d0bd149c737db56e0d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:124
+msgid "**Display settings** specifies the script representation in the viewer:"
+msgstr ""
+
+# e861eee5632845b2981089b0fd4a0906
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:126
+msgid ""
+"**Enable current line highlight** switches on background coloring of the "
+"current line."
+msgstr ""
+
+# 988983d81450493da0fd9efb42969302
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:127
+msgid "**Enable text wrapping** wraps lines at the view border of the editor."
+msgstr ""
+
+# 3fb8e6b3b75749c79e5b40c8b0b64c8d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:128
+msgid ""
+"**Center cursor on scroll** scrolls the script vertically to make the "
+"cursor visible at the center of the viewer."
+msgstr ""
+
+# 5baca2e26a9a4e2f9c51699e960c8b30
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:129
+msgid ""
+"**Display line numbers area** shows a panel with line numbers of the "
+"script at the left border of the editor."
+msgstr ""
+
+# 96af9b7924404bdbb1c819547486e711
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:131
+msgid ""
+"**Tab settings** allows displaying tab indentation as a certain number of"
+" white-spaces."
+msgstr ""
+
+# 1ab36852fe564bc9aff9b48ac5f3ecb3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:133
+msgid ""
+"**Vertical edge settings** manages drawing of a vertical line at the "
+"specified column of the viewer."
+msgstr ""
+
+# a34dcfc0b25d447492eeb483637c81a7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:135
+msgid ""
+"**Save settings as default** button stores the applied Python viewer "
+"settings in the SALOME preferences .xml file. The settings will be "
+"restored in the current and next SALOME sessions."
+msgstr ""
+
+# 9bf239662be249bda21a1cd100a35746
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/python_viewer.rst:137
+msgid ""
+"The buttons in in the bottom part of dialog box peform the following "
+"actions: - **OK** button applies preferences to the editor; - **Cancel** "
+"button rejects changes; - **Defaults** button restores preferences from "
+"applicaion's defaults; - **Help** button opens Help browser."
+msgstr ""
+

@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 28d6dee8eab74a1898d8059218955f16
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:5
+msgid "Select Color and Font"
+msgstr ""
+
+# a6e889b3cb5049ba8bd5c8c51cd4ed9e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:10
+msgid "Select Color Dialog"
+msgstr ""
+
+# a81897b0787e414499f6c9aac184091f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:12
+msgid "**Select Color** and **Select Font** menus are used in many Preferences."
+msgstr ""
+
+# b628e5698a4b436bae538543c1413f57
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:16
+msgid "Select color"
+msgstr ""
+
+# 66b0c69125454b57a72cacb54e5d992d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:21
+msgid ""
+"This menu  allows to choose from either predefined **Basic Colors** "
+"grouped in the upper left corner of the window or **Custom Colors**, "
+"which you can define yourselves. To define a Custom Color, click on one "
+"of the Custom Color cells, select the color you need in the field of "
+"colors or by typing in its numeric parameters in the lower right corner "
+"of the window, then click **Add to Custom Colors** button. The chosen "
+"color will be added to **Custom Colors** table."
+msgstr ""
+
+# 64bbf4472c034c2a9c1ba350ead0bc5d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:32
+msgid "Select font"
+msgstr ""
+
+# 2de55080378d4fae907465fba1f64230
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/select_color_and_font.rst:37
+msgid ""
+"This menu provides a wide choice of **Fonts**, **Font Styles** and "
+"**Sizes**. Characters can be underlined or struck out. It is possible to "
+"preview them in the **Sample** window. **Script** dialog-box gives the "
+"possibility to use not only Latin and Latin Extended but also Cyrillic, "
+"Greek, Arabic, Runic and many other subsets."
+msgstr ""
+

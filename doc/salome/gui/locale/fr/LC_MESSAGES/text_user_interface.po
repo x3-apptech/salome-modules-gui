@@ -1,0 +1,44 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 14779d11a44e42e8bf6c2eb7fb603ffb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/text_user_interface.rst:5
+msgid "Using SALOME GUI python interface"
+msgstr ""
+
+# 7f657f1913cf485cbbb0ee8ce04837c2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/text_user_interface.rst:8
+msgid ""
+"The extended salome.py Python module provides **sg** variable, which "
+"gives access to some GUI functions."
+msgstr ""
+
+# 51d46e1866bd441798a97aae8dc70bb9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/text_user_interface.rst:10
+msgid ""
+"**Note**, that this variable is not available if you use salome.py Python"
+" module outside of the GUI desktop, i.e. without the embedded Python "
+"console (since SWIG library is linked directly to the GUI library)."
+msgstr ""
+
+# 7b87711a4c26409cbe229791dac78f1f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/text_user_interface.rst:14
+msgid "The example of usage:"
+msgstr ""
+

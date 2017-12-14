@@ -1,0 +1,258 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 0e5e3ceba2f54c5e822c439cc550364a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:5
+msgid "SALOME desktop"
+msgstr ""
+
+# 975311cf90464650af541c9c76900db0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:7
+msgid ""
+"SALOME applies **Single Document Interface** (SDI) approach. Only one "
+":ref:`study_management_page` \"study (document)\" can be opened at any "
+"given moment."
+msgstr ""
+
+# 2701d503476c423b9f73c42f23882020
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:10
+msgid ""
+"The front-end of the application is a single Desktop top-level window "
+"that embeds all GUI operations. The desktop window provides access to "
+"standard GUI elements, such as viewers, main menu, toolbars, dockable "
+"windows, dialog boxes, etc."
+msgstr ""
+
+# dd7f4e04f584454880dff9ccbf29f3fc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:14
+msgid ""
+"The main elements of the SALOME Desktop are represented on the picture "
+"below:"
+msgstr ""
+
+# bb34f6ca8835455cacf6653b7ba2a8ef
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:19
+msgid "The main parts of the SALOME Desktop are:"
+msgstr ""
+
+# 47298d10ef0e477d8be39bd65a1a3221
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:21
+msgid ""
+"**Main menu** - This is a set of context-sensitive menus updated "
+"according to the functionality of the currently active component. In "
+"general, these menus contain all functional options of SALOME platform."
+msgstr ""
+
+# 093f72b1f68144d99f5bbdfa2185ca8e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:22
+msgid ""
+"**Standard toolbar** - contains standard actions that allow creating new "
+"or opening existing study, saving study, deleting objects, etc."
+msgstr ""
+
+# f4f9cd8c5b51454580bebc368b2a787c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:23
+msgid "**Components toolbar** - allows activating components in SALOME platform."
+msgstr ""
+
+# a0fa34dd25f6430587af814435665c15
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:24
+msgid ""
+"**Module toolbars** - contain actions specific to the currently active "
+"module."
+msgstr ""
+
+# 99f6cca745f44fc8bb84f360a8c0c898
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:25
+msgid ""
+"**Viewer toolbar** - provides a set of tools destined for visualization "
+"of the presentations in the viewer."
+msgstr ""
+
+# 6e203e249d7c48d1bf35d98dd97c1356
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:27
+msgid ""
+"All toolbars in the **SALOME** Platform are context-sensitive. Loading of"
+" a definite component (Geometry, Mesh etc.) will automatically add some "
+"additional toolbars specific to this component. To display/hide a "
+"toolbar, in the main menu choose **View > Toolbars**, and from this "
+"submenu check or uncheck the toolbar that you would like to display/hide."
+msgstr ""
+
+# 5c78f90a0eef4fa4be287853f62cf144
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:31
+msgid ""
+"By default all toolbars are located on top of the SALOME desktop, but you"
+" can relocate a toolbar by dragging it with the mouse and dropping in any"
+" place of the window."
+msgstr ""
+
+# 66b0a56f2f934bdabb014553c10a37b8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:33
+msgid "Parts of the study window:"
+msgstr ""
+
+# 3e5c22453a4647cb8424732caa3d05f2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:35
+msgid ""
+"**Object browser** - Management of objects created or imported into "
+"SALOME application."
+msgstr ""
+
+# f3dc35a87eb3404f81b87fc6e081937f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:36
+msgid "**Viewer** - This window is destined for visualization of presentations."
+msgstr ""
+
+# 22e7305ae28b4e288305deaacfad577c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:37
+msgid ""
+"**Python console** - Window for Python interpreter. This window functions"
+" like a standard document: the pop-up menu invoked by right-click in this"
+" window gives access to **Copy/Paste/SelectAll/ClearAll** options."
+msgstr ""
+
+# 3f29315ff2744762850ea2a054b9a097
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:39
+msgid ""
+"Object Browser, Python Console, MenuBar, etc are, in fact, separate "
+"dockable windows. Dockable windows can be placed in special areas, on the"
+" borders of desktop like toolbars. You can change the size and the "
+"position of dockable windows, hide them or even place outside desktop. "
+"SALOME saves in the same file all positions and sizes of dockable "
+"windows. It means that the difference in settings of the same windows "
+"(for example Python console) is possible between different modules (the "
+"same window can have different size and position when other module is "
+"activated). Also each module can indicate which common windows are "
+"necessary for working, and only they will be displayed when this module "
+"is active."
+msgstr ""
+
+# 64b21baf61a94821b4c4d5fb15b5d185
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:51
+msgid ""
+"All parts of Salome desktop and study window can be managed through "
+"**View** menu."
+msgstr ""
+
+# 141c909fc28e4ba798e68ea2c4911bfa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:56
+msgid "**Toolbars** - allows to show and hide toolbars."
+msgstr ""
+
+# 3ff6798c819f455d8c4d0616c495b279
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:57
+msgid ""
+"**Windows** - allows to show and hide dockable windows, such as Object "
+"Browser and Python Console."
+msgstr ""
+
+# 4e165d2fff12471696593ff9e02516f2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:58
+msgid "**Status Bar** allows showing and hiding the Status Bar."
+msgstr ""
+
+# 913fd9c37be3421f9f506ceb5b5aadea
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:59
+msgid ""
+":ref:`themes_page` - allows to select and edit the style (colors and "
+"fonts) for Salome session."
+msgstr ""
+
+# f4068464af804adc84a28a9eb1f8eb24
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:61
+msgid ""
+"If there are several viewer windows in your current study and you want to"
+" display more then one at the same time, you can use the functionalities "
+"provided by the **Window** menu."
+msgstr ""
+
+# 5afb1a7e02774a43932c73172a107d80
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:66
+msgid "**New window** - allows to open a new instance of any viewer."
+msgstr ""
+
+# 7c87455ce13143cfbc91c0612d1a468e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:67
+msgid "**Close** - closes the currently active viewer window."
+msgstr ""
+
+# 3384b07cf5174c96bd2e75f4dec78d56
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:68
+msgid "**Close all** - closes all viewer windows."
+msgstr ""
+
+# 8be06758e2744bf08a87d40cb71030e7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:69
+msgid "**Group all** - arranges all created viewer windows on the same desktop."
+msgstr ""
+
+# 45c3819814cc40e4a13feb2653dcd695
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:70
+msgid ""
+"**Arrange Views** - allows choosing the necessary views and their layout "
+"(see image below)."
+msgstr ""
+
+# b5697a7c2f45459cb6b0bceb3299c18b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:72
+msgid ""
+"The radio-buttons in **Views Layout** section allow choosing the number "
+"of views to be arranged (2, 3 or 4). The buttons with images allow "
+"choosing the view layout (depending on the chosen number of views)."
+msgstr ""
+
+# d64d61d307a04406920ade77a1f64d7c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:73
+msgid ""
+"**Views List**  contains the list of opened view windows, where it is "
+"possible to check in the necessary views."
+msgstr ""
+
+# 9bdffd7eba7d40f1936b2f0a927fcebb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:74
+msgid ""
+"**Close the remaining views** check-box allows closing all non-selected "
+"views."
+msgstr ""
+
+# 1b1f65a4de7d428d8f91c890ee1946f4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:75
+msgid ""
+"**Stack the remaining views** check-box allows stacking all non-selected "
+"views in the last tab area."
+msgstr ""
+
+# beb795c232ac4fd1a451b223d65806ab
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:80
+msgid ""
+"**Split Vertically** and **Split Horizontally** allow splitting the "
+"representation area into two parts, in horizontal or vertical direction."
+msgstr ""
+
+# 8e37126027e34444ab27a780ed783575
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:81
+msgid "List of all opened viewer windows provides fast access to them."
+msgstr ""
+
+# bc32f1e8f6e148efae5f201c477155e3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/salome_desktop.rst:82
+msgid "**Rename** - allows renaming the currently selected viewer window."
+msgstr ""
+

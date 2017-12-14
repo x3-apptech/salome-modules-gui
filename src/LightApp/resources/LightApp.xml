@@ -246,14 +246,11 @@
     <parameter name="documentation"     value="kernel_help"/>
   </section>
   <section name="gui_help" >
-    <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="User's Guide"      value="${GUI_ROOT_DIR}/share/doc/salome/gui/GUI/index.html"/>
-    <parameter name="Developer's Guide" value="${GUI_ROOT_DIR}/share/doc/salome/tui/GUI/index.html"/>
+    <parameter name="User's Guide/GUI module"      value="${GUI_ROOT_DIR}/share/doc/salome/gui/GUI/index.html"/>
+    <parameter name="Developer's Guide/GUI module" value="${GUI_ROOT_DIR}/share/doc/salome/tui/GUI/index.html"/>
   </section>
   <section name="kernel_help" >
-    <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="User's Guide"      value="${KERNEL_ROOT_DIR}/share/doc/salome/gui/KERNEL/index.html"/>
-    <parameter name="Developer's Guide" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html"/>
+    <parameter name="Developer's Guide/KERNEL module" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html"/>
   </section>
   <!--Salome shortcut settings-->
   <section name="shortcuts_settings">

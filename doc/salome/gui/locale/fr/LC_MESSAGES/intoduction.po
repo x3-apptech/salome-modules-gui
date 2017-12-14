@@ -1,0 +1,223 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:01+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# ed75a7af50374f3fb44fe68d8b018bd7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:3
+msgid "Introduction to Salome Platform"
+msgstr ""
+
+# 5941340805194ca296cebb55742a0f8e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:8
+msgid ""
+"Welcome to SALOME Platform! Modern technological products (cars, "
+"structures, electrical or electronic equipment) are getting more and more"
+" complex every year and must meet increasingly severe requirements in "
+"terms of quality and performance. For example, for structures and their "
+"environment the demands to reduce risks and optimize costs are extremely "
+"high. It requires particularly refined simulations concerning structural "
+"behavior and robustness to ensure high reliability."
+msgstr ""
+
+# 43f6d25dc4a54e259e9301498ea12d2b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:17
+msgid ""
+"The numeric modeling of a physical problem, the development of solutions "
+"and their integration into the design process are often handled in very "
+"specific environments. SALOME represents a generic CAD-based application "
+"for digital simulation with \"high reactivity to market evolutions and "
+"customer expectations\"."
+msgstr ""
+
+# d75ccadb632647dda291b37b68bf4c3b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:23
+msgid ""
+"SALOME is a free software that provides a generic platform for Pre and "
+"Post-Processing for numerical simulation. It is based on an open and "
+"flexible architecture made of reusable components available as free "
+"software."
+msgstr ""
+
+# 30383a000a364882adab54e30d534af7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:28
+msgid ""
+"SALOME is a CAD/CAE integration platform. It provides reusable components"
+" for:"
+msgstr ""
+
+# acf7b47bd43540ad9a7ab7bca5c41115
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:31
+msgid "3D modeling (bottom-up construction, import, healing);"
+msgstr ""
+
+# c20a5e28bce145459cd9e7d985880c3f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:32
+msgid "Visualization;"
+msgstr ""
+
+# 40ca7358195b4a4683b325687c2a28ba
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:33
+msgid "Computational schemas management;"
+msgstr ""
+
+# 7355abeefe304d4282aa7f3fb61d8de6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:34
+msgid "Post-processing."
+msgstr ""
+
+# 6c4809c68d8c4ca4bd019b843d69cfeb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:37
+msgid "SALOME is tailored for integration of custom components:"
+msgstr ""
+
+# d09f30628787422fac8e6d05417d551e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:39
+msgid "CAD interfaces;"
+msgstr ""
+
+# 8d51e12e8b1a4a50a9e58cd378b79ded
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:40
+msgid "Mesh generators;"
+msgstr ""
+
+# c5922f3daaae488faee7414488f7daed
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:41
+msgid "Finite Element solvers with specific pre-processors."
+msgstr ""
+
+# 6320ccdb21ea4cf6a88710f1c407d95a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:44
+msgid "The SALOME platform is available in Open Source."
+msgstr ""
+
+# ba329a1b62514eda8310b99b079a2fad
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:46
+msgid "**Salome Platform:**"
+msgstr ""
+
+# 5e0bdb03b0b54d5ba325b59dce425374
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:48
+msgid ""
+"Supports interoperability between CAD modeling and computation software "
+"(CAD-CAE link)"
+msgstr ""
+
+# b17c7d041a3a4542a0577cb75a371b0e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:49
+msgid ""
+"Makes easier the integration of new components on heterogeneous systems "
+"for numerical computation"
+msgstr ""
+
+# 2337eaeaf8cc4e6abb088db3d668e980
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:50
+msgid "Sets the priority to multi-physics coupling between computation software"
+msgstr ""
+
+# cbeaa9f02c20443ab32bbae14f33aeb5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:51
+msgid ""
+"Provides a generic user interface, user-friendly and efficient, which "
+"helps to reduce the costs and delays of carrying out the studies"
+msgstr ""
+
+# a7dc8b5d0c6c428fa9b018f266cd914d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:52
+msgid ""
+"Reduces training time to the specific time for learning the software "
+"solution which has been based on this platform"
+msgstr ""
+
+# 4c1c3b12b2d1481db37f48c59ad6193c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:53
+msgid ""
+"All functionalities are accessible through the programmatic integrated "
+"Python console"
+msgstr ""
+
+# 29a822f339114278a5821a7461f81663
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:59
+msgid "**What can you do in SALOME? (Some of SALOME main functions)**"
+msgstr ""
+
+# d30d6238b76840d7ad7273e3c1a6988b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:61
+msgid ""
+"Define geometrical models (create/modify geometrical items), import and "
+"export them using the BREP, IGES and STEP formats;"
+msgstr ""
+
+# 205eef655f674394a85daed05845acd6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:62
+msgid "Define meshing of these geometrical items, import and export them;"
+msgstr ""
+
+# 69c12db738264a3fb199a320ab556b37
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:63
+msgid ""
+"Handle physical properties and quantities attached to geometrical items, "
+"import and export them to a reusable format;"
+msgstr ""
+
+# 4bfb66fb8e56469a8a678d630cd617b4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:64
+msgid ""
+"Perform computations using a solver (optionally provided): read input "
+"data, configure the solver, and write calculation results);"
+msgstr ""
+
+# 6d40eae4a8f84ac89815b46eae4b992e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:65
+msgid ""
+"Visualize result fields in 3D, 2D and export images of their "
+"visualization to an appropriate format;"
+msgstr ""
+
+# f7af5f7de02543c1b438185860009ad1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:66
+msgid "Manage study schemes: definition, save/restore;"
+msgstr ""
+
+# 50be82fcd89948e69de0ba4d7c921972
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:67
+msgid "Manage computation schemes: definition, execution."
+msgstr ""
+
+# a551accf0cd646f9981180e2d4a11527
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:69
+msgid ""
+"From the point of view of the :ref:`salome_architecture_page`, Salome is "
+"composed of several modules."
+msgstr ""
+
+# 988389fbf81d4f00b71c698e8a16b401
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:72
+msgid ""
+"This part of documentation on Salome also covers "
+":ref:`introduction_to_gui_page`, common for all modules, such as study "
+"management, Salome viewers, preferences, etc."
+msgstr ""
+
+# 37581881baff494f9e4a59377b01ca60
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/intoduction.rst:77
+msgid ""
+"And finally, there is an additional chapter, which provides a short guide"
+" about the :ref:`tui_page` to access SALOME GUI functionalities from the "
+"Python code."
+msgstr ""
+

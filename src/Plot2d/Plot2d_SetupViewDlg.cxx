@@ -1195,6 +1195,6 @@ void Plot2d_SetupViewDlg::onHelp()
 #ifndef NO_SUIT
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if ( app )
-    app->onHelpContextModule( "GUI", "plot2d_viewer_page.html", "settings" );
+    app->onHelpContextModule( "GUI", "plot2d_viewer.html", "settings" );
 #endif
 }

@@ -79,5 +79,9 @@
         <source>ICON_FILE_CLOSE</source>
         <translation>close.png</translation>
     </message>
+        <message>
+        <source>ICON_DESK_ABOUT</source>
+        <translation>about.png</translation>
+    </message>
 </context>
 </TS>

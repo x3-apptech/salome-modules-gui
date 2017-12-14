@@ -1,0 +1,102 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 1ee71843c22c4d2aaaf9f163138d8b80
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:5
+msgid "GL 2D Viewer"
+msgstr ""
+
+# ab320e3a70d6400894d03f59284c37b5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:8
+msgid "Operations"
+msgstr ""
+
+# 6bd154d41ce04cdd8ac5ad11d1843f4d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:10
+msgid ""
+"The functionalities of GL viewer are available via its Viewer Toolbar. "
+"Buttons marked with small downward triangles have extended functionality "
+"which can be accessed by locking on them with left mouse button."
+msgstr ""
+
+# f4d2d4b3313b403595463c2c3ebd04cf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:23
+msgid ""
+"**Dump View** - exports an object from the viewer in bmp, png or jpeg "
+"image format."
+msgstr ""
+
+# adab0525a9ad49b69ba10b39fbe79434
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:30
+msgid ""
+"**Fit all** - scales the presentation so that it could fit within the "
+"Viewer boundaries."
+msgstr ""
+
+# c561714ba5b94ab8b6879b2febe85f0a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:37
+msgid ""
+"**Fit area** - resizes the view to place in the visible area only the "
+"contents of a frame drawn with pressed left mouse button."
+msgstr ""
+
+# 0622e0cb6e53449b804d86837cca077c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:45
+msgid ""
+"**Fit selection** - resizes the view to fit in the visible area only "
+"currently selected objects."
+msgstr ""
+
+# ca5b773f36214b43bf880bab1526c27e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:52
+msgid "**Zoom** - allows to zoom in and out."
+msgstr ""
+
+# d8ec79f3fade404caf112b34958177d8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:59
+msgid ""
+"**Panning** - if the represented objects are greater that the visible "
+"area and you don't wish to use **Fit all** functionality, click on this "
+"button and you'll be able to drag the scene to see its remote parts."
+msgstr ""
+
+# e5c56d8cfb8c4aea8a49130e6f1db949
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:69
+msgid ""
+"**Global panning** - allows to select a point to be the center of the "
+"presentation showing all displayed objects in the visible ares."
+msgstr ""
+
+# 74974e6ed9bd423eb049c96bfae54650
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:77
+msgid "**Reset** - restores the default position the scene."
+msgstr ""
+
+# 4db1a8c08c8342ce8711e5ccd3952572
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:85
+msgid "Background"
+msgstr ""
+
+# f5b5c6090f5e45839136ef307bc0af59
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/gl_2d_viewer.rst:87
+msgid ""
+"GL Viewer background can be customized using the \"Change background\" "
+"popup menu command that opens standard \"Select Color\" dialog box:"
+msgstr ""
+

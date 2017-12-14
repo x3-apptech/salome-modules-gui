@@ -1,0 +1,599 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# edb8448e5e2e48ebbfd8b386bba7d4a0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:5
+msgid "OCC 3D Viewer"
+msgstr ""
+
+# 5f0a10b86b0745bab33ab22d08541575
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:8
+msgid "Operations"
+msgstr ""
+
+# 6105786db0c84af481b37834cfa8bbbf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:10
+msgid ""
+"The functionalities of OCC viewer are available via its Viewer Toolbar. "
+"Buttons marked with small downward triangles have extended functionality "
+"which can be accessed by locking on them with left mouse button."
+msgstr ""
+
+# 7d2d79f84eaa4698b57a3e10ba9fe037
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:23
+msgid ""
+"**Dump View** - exports an object from the viewer in bmp, png, jpeg or "
+"another image format."
+msgstr ""
+
+# 2c51788487f14db8b2689de03e1bc6ce
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:30
+msgid ""
+"**Interaction style switch** - allows to switch between standard and "
+"\"keyboard free\" interaction styles. \"Keyboard free\" style allows to "
+"process all view transformations without using keyboard (only by mouse). "
+"By default, rotation in this mode is performed by left mouse button, "
+"panning - by middle mouse button, zooming - by right mouse button. "
+"Selection in view by pressing \"s\" key works in both styles."
+msgstr ""
+
+# 8c1ebf4dbbec4aa7824408fa7e41cec1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:43
+msgid ""
+"**Zooming style switch** - allows to switch between standard (zooming at "
+"the center of the view) and advanced (zooming at the current cursor "
+"position) zooming styles."
+msgstr ""
+
+# 0f72bdbcbba942c5b46e2b904568c198
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:52
+msgid "**Show/Hide Trihedron** - shows or hides coordinate axes."
+msgstr ""
+
+# 511c661f99a94aa796ff3bfbcbb94f0e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:59
+msgid ""
+"**Enable/Disable preselection** - enables or disables preselection "
+"(highlighting) in the view."
+msgstr ""
+
+# 79d06086f04c4d6c9fa99574b64b591d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:66
+msgid "**Enable/Disable selection** - enables or disables selection in the view."
+msgstr ""
+
+# f36e954304dc41b5b977d2ae09aa51d0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:73
+msgid "**Fit all** - represents all displayed objects in the visible area."
+msgstr ""
+
+# b4db21371b594ce7b4837fd3e0eeda37
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:81
+msgid ""
+"**Fit area** - resizes the view to place in the visible area only the "
+"contents of a frame drawn with pressed left mouse button."
+msgstr ""
+
+# d2b8bb6a469e4cd09b6aa3b17c9fd721
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:89
+msgid "**Fit selection** - fits view contents to the current selection."
+msgstr ""
+
+# bdd29f2475664e2680e66653fb25c499
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:96
+msgid "**Zoom** - allows to zoom in and out."
+msgstr ""
+
+# f225c2090b254c9b908589e690bb1327
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:103
+msgid ""
+"**Panning** - if the represented objects are greater that the visible "
+"area and you don't wish to use **Fit all** functionality, click on this "
+"button and you'll be able to drag the scene to see its remote parts."
+msgstr ""
+
+# 2b445536fe1e48dcad787775b2563a2f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:113
+msgid ""
+"**Global panning** - allows to select a point to be the center of a scene"
+" representing all displayed objects in the visible area."
+msgstr ""
+
+# 258426eee41f464abbb0ed43921bf1ff
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:121
+msgid ""
+"**Change rotation point** - allows to choose the point around which the "
+"rotation is performed."
+msgstr ""
+
+# 491ed593fdeb455484d207451432a761
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:127
+msgid ""
+"By default the rotation point is located in the Center of the bounding "
+"box of represented objects."
+msgstr ""
+
+# 21681dbe0a914185a7ec10b808b04449
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:133
+msgid ""
+"Unchecking **Use Bounding Box Center** check-box allows you to change "
+"rotation point:"
+msgstr ""
+
+# 506e066ae75848fd905a452557ecf305
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:136
+msgid ""
+"**Set to Origin** button sets the rotation point to origin of "
+"coordinates: (0, 0, 0)."
+msgstr ""
+
+# 5e75938dd95d43d59e9cbb8be531ee92
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:137
+msgid ""
+"**Gravity Center of Selected Object** button allows using the gravity "
+"center of the object selected in the viewer as the center of the rotation"
+" point. When you click this button, you should first choose the type of "
+"selectable object: Point, Edge, Face or Solid and only then proceed with "
+"selection in the viewer."
+msgstr ""
+
+# 4c398b1f69b74199814a54f700faf78a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:138
+msgid "Also you can define the coordinates of the rotation point manually."
+msgstr ""
+
+# 11fb42efaf2b4d2d9ea46490dd78ed63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:145
+msgid "**Rotation** - allows to rotate the scene using the mouse."
+msgstr ""
+
+# f501bdf17e1d47e38904c12f90b3648f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:167
+msgid ""
+"These buttons orientate the scene strictly about coordinate axes: "
+"**Front**, **Back**, **Top**, **Bottom**, **Left** or **Right** side."
+msgstr ""
+
+# 1d56af2c92804fecad7ebb0e81e6c627
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:175
+msgid ""
+"**Rotate counterclockwise** - rotates view 90 @htmlonly &deg; "
+"@endhtmlonly counterclockwise."
+msgstr ""
+
+# 04bbccb4c185462ca7904926c88deec1
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:182
+msgid ""
+"**Rotate clockwise** - rotates view 90 @htmlonly &deg; @endhtmlonly "
+"clockwise."
+msgstr ""
+
+# ab4f03c1383a4b09be5b3ddb3077012d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:189
+msgid "**Ortographic projection** - default OCC viewer projection mode."
+msgstr ""
+
+# 69ee8f1f0d8c46428065050295a4ff5a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:196
+msgid "**Perspective projection** - perspective OCC viewer projection mode."
+msgstr ""
+
+# 4e6bd91beaa743a8a5c1bfbbde1a5ac4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:203
+msgid ""
+"**Stereo projection** - stereoscopic rendering of the view. .. note:: "
+"Activation of this mode also switches the view to perpective projection "
+"in case if the orthographic one has been active. .. note:: By default, "
+"quad-buffered stereo is activated, if it is supported by the graphic "
+"card. If no stereo capabilities are available, an error message is shown."
+" .. note:: The stereoscopic view settings can be defined in "
+":ref:`occ_preferences` preferences."
+msgstr ""
+
+# 7a1a3affc2a942f789904b4d7e9bacd3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:213
+msgid ""
+"**Reset** - restores the default position (isometric) of objects in the "
+"scene."
+msgstr ""
+
+# 9a9311db82ed4b0aa101bdc53ed7784a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:221
+msgid "**Memorize view** - saves the current position of objects in the scene."
+msgstr ""
+
+# c66cd9df583b40a6ab953f3aa010ff13
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:229
+msgid "**Restore view** - restores the saved position of objects in the scene."
+msgstr ""
+
+# a90836b57fae4c8ea0bf00144b1b11db
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:237
+msgid "**Clone view** - opens a new duplicate scene."
+msgstr ""
+
+# b720ad6e71b94dcf88939ad65438c142
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:244
+msgid "Clipping Planes"
+msgstr ""
+
+# 4728621efd304609a18055d23a74ed99
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:246
+msgid ""
+"**Clipping** allows creating cross-section views (clipping planes) of "
+"your mesh."
+msgstr ""
+
+# 4cdb83c510f54e168e85a5a358188faa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:249
+msgid ""
+"To create a clipping plane, click on the **New** button in the dialog and"
+" choose how it will be defined by **Absolute** or **Relative** "
+"coordinates."
+msgstr ""
+
+# a395c00866ed478190f2fae1071b799e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:251
+msgid "**Absolute Coordinates**"
+msgstr ""
+
+# 9fe56524a22c4eb0ae965b10b2b8996e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:256
+msgid ""
+"**Base point** - allows defining the coordinates of the base point for "
+"the clipping plane."
+msgstr ""
+
+# ff2dd6b702754c8cad50abdf5e56e9bf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:258
+msgid "**Reset** - returns the base point to coordinate origin."
+msgstr ""
+
+# b81e17892cbb408ab2587a04385dd457
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:260
+msgid "**Direction** - allows defining the orientation of the clipping plane."
+msgstr ""
+
+# da939f4681e2407c8e8efff25446ddd8
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:262
+msgid ""
+"**Invert** - allows selecting, which part of the object will be removed "
+"and which will remain after clipping."
+msgstr ""
+
+# 207d3f3c7f494b9ca47599e6a3497686
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:265
+msgid "**Relative mode**"
+msgstr ""
+
+# 14704a9aadc94812b6e59c31e9476145
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:270
+msgid "**Orientation** ( ||X-Y, ||X-Z or ||Y-Z)."
+msgstr ""
+
+# f446cc2a842343c79f8fb484d84e7e00
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:272
+msgid ""
+"**Distance** between the opposite extremities of the boundary box of "
+"represented objects, if it is set to 0.5 the boundary box is split in two"
+" halves."
+msgstr ""
+
+# 613150bca3724c579791cc6e9cd77233
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:274
+msgid ""
+"**Rotation** (in angle degrees) **around X** (Y to Z) and **around Y** (X"
+" to Z) (depending on the chosen Orientation)"
+msgstr ""
+
+# 7b2b696e6b1b40e69b411c3524f40f2d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:276
+msgid "The other parameters are available in both modes :"
+msgstr ""
+
+# f3f79f79e96c4c7a8d851f0058c1b5c7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:278
+msgid ""
+"**Active** checkbox is used to apply/erase current plane and it's affect "
+"to/from view."
+msgstr ""
+
+# 597cf13c13054c88a08e2a1938c5695c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:279
+msgid ""
+"**Delete** removes the active clipping plane and discards it's view "
+"changes."
+msgstr ""
+
+# 30c0dff4834c49d28e4d69a7fbaafbbc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:280
+msgid ""
+"**Disable all** deactivates all created clipping planes and clears **Auto"
+" Apply** checkbox."
+msgstr ""
+
+# eaf958796f3a49ad8a05bbf118734a7a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:281
+msgid "**Preview** check-box shows the clipping plane in the **3D Viewer**."
+msgstr ""
+
+# fb74485207ca4d8d9d17cb1c3d9f975a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:282
+msgid ""
+"**Auto Apply** check-box allows you to see the result of clipping in the "
+"**3D Viewer** immediately. Be careful, it is not a preview 2and Close "
+"button could not cancel the applied modifications."
+msgstr ""
+
+# 853cc63ab412420caac383c6c96fac5e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:284
+msgid ""
+"It is also possible to interact with the clipping plane directly in 3D "
+"view using the mouse."
+msgstr ""
+
+# fef03fa2ea4a40ce841deb3583cc2e8e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:292
+msgid ""
+"**Scaling** - represents objects deformed (stretched or stuffed) along "
+"the axes of coordinates."
+msgstr ""
+
+# c4e889c8134e469cbce9fdd07df3f25f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:300
+msgid "**Graduated axes** - allows to define axes parameters and graduate them."
+msgstr ""
+
+# ab21f90ae19c455fbf312cd54f169765
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:306
+msgid "**Axis name** - if checked the axis name is displayed in the viewer."
+msgstr ""
+
+# 6e6cd5dc06a34514983e65f42d4c4e16
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:308
+msgid "**Name** - allows to redefine the axis name."
+msgstr ""
+
+# 1774516d068b453db6897560a3e77930
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:310
+msgid "**Font** - allows to define the font color of the axis name."
+msgstr ""
+
+# 1f8f55583c0148a5ababc422b53055f3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:312
+msgid "**Labels** - if checked the labels are displayed in the viewer."
+msgstr ""
+
+# 9b7c593ec0e44f7eaef3b1af99a68d53
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:314
+msgid "**Number** - allows to define the number of labels."
+msgstr ""
+
+# b9e0349af5e443448aa902880a2b20c3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:316
+msgid "**Offset** - allows to define the distance between axis and labels."
+msgstr ""
+
+# 8657bd54ff68436c9cee93c39c9aed15
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:318
+msgid "**Font** - allows to define the font color of labels names."
+msgstr ""
+
+# e45ec749cdbd476e9fc3152e1613b9e4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:320
+msgid "**Tick marks** - if checked the tick marks are displayed in the viewer."
+msgstr ""
+
+# 378296b383cc4f41bcba4bb2da0bcb22
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:322
+msgid "**Length** - allows to define the length of tick marks."
+msgstr ""
+
+# 6602e5af259d43199c1c87bef65a15e7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:324
+msgid ""
+"**Is visible** - if checked the graduated axes are displayed in the "
+"viewer."
+msgstr ""
+
+# cf733d6f31c34a41a1209efbe86eca29
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:331
+msgid "**Toggle ambient light** - toggle \"keep only ambient light\" flag on/off."
+msgstr ""
+
+# a0786e2bbbbf41dd85d6ce344d7fdb06
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:344
+msgid ""
+"**Minimize/Maximize** - these buttons allow switching the current view "
+"area to the minimized / maximized state."
+msgstr ""
+
+# b1d4a1f5c68a4ff2a05b293461b1d572
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:352
+msgid ""
+"**Return to 3D** - this button switches from 2D view projection back to "
+"the 3D view mode."
+msgstr ""
+
+# cf501138dae14e9eb2462c7c91ea5f6a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:359
+msgid ""
+"**Synchronize view** - allows to synchronize 3d view parameters. This "
+"button has two states - checked and unchecked. Clicking on this button "
+"opens a drop-down menu listing the compatible 3d views. As soon as the "
+"user selects any view from the list, the parameters (view point, "
+"position, zoom coefficient, etc.) of the current view are synchronized "
+"with the selected view (static synchronization)."
+msgstr ""
+
+# cddb399d118c4c06b9eba1218be632b0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:367
+msgid ""
+"In addition, when this button is in the \"checked\" state, the dynamic "
+"synchronization of the views is performed, i.e. any zoom, pan, rotate or "
+"other view operation done in one view is automatically applied to the "
+"other view."
+msgstr ""
+
+# 5474cbcb118c421386fdfc663380286a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:380
+msgid "Ray tracing"
+msgstr ""
+
+# 9ea273a72e53490aaa114c745ed87c26
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:382
+msgid ""
+"**Ray tracing** - allows to switch between rendering methods in run-time "
+"in the current OCCT 3D view. It can be used to produce images with "
+"photorealistic quality."
+msgstr ""
+
+# 54a6d111e4bc4eb8845b1da143889b5a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:388
+msgid ""
+"**Ray tracing** - specifies rendering mode: OpenGL rasterization (by "
+"default) or GPU ray-tracing."
+msgstr ""
+
+# 844c7808f5da4df39819b117e1049573
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:390
+msgid "**Depth** - defines maximum ray-tracing depth."
+msgstr ""
+
+# d72d6880ef04437c9eb57fdff137c30a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:392
+msgid "**Specular reflections** - enables/disables specular reflections."
+msgstr ""
+
+# c8a99eca0fbb4132b902efcd7534cdb9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:394
+msgid "**Adaptive anti-aliasing** - enables/disables adaptive anti-aliasing."
+msgstr ""
+
+# 350131a35d9c4428abe9038cb53b9525
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:396
+msgid "**Shadows rendering** - enables/disables shadows rendering."
+msgstr ""
+
+# 58471157964641908730c9b6cb84aebf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:398
+msgid ""
+"**Transparent shadow** - enables/disables light propagation through "
+"transparent media."
+msgstr ""
+
+# e437fd68f79f465994c4750128e2314b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:408
+msgid "Environment texture"
+msgstr ""
+
+# dd9ed685518e48e7b6de70a3aad0c421
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:410
+msgid ""
+"**Environment texture** - allows to set parameters for environment "
+"texture. This is a special mode of texture mapping when specular "
+"reflection of environment texture is simulated by OpenGL using a special "
+"texture coordinates generation algorithm (a sphere map)."
+msgstr ""
+
+# e45dbdf97d2b4bfa82f7967a25bb29c5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:417
+msgid ""
+"**Environment texture** - enables/disables environment texture in the "
+"current OCCT 3D view."
+msgstr ""
+
+# 4e7c9918d17747539f26f469fc70415a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:419
+msgid ""
+"User can select one of 7 predefined environment texture from the list or "
+"define its texture from file by choosing item **\"Custom...\"** in a "
+"combo box."
+msgstr ""
+
+# 894ccb13741142a8b1b2e6cdc787ecb2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:424
+msgid ""
+"Environment texture file should normally satisfy the following "
+"requirements in order to produce good visual result:"
+msgstr ""
+
+# 3fbbc871fefd4836bd6de54c179d3ed6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:424
+msgid "The image file should have 2:1 width-to-height ratio."
+msgstr ""
+
+# e0d0e446c5ea456f9ecc7b623e4ef7a2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:425
+msgid ""
+"It should constitute a 360-degrees panoramic image created using a fish-"
+"eye lens."
+msgstr ""
+
+# 14644aff7a5a4df0ad5cd7f819492d67
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:435
+msgid "Light source"
+msgstr ""
+
+# 66f761f1a25244559d22f4cf89ced351
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:437
+msgid "**Light source** - allows to set parameters for light source."
+msgstr ""
+
+# b496c483ee644da5a4d0b8bd8b5bfe4e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:439
+msgid ""
+"It's possible to choose a type of light source between directional and "
+"positional light."
+msgstr ""
+
+# b532628134194931bb2736ec15abd942
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:444
+msgid ""
+"**Directional** light - creates a directional light source in the viewer."
+" It is defined by direction coordinates, color and headlight parameter."
+msgstr ""
+
+# 9bdf5ead3d044ffebb59cd6293b9f7ec
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:450
+msgid ""
+"**Positional** light - creates an isolated light source X,Y,Z in the "
+"viewer. It is also defined by the color and headlight parameter."
+msgstr ""
+
+# 871469fd93524c778f11b7f655900b86
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:453
+msgid "Click:"
+msgstr ""
+
+# 87b0705ba1da4716b9122e5a4a0df6dc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:455
+msgid "**Apply and Close** to apply defined light source to the OCC 3D Viewer."
+msgstr ""
+
+# e00383e0e3334d408c19c7736c3b1b31
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:457
+msgid "**Default** to restore default values of light source."
+msgstr ""
+
+# 698c0f033f1d48b6a0ec0497cbd4ba75
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/occ_3d_viewer.rst:459
+msgid "**Close** to return parameters of light source on initial values."
+msgstr ""
+

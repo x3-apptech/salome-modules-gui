@@ -1,0 +1,318 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 54c022b14f0e4453bf7ce230dc758197
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:5
+msgid "Functionality common for OCC and VTK viewers"
+msgstr ""
+
+# 83afa961883f47eab6b65d12964038fc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:10
+msgid "Background"
+msgstr ""
+
+# fb968bc9d9f44492bcdd49a8507d8513
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:12
+msgid ""
+"Viewers background can be customized using the \"Change background\" "
+"popup menu command that opens the following dialog box:"
+msgstr ""
+
+# 7b839e3691464ae6ad1361b41485082c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:18
+msgid "The following types of the background are supported:"
+msgstr ""
+
+# 97d6b068a3be4284b86f61f2697788db
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:20
+msgid ""
+"**Single color:** the background is colored with the solid color "
+"specified by the user in the dialog box."
+msgstr ""
+
+# 334b1a5c72214844b30e5385e40a3bc5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:22
+msgid ""
+"**Gradient background:** the background is gradiently colored according "
+"to two colors and the gradient type specified in the dialog box. The "
+"following types of background are supported:"
+msgstr ""
+
+# 22550ebe91bf4ee5a8794a46eedfbcde
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:24
+msgid "Horizontal"
+msgstr ""
+
+# 98d6cd2214f14d089c9697ceedf9233b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:25
+msgid "Vertical"
+msgstr ""
+
+# 365d73cff65c4895ba7ca34bb741be6a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:26
+msgid "First diagonal"
+msgstr ""
+
+# 296e8dd5babb4eb48c24370833e9c906
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:27
+msgid "Second diagonal"
+msgstr ""
+
+# 5ffc074a79534059beadf10b3b6b4d35
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:28
+msgid "First corner"
+msgstr ""
+
+# d51cdd4c50ee4904a13df362c17a919d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:29
+msgid "Second corner"
+msgstr ""
+
+# 180fe3394489422a904f11c03d7f8531
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:30
+msgid "Third corner"
+msgstr ""
+
+# 52a6312b194847e6a173933ed176dfaa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:31
+msgid "Fourth corner"
+msgstr ""
+
+# c0d00c5514384e5d8a9ab459c76c8046
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:33
+msgid ""
+"**Image:** allows to set image as viewer background and define filling "
+"type:"
+msgstr ""
+
+# 812c7860c3474feab2456d645902348f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:35
+msgid "**Center:** the image is located at the center of the viewer backgound"
+msgstr ""
+
+# 206cdccb86e34e01b056f6e00050f983
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:36
+msgid "**Tile:** the image fills the entire viewer backgound one by one"
+msgstr ""
+
+# ae2d913c1f2b4c538ddf1e41ff678f63
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:37
+msgid "**Stretch:** the image is stretched to the entire viewer backgound."
+msgstr ""
+
+# 615cd01d9ae44a5aaf0a7c6cb3d466dc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:39
+msgid ""
+"Default background for the OCC viewer is specified via the "
+":ref:`occ_preferences` and for the VTK viewer via the "
+":ref:`vtk_preferences`."
+msgstr ""
+
+# d412fa233f9c4677a5e64201630aa6d5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:45
+msgid "Selection"
+msgstr ""
+
+# 4747130419b041adb688515be94e1ca7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:47
+msgid ""
+"An element can be selected by clicking on it with the left mouse button. "
+"Selecting objects with locked *Shift* key produces a multi selection."
+msgstr ""
+
+# f0f2925a9b07405a8f606b0190344af3
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:50
+msgid ""
+"Additionally, when the viewer owns an input focus, an object can be "
+"selected by pressing *\"S\"* on the keyboard. Pressing *\"S\"* when "
+"holding \\em Shift key allows adding/removing an object to/from the "
+"current selection."
+msgstr ""
+
+# 404ae3199ee3495ab048342338f88ed4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:54
+msgid ""
+"OCC viewer provides a way to navigate between the selectable objects. "
+"This feature (disabled by default) is used in some dialog boxes (for "
+"example, in Geometry module). When there are several objects which suit "
+"current selection requirements (specified by the dialog) under the "
+"current mouse cursor, it is possible to switch between them by means of "
+"mouse scroll wheel. The same can be also done by pressing *\"N\"* and "
+"*\"P\"* keys."
+msgstr ""
+
+# 3935dcdbfb1c445d92db6ff759225962
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:61
+msgid ""
+"There are also two additional selection mechanisms: rectangle and "
+"polyline selection."
+msgstr ""
+
+# 6e918360403a48f28cc08010fa2baf82
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:65
+msgid "Rectangle selection"
+msgstr ""
+
+# 6c0d63a1c25d4f859eea20ae507d0102
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:67
+msgid "Rectangle Selection is the basic and commonly used selection tool."
+msgstr ""
+
+# 35f27335bf9e405aad330beb80bb876c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:69
+msgid ""
+"To select a rectangle area press and hold the left mouse button while "
+"drawing the diagonal of the selection rectangle in the viewer."
+msgstr ""
+
+# df95a2cc3acd454d98331e23c65ff7c6
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:74
+msgid "As a result, the objects within the rectangle are selected."
+msgstr ""
+
+# 532448bb71834dfeb00aa69694072742
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:79
+msgid ""
+"It is possible to add an area to the existing selection by holding down "
+"*Shift* key while selecting."
+msgstr ""
+
+# ca0f77e08c6a44a080dd37587e4ec1bb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:82
+msgid "Polyline selection"
+msgstr ""
+
+# 83661f8af38d490c92f6083e4938dc44
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:84
+msgid ""
+"OCC and VTK Viewers feature a special Polyline Selection mechanism, which"
+" allows selecting an arbitrary part of the graphic area using a polygon "
+"frame (rubber band), instead of the usual selection with a rectangular "
+"frame."
+msgstr ""
+
+# 412c35a9fb524be8b8fb45fdaa7a090c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:89
+msgid ""
+"To produce a Polyline Selection, press and hold the right mouse button "
+"and draw the first side of the selection polygon, then change the "
+"direction by clicking the left mouse button add draw another side, etc. "
+"Click twice by left mouse button to finish drawing."
+msgstr ""
+
+# 335bcdc8eddb4405b502f4a237f6e218
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:97
+msgid "As a result, the objects within the polygon are selected."
+msgstr ""
+
+# ef93c2135b7e4e5ea80fda6173c8ee2a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:102
+msgid ""
+"To add an area to the existing selection it is necessary to hold down "
+"*Shift* key while selecting."
+msgstr ""
+
+# 65898a88ed354fc1bbd99460b858888d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:108
+msgid "Navigation modes"
+msgstr ""
+
+# 29cfbceb0fcd4233adf52f499933bce5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:111
+msgid "OCC and VTK 3D viewers support two different navigation modes:"
+msgstr ""
+
+# 3ea905a62d034bfa9dde0f90d1c4be7a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:113
+msgid ""
+"**Salome standard controls** Rectangle selection in this mode is "
+"performed by the left mouse button and polyline selection by the right "
+"mouse button; multiple selection is available when *Shift* button is "
+"pressed."
+msgstr ""
+
+# a65eb8ab4bc04fb78a6a2d69ff19a319
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:118
+msgid ""
+"Also, holding *Ctrl* key with pressed mouse buttons performs the "
+"following view transformations:"
+msgstr ""
+
+# 90fd47fc08e1471cbe6afa1c00a60baa
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:120
+msgid "*Ctrl* + left mouse button - zooming;"
+msgstr ""
+
+# be4e66b5c8134cb58ff45697a53206d0
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:121
+msgid "*Ctrl* + middle mouse button - panning;"
+msgstr ""
+
+# 0ee19547cf0242a4b5bd5922b266b326
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:122
+msgid "*Ctrl* + right mouse button - rotation."
+msgstr ""
+
+# c0f33651c521471baec81d2bf97d6e81
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:124
+msgid "**Keyboard free style**"
+msgstr ""
+
+# 3dc2e4157ed84f81b0d29b4ab37fa59f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:126
+msgid ""
+"This mode allows performing all view transformations without using the "
+"keyboard (only by the mouse):"
+msgstr ""
+
+# cd8c3d6c0f6648759db4497469b7291f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:129
+msgid "Left mouse button performs view rotation;"
+msgstr ""
+
+# 9d273e07879448fbbb58197d4eed2753
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:130
+msgid "Middle mouse button performs panning;"
+msgstr ""
+
+# bdc5c8d64b6d4255b2ad7d20b598122d
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:131
+msgid "Right mouse button makes zooming."
+msgstr ""
+
+# 1665cd478a8c4a03a25b804650632ae7
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:133
+msgid ""
+"In this style rectangle selection is done by the left mouse button with "
+"*Ctrl* key pressed; polyline selection is done by the right mouse button "
+"with *Ctrl* key pressed."
+msgstr ""
+
+# 76ec17847b8f482885ab1bc1e59af551
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:136
+msgid ""
+"In both styles selection of objects in the viewer can be performed by "
+"pressing *\"S\"* key or by the left mouse button click."
+msgstr ""
+
+# edbd1195129048adb7c6e00e7ad5395e
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/common_functionality.rst:139
+msgid "Zooming can be alternatively done by scrolling mouse wheel."
+msgstr ""
+

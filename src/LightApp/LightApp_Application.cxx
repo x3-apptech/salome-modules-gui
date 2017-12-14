@@ -603,12 +603,46 @@ void LightApp_Application::createActions()
 
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
   createMenu( separator(), helpMenu, -1, 10 );
+  
+  // Site && forum
+  int id = LightApp_Application::UserID + FIRST_HELP_ID;
+
+  QString site = tr ( "SALOME_SITE" );
+  QAction* as = createAction( id, site,
+			      resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
+			      site, site,
+			      0, desk, false, this, SLOT( onHelpOnline() ) );
+  as->setData( "salome-platform.org" );
+  createMenu( as, helpMenu, -1, 0 );
+  id++;
+
+  QString forum = tr ( "SALOME_FORUM" );
+
+  QAction* af = createAction( helpMenu, forum,
+			      resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
+			      forum, forum,
+			      0, desk, false, this, SLOT( onHelpOnline() ) );
+  af->setData( "salome-platform.org/forum" );
+  createMenu( af, helpMenu, -1, 0 );
+  id++;
+
+  createMenu( separator(), helpMenu, -1, 0 );
+
+  // YouTube channel
+  QString video = tr ( "SALOME_VIDEO_TUTORIALS" );
+  QAction* av = createAction( helpMenu, video,
+			      resMgr->loadPixmap( "LightApp", tr( "ICON_LIFE_RIGN" ), false ),
+			      video, video,
+			      0, desk, false, this, SLOT( onHelpOnline() ) );
+  av->setData( "not-created-yet.com" );
+  createMenu( av, helpMenu, -1, 0 );
+  id++;
+
+
   QStringList aModuleList;
   modules( aModuleList, false );
   aModuleList.prepend( "GUI" );
   aModuleList.prepend( "KERNEL" );
-
-  int id = LightApp_Application::UserID + FIRST_HELP_ID;
 
   QString aModule;
   foreach( aModule, aModuleList ) {
@@ -1097,16 +1131,23 @@ public:
               const QString&        theApp,
               const QString&        theParams,
               const QString&        theHelpFile,
-              const QString&        theContext = QString() )
+              const QString&        theContext = QString(),
+	      //For the external browser always specify 'file://' protocol,
+	      //because some WEB browsers (for example Mozilla Firefox) can't open local file without protocol.
+	      const QString&        theProtocol = QString("file://"),
+	      const bool            isFile = true)
     : myApp( theApp ),
       myParams( theParams ),
       myContext( theContext ),
       myStatus(0),
       myLApp( app )
   {
-    //For the external browser always specify 'file://' protocol,
-    //because some WEB browsers (for example Mozilla Firefox) can't open local file without protocol.
-    myHelpFile = QString("file://%1").arg( QFileInfo( theHelpFile ).canonicalFilePath() );
+    QString path_begin = theProtocol+"%1";
+    QString path_end = theHelpFile;
+    if( isFile ) {
+      path_end = QFileInfo( theHelpFile ).canonicalFilePath();
+    }
+    myHelpFile = path_begin.arg( path_end );
   }
 
   virtual void run()
@@ -1257,6 +1298,57 @@ void LightApp_Application::onHelpContextModule( const QString& theComponentName,
     parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
     parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
     parameters << QString( "%1#%2" ).arg( helpFile ).arg( context );
+    QProcess::startDetached( "HelpBrowser", parameters );
+  }
+}
+
+/*!
+  SLOT: Displays help contents for choosen module
+*/
+void LightApp_Application::onHelpOnline()
+{
+  const QAction* a = (QAction*) sender();
+  QString url = a->data().toString();
+  if ( url.isEmpty() ) return;
+
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+  QString platform;
+#ifdef WIN32
+  platform = "winapplication";
+#else
+  platform = "application";
+#endif
+  QString anApp = resMgr->stringValue("ExternalBrowser", platform);
+#ifdef WIN32
+  QString quote("\"");
+  anApp.prepend( quote );
+  anApp.append( quote );
+#endif
+  QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
+#if DISABLE_QTXWEBBROWSER
+  bool useExtBrowser = true;
+#else  
+  bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
+#endif
+  
+  if( useExtBrowser ) {
+    if ( !anApp.isEmpty() ) {
+      RunBrowser* rs = new RunBrowser( this, anApp, aParams, url, "", "http://", false );
+      rs->start();
+    }
+    else {
+      if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
+                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
+                                      SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
+
+        showPreferences( tr( "PREF_APP" ) );
+    }
+  }
+  else {
+    QStringList parameters;
+    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
+    parameters << "http://" + url;
     QProcess::startDetached( "HelpBrowser", parameters );
   }
 }

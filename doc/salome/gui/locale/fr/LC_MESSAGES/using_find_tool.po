@@ -1,0 +1,214 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# 0029fe08bab14034a739c8049ad14aab
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:5
+msgid "Using Find Tool"
+msgstr ""
+
+# 1aab2477494346c7a02dfef39d8ac50c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:7
+msgid ""
+"The **Object Browser** is supplied with the **Find** toolbox. This tool "
+"allows performing context search of the items in the Object Browser:"
+msgstr ""
+
+# a0b41dc1ab0d459ca6ab637d62d9a56f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:13
+msgid "The **Find** toolbox can be invoked in several ways:"
+msgstr ""
+
+# 1bc6d1987170474196ca2dc976160c6a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:15
+msgid ""
+"Pressing :kbd:`Ctrl-F` key combination starts a new search; the text "
+"previously input by the user in the edit control of the **Find** toolbox "
+"is automatically selected."
+msgstr ""
+
+# b74d123bf7894b9d9b7602b7a90c9b3a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:16
+msgid ""
+"Pressing :kbd:`/` (slash) key starts a new search; the text previously "
+"input by the user is cleared."
+msgstr ""
+
+# 1716e492f1f647669a3a3ba1b4ff2028
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:17
+msgid ""
+"Pressing :kbd:`F3` key repeats the previous search in the forward "
+"direction (from top to bottom)."
+msgstr ""
+
+# 6c23557f3e6e4327be09685ac1c39a83
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:18
+msgid ""
+"Pressing :kbd:`Shift-F3` key repeats the previous search in the backward "
+"direction (from bottom to top)."
+msgstr ""
+
+# e0caf6b8fbb9493ab470b533d3b91568
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:19
+msgid ""
+"Activating *Find* command from the Object Browser context popup menu "
+"starts a new search (the same as :kbd:`Ctrl-F`)."
+msgstr ""
+
+# ccf51e06778d42a4b680ad48c5efdfbf
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:21
+msgid "Pressing :kbd:`Escape` key closes the **Find** toolbox."
+msgstr ""
+
+# 47a44df59cf243efb37163853d6a7fe5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:23
+msgid ""
+"The search is always started from the first selected item in the Object "
+"Browser. If there are no selected items, the search is started from the "
+"top of the Object Browser contents. If there is an item which satisfies "
+"the search conditions, it is selected and the Object Browser is expanded "
+"to show this item (if it is collapsed)."
+msgstr ""
+
+# f16f689bd01f4a9cafdc03aafa712dc9
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:29
+msgid ""
+"The **Find** toolbox provides a set of widgets which are used to perform "
+"the search operations or change the search conditions:"
+msgstr ""
+
+# c6a5610f23a94e5bacf781a59e33b957
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:32
+msgid "*\"Close\"* button closes the **Find** toolbox."
+msgstr ""
+
+# 1ac116c5575a46abbd080ffcd4e027d2
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:33
+msgid ""
+"Line edit box is used to input the searched text. Note that the search is"
+" always done by the object name, i.e. by the data displayed in the "
+"\"Name\" column of the Object Browser."
+msgstr ""
+
+# 4ea63098f6574d2494110e17c59517b4
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:34
+msgid ""
+"*\"Find first item\"* button searches the very first item which satisfies"
+" the search conditions."
+msgstr ""
+
+# 524e3714f2b0472db0390086f9c6b497
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:35
+msgid ""
+"*\"Find previous item\"* button searches the previous item which "
+"satisfies the search conditions."
+msgstr ""
+
+# 0222d93590824f1389f07b6e9eb41d87
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:36
+msgid ""
+"*\"Find next item\"* button searches the next item which satisfies the "
+"search conditions."
+msgstr ""
+
+# 78c773b09b734426be5105c38af14c8b
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:37
+msgid ""
+"*\"Find last item\"* button searches the very last item which satisfies "
+"the search conditions."
+msgstr ""
+
+# d86db0e5b8b34c2084a326a503a88f66
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:38
+msgid "*\"Case sensitive\"* check box allows performing case sensitive search."
+msgstr ""
+
+# 22ea11330d04428aa847d6890fdc8673
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:39
+msgid ""
+"*\"Regular Expression\"* check box allows performing the search of the "
+"items by the regular expression, for example:"
+msgstr ""
+
+# de4f1ca0042f462cadb39fae439c53fd
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:41
+msgid "*Face* - matches all faces"
+msgstr ""
+
+# 4f7b2b89458e4220a1c97ddd2c75529c
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:42
+msgid "*Face_[\\\\d]* - matches Face_1, Face_2, etc.. (all faces)"
+msgstr ""
+
+# cfdfb96a4c9c46c1b8adb0f4ca376e83
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:43
+msgid ""
+"*Face_[\\\\d]$* - matches Face_1, Face_2, but does not match Face_11, "
+"Face_12."
+msgstr ""
+
+# 61225225186349be93a67b9728a489ab
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:44
+msgid "*^Face_[\\\\d]$* - the same as above"
+msgstr ""
+
+# e124424f410744afb64066894e6646ba
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:45
+msgid "*^ Face_[\\\\d]$* - matches nothing"
+msgstr ""
+
+# f115b8e0e5d04af1803c111e3d9c8e0a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:47
+msgid ""
+"*\"Wrap search\"* check box: if checked and the search reaches the last "
+"item, satisfying the search conditions, pressing *\"Find Next\"* button "
+"moves the selection to the very first item which matches the search "
+"conditions (i.e. a cyclic search is performed)."
+msgstr ""
+
+# e37dd0fa0cca4f38bb90a88564c37803
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:49
+msgid ""
+"If there are no items satisfying the search conditions in the Object "
+"Browser, the edit control of the **Find** toolbox becomes red-colored:"
+msgstr ""
+
+# 3c42a9bbb34147b6976934705b6c1130
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:54
+msgid ""
+"The **Find** toolbox also has an auto-hiding feature. This works as "
+"follows:"
+msgstr ""
+
+# 74ce5017dd7f423da9b552493fef023f
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:56
+msgid ""
+"If the input focus is inside the **Find** toolbox, auto-hiding is "
+"automatically deactivated."
+msgstr ""
+
+# 4b572194b68a4d539b963b498658035a
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/using_find_tool.rst:57
+msgid ""
+"If the input focus moves outside the **Find** toolbox, it hides "
+"automatically in 10 seconds after the last search operation (which can be"
+" done by clicking * \"Find Next\"*, *\"Find Previous\"* button, or typing"
+" something in the edit field); each new search operation restarts the "
+"auto-hide timer."
+msgstr ""
+

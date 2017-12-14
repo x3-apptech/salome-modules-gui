@@ -1,0 +1,46 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C)
+# This file is distributed under the same license as the GUI package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: GUI 8.4.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-14 15:16+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.0\n"
+
+# b85fda66a24c4699bb0e9c5a529a91bc
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/howtos_and_best_practives.rst:5
+msgid "How-To's and Best Practices"
+msgstr ""
+
+# 696ceb802786485b94f7803b0369bee5
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/howtos_and_best_practives.rst:7
+msgid ""
+"These documents provide guidelines and best practices explaining "
+"different aspects and usage examples of SALOME platform."
+msgstr ""
+
+# 52c0b9925beb4cc4ab0f32df360dfbeb
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/howtos_and_best_practives.rst:10
+msgid ":ref:`use_case_builder`:"
+msgstr ""
+
+# 15eefca5c998491b8cfca7f50558ef57
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/howtos_and_best_practives.rst:11
+msgid ":ref:`drag_and_drop`"
+msgstr ""
+
+# ec648c3b2e1c46b58b0aaea366988fac
+#: ../../../../../../SRC/GUI_SRC/doc/salome/gui/input/howtos_and_best_practives.rst:12
+msgid ":ref:`using_pluginsmanager`"
+msgstr ""
+
