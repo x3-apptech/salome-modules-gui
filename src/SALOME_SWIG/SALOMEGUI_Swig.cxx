@@ -628,7 +628,7 @@ public:
       if (!viewMgr) return;
       SUIT_ViewWindow* window = viewMgr->getActiveView();
       if ( window ) {
-        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
+        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
         if ( view ) {
           SALOME_Prs* aPrs = view->CreatePrs( myEntry.toLatin1() );
           myResult = !aPrs->IsNull();
@@ -658,7 +658,7 @@ void SALOMEGUI_Swig::UpdateView()
         if (!viewMgr) return;
         SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
-          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
+          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
           if ( view )
             view->Repaint();
         }

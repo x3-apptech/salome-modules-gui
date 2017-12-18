@@ -23,7 +23,6 @@
 //  SALOME SALOMEGUI : implementation of desktop and GUI kernel
 //  File   : SALOME_Selection.cxx
 //  Author : Nicolas REJNERI
-
 #include "SVTK_SelectorDef.h"
 
 #include <VTKViewer_Filter.h>
@@ -106,6 +105,7 @@ SVTK_SelectorDef
   if(mySelectionMode != theMode){
     mySelectionMode = theMode;
     myMapIOSubIndex.clear();
+    myMapIOSubCompositeIndex.clear();
     this->EndPickCallback();
   }
 }
@@ -120,6 +120,7 @@ SVTK_SelectorDef
   myIO2Actors.clear();
   myIObjects.clear();
   myMapIOSubIndex.clear();
+  myMapIOSubCompositeIndex.clear();
 }
 
 /*!
@@ -206,6 +207,7 @@ SVTK_SelectorDef
   myIObjects.erase(theIO);
   myIO2Actors.erase(theIO);
   myMapIOSubIndex.erase(theIO);
+  myMapIOSubCompositeIndex.erase(theIO);
 
   return anIsIOBound;
 }
@@ -320,6 +322,29 @@ static bool removeIndex(TColStd_IndexedMapOfInteger& theMapIndex, const int theI
   }
   return anId != 0;
 }
+
+static bool removeCompositeIndex( SVTK_IndexedMapOfIds& theMapIndex, const SVTK_ListOfInteger theIds )
+{
+  int anId = theMapIndex.FindIndex( theIds ); // i==0 if Index is not in the MapIndex
+  if( anId ) {
+    // only the last key can be removed
+    SVTK_ListOfInteger aLastIds = theMapIndex.FindKey( theMapIndex.Extent() );
+    if( aLastIds == theIds )
+      theMapIndex.RemoveLast();
+    else {
+      SVTK_IndexedMapOfIds aNewMap;
+      aNewMap.ReSize(theMapIndex.Extent()-1);
+      for( int j = 1; j <= theMapIndex.Extent(); j++ ){
+        SVTK_ListOfInteger anIds = theMapIndex( j );
+        if ( anIds != theIds )
+          aNewMap.Add( anIds );
+      }
+      theMapIndex = aNewMap;
+    }
+  }
+  return anId != 0;
+}
+
 
 /*!
   Changes indices of subselection for SALOME_InteractiveObject
@@ -455,6 +480,147 @@ SVTK_SelectorDef
 {
   myMapIOSubIndex.clear();  
 }
+
+/*!
+  \return true if the SALOME_InteractiveObject has a composite index subselection
+  \param theIO - SALOME_InteractiveObject
+*/
+bool 
+SVTK_SelectorDef
+::HasCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO ) const
+{
+  return myMapIOSubCompositeIndex.find( theIO ) != myMapIOSubCompositeIndex.end();
+}
+
+/*!
+  Gets composite indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+*/
+void 
+SVTK_SelectorDef
+::GetCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+		     SVTK_IndexedMapOfIds& theIds )
+{
+  TMapIOSubCompositeIndex::const_iterator anIter = myMapIOSubCompositeIndex.find( theIO );
+  if( anIter != myMapIOSubCompositeIndex.end() )
+    theIds = anIter->second;
+  else
+    theIds.Clear();
+}
+
+/*!
+  Changes composite indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIndices - composite id
+  \param theIsModeShift - if it is false, then map will be cleared before indices are added
+*/
+bool
+SVTK_SelectorDef
+::AddOrRemoveCompositeIndex( const Handle( SALOME_InteractiveObject )& theIO, 
+                    const SVTK_IndexedMapOfIds& theIds, 
+                    bool theIsModeShift)
+{
+  TMapIOSubCompositeIndex::iterator aMapIter = myMapIOSubCompositeIndex.find( theIO );
+  if( aMapIter == myMapIOSubCompositeIndex.end() ) {
+    SVTK_IndexedMapOfIds anEmpty;
+    aMapIter = myMapIOSubCompositeIndex.insert( TMapIOSubCompositeIndex::value_type( theIO, anEmpty ) ).first;
+  }
+  SVTK_IndexedMapOfIds& aMapIndex = aMapIter->second;
+
+  if( !theIsModeShift )
+    aMapIndex.Clear();
+  
+  for( int i = 1, iEnd = theIds.Extent(); i <= iEnd; i++ )
+    aMapIndex.Add( theIds( i ) );
+  
+  if( aMapIndex.IsEmpty() ) {
+    myMapIOSubCompositeIndex.erase( theIO );
+    return false;
+  }
+  return true;
+}
+
+/*!
+  Changes indices of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIds - composite ids
+  \param theIsModeShift - if it is false, then map will be cleared before indices are added
+*/
+bool 
+SVTK_SelectorDef
+::AddOrRemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+			     SVTK_ListOfInteger theIds,
+			     bool theIsModeShift)
+{
+  TMapIOSubCompositeIndex::iterator anIter = myMapIOSubCompositeIndex.find( theIO );
+  if( anIter == myMapIOSubCompositeIndex.end() ) {
+    SVTK_IndexedMapOfIds anEmpty;
+    anIter = myMapIOSubCompositeIndex.insert(TMapIOSubCompositeIndex::value_type( theIO,anEmpty ) ).first;
+  }
+
+  SVTK_IndexedMapOfIds& aMapIndex = anIter->second;
+
+  bool anIsContains = aMapIndex.Contains( theIds ) == Standard_True;
+  if ( anIsContains )
+    removeCompositeIndex( aMapIndex, theIds );
+  
+  if ( !theIsModeShift )
+    aMapIndex.Clear();
+  
+  if ( !anIsContains )
+    aMapIndex.Add( theIds );
+
+  if ( aMapIndex.IsEmpty() )
+    myMapIOSubIndex.erase( theIO );
+
+  return false;
+}
+
+/*!
+  Removes composite index of subselection for SALOME_InteractiveObject
+  \param theIO - SALOME_InteractiveObject
+  \param theIds - index
+*/
+void
+SVTK_SelectorDef
+::RemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+			SVTK_ListOfInteger theIds )
+{
+  if(IsCompositeIndexSelected( theIO, theIds ) ) {
+    TMapIOSubCompositeIndex::iterator anIter = myMapIOSubCompositeIndex.find( theIO );
+    SVTK_IndexedMapOfIds& aMapIndex = anIter->second;
+    removeCompositeIndex( aMapIndex,theIds );
+  }
+}
+
+/*!
+  \return true if the composite index presents in subselection 
+  \param theIO - SALOME_InteractiveObject
+  \param theIds - index
+*/
+bool
+SVTK_SelectorDef
+::IsCompositeIndexSelected( const Handle(SALOME_InteractiveObject)& theIO, 
+			    SVTK_ListOfInteger theIds ) const
+{
+  TMapIOSubCompositeIndex::const_iterator anIter = myMapIOSubCompositeIndex.find( theIO );
+  if( anIter != myMapIOSubCompositeIndex.end() ) {
+    const SVTK_IndexedMapOfIds& aMapIndex = anIter->second;
+    return aMapIndex.Contains( theIds ) == Standard_True;
+  }
+  return false;
+}
+
+/*!
+  Clears all composite indices of subselection
+*/
+void 
+SVTK_SelectorDef
+::ClearCompositeIndex()
+{
+  myMapIOSubCompositeIndex.clear();  
+}
+
 
 /*!
   To apply a filter on the selection

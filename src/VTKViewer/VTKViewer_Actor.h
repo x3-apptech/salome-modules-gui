@@ -146,6 +146,11 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   double*
   GetNodeCoord(int theObjID);
 
+  //! Maps object index of a node to corresponding VTK index
+  virtual
+  int 
+  GetNodeVtkId(int theObjID);
+
   //! Maps VTK index of a cell to corresponding object index
   virtual 
   int

@@ -103,6 +103,14 @@ SVTK_Actor
   return myMapIndex;
 }
 
+
+const SVTK_IndexedMapOfIds&
+SVTK_Actor
+::GetMapCompositeIndex() const 
+{
+  return myMapCompositeIndex;
+}
+
 void
 SVTK_Actor
 ::MapCells(SALOME_Actor* theMapActor,
@@ -211,6 +219,34 @@ SVTK_Actor
   }
 
   myMapIndex = theMapIndex;
+}
+
+void
+SVTK_Actor
+::MapEdge( SALOME_Actor* theMapActor, 
+           const SVTK_IndexedMapOfIds& theMapCompositeIndex) {
+  myUnstructuredGrid->Initialize();
+  myUnstructuredGrid->Allocate();
+
+  vtkUnstructuredGrid * aSourceGrid = ( vtkUnstructuredGrid * )theMapActor->GetInput();
+  GetSource()->SetPoints( aSourceGrid->GetPoints() );
+
+  int aNbOfParts = theMapCompositeIndex.Extent();
+  for(int ind = 1; ind <= aNbOfParts; ind++){
+      std::vector<int> aNodesIds = theMapCompositeIndex( ind );
+      vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
+      ids->InsertNextId(theMapActor->GetNodeVtkId( aNodesIds[0] ) );
+      ids->InsertNextId(theMapActor->GetNodeVtkId( aNodesIds[1] ) );
+      myUnstructuredGrid->InsertNextCell(VTK_LINE,ids);
+  }
+
+  UnShrink();
+  if(theMapActor->IsShrunk()){
+    SetShrinkFactor(theMapActor->GetShrinkFactor());
+    SetShrink();
+  }
+  
+  myMapCompositeIndex = theMapCompositeIndex;
 }
 
 /*!

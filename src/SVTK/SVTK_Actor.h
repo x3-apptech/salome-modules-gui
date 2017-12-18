@@ -23,6 +23,7 @@
 #ifndef SVTK_ACTOR_H
 #define SVTK_ACTOR_H
 
+#include "SVTK_Selector.h"
 #include <TColStd_IndexedMapOfInteger.hxx>
 
 class vtkRenderer;
@@ -32,7 +33,7 @@ class vtkUnstructuredGrid;
 
 #include "SVTK.h"
 #include "SVTK_DeviceActor.h"
-
+#include "SVTK_Hash.h"
 #include <vtkSmartPointer.h>
 
 class SALOME_Actor;
@@ -83,11 +84,21 @@ public:
   MapEdge(SALOME_Actor* theMapActor, 
           const TColStd_IndexedMapOfInteger& theMapIndex);
 
+//! Allow to recostruct selected edges from source SALOME_Actor and map of subindexes using corner node ids
+  virtual void 
+  MapEdge(SALOME_Actor* theMapActor, 
+          const SVTK_IndexedMapOfIds& theMapCompositeIndex);
+  
+
   const TColStd_IndexedMapOfInteger&
   GetMapIndex() const;
 
+  const SVTK_IndexedMapOfIds&
+  GetMapCompositeIndex() const;
+
  protected:
   TColStd_IndexedMapOfInteger myMapIndex;
+  SVTK_IndexedMapOfIds        myMapCompositeIndex;
 
   vtkSmartPointer<vtkUnstructuredGrid> myUnstructuredGrid;
 

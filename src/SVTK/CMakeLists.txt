@@ -99,6 +99,7 @@ SET(_other_HEADERS
    SVTK_Selector.h
    SVTK_SpaceMouse.h
    SVTK_Utils.h
+   SVTK_Hash.h
 )
 
 # header files / no moc processing / internal
