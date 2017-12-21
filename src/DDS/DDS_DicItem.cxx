@@ -30,7 +30,7 @@
 #include <UnitsAPI.hxx>
 #include <Units_Dimensions.hxx>
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_DicItem, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(DDS_DicItem, Standard_Transient)
 
 /*!
   \class DDS_DicItem

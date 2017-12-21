@@ -451,6 +451,17 @@ VTKViewer_Actor
 }
 
 /*!
+ Maps object index of a node to corresponding VTK index
+*/
+int
+VTKViewer_Actor
+::GetNodeVtkId( int theObjID )
+{
+  return theObjID;
+}
+
+
+/*!
   Get corresponding #vtkCell for given object index
 */
 vtkCell* 

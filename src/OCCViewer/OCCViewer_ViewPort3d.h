@@ -23,8 +23,6 @@
 #ifndef OCCVIEWER_VIEWPORT3D_H
 #define OCCVIEWER_VIEWPORT3D_H
 
-#include <Basics_OCCTVersion.hxx>
-
 #include "OCCViewer_ViewPort.h"
 #include "Qtx.h"
 
@@ -64,11 +62,6 @@ public:
 
 //   void         setActive( V3d_TypeOfView );
   virtual bool          syncronize( const OCCViewer_ViewPort3d* );
-
-#if OCC_VERSION_LARGE <= 0x07000000
-  double                getZSize() const;
-  void                  setZSize( double );
-#endif
 
   void                  getAxialScale( double&, double&, double& );
 
@@ -128,10 +121,6 @@ private:
   
 private:
   Handle(V3d_View)      myActiveView;
-#if OCC_VERSION_LARGE <= 0x06070100
-  Handle(V3d_View)      myOrthoView;
-  Handle(V3d_View)      myPerspView;
-#endif
   bool                  myBusy;
   double                myScale;
   bool                  myIsAdvancedZoomingEnabled;

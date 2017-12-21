@@ -110,7 +110,7 @@ void LightApp_DataModel::build()
 void LightApp_DataModel::updateWidgets()
 {
   LightApp_Application* app = dynamic_cast<LightApp_Application*>( module()->application() );
-  if ( app )
+  if ( app && app->objectBrowser() )
     app->objectBrowser()->updateTree( 0, false );
 }
 

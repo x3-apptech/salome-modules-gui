@@ -32,7 +32,7 @@
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, Standard_Transient)
 
 /*!
   \class DDS_DicGroup
@@ -47,7 +47,7 @@ OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_DicGroup, MMgt_TShared)
   \param name group name
 */
 DDS_DicGroup::DDS_DicGroup( const TCollection_AsciiString& name )
-: MMgt_TShared(),
+: Standard_Transient(),
   myName( name ),
   myActiveSystem( UNIT_SYSTEM_SI )
 {

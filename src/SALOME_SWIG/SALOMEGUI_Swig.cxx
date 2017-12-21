@@ -484,7 +484,7 @@ void SALOMEGUI_Swig::DisplayOnly( const char* theEntry )
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), true );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
 
@@ -594,7 +594,7 @@ void SALOMEGUI_Swig::EraseAll()
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), true );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
       }
@@ -628,7 +628,7 @@ public:
       if (!viewMgr) return;
       SUIT_ViewWindow* window = viewMgr->getActiveView();
       if ( window ) {
-        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
+        SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
         if ( view ) {
           SALOME_Prs* aPrs = view->CreatePrs( myEntry.toLatin1() );
           myResult = !aPrs->IsNull();
@@ -658,7 +658,7 @@ void SALOMEGUI_Swig::UpdateView()
         if (!viewMgr) return;
         SUIT_ViewWindow* window = viewMgr->getActiveView();
         if ( window ) {
-          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getActiveView() );
+          SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
           if ( view )
             view->Repaint();
         }

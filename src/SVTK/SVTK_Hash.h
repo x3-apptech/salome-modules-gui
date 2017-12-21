@@ -20,31 +20,38 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "SALOME_TypeFilter.hxx"
+//  SALOME SALOMEGUI : 
+//  File   : SVTK_Hash.h
+//  Author : Roman NIKOLAEV
 
-IMPLEMENT_STANDARD_RTTIEXT(SALOME_TypeFilter, SALOME_Filter)
+#ifndef SVTK_HASH_H
+#define SVTK_HASH_H
 
-/*!
-  Constructor
-  \param TheKind - type of filter
-*/
-SALOME_TypeFilter::SALOME_TypeFilter(const Standard_CString theKind)
-: myKind( theKind )
-{
-}
+#include <vector>
+#include <NCollection_IndexedMap.hxx>
+#include <Standard_Integer.hxx>
 
-/*!
-  Destructor
-*/
-SALOME_TypeFilter::~SALOME_TypeFilter()
-{
-}
+typedef std::vector<Standard_Integer> SVTK_ListOfInteger;
 
-/*!
-  \param theObj - object to be checked
-  \return \c true if object passes filter
-*/
-Standard_Boolean SALOME_TypeFilter::IsOk(const Handle(SALOME_InteractiveObject)& theObj) const 
-{
-  return theObj->isComponentType( myKind );
-}
+class SVTK_Hasher {
+
+public:
+    static Standard_Integer HashCode(const std::vector<Standard_Integer> ids,
+				     const Standard_Integer upper) {
+        Standard_Integer seed = ids.size();
+        for( Standard_Integer i = 0; i <  (Standard_Integer) ids.size(); i++ ) {
+            Standard_Integer v = ids[i];
+            seed ^= v + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
+        }
+        return ::HashCode(seed,upper);
+    }
+
+    static Standard_Boolean IsEqual(const SVTK_ListOfInteger& theKey1,
+                                    const SVTK_ListOfInteger& theKey2) {
+        return theKey1 == theKey2;
+    }
+};
+
+typedef NCollection_IndexedMap<SVTK_ListOfInteger,SVTK_Hasher> SVTK_IndexedMapOfIds;
+
+#endif // SVTK_HASH_H

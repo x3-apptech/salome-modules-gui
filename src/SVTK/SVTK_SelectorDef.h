@@ -27,6 +27,8 @@
 #ifndef SVTK_SELECTORDEF_H
 #define SVTK_SELECTORDEF_H
 
+#include "SVTK_Selector.h"
+
 #include <set>
 #include <map>
 
@@ -35,8 +37,6 @@
 #include <vtkSmartPointer.h>
 
 #include "SALOME_InteractiveObject.hxx"
-
-#include "SVTK_Selector.h"
 
 class SALOME_Actor;
 
@@ -134,6 +134,42 @@ public:
   virtual
   void 
   ClearIndex();
+
+  //----------------------------------------------------------------------------
+  /// ! Composite indexes 
+  virtual
+  bool 
+  HasCompositeIndex(const Handle(SALOME_InteractiveObject)& theIO ) const;
+
+  virtual
+  void 
+  GetCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+		     SVTK_IndexedMapOfIds& theIds );        
+  virtual
+  bool 
+  AddOrRemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+			     const SVTK_IndexedMapOfIds& theIds,
+			     bool theIsModeShift);
+
+  virtual
+  bool
+  AddOrRemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+			     SVTK_ListOfInteger theIds,
+			     bool theIsModeShift);
+
+  virtual
+  void 
+  RemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
+			SVTK_ListOfInteger theIds );
+
+  virtual
+  bool 
+  IsCompositeIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
+			   SVTK_ListOfInteger theIds ) const;
+
+  virtual
+  void 
+  ClearCompositeIndex();
 
   //----------------------------------------------------------------------------
   virtual
@@ -242,6 +278,12 @@ private:
                    TIndexedMapOfInteger,
                    TIOLessThan> TMapIOSubIndex;
   TMapIOSubIndex myMapIOSubIndex;
+
+  typedef std::map<Handle(SALOME_InteractiveObject),
+                   SVTK_IndexedMapOfIds,
+                   TIOLessThan> TMapIOSubCompositeIndex;
+  TMapIOSubCompositeIndex myMapIOSubCompositeIndex;
+
 
   typedef std::map<TFilterID,Handle(VTKViewer_Filter)> TFilters;
   TFilters myFilters;
