@@ -20,40 +20,27 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _ViewerData_AISShape_HeaderFile
-#define _ViewerData_AISShape_HeaderFile
-
-// When below macro is defined, AIS_TexturedShape is used as base class
-#define USE_TEXTURED_SHAPE
-
-#ifdef USE_TEXTURED_SHAPE
-  #include <AIS_TexturedShape.hxx>
-  #define BASE_SHAPE AIS_TexturedShape
-#else
-  #include <AIS_Shape.hxx>
-  #define BASE_SHAPE AIS_Shape
-#endif
+#ifndef VIEWERDATA_AISSHAPE
+#define VIEWERDATA_AISSHAPE
 
 #include <Standard.hxx>
 #include <Standard_DefineHandle.hxx>
+#include <AIS_ColoredShape.hxx>
 
-#include <Basics_OCCTVersion.hxx>
-
-class ViewerData_AISShape
-  : public BASE_SHAPE
+class ViewerData_AISShape : public AIS_ColoredShape
 {
 public:
-  Standard_EXPORT ViewerData_AISShape (const TopoDS_Shape& theShape);
+  Standard_EXPORT ViewerData_AISShape(const TopoDS_Shape&);
   Standard_EXPORT ~ViewerData_AISShape();
 
-  // checks if shape is clippable
+  //! Checks if shape is clippable.
   Standard_EXPORT inline bool IsClippable() const
   {
     return myIsClippable;
   }
 
-  // makes shape clippable/not clippable
-  Standard_EXPORT inline void SetClippable (bool isClippable)
+  //! Makes shape clippable/not clippable.
+  Standard_EXPORT inline void SetClippable(bool isClippable)
   {
     myIsClippable = isClippable;
   }
@@ -62,9 +49,9 @@ protected:
   bool myIsClippable;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape, BASE_SHAPE)
+  DEFINE_STANDARD_RTTIEXT(ViewerData_AISShape, AIS_ColoredShape)
 };
 
-DEFINE_STANDARD_HANDLE(ViewerData_AISShape, BASE_SHAPE)
+DEFINE_STANDARD_HANDLE(ViewerData_AISShape, AIS_ColoredShape)
 
-#endif // _ViewerData_AISShape_HeaderFile
+#endif // VIEWERDATA_AISSHAPE

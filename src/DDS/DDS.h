@@ -23,10 +23,7 @@
 #ifndef DDS_H
 #define DDS_H
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <TCollection_AsciiString.hxx>
-
 #include <NCollection_DefineDataMap.hxx>
 
 #define UNIT_SYSTEM_SI "SI"

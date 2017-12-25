@@ -244,6 +244,14 @@ static const char* imageEmptyIcon[] = {
 //since the 'toolbar marker' is not unique, find index of first occurrence of the
 //'toolbar marker' in the array and check that next string is name of the toolbar
 
+void LightAppCleanUpAppResources()
+{
+  if ( LightApp_Application::_prefs_ ) {
+    delete LightApp_Application::_prefs_;
+    LightApp_Application::_prefs_ = 0;
+  }
+}
+
 namespace
 {
   int getToolbarMarkerIndex( QByteArray input, const QStringList& aFlags ) {
@@ -429,6 +437,7 @@ LightApp_Application::~LightApp_Application()
   savePreferences();
   delete mySelMgr;
   delete myScreenHelper;
+  myPrefs = 0;
 }
 
 /*!Start application.*/
@@ -1566,7 +1575,6 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
                            resMgr->booleanValue( "3DViewer", "relative_size", vm->trihedronRelative() ));
     vm->setInteractionStyle( resMgr->integerValue( "3DViewer", "navigation_mode", vm->interactionStyle() ) );
     vm->setProjectionType( resMgr->integerValue( "OCCViewer", "projection_mode", vm->projectionType() ) );
-  #if OCC_VERSION_LARGE > 0x06090000
     vm->setStereoType( resMgr->integerValue( "OCCViewer", "stereo_type", vm->stereoType() ) );
     vm->setAnaglyphFilter( resMgr->integerValue( "OCCViewer", "anaglyph_filter", vm->anaglyphFilter() ) );
     vm->setStereographicFocus( resMgr->integerValue( "OCCViewer", "focus_type", vm->stereographicFocusType() ),
@@ -1577,7 +1585,6 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
     vm->setReverseStereo( resMgr->booleanValue( "OCCViewer", "reverse_stereo", vm->isReverseStereo() ) );
     vm->setVSync( resMgr->booleanValue( "OCCViewer", "enable_vsync", vm->isVSync() ) );
     vm->setQuadBufferSupport( resMgr->booleanValue( "OCCViewer", "enable_quad_buffer_support", vm->isQuadBufferSupport() ) );
-  #endif
     vm->setZoomingStyle( resMgr->integerValue( "3DViewer", "zooming_mode", vm->zoomingStyle() ) );
     vm->enablePreselection( resMgr->booleanValue( "OCCViewer", "enable_preselection", vm->isPreselectionEnabled() ) );
     vm->enableSelection(    resMgr->booleanValue( "OCCViewer", "enable_selection",    vm->isSelectionEnabled() ) );
@@ -2113,6 +2120,7 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
   {
     _prefs_ = new LightApp_Preferences( resourceMgr() );
     that->createPreferences( _prefs_ );
+    qAddPostRoutine( LightAppCleanUpAppResources );
   }
 
   that->myPrefs = _prefs_;
@@ -2394,7 +2402,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   anIndicesList << 0                       << 1;
   pref->setItemProperty( "strings", aValuesList,   occProjMode );
   pref->setItemProperty( "indexes", anIndicesList, occProjMode );
-#if OCC_VERSION_LARGE > 0x06090000
+
   // .... -> Stereo group
   int stereoGroup = pref->addPreference( tr( "PREF_GROUP_STEREO" ), occGroup);
   pref->setItemProperty( "columns", 2, stereoGroup );
@@ -2465,7 +2473,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   // .... -> Enable quad-buffer support
   pref->addPreference( tr( "PREF_ENABLE_QUAD_BUFFER_SUPPORT" ), stereoGroup,
                        LightApp_Preferences::Bool, "OCCViewer", "enable_quad_buffer_support" );
-#endif
+
   // ... "Background" group <<start>>
   int bgGroup = pref->addPreference( tr( "PREF_VIEWER_BACKGROUND" ), occGroup );
   //  pref->setItemProperty( "columns", 2, bgGroup );
@@ -3240,7 +3248,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 #endif
-#if OCC_VERSION_LARGE > 0x06090000
+
 #ifndef DISABLE_OCCVIEWER
   if ( sec == QString( "OCCViewer" ) && param == QString( "stereo_type" ) )
   {
@@ -3377,7 +3385,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 #endif
-#endif
+
   if ( sec == QString( "3DViewer" ) && param == QString( "zooming_mode" ) )
   {
     int mode = resMgr->integerValue( "3DViewer", "zooming_mode", 0 );

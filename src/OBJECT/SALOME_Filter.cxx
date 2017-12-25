@@ -22,7 +22,7 @@
 
 #include "SALOME_Filter.hxx"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(SALOME_Filter, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_Filter, Standard_Transient)
 
 SALOME_Filter::SALOME_Filter()
 {

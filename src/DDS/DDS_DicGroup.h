@@ -27,15 +27,15 @@
 
 #include "DDS_DicItem.h"
 
-#include <MMgt_TShared.hxx>
+#include <Standard_Transient.hxx>
 #include <TColStd_SequenceOfAsciiString.hxx>
 #include <NCollection_List.hxx>
 
 class LDOM_Element;
 
-DEFINE_STANDARD_HANDLE(DDS_DicGroup, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(DDS_DicGroup, Standard_Transient)
 
-class DDS_DicGroup : public MMgt_TShared
+class DDS_DicGroup : public Standard_Transient
 {
 public:
   Standard_EXPORT DDS_DicGroup( const TCollection_AsciiString& );
@@ -89,7 +89,7 @@ private:
   friend class DDS_Dictionary;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_DicGroup,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(DDS_DicGroup, Standard_Transient)
 };
 
 typedef NCollection_IndexedDataMap<TCollection_AsciiString, Handle(DDS_DicGroup)> DDS_IndexedDataMapOfDicGroups;

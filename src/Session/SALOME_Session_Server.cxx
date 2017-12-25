@@ -77,9 +77,6 @@
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QTextStream>
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-#include <QSurfaceFormat>
-#endif
 
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
@@ -371,12 +368,13 @@ int main( int argc, char **argv )
   }
   
 #if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-  // initialization of the X11 visual on Linux
-  QSurfaceFormat format;
-  format.setDepthBufferSize(16);
-  format.setStencilBufferSize(1);
-  format.setProfile(QSurfaceFormat::CompatibilityProfile);
-  QSurfaceFormat::setDefaultFormat(format);
+
+  // RNV: setup the default format:
+  // QSurfaceFormat should be set before creation of QApplication,  
+  // so to avoid conflicts beetween SALOME and ParaView QSurfaceFormats we should merge theirs formats
+  // (see void Qtx::initDefaultSurfaceFormat()) and set the resultant format here.
+  Qtx::initDefaultSurfaceFormat(); 
+
 #endif
 
   // Create Qt application instance;

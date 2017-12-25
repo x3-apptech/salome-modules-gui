@@ -22,7 +22,7 @@
 
 #include "SALOME_AISShape.hxx"
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISShape, ViewerData_AISShape)
+IMPLEMENT_STANDARD_RTTIEXT(SALOME_AISShape, ViewerData_AISShape)
 
 /*!
   Constructor

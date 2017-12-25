@@ -38,7 +38,7 @@
 #include <Standard_Failure.hxx>
 #include <Standard_ErrorHandler.hxx>
 
-OCCT_IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(DDS_Dictionary, Standard_Transient)
 
 Handle(DDS_Dictionary) DDS_Dictionary::myDictionary = Handle(DDS_Dictionary)();
 
@@ -259,7 +259,7 @@ Handle(DDS_Dictionary) DDS_Dictionary::myDictionary = Handle(DDS_Dictionary)();
   Use Get() method instead.
 */
 DDS_Dictionary::DDS_Dictionary()
-: MMgt_TShared()
+: Standard_Transient()
 {
 }
 

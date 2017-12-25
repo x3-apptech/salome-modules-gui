@@ -26,12 +26,8 @@
 #ifndef CASCATCH_FAILURE_HXX
 #define CASCATCH_FAILURE_HXX
 
-#include <Basics_OCCTVersion.hxx>
-
 #include <Standard_Transient.hxx>
 #include <Standard_DefineHandle.hxx>
-DEFINE_STANDARD_HANDLE( CASCatch_Failure, Standard_Transient )
-
 #include <Standard.hxx>
 
 /*!
@@ -53,8 +49,7 @@ Standard_EXPORT static  void Raise(const Standard_CString aMessage = "") ;
 Standard_EXPORT virtual  void Throw() const;public:
 
 public:
-
-  OCCT_DEFINE_STANDARD_RTTIEXT(CASCatch_Failure,Standard_Transient)
+  DEFINE_STANDARD_RTTIEXT(CASCatch_Failure, Standard_Transient)
 
 private: 
 /*!\var myMessage
@@ -64,5 +59,6 @@ Standard_Character* myMessage;
 
 };
 
+DEFINE_STANDARD_HANDLE(CASCatch_Failure, Standard_Transient)
 
 #endif // CASCATCH_FAILURE_HXX

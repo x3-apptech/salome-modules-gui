@@ -23,13 +23,13 @@
 #ifndef SALOME_FILTER_HXX
 #define SALOME_FILTER_HXX
 
-#include <MMgt_TShared.hxx>
 #include <Standard.hxx>
+#include <Standard_Transient.hxx>
 #include <Standard_DefineHandle.hxx>
 
 #include "SALOME_InteractiveObject.hxx"
 
-class SALOME_Filter : public MMgt_TShared
+class SALOME_Filter : public Standard_Transient
 {
 public:
   Standard_EXPORT SALOME_Filter();
@@ -38,9 +38,9 @@ public:
   Standard_EXPORT virtual Standard_Boolean IsOk(const Handle(SALOME_InteractiveObject)& anObj) const = 0;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_Filter,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(SALOME_Filter, Standard_Transient)
 };
 
-DEFINE_STANDARD_HANDLE(SALOME_Filter, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(SALOME_Filter, Standard_Transient)
 
 #endif // SALOME_FILTER_HXX

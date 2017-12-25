@@ -186,9 +186,6 @@ void OCCViewer_ViewFrame::setSubViewParams( OCCViewer_ViewWindow* theView )
 
   // set environment texture parameters
   aView->SetTextureEnv( aMainView->TextureEnv() );
-#if OCC_VERSION_LARGE <= 0x07000000
-  aView->SetSurfaceDetail( aMainView->SurfaceDetail() );
-#endif
 }
 
 void OCCViewer_ViewFrame::splitSubViews()

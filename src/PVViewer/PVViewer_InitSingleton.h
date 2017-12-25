@@ -1,4 +1,4 @@
-// Copyright (C) 2010-2016  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,26 +16,27 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony GEAY (EDF R&D)
 
-#ifndef VTKEDF_OVERLOADS_DEFINES_H
-#define VTKEDF_OVERLOADS_DEFINES_H
+#ifndef __PVVIEWER_INITSINGLETON_H__
+#define __PVVIEWER_INITSINGLETON_H__
 
-#if defined WIN32
-#  if defined VTKEDF_OVERLOADS_EXPORTS || defined vtkEDFOverloads_EXPORTS
-#    define VTKEDF_OVERLOADS_EXPORT __declspec( dllexport )
-#  else
-#    define VTKEDF_OVERLOADS_EXPORT __declspec( dllimport )
-#  endif
+#include "PVViewer.h"
 
-#  if defined VTKTOOLS_EXPORTS || defined vtkTools_EXPORTS
-#    define VTKTOOLS_EXPORT __declspec( dllexport )
-#  else
-#    define VTKTOOLS_EXPORT __declspec( dllimport )
-#  endif
+class QMainWindow;
+class LogWindow;
 
-#else
-#  define VTKEDF_OVERLOADS_EXPORT
-#  define VTKTOOLS_EXPORT
-#endif //WIN32
+/**
+ * This class deals with initialization of SALOME_Session to make it a PV based application.
+ * The initialization must be done only once.
+ * It allows multi initializator ParaView visu modules other than PARAVIS.
+ */
+class PVVIEWER_EXPORT PVViewer_InitSingleton
+{
+public:
+  static void Init(QMainWindow *aDesktop, LogWindow *logWindow);
+private:
+  static bool IS_INIT;
+};
 
-#endif //VTKEDF_OVERLOADS_DEFINES_H
+#endif /* SRC_PVVIEWER_PVVIEWER_CORE_H_ */

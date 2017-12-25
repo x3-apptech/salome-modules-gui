@@ -23,12 +23,7 @@
 #include "OCCViewer.h"
 
 #include <AIS_InteractiveObject.hxx>
-#include <Basics_OCCTVersion.hxx>
-#if OCC_VERSION_LARGE > 0x06070100 // for OCC-6.7.2 and higher version
-  #include <Graphic3d_BndBox4f.hxx>
-#else
-  #include <Graphic3d_CBounds.hxx>
-#endif
+#include <Graphic3d_BndBox4f.hxx>
 #include <Standard_DefineHandle.hxx>
 
 /*!
@@ -48,20 +43,16 @@ public:
   virtual void           ComputeSelection( const Handle( SelectMgr_Selection )&,
                                            const Standard_Integer );
 
-#if OCC_VERSION_LARGE > 0x06070100
   virtual void           bounds( Graphic3d_BndBox4f& ) const;
-#else
-  virtual void           bounds( Graphic3d_CBounds& ) const;
-#endif
 
   virtual void           display();
 
-  OCCT_DEFINE_STANDARD_RTTIEXT(OCCViewer_Trihedron,AIS_InteractiveObject)
+  DEFINE_STANDARD_RTTIEXT(OCCViewer_Trihedron, AIS_InteractiveObject)
 
 private:
   unsigned int           myTextList;
 };
 
-DEFINE_STANDARD_HANDLE( OCCViewer_Trihedron, AIS_InteractiveObject )
+DEFINE_STANDARD_HANDLE(OCCViewer_Trihedron, AIS_InteractiveObject)
 
-#endif
+#endif // OCCVIEWER_TRIHEDRON_H

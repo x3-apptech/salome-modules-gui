@@ -25,7 +25,7 @@
 
 #include "DDS.h"
 
-#include <MMgt_TShared.hxx>
+#include <Standard_Transient.hxx>
 
 #include <TCollection_AsciiString.hxx>
 
@@ -49,7 +49,7 @@ class DDS_Dictionary;
 //  optional  : format, units,
 //              min value, max value, default value.
 
-class DDS_DicItem : public MMgt_TShared
+class DDS_DicItem : public Standard_Transient
 {
 public:
   /*! Enum describes type of datum value */
@@ -253,10 +253,10 @@ private:
   friend class DDS_DicGroup;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(DDS_DicItem,MMgt_TShared)
+  DEFINE_STANDARD_RTTIEXT(DDS_DicItem, Standard_Transient)
 };
 
-DEFINE_STANDARD_HANDLE(DDS_DicItem, MMgt_TShared)
+DEFINE_STANDARD_HANDLE(DDS_DicItem, Standard_Transient)
 
 typedef NCollection_IndexedDataMap<TCollection_AsciiString, Handle(DDS_DicItem)> DDS_IndexedDataMapOfDicItems;
 

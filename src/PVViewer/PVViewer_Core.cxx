@@ -29,6 +29,7 @@
 #include <QStringList>
 #include <QDir>
 #include <QMainWindow>
+#include <QStandardPaths>
 
 #include <string>
 
@@ -65,7 +66,7 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
       char** argv = 0;
       QString aOptions = getenv("PARAVIEW_OPTIONS");
       QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
-      argv = new char*[aOptList.size() + 1];
+      argv = new char*[aOptList.size() + 3];
       QStringList args = QApplication::arguments();
       argv[0] = (args.size() > 0)? strdup(args[0].toLatin1().constData()) : strdup("paravis");
       argc++;
@@ -74,6 +75,25 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
         argv[argc] = strdup( aStr.toLatin1().constData() );
         argc++;
       }
+      argv[argc++] = strdup("--multi-servers");
+      // Make salome sharing the same server configuration than external one with "salome shell paraview"
+      QStringList li(QStandardPaths::standardLocations(QStandardPaths::ConfigLocation));
+      foreach(QString pathConfig,li)
+        {
+          QFileInfo fi(QDir(pathConfig),QString("ParaView"));
+          if(fi.exists() && fi.isDir())
+            {
+              QFileInfo fi2(fi.canonicalFilePath(),"servers.pvsc");
+              if(fi2.exists() && fi2.isFile())
+                {
+                  QString addEntry(QString("--servers-file=%1").arg(fi2.canonicalFilePath()));
+                  std::string addEntry2(addEntry.toStdString());
+                  argv[argc++] = strdup(addEntry2.c_str());
+                  break;
+                }
+            }
+        }
+      //
       MyCoreApp = new pqPVApplicationCore (argc, argv);
       if (MyCoreApp->getOptions()->GetHelpSelected() ||
           MyCoreApp->getOptions()->GetUnknownArgument() ||

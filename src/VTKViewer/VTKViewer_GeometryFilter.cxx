@@ -877,6 +877,7 @@ VTKViewer_GeometryFilter
         case VTK_QUADRATIC_HEXAHEDRON:
         case VTK_TRIQUADRATIC_HEXAHEDRON:
         case VTK_QUADRATIC_WEDGE:
+        case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
         case VTK_QUADRATIC_PYRAMID:
 
           if(!myIsWireframeMode)
@@ -939,11 +940,12 @@ VTKViewer_GeometryFilter
               {
                 int npts1 = 0;
                 switch (aCellType ){
-                case VTK_QUADRATIC_TETRA:         npts1 = 4; break;
-                case VTK_QUADRATIC_HEXAHEDRON:    npts1 = 8; break;
-                case VTK_TRIQUADRATIC_HEXAHEDRON: npts1 = 8; break;
-                case VTK_QUADRATIC_WEDGE:         npts1 = 6; break;
-                case VTK_QUADRATIC_PYRAMID:       npts1 = 5; break;
+                case VTK_QUADRATIC_TETRA:             npts1 = 4; break;
+                case VTK_QUADRATIC_HEXAHEDRON:        npts1 = 8; break;
+                case VTK_TRIQUADRATIC_HEXAHEDRON:     npts1 = 8; break;
+                case VTK_QUADRATIC_WEDGE:             npts1 = 6; break;
+                case VTK_BIQUADRATIC_QUADRATIC_WEDGE: npts1 = 6; break;
+                case VTK_QUADRATIC_PYRAMID:           npts1 = 5; break;
                 }
                 faceIdsTmp->SetNumberOfIds( npts1 );
                 if ( npts1 > 0 ) {
@@ -1086,6 +1088,7 @@ VTKViewer_GeometryFilter
             }
             case VTK_QUADRATIC_TETRA:
             case VTK_QUADRATIC_WEDGE:
+            case VTK_BIQUADRATIC_QUADRATIC_WEDGE:
             case VTK_TRIQUADRATIC_HEXAHEDRON:
             case VTK_QUADRATIC_HEXAHEDRON:
             case VTK_QUADRATIC_PYRAMID:

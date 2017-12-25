@@ -74,8 +74,8 @@ VTKViewer_Actor
   myIsPreselected(false),
   myIsHighlighted(false)
 {
-  vtkMapper::GetResolveCoincidentTopologyPolygonOffsetParameters(myPolygonOffsetFactor,
-                                                                 myPolygonOffsetUnits);
+  VTKViewer_Actor::GetDefaultPolygonOffsetParameters(myPolygonOffsetFactor,
+						     myPolygonOffsetUnits);
 
   for(int i = 0; i < 6; i++)
     myPassFilter.push_back(vtkPassThroughFilter::New());
@@ -274,6 +274,19 @@ VTKViewer_Actor
 }
 
 /*!
+  Get polygon offset parameters
+  \param factor, units  - Opengl polygon offset parameters
+*/
+void
+VTKViewer_Actor
+::GetDefaultPolygonOffsetParameters(double& factor, 
+				    double& units)
+{
+  factor = 2.0;
+  units = 2.0;
+}
+
+/*!
   \return shrink factor
 */
 double
@@ -436,6 +449,17 @@ VTKViewer_Actor
 {
   return GetInput()->GetPoint(theObjID);
 }
+
+/*!
+ Maps object index of a node to corresponding VTK index
+*/
+int
+VTKViewer_Actor
+::GetNodeVtkId( int theObjID )
+{
+  return theObjID;
+}
+
 
 /*!
   Get corresponding #vtkCell for given object index

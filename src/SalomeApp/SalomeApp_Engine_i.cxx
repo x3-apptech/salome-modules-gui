@@ -26,6 +26,10 @@
 
 #include "SalomeApp_Engine_i.h"
 #include "SalomeApp_Application.h"
+#include "SalomeApp_Study.h"
+#include "SUIT_Session.h"
+#include "CAM_Module.h"
+#include "LightApp_DataModel.h"
 
 #include <SALOME_NamingService.hxx>
 #include <SALOMEDS_Tool.hxx>
@@ -44,10 +48,10 @@
   Constructor
 */
 SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
+  : myComponentName( theComponentName )
 {
-  myComponentName = theComponentName;
   MESSAGE("SalomeApp_Engine_i::SalomeApp_Engine_i(): myComponentName = " <<
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
 }
 
 /*!
@@ -56,7 +60,7 @@ SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
 SalomeApp_Engine_i::~SalomeApp_Engine_i()
 {
   MESSAGE("SalomeApp_Engine_i::~SalomeApp_Engine_i(): myComponentName = " << 
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
 }
 
 SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theComponent,
@@ -65,38 +69,91 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 {
   SALOMEDS::TMPFile_var aStreamFile = new SALOMEDS::TMPFile;
 
+
   if (CORBA::is_nil(theComponent))
     return aStreamFile._retn();
+  
+  // Component type
+  QString componentName (theComponent->ComponentDataType());
+
+  // Error somewhere outside - Save() called with wrong SComponent instance
+  if ( myComponentName != componentName )
+    return aStreamFile._retn();
+    
+  // Get a temporary directory to store a file
+  //std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
+
+  bool manuallySaved = false;
+
+  if ( GetListOfFiles().empty() ) {
+
+    // Save was probably called from outside GUI, so SetListOfFiles was not called!
+    // Try to get list of files from directly from data model
+
+    MESSAGE("SalomeApp_Engine_i::Save(): myComponentName = " <<
+            qPrintable( myComponentName ) <<
+            "it seems Save() was called from outside GUI" );
+
+    // - Get app rnv
+    SalomeApp_Application* app = 
+      dynamic_cast<SalomeApp_Application*>(SUIT_Session::session()->activeApplication());
+    if ( !app )
+      return aStreamFile._retn();
+
+    // - Get study
+    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( app->activeStudy() );
+
+    if ( !study )
+      return aStreamFile._retn();
+    QString url = QString::fromStdString(study->studyDS()->URL());
+
+    // - Get module
+    CAM_Module* module = app->module( SalomeApp_Application::moduleTitle( componentName ) );
+    if ( !module ) // load module???
+      return aStreamFile._retn();
+    // - Get data model
+    LightApp_DataModel* dataModel = dynamic_cast<LightApp_DataModel*>( module->dataModel() );
+    if ( !dataModel )
+      return aStreamFile._retn();
+    // - Save data files
+    QStringList dataFiles;
+    // we use 'url' instead of 'theURL' as latter normally contains path to the tmp dir,
+    // but not actual study's URL
+    dataModel->saveAs( url, study, dataFiles );
+    std::vector<std::string> names;
+    foreach ( QString name, dataFiles ) {
+      if ( !name.isEmpty() )
+        names.push_back(name.toUtf8().data());
+    }
+    SetListOfFiles( names );
+    manuallySaved = true;
+  }
 
   // Get a temporary directory to store a file
   //std::string aTmpDir = isMultiFile ? theURL : SALOMEDS_Tool::GetTmpDir();
 
-  std::string componentName (theComponent->ComponentDataType());
-
-  // Error somewhere outside - Save() called with
-  // wrong SComponent instance
-  if ( myComponentName != componentName )
-    return aStreamFile._retn();
-
   // listOfFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
   const int n = myListOfFiles.size() - 1;
-
+  
   if (n > 0) { // there are some files, containing persistent data of the component
     std::string aTmpDir = myListOfFiles[0];
-
+    
     // Create a list to store names of created files
     ListOfFiles aSeq;
     aSeq.reserve(n);
     for (int i = 0; i < n; i++)
       aSeq.push_back(CORBA::string_dup(myListOfFiles[i + 1].c_str()));
-
+    
     // Convert a file to the byte stream
     aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq, isMultiFile);
-
+    
     // Remove the files and tmp directory, created by the component storage procedure
     if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
   }
+  
+  if ( manuallySaved )
+    SetListOfFiles( ListOfFiles());
 
   return aStreamFile._retn();
 }
@@ -112,7 +169,7 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
 
   // Error somewhere outside - Load() called with
   // wrong SComponent instance
-  std::string componentName (theComponent->ComponentDataType());
+  QString componentName = theComponent->ComponentDataType();
   if ( myComponentName != componentName )
     return false;
 
@@ -154,7 +211,7 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
 						                         CORBA::Boolean& isValidScript)
 {
   MESSAGE("SalomeApp_Engine_i::DumpPython(): myComponentName = "<<
-	  myComponentName << ", this = " << this);
+	  qPrintable( myComponentName ) << ", this = " << this);
   
   // Temporary solution: returning a non-empty sequence
   // even if there's nothing to dump, to avoid crashes in SALOMEDS
@@ -248,7 +305,7 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
 */
 char* SalomeApp_Engine_i::ComponentDataType()
 {
-  return const_cast<char*>( myComponentName.c_str() );
+  return CORBA::string_dup( myComponentName.toLatin1().constData() );
 }
 
 /*!
@@ -260,7 +317,7 @@ char* SalomeApp_Engine_i::getVersion()
   QString version;
   SalomeApp_Application::ModuleShortInfo version_info;
   foreach ( version_info, versions ) {
-    if ( SalomeApp_Application::moduleName( version_info.name ) == myComponentName.c_str() ) {
+    if ( SalomeApp_Application::moduleName( version_info.name ) == myComponentName ) {
       version = version_info.version;
       break;
     }

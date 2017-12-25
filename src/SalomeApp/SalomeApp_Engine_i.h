@@ -31,6 +31,7 @@
 
 #include "SALOME_Component_i.hxx"
 
+#include <QString>
 #include <vector> 
 #include <map> 
 
@@ -98,7 +99,7 @@ private:
 private:
   ListOfFiles                        myListOfFiles;
 
-  std::string                        myComponentName;
+  QString                            myComponentName;
 };
 
 #endif

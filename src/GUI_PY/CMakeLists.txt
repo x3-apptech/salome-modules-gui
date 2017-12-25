@@ -22,7 +22,7 @@ INCLUDE(UsePyQt)
 # --- resources ---
 
 # uic files / to be processed by pyuic
-SET(_pyuic_files
+SET(_pyuic_FILES
   SelectVarsDialog.ui
   genericdialog.ui
   mytestdialog.ui
@@ -31,7 +31,7 @@ SET(_pyuic_files
 # --- scripts ---
 
 # scripts / pyuic wrappings
-PYQT_WRAP_UIC(_pyuic_SCRIPTS ${_pyuic_files})
+PYQT_WRAP_UIC(_pyuic_SCRIPTS ${_pyuic_FILES} TARGET_NAME _target_name_pyuic)
 
 # scripts / static
 SET(_other_SCRIPTS 
@@ -42,6 +42,7 @@ SET(_other_SCRIPTS
   selectvars.py
   dockwidgets.py
 )
+
 SET(_bin_SCRIPTS
   test_dockwidgets.py
 )
@@ -52,11 +53,11 @@ SET(_gen_SCRIPTS
     ${CMAKE_CURRENT_BINARY_DIR}/qtsalome.py
 )
 
-# scripts / to install
-
-SET(_all_SCRIPTS ${_other_SCRIPTS} ${_pyuic_SCRIPTS})
-
 # --- rules ---
 SALOME_INSTALL_SCRIPTS("${_gen_SCRIPTS}" ${SALOME_INSTALL_PYTHON})
-SALOME_INSTALL_SCRIPTS("${_all_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/salome/gui)
+SALOME_INSTALL_SCRIPTS("${_other_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/salome/gui)
 SALOME_INSTALL_SCRIPTS("${_bin_SCRIPTS}" ${SALOME_INSTALL_SCRIPT_DATA})
+SALOME_INSTALL_SCRIPTS("${_pyuic_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/salome/gui TARGET_NAME _target_name_pyuic_py)
+# add dependency of compiled py files on uic files in order
+# to avoid races problems when compiling in parallel
+ADD_DEPENDENCIES(${_target_name_pyuic_py} ${_target_name_pyuic})

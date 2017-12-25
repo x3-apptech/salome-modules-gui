@@ -54,7 +54,7 @@ public:
   Standard_EXPORT virtual void highlightSubShapes(const TColStd_IndexedMapOfInteger& aIndexMap, const Standard_Boolean aHighlight ) = 0;
 
 public:
-  OCCT_DEFINE_STANDARD_RTTIEXT(SALOME_AISShape,ViewerData_AISShape)
+  DEFINE_STANDARD_RTTIEXT(SALOME_AISShape, ViewerData_AISShape)
 };
 
 DEFINE_STANDARD_HANDLE(SALOME_AISShape, ViewerData_AISShape)

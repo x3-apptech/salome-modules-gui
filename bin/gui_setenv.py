@@ -25,16 +25,9 @@ import os, re
 
 def set_env( args ):
     """Add environment required for GUI module"""
-    vtk_overloads_dir = os.path.join( os.getenv( "GUI_ROOT_DIR" ), "lib", "paraview" )
-    dirs = re.split( ":|;", os.getenv( 'VTK_AUTOLOAD_PATH', vtk_overloads_dir ) )
-    if vtk_overloads_dir not in dirs: dirs[0:0] = [vtk_overloads_dir]
-    os.environ['VTK_AUTOLOAD_PATH'] = os.pathsep.join(dirs)
-    #print 'QT_PLUGIN_PATH: ', os.environ['QT_PLUGIN_PATH']
     qt_plugin_dir = os.path.join( os.getenv( "QTDIR" ), "plugins" )
     dirs = re.split( ":|;", os.getenv( 'QT_PLUGIN_PATH', qt_plugin_dir ) )
     if qt_plugin_dir not in dirs: dirs[0:0] = [qt_plugin_dir]
     dirs2 = list(set(dirs))
     os.environ['QT_PLUGIN_PATH'] = os.pathsep.join(dirs2)
-    #print 'QT_PLUGIN_PATH: ', os.environ['QT_PLUGIN_PATH']
-    #print 'QT_QPA_PLATFORM_PLUGIN_PATH: ', os.environ['QT_QPA_PLATFORM_PLUGIN_PATH']
     return

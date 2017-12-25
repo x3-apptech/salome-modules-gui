@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2017  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,32 +16,15 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony GEAY (EDF R&D)
 
-#include "SALOME_TypeFilter.hxx"
+#include "QApplication"
+#include "QRemoteFileBrowser"
 
-IMPLEMENT_STANDARD_RTTIEXT(SALOME_TypeFilter, SALOME_Filter)
-
-/*!
-  Constructor
-  \param TheKind - type of filter
-*/
-SALOME_TypeFilter::SALOME_TypeFilter(const Standard_CString theKind)
-: myKind( theKind )
+int main(int argc, char *argv[])
 {
-}
-
-/*!
-  Destructor
-*/
-SALOME_TypeFilter::~SALOME_TypeFilter()
-{
-}
-
-/*!
-  \param theObj - object to be checked
-  \return \c true if object passes filter
-*/
-Standard_Boolean SALOME_TypeFilter::IsOk(const Handle(SALOME_InteractiveObject)& theObj) const 
-{
-  return theObj->isComponentType( myKind );
+  QApplication app(argc,argv);
+  QRemoteFileTransfer ft;
+  ft.show();
+  return app.exec();
 }

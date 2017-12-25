@@ -40,20 +40,8 @@
 #include <QApplication>
 #include <QTimer>
 
-#if OCC_VERSION_MAJOR < 7
-  #include <Visual3d_View.hxx>
-#endif
-
-#if OCC_VERSION_LARGE > 0x06070100
 #include <V3d_View.hxx>
-#else
-#include <V3d_PerspectiveView.hxx>
-#include <V3d_OrthographicView.hxx>
-#endif
-
-#if OCC_VERSION_LARGE > 0x07010000
 #include <Quantity_Ratio.hxx>
-#endif
 
 #include "utilities.h"
 
@@ -83,18 +71,7 @@ OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_V
   // VSR: 01/07/2010 commented to avoid SIGSEGV at SALOME exit
   //selectVisualId();
 
-#if OCC_VERSION_LARGE > 0x06070100
   myActiveView = new V3d_View( viewer, type );
-#else
-  if ( type == V3d_ORTHOGRAPHIC ) {
-    myOrthoView = new V3d_OrthographicView( viewer );
-    myActiveView = myOrthoView;
-    myPerspView = 0;
-  } else {
-    myPerspView = new V3d_PerspectiveView( viewer );
-    myActiveView = myPerspView;
-  }
-#endif
 
   setDefaultParams();
 
@@ -240,44 +217,16 @@ bool OCCViewer_ViewPort3d::syncronize( const OCCViewer_ViewPort3d* ref )
   refView->Up( x, y, z ); tgtView->SetUp( x, y, z );
   refView->Eye( x, y, z ); tgtView->SetEye( x, y, z );
   refView->Proj( x, y, z ); tgtView->SetProj( x, y, z );
-#if OCC_VERSION_LARGE <= 0x06070100
-  refView->Center( x, y ); tgtView->SetCenter( x, y );
-#endif
   tgtView->SetScale( refView->Scale() );
   tgtView->SetTwist( refView->Twist() );
 
   /* update */
   tgtView->Update();
   tgtView->SetImmediateUpdate( Standard_True );
-#if OCC_VERSION_LARGE <= 0x07000000
-  tgtView->ZFitAll();
-#endif
+
   return true;
 }
 
-#if OCC_VERSION_LARGE <= 0x07000000
-/*!
-  Returns Z-size of this view. [ public ]
-*/
-double OCCViewer_ViewPort3d::getZSize() const
-{
-  if ( !activeView().IsNull() )
-    return activeView()->ZSize();
-  return 0;
-}
-
-/*!
-  Sets Z-size of this view ( for both orthographic and perspective ). [ public ]
-*/
-void OCCViewer_ViewPort3d::setZSize( double zsize )
-{
-  myActiveView->SetZSize( zsize );
-  /*    if ( !myOrthoView.IsNull() )
-        myOrthoView->SetZSize( zsize );
-        if ( !myPerspView.IsNull() )
-        myPerspView->SetZSize( zsize );*/
-}
-#endif
 
 /*!
   Get axial scale to the view
@@ -582,10 +531,6 @@ void OCCViewer_ViewPort3d::rotate( int x, int y,
 void OCCViewer_ViewPort3d::endRotation()
 {
   if ( !activeView().IsNull() ) {
-#if OCC_VERSION_LARGE <= 0x07000000
-    activeView()->ZFitAll( 1.0 );
-    activeView()->SetZSize( 0.0 );
-#endif
     activeView()->Update();
     emit vpTransformed( this );
   }
@@ -606,12 +551,7 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
     QApplication::syncX();
 #endif
     if ( !myPaintersRedrawing ) {
-#if OCC_VERSION_MAJOR < 7
-      QRect rc = e->rect();
-      activeView()->Redraw( rc.x(), rc.y(), rc.width(), rc.height() );
-#else
       activeView()->Redraw();
-#endif
     }
   }
   OCCViewer_ViewPort::paintEvent( e );
@@ -657,16 +597,8 @@ void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
 
   Standard_Real margin = 0.01;
   
-#if OCC_VERSION_LARGE > 0x06070100
   activeView()->FitAll( margin, upd );
-#if OCC_VERSION_LARGE <= 0x07000000
-  if(withZ)
-    activeView()->ZFitAll();
-#endif  
-#else
-  activeView()->FitAll( margin, withZ, upd );
-  activeView()->SetZSize(0.);
-#endif
+
   emit vpTransformed( this );
 }
 
@@ -774,15 +706,7 @@ bool OCCViewer_ViewPort3d::synchronize( OCCViewer_ViewPort* view )
     Handle(V3d_View) aView3d = getView();
     Handle(V3d_View) aRefView3d = vp3d->getView();
     aView3d->SetImmediateUpdate( Standard_False );
-#if OCC_VERSION_LARGE > 0x06070100
     aView3d->Camera()->Copy( aRefView3d->Camera() );
-#else
-    aView3d->SetViewMapping( aRefView3d->ViewMapping() );
-    aView3d->SetViewOrientation( aRefView3d->ViewOrientation() );
-#endif
-#if OCC_VERSION_LARGE <= 0x07000000
-    aView3d->ZFitAll();
-#endif
     aView3d->SetImmediateUpdate( Standard_True );
     aView3d->Update();
     blockSignals( blocked );

@@ -59,13 +59,6 @@ PVViewer_ViewWindow::PVViewer_ViewWindow( SUIT_Desktop* theDesktop, PVViewer_Vie
     // This is mandatory, see setParent() method in Qt 4 documentation
     myPVMgr->show();
     setCentralWidget( myPVMgr );
-
-    // Finish ParaView set up: behaviors, connection and configurations.
-    const QString configPath(PVViewer_ViewManager::GetPVConfigPath());
-    PVViewer_Core::ParaviewInitBehaviors(true, theDesktop);
-    PVViewer_ViewManager::ConnectToExternalPVServer(theDesktop);
-    PVViewer_Core::ParaviewLoadConfigurations(configPath);
-
     // Hide toolbars
     PVViewer_GUIElements * pvge = PVViewer_GUIElements::GetInstance(myDesktop);
     pvge->setToolBarVisible(false);

@@ -36,7 +36,6 @@
 #include <pqDataTimeStepBehavior.h>
 #include <pqDefaultViewBehavior.h>
 #include <pqObjectPickingBehavior.h>
-#include <pqPersistentMainWindowStateBehavior.h>
 #include <pqPipelineContextMenuBehavior.h>
 #include <pqPluginActionGroupBehavior.h>
 #include <pqPluginDockWidgetsBehavior.h>
@@ -76,6 +75,7 @@ void PVViewer_Behaviors::instanciateMinimalBehaviors(QMainWindow * desk)
       // Load plugins distributed with application.
       pqApplicationCore::instance()->loadDistributedPlugins();
 
+      new pqPipelineContextMenuBehavior(this);
       new pqDefaultViewBehavior(this);  // shows a 3D view as soon as a server connection is made
       new pqAlwaysConnectedBehavior(this);  // client always connected to a server
       new pqVerifyRequiredPluginBehavior(this);
@@ -106,12 +106,14 @@ void PVViewer_Behaviors::instanciateAllBehaviors(QMainWindow * desk)
       //new pqQtMessageHandlerBehavior(this);   // THIS ONE TO EXCLUDE !! see comment above
       new pqDataTimeStepBehavior(this);
       new pqSpreadSheetVisibilityBehavior(this);
-      new pqPipelineContextMenuBehavior(this);
+      //new pqPipelineContextMenuBehavior(this);
       new pqUndoRedoBehavior(this);
       new pqAutoLoadPluginXMLBehavior(this);  // auto load plugins GUI stuff
       new pqPluginDockWidgetsBehavior(desk);
       new pqPluginActionGroupBehavior(desk);
-      new pqPersistentMainWindowStateBehavior(desk);
+      // rnv: Disable ParaView main window persistance mechanism,
+      //      because SALOME has own functionality for store/restore windows state.
+      //  new pqPersistentMainWindowStateBehavior(desk);
       new pqObjectPickingBehavior(desk);
       new pqCollaborationBehavior(this);
       new pqViewStreamingBehavior(this);

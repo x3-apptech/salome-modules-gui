@@ -340,6 +340,8 @@ protected:
   static LightApp_Preferences*        _prefs_;
 
   QStringList                         myUserWmTypes;
+
+  friend void LightAppCleanUpAppResources();
 };
 
 #ifdef WIN32
