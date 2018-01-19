@@ -308,6 +308,7 @@ public:
   static bool              setViewTitle( const int, const QString& );
   static QString           getViewTitle( const int );
   static bool              setViewSize( const int, const int, const int = 0 );
+  static bool              setViewRotationPoint( const double, const double, const double, const int = 0 );
   static QList<int>        findViews( const QString& );
   static bool              activateView( const int );
   static bool              activateViewManagerAndView( const int );

@@ -436,6 +436,7 @@ public:
   static bool              setViewTitle( const int, const QString& ) /ReleaseGIL/ ;
   static QString           getViewTitle( const int ) /ReleaseGIL/ ;
   static bool              setViewSize( const int, const int, const int = 0 ) /ReleaseGIL/ ;
+  static bool              setViewRotationPoint( const double, const double, const double, const int = 0 ) /ReleaseGIL/ ;
   static QList<int>        findViews( const QString& ) /ReleaseGIL/ ;
   static bool              activateView( const int ) /ReleaseGIL/ ;
   static bool              activateViewManagerAndView( const int ) /ReleaseGIL/ ;

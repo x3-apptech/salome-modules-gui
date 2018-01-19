@@ -42,6 +42,9 @@
 #include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewFrame.h"
 #endif // DISABLE_OCCVIEWER
+#ifndef DISABLE_VTKVIEWER
+#include "SVTK_ViewWindow.h"
+#endif // DISABLE_VTKVIEWER
 #ifndef DISABLE_PLOT2DVIEWER
 #include "Plot2d_ViewManager.h"
 #include "Plot2d_ViewWindow.h"
@@ -3002,6 +3005,85 @@ public:
 bool SalomePyQt::setViewSize( const int w, const int h, const int id )
 {
   return ProcessEvent( new TSetViewSize( w, h, id ) );
+}
+
+/*!
+  \fn bool SalomePyQt::setViewRotationPoint( const double x, const double y, const double z, const int id );
+  \brief Set view rotation point
+  \param x coordinate X view rotation point
+  \param y coordinate Y view rotation point
+  \param z coordinate Z view rotation point
+  \param id window identifier
+  \return \c true if operation is completed successfully and \c false otherwise 
+*/
+
+class TSetViewRotationPoint: public SALOME_Event
+{
+public:
+  typedef bool TResult;
+  TResult myResult;
+  double myX;
+  double myY;
+  double myZ;
+  int myWndId;
+  TSetViewRotationPoint( const double x, const double y, const double z, const int id )
+    : myResult( false ),
+      myX( x ),
+      myY( y ),
+      myZ( z ),
+      myWndId( id ) {}
+  virtual void Execute() 
+  {
+    SUIT_ViewWindow* wnd = 0;
+    if ( !myWndId ) {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        SUIT_ViewManager* vm = anApp->activeViewManager();
+        if ( vm )
+          wnd = vm->getActiveView();
+      }
+    }
+    else {
+      wnd = dynamic_cast<SUIT_ViewWindow*>( getWnd( myWndId ) );
+    }
+    if ( wnd ) {
+      SUIT_ViewManager* viewMgr = wnd->getViewManager();
+      if ( viewMgr ) {
+        QString type = viewMgr->getType();
+        if ( type == "OCCViewer") {
+#ifndef DISABLE_OCCVIEWER
+          // specific processing for OCC viewer:
+          // OCC view can embed up to 4 sub-views, split according to the specified layout;
+          // - if there is only one sub-view active; its rotation point will be changed;
+          // - if there are several sub-views, rotaion points of each of them will be changed.
+          OCCViewer_ViewWindow* occView = qobject_cast<OCCViewer_ViewWindow*>( wnd );
+          if ( occView ) {
+            for ( int i = OCCViewer_ViewFrame::BOTTOM_RIGHT; i <= OCCViewer_ViewFrame::TOP_RIGHT; i++ ) {
+              if ( occView && occView->getView( i ) ) {
+                occView->getView( i )->activateSetRotationSelected( myX, myY, myZ );
+                myResult = true;
+              }
+            }
+          }
+#endif // DISABLE_OCCVIEWER
+        }
+        else if ( type == "VTKViewer") {
+#ifndef DISABLE_VTKVIEWER
+          SVTK_ViewWindow* vtkView = qobject_cast<SVTK_ViewWindow*>( wnd );
+          if ( vtkView )
+          {
+            double aCenter[3] = { myX, myY, myZ };
+            vtkView->activateSetRotationSelected( (void*)aCenter );
+            myResult = true;
+          }
+#endif // DISABLE_VTKVIEWER
+        }
+      }
+    }
+  }
+};
+bool SalomePyQt::setViewRotationPoint( const double x, const double y, const double z, const int id )
+{
+  return ProcessEvent( new TSetViewRotationPoint( x, y, z, id ) );
 }
 
 /*!
