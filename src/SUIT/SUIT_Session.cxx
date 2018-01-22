@@ -344,7 +344,7 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& li
     return 0;
 
   AppLib lib = 0;
-  QByteArray bid = libFile.toLatin1();
+  QByteArray bid = libFile.toUtf8();
 #ifdef WIN32
 #ifdef UNICODE
   LPTSTR str = (LPTSTR)libFile.utf16();
@@ -353,7 +353,7 @@ SUIT_Session::AppLib SUIT_Session::loadLibrary( const QString& name, QString& li
 #endif
   lib = ::LoadLibrary( str );
 #else
-  lib = dlopen( (const char*)libFile.toLatin1(), RTLD_LAZY | RTLD_GLOBAL  );
+  lib = dlopen( (const char*)libFile.toUtf8(), RTLD_LAZY | RTLD_GLOBAL  );
 #endif
   return lib;
 }

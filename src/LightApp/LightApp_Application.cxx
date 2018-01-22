@@ -611,7 +611,7 @@ void LightApp_Application::createActions()
     QString modName = moduleName( aModule );                         // module name
     if ( modName.isEmpty() ) modName = aModule;                      // for KERNEL and GUI
     QString rootDir = QString( "%1_ROOT_DIR" ).arg( modName );       // module root dir variable
-    QString modDir  = getenv( rootDir.toLatin1().constData() );      // module root dir
+    QString modDir  = getenv( rootDir.toUtf8().constData() );      // module root dir
     QString docSection;
     if (resMgr->hasValue( modName, "documentation" ) )
       docSection = resMgr->stringValue(modName, "documentation");
@@ -4780,9 +4780,9 @@ QString LightApp_Application::browseObjects( const QStringList& theEntryList,
         SUIT_DataOwnerPtrList aList;
 #ifndef DISABLE_SALOMEOBJECT
         Handle(SALOME_InteractiveObject) aSObj = new SALOME_InteractiveObject
-          ( anObject->entry().toLatin1().constData(),
+          ( anObject->entry().toUtf8().constData(),
             anObject->componentDataType().toLatin1().constData(),
-            anObject->name().toLatin1().constData() );
+            anObject->name().toUtf8().constData() );
         LightApp_DataOwner* owner = new LightApp_DataOwner( aSObj  );
 #else
         LightApp_DataOwner* owner = new LightApp_DataOwner( anEntry );

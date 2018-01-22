@@ -1191,7 +1191,7 @@ int SalomeApp_Application::openChoice( const QString& aName )
   } else { // file is not exist on disk
     SUIT_MessageBox::warning( desktop(),
                               QObject::tr("WRN_WARNING"),
-                              QObject::tr("WRN_FILE_NOT_EXIST").arg(aName.toLatin1().data()));
+                              QObject::tr("WRN_FILE_NOT_EXIST").arg(aName.toUtf8().data()));
     return false;
   }
 

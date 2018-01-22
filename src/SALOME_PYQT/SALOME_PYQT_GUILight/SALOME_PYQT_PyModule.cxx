@@ -371,7 +371,7 @@ QIcon PyModuleHelper::XmlHandler::loadIcon( const QString& fileName )
       SUIT_ResourceMgr* resMgr = module()->getApp()->resourceMgr();
       QPixmap pixmap = resMgr->loadPixmap( module()->name(),
           QApplication::translate( module()->name().toLatin1().data(),
-                                   fileName.toLatin1().data() ) );
+                                   fileName.toUtf8().data() ) );
       if ( !pixmap.isNull() )
         icon = QIcon( pixmap );
   }
@@ -2162,8 +2162,8 @@ void PyModuleHelper::internalPreferencesChanged( const QString& section, const Q
     PyObjWrapper res( PyObject_CallMethod( myPyModule,
                                            (char*)"preferenceChanged", 
                                            (char*)"ss", 
-                                           section.toLatin1().constData(), 
-                                           setting.toLatin1().constData() ) );
+                                           section.toUtf8().constData(), 
+                                           setting.toUtf8().constData() ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2315,9 +2315,9 @@ void PyModuleHelper::internalContextMenu( const QString& context, QMenu* menu )
     PyObjWrapper res( PyObject_CallMethod( myPyModule,
                                            (char*)"definePopup",
                                            (char*)"sss",
-                                           context.toLatin1().constData(),
-                                           aObject.toLatin1().constData(),
-                                           aParent.toLatin1().constData() ) );
+                                           context.toUtf8().constData(),
+                                           aObject.toUtf8().constData(),
+                                           aParent.toUtf8().constData() ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2350,7 +2350,7 @@ void PyModuleHelper::internalContextMenu( const QString& context, QMenu* menu )
                                             (char*)"createPopupMenu",
                                             (char*)"Os",
                                             sipPopup.get(),
-                                            context.toLatin1().constData() ) );
+                                            context.toUtf8().constData() ) );
     if( !res1 ) {
       PyErr_Print();
     }
@@ -2363,9 +2363,9 @@ void PyModuleHelper::internalContextMenu( const QString& context, QMenu* menu )
                                             (char*)"customPopup",
                                             (char*)"Osss",
                                             sipPopup.get(),
-                                            aContext.toLatin1().constData(),
-                                            aObject.toLatin1().constData(),
-                                            aParent.toLatin1().constData() ) );
+                                            aContext.toUtf8().constData(),
+                                            aObject.toUtf8().constData(),
+                                            aParent.toUtf8().constData() ) );
     if( !res2 ) {
       PyErr_Print();
     }
@@ -2509,12 +2509,12 @@ void PyModuleHelper::internalSave( QStringList& files, const QString& url )
     // try with two parameters (new syntax)
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"saveFiles",
                                            (char*)"ss",
-                                           files.first().toLatin1().constData(),
-                                           url.toLatin1().constData() ) );
+                                           files.first().toUtf8().constData(),
+                                           url.toUtf8().constData() ) );
     if ( !res )
       // try with single parameter (old syntax)
       res = PyObject_CallMethod( myPyModule, (char*)"saveFiles",
-                                 (char*)"s", files.first().toLatin1().constData() );
+                                 (char*)"s", files.first().toUtf8().constData() );
     
     if ( !res ) {
       PyErr_Print();
@@ -2569,7 +2569,7 @@ void PyModuleHelper::internalLoad( const QStringList& files, const QString& url,
     // try with two parameters (new syntax)
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"openFiles",
                                            (char*)"Os", sipList.get(),
-                                           url.toLatin1().constData() ) );
+                                           url.toUtf8().constData() ) );
 
     if ( !res )
       // try with single parameter (old syntax)
@@ -2603,7 +2603,7 @@ void PyModuleHelper::internalDumpPython( QStringList& files )
 
   if ( PyObject_HasAttrString(myPyModule, (char*)"dumpStudy") ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"dumpStudy",
-                                           (char*)"s", files.first().toLatin1().constData()));
+                                           (char*)"s", files.first().toUtf8().constData()));
 
     if ( !res ) {
       PyErr_Print();
@@ -2649,7 +2649,7 @@ bool PyModuleHelper::internalIsDraggable( LightApp_DataObject* what )
 
   if ( PyObject_HasAttrString(myPyModule , (char*)"isDraggable") ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"isDraggable",
-                      (char*)"s", what->entry().toLatin1().constData() ) );
+                      (char*)"s", what->entry().toUtf8().constData() ) );
     if( !res || !PyBool_Check( res )) {
       PyErr_Print();
       draggable = false;
@@ -2681,7 +2681,7 @@ bool PyModuleHelper::internalIsDropAccepted( LightApp_DataObject* where )
 
   if ( PyObject_HasAttrString(myPyModule , (char*)"isDropAccepted") ) {
     PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"isDropAccepted",
-                      (char*)"s", where->entry().toLatin1().constData() ) );
+                      (char*)"s", where->entry().toUtf8().constData() ) );
     if( !res || !PyBool_Check( res )) {
       PyErr_Print();
       dropAccepted = false;
@@ -2731,7 +2731,7 @@ void PyModuleHelper::internalDropObjects( const DataObjectList& what, SUIT_DataO
   if ( PyObject_HasAttrString(myPyModule, (char*)"dropObjects") ) {
       PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"dropObjects", (char*)"Osii",
                         sipList.get(),
-                        whereObject->entry().toLatin1().constData(),
+                        whereObject->entry().toUtf8().constData(),
                         row, action ) );
     
     if( !res ) {
@@ -2819,7 +2819,7 @@ void PyModuleHelper::internalOBClickedPython( const QString& theObj, int theColu
     return; // Error
 
   if ( PyObject_HasAttrString( myPyModule, (char*)"onObjectBrowserClicked" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"onObjectBrowserClicked", (char*)"si", theObj.toLatin1().constData(), theColumn ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"onObjectBrowserClicked", (char*)"si", theObj.toUtf8().constData(), theColumn ) );
     if( !res ) {
       PyErr_Print();
     }

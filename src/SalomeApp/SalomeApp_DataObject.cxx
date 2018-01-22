@@ -291,7 +291,7 @@ QString SalomeApp_DataObject::toolTip( const int /*id*/ ) const
       if ( !CORBA::is_nil(aComponent) && aComponent->hasObjectInfo() ) {
         LightApp_RootObject* aRoot = dynamic_cast<LightApp_RootObject*>( root() );
         if ( aRoot && aRoot->study() ) {
-          CORBA::String_var data = aComponent->getObjectInfo( entry().toLatin1().constData());
+          CORBA::String_var data = aComponent->getObjectInfo( entry().toUtf8().constData());
           QString objInfo = data.in();
           QStringList l;
           l << name();

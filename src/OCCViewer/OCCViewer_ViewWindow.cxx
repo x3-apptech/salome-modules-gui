@@ -2256,7 +2256,7 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     int prev = aCaps->ffpEnable;
     aCaps->ffpEnable = 1;
-    res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_PostScript);
+    res = a3dView->Export(strdup(qUtf8Printable(fileName)), Graphic3d_EF_PostScript);
     aCaps->ffpEnable = prev;
   }
   else if (format == "EPS") {
@@ -2264,7 +2264,7 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
     OpenGl_Caps* aCaps = &aDriver->ChangeOptions();
     int prev = aCaps->ffpEnable;
     aCaps->ffpEnable = 1;
-    res = a3dView->Export(strdup(qPrintable(fileName)), Graphic3d_EF_EnhPostScript);
+    res = a3dView->Export(strdup(qUtf8Printable(fileName)), Graphic3d_EF_EnhPostScript);
     aCaps->ffpEnable = prev;
   }
   else {

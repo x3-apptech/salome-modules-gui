@@ -678,7 +678,7 @@ void SVTK_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
 	  aReader = vtkMetaImageReader::New();           
 	if ( aReader ) {
 	  // create texture
-	  aReader->SetFileName( fi.absoluteFilePath().toLatin1().constData() );
+	  aReader->SetFileName( fi.absoluteFilePath().toUtf8().constData() );
 	  aReader->Update();	  
 	  VTKViewer_Texture* aTexture = VTKViewer_Texture::New();	    
 	  vtkImageMapToColors* aMap = 0;
@@ -1421,7 +1421,7 @@ bool SVTK_ViewWindow::dumpViewToFormat( const QImage& img, const QString& fileNa
     QString aFilePrefix(fileName);
     QString anExtension(SUIT_Tools::extension(fileName));
     aFilePrefix.truncate(aFilePrefix.length() - 1 - anExtension.length());
-    anExporter->SetFilePrefix(aFilePrefix.toLatin1().data());
+    anExporter->SetFilePrefix(aFilePrefix.toUtf8().data());
     anExporter->Write();
     anExporter->Delete();
   }
@@ -1648,7 +1648,7 @@ void setGradAxisVisualParams(QXmlStreamReader& reader, vtkAxisActor2D* actor)
   //printf("#### Color: %f, %f, %f\n", color[0], color[1], color[2]);
 
   actor->SetTitleVisibility( isVisible );
-  actor->SetTitle( title.toLatin1() );
+  actor->SetTitle( title.toUtf8() );
   vtkTextProperty* txtProp = actor->GetTitleTextProperty();
   if ( txtProp ) {
     txtProp->SetColor( color );
@@ -1733,7 +1733,7 @@ void setGradAxisVisualParams( vtkAxisActor2D* actor, const QString& params )
     int shadow = paramsLst[10].toInt();
 
     actor->SetTitleVisibility( isVisible );
-    actor->SetTitle( title.toLatin1() );
+    actor->SetTitle( title.toUtf8() );
     vtkTextProperty* txtProp = actor->GetTitleTextProperty();
     if ( txtProp ) {
       txtProp->SetColor( color );

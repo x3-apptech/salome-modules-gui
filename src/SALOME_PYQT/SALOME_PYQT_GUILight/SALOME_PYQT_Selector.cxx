@@ -149,9 +149,9 @@ void SALOME_PYQT_Selector::getSelection(SUIT_DataOwnerPtrList& theList) const
           SALOME_PYQT_BorrowedDataObjectLight *obj = new SALOME_PYQT_BorrowedDataObjectLight(myLocalEntries[i]);
 #ifndef DISABLE_SALOMEOBJECT
           Handle(SALOME_InteractiveObject)aSObj = new SALOME_InteractiveObject
-          ( obj->entry().toLatin1().constData(),
+          ( obj->entry().toUtf8().constData(),
               obj->componentDataType().toLatin1().constData(),
-              obj->name().toLatin1().constData() );
+              obj->name().toUtf8().constData() );
           LightApp_DataOwner* owner = new LightApp_DataOwner(aSObj);
 #else
           LightApp_DataOwner* owner = new LightApp_DataOwner( obj->entry() );

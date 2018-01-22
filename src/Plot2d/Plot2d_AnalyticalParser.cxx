@@ -182,7 +182,7 @@ int Plot2d_AnalyticalParser::calculate( const QString& theExpr,
   aPyScript = aPyScript.arg(theExpr);
   int result = -1;
   PyGILState_STATE gstate = PyGILState_Ensure();
-  PyObject* obj = PyRun_String(qPrintable(aPyScript), Py_file_input, myMainDict, NULL);
+  PyObject* obj = PyRun_String(qUtf8Printable(aPyScript), Py_file_input, myMainDict, NULL);
 
   if(obj == NULL) {
     PyErr_Print();

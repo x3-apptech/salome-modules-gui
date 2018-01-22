@@ -320,7 +320,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
   GET_VERSION_FUNC getVersion = 0;
 
 #ifdef WIN32
-  HINSTANCE modLib = ::LoadLibrary( libName.toLatin1() ); 
+  HINSTANCE modLib = ::LoadLibrary( libName.toUtf8() ); 
   if ( !modLib )
   {
     LPVOID lpMsgBuf;
@@ -344,7 +344,7 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
     getVersion = (GET_VERSION_FUNC)::GetProcAddress( modLib, GET_VERSION_NAME );
   }
 #else
-  void* modLib = dlopen( libName.toLatin1(), RTLD_LAZY | RTLD_GLOBAL );
+  void* modLib = dlopen( libName.toUtf8(), RTLD_LAZY | RTLD_GLOBAL );
   if ( !modLib )
     err = QString( "Can not load library %1. %2" ).arg( libName ).arg( dlerror() );
   else

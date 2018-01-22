@@ -41,7 +41,7 @@ void SUIT_Tools::trace( const char* lpszLog, const char* lpszFormat, ... )
   tmpPath += QString( "Salome_trace" );
 
   FILE* pStream;
-  pStream = fopen( lpszLog ? lpszLog : (const char*)tmpPath.toLatin1(), "a" );
+  pStream = fopen( lpszLog ? lpszLog : (const char*)tmpPath.toUtf8(), "a" );
   if ( pStream ) 
   {     
     va_list argptr;

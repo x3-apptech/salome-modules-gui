@@ -85,7 +85,7 @@ void SPlot2d_Viewer::rename( const Handle(SALOME_InteractiveObject)& IObject,
     }
 
     if( aCurve && aCurve->hasTableIO() && aCurve->getTableIO()->isSame( IObject ) )
-      aCurve->getTableIO()->setName( newName.toLatin1() );
+      aCurve->getTableIO()->setName( newName.toUtf8() );
   }
   aViewFrame->updateTitles();
 }

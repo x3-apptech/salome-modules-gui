@@ -149,7 +149,7 @@ bool SVTK_AxisWidget::Apply(vtkAxisActor2D* theActor)
   // Name
 
   theActor->SetTitleVisibility(myNameGrp->isChecked() ? 1 : 0);
-  theActor->SetTitle(myAxisName->text().toLatin1());
+  theActor->SetTitle(myAxisName->text().toUtf8());
 
   QColor aTitleColor(255, 255, 255);
   int aTitleFontFamily = VTK_ARIAL;

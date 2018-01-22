@@ -254,7 +254,7 @@ void showTree( SUIT_DataObject* root )
   {
     QString marg; marg.fill( ' ', 3*it.depth() );
     QString nnn = "%1 '%2'";
-    qDebug( nnn.arg( marg ).arg( it.current()->name() ).toLatin1() );
+    qDebug( nnn.arg( marg ).arg( it.current()->name() ).toUtf8() );
   }
 }
 
@@ -286,7 +286,7 @@ bool SalomeApp_DataModel::open( const QString& name, CAM_Study* study, QStringLi
   if ( anId.isEmpty() )
     return true; // Probably nothing to load
 
-  _PTR(SComponent) aSComp ( SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toLatin1() ) ) );
+  _PTR(SComponent) aSComp ( SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toUtf8() ) ) );
   if ( aSComp )
     updateTree( aSComp, aDoc );
 
@@ -320,7 +320,7 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       studyRoot = dynamic_cast<LightApp_RootObject*>( aSStudy->root() );
       QString anId = getRootEntry( aSStudy );
       if ( !anId.isEmpty() ){ // if nothing is published in the study for this module -> do nothing
-        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toLatin1() ) );
+        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toUtf8() ) );
       }
     }
   }
@@ -330,7 +330,7 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       aSStudy = dynamic_cast<SalomeApp_Study*>( studyRoot->study() ); // <study> value should not change here theoretically, but just to make sure
       if ( aSStudy ) {
         // modelRoot->object() cannot be reused here: it is about to be deleted by buildTree() soon
-        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( modelRoot->entry().toLatin1() ) );
+        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( modelRoot->entry().toUtf8() ) );
       }
     }
   }

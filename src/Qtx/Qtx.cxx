@@ -543,14 +543,14 @@ QString Qtx::addSlash( const QString& path )
 */
 bool Qtx::dos2unix( const QString& absName )
 {
-  FILE* src = ::fopen( absName.toLatin1(), "rb" );
+  FILE* src = ::fopen( absName.toUtf8(), "rb" );
   if ( !src )
     return false;
 
   /* we'll use temporary file */
   char temp[512] = { '\0' };
   QString dir = Qtx::dir( absName );
-  FILE* tgt = ::fopen( strcpy( temp, ::tempnam( dir.toLatin1(), "__x" ) ), "wb" );
+  FILE* tgt = ::fopen( strcpy( temp, ::tempnam( dir.toUtf8(), "__x" ) ), "wb" );
   if ( !tgt )
     return false;
 
@@ -727,8 +727,8 @@ QString Qtx::makeEnvVarSubst( const QString& str, const SubstMode mode )
         break;
 
       QString newStr;
-      if ( ::getenv( envName.toLatin1() ) || mode == Always )
-        newStr = QString( ::getenv( envName.toLatin1() ) );
+      if ( ::getenv( envName.toUtf8() ) || mode == Always )
+        newStr = QString( ::getenv( envName.toUtf8() ) );
 
       if ( newStr.isNull() )
       {

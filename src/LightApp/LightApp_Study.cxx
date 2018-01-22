@@ -335,7 +335,7 @@ void LightApp_Study::saveModuleData(QString theModuleName, QStringList theListOf
   for ( QStringList::Iterator it = theListOfFiles.begin(); it != theListOfFiles.end(); ++it ) {
     if ( (*it).isEmpty() )
       continue;
-    aListOfFiles[anIndex] = (*it).toLatin1().constData();
+    aListOfFiles[anIndex] = (*it).toUtf8().constData();
     anIndex++;
   }
   myDriver->SetListOfFiles(theModuleName.toLatin1().constData(), aListOfFiles);
@@ -368,7 +368,7 @@ bool LightApp_Study::saveStudyData( const QString& theFileName )
     return false;
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
 
-  bool aRes = myDriver->SaveDatasInFile(theFileName.toLatin1(), isMultiFile);
+  bool aRes = myDriver->SaveDatasInFile(theFileName.toUtf8(), isMultiFile);
   return aRes;
 }
 
@@ -382,7 +382,7 @@ bool LightApp_Study::openStudyData( const QString& theFileName )
     return false;
   bool isMultiFile = resMgr->booleanValue( "Study", "multi_file", false );
 
-  bool aRes = myDriver->ReadDatasFromFile(theFileName.toLatin1(), isMultiFile);
+  bool aRes = myDriver->ReadDatasFromFile(theFileName.toUtf8(), isMultiFile);
   return aRes;
 }
 

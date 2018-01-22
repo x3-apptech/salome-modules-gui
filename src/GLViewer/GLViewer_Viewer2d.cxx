@@ -731,7 +731,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
     if ( !getActiveView() )
       return false;
 
-        QFile hFile( FileName.toLatin1() );
+        QFile hFile( FileName.toUtf8() );
 
 #ifdef WIN32
     HDC hMetaFileDC;
@@ -793,7 +793,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
         HDC screen_dc = GetDC( 0 ); //The screen device context
         HDC bitDC = CreateCompatibleDC ( screen_dc ); //The context compatible with screen
 
-        hMetaFileDC = CreateEnhMetaFile( bitDC, FileName.toLatin1().data(), &r, "" );
+        hMetaFileDC = CreateEnhMetaFile( bitDC, FileName.toUtf8().data(), &r, "" );
         SetMapMode( hMetaFileDC, MM_HIMETRIC );
         SetWindowOrgEx( hMetaFileDC, 0, r.bottom, NULL );
         HRGN ClipRgn = CreateRectRgn( 0, 0, AW, AH );

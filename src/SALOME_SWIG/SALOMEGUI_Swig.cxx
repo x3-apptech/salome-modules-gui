@@ -308,7 +308,7 @@ const char* SALOMEGUI_Swig::getSelected( int index )
 {
   QStringList selected = ProcessEvent( new TGetSelectedEvent() );
   return index >= 0 && index < selected.count() ? 
-    strdup( selected[ index ].toLatin1().constData() ) : 0;
+    strdup( selected[ index ].toUtf8().constData() ) : 0;
 }
 
 /*!
@@ -329,7 +329,7 @@ void SALOMEGUI_Swig::AddIObject( const char* theEntry )
         LightApp_SelectionMgr* aSelMgr = anApp->selectionMgr(); 
         if ( aStudy && aSelMgr ) {
           SALOME_ListIO anIOList;
-          anIOList.Append( new SALOME_InteractiveObject( myEntry.toLatin1(), "", "" ) );
+          anIOList.Append( new SALOME_InteractiveObject( myEntry.toUtf8(), "", "" ) );
           aSelMgr->setSelectedObjects( anIOList, true );
         }
       }
@@ -364,7 +364,7 @@ void SALOMEGUI_Swig::RemoveIObject( const char* theEntry )
           aSelMgr->selectedObjects( anIOList );
           SALOME_ListIteratorOfListIO anIter( anIOList );
           for( ; anIter.More(); anIter.Next() ) {
-            if ( anIter.Value()->isSame( new SALOME_InteractiveObject( myEntry.toLatin1(), "", "" ) ) ) { 
+            if ( anIter.Value()->isSame( new SALOME_InteractiveObject( myEntry.toUtf8(), "", "" ) ) ) { 
               anIOList.Remove( anIter );
               aSelMgr->setSelectedObjects( anIOList, true );
               return;
@@ -605,7 +605,7 @@ public:
       if ( window ) {
         SALOME_View* view = dynamic_cast<SALOME_View*>( window->getViewManager()->getViewModel() );
         if ( view ) {
-          SALOME_Prs* aPrs = view->CreatePrs( myEntry.toLatin1() );
+          SALOME_Prs* aPrs = view->CreatePrs( myEntry.toUtf8() );
           myResult = !aPrs->IsNull();
         }
       }
@@ -898,7 +898,7 @@ public:
 	
 const char* SALOMEGUI_Swig::getViewParameters() {
   QString result = ProcessEvent( new TGetViewParameters() );
-  return result.isEmpty() ? 0 : strdup( result.toLatin1().constData() );  
+  return result.isEmpty() ? 0 : strdup( result.toUtf8().constData() );  
 }
 
 

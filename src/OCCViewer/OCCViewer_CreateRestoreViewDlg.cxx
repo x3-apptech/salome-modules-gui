@@ -222,7 +222,7 @@ const viewAspectList& OCCViewer_CreateRestoreViewDlg::parameters() const
 void OCCViewer_CreateRestoreViewDlg::editItemText( QListWidgetItem* anItem )
 {
   int index = anItem->listWidget()->row( anItem );
-  myParametersMap[ index ].name = anItem->text().toLatin1();
+  myParametersMap[ index ].name = anItem->text().toUtf8();
 }
 
 /*!

@@ -169,7 +169,7 @@ void LightApp_Displayer::Erase( const QStringList& list, const bool forced,
   QStringList::const_iterator it = list.constBegin();
   for ( ; it != list.constEnd(); ++it)
   {
-    SALOME_Prs* prs = vf->CreatePrs( (*it).toLatin1().data() );
+    SALOME_Prs* prs = vf->CreatePrs( (*it).toUtf8().data() );
     if ( prs ) {
       myLastEntry = *it;
       vf->BeforeErase( this, prs );
@@ -218,7 +218,7 @@ bool LightApp_Displayer::IsDisplayed( const QString& entry, SALOME_View* theView
   {
 #ifndef DISABLE_SALOMEOBJECT
     Handle( SALOME_InteractiveObject ) temp = new SALOME_InteractiveObject();
-    temp->setEntry( entry.toLatin1() );
+    temp->setEntry( entry.toUtf8() );
     res = vf->isVisible( temp );
 #endif
   }
@@ -248,7 +248,7 @@ SALOME_Prs* LightApp_Displayer::buildPresentation( const QString& entry, SALOME_
   SALOME_View* vf = theViewFrame ? theViewFrame : GetActiveView();
 
   if ( vf )
-    prs = vf->CreatePrs( entry.toLatin1() );
+    prs = vf->CreatePrs( entry.toUtf8() );
 
   return prs;
 }

@@ -259,7 +259,7 @@ void SOCC_Viewer::rename( const Handle(SALOME_InteractiveObject)& obj,
         Handle(SALOME_InteractiveObject) IO = aSh->getIO();
         if ( IO->isSame( obj ) )
         {
-          aSh->setName( name.toLatin1().data() );
+          aSh->setName( name.toUtf8().data() );
           break;
         }
       }

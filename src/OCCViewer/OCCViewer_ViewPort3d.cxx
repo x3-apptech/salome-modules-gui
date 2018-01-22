@@ -358,13 +358,13 @@ void OCCViewer_ViewPort3d::updateBackground()
       // set texture image: file name and fill mode
       switch ( textureMode ) {
       case Qtx::CenterTexture:
-	activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_CENTERED );
+	activeView()->SetBackgroundImage( fi.absoluteFilePath().toUtf8().constData(), Aspect_FM_CENTERED );
 	break;
       case Qtx::TileTexture:
-	activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_TILED );
+	activeView()->SetBackgroundImage( fi.absoluteFilePath().toUtf8().constData(), Aspect_FM_TILED );
 	break;
       case Qtx::StretchTexture:
-	activeView()->SetBackgroundImage( fi.absoluteFilePath().toLatin1().constData(), Aspect_FM_STRETCH );
+	activeView()->SetBackgroundImage( fi.absoluteFilePath().toUtf8().constData(), Aspect_FM_STRETCH );
 	break;
       default:
 	break;

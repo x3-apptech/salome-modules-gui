@@ -489,6 +489,6 @@ SVTK_Recorder
 	") & (for /f %i in (" + tmpFile + ") do (del \"%i\")) & (del " + tmpFile + "))) > NUL";
 #endif
 
-  if(MYDEBUG) cout<<"SVTK_Recorder::MakeFileAVI - "<<(const char*)aCommand.toLatin1()<<endl;
-  system((const char*)aCommand.toLatin1());
+  if(MYDEBUG) cout<<"SVTK_Recorder::MakeFileAVI - "<<(const char*)aCommand.toUtf8()<<endl;
+  system((const char*)aCommand.toUtf8());
 }

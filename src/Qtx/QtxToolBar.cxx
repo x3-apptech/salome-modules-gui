@@ -238,7 +238,7 @@ void QtxToolBar::Watcher::installFilters()
   const QObjectList& objList = myCont->children();
   for ( QObjectList::const_iterator it = objList.begin(); it != objList.end(); ++it )
   {
-    if ( (*it)->isWidgetType() && qstrcmp( "qt_dockwidget_internal", (*it)->objectName().toLatin1() ) )
+    if ( (*it)->isWidgetType() && qstrcmp( "qt_dockwidget_internal", (*it)->objectName().toUtf8() ) )
       (*it)->installEventFilter( this );
   }
 }

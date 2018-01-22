@@ -564,7 +564,7 @@ void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
         if( myVariableMap.contains( anIndex ) )
         {
           const NoteBoox_Variable& aVariable = myVariableMap[ anIndex ];
-          if( !aVariable.Name.isEmpty() && SalomeApp_Application::getStudy()->IsVariableUsed( std::string( aVariable.Name.toLatin1().constData() ) ) )
+          if( !aVariable.Name.isEmpty() && SalomeApp_Application::getStudy()->IsVariableUsed( std::string( aVariable.Name.toUtf8().constData() ) ) )
           {
             if( QMessageBox::warning( parentWidget(), tr( "WARNING" ),
                                       tr( "RENAME_VARIABLE_IS_USED" ).arg( aVariable.Name ),
@@ -677,7 +677,7 @@ void NoteBook_Table::RemoveSelected()
       else {
         int nRow = row(aSelectedItems[i]);
 
-        if( aStudy->IsVariableUsed( std::string( aRow->GetName().toLatin1().constData() ) ) )
+        if( aStudy->IsVariableUsed( std::string( aRow->GetName().toUtf8().constData() ) ) )
         {
           if( QMessageBox::warning( parentWidget(), tr( "WARNING" ),
                                     tr( "REMOVE_VARIABLE_IS_USED" ).arg( aRow->GetName() ),
@@ -695,7 +695,7 @@ void NoteBook_Table::RemoveSelected()
           myVariableMap.remove( index );
         removeRow(nRow);
         myRows.removeAt(nRow);
-        if(aStudy->IsVariable(aVarName.toLatin1().constData()))
+        if(aStudy->IsVariable(aVarName.toUtf8().constData()))
           removedFromStudy = true;
       }
     }
@@ -849,7 +849,7 @@ void SalomeApp_NoteBook::onApply()
     if( aVariableMapRef.contains( anIndex ) )
     {
       QString aRemovedVariable = aVariableMapRef[ anIndex ].Name;
-      aStudy->RemoveVariable( std::string( aRemovedVariable.toLatin1().constData() ) );
+      aStudy->RemoveVariable( std::string( aRemovedVariable.toUtf8().constData() ) );
     }
   }
 
@@ -871,22 +871,22 @@ void SalomeApp_NoteBook::onApply()
 
         if( !aNameRef.isEmpty() && !aValueRef.isEmpty() && aNameRef != aName )
         {
-          aStudy->RenameVariable( std::string( aNameRef.toLatin1().constData() ),
-                                  std::string( aName.toLatin1().constData() ) );
+          aStudy->RenameVariable( std::string( aNameRef.toUtf8().constData() ),
+                                  std::string( aName.toUtf8().constData() ) );
         }
       }
 
       if( NoteBook_TableRow::IsIntegerValue(aValue,&anIVal) )
-        aStudy->SetInteger(std::string(aName.toLatin1().constData()),anIVal);
+        aStudy->SetInteger(std::string(aName.toUtf8().constData()),anIVal);
 
       else if( NoteBook_TableRow::IsRealValue(aValue,&aDVal) )
-        aStudy->SetReal(std::string(aName.toLatin1().constData()),aDVal);
+        aStudy->SetReal(std::string(aName.toUtf8().constData()),aDVal);
     
       else if( NoteBook_TableRow::IsBooleanValue(aValue,&aBVal) )
-        aStudy->SetBoolean(std::string(aName.toLatin1().constData()),aBVal);
+        aStudy->SetBoolean(std::string(aName.toUtf8().constData()),aBVal);
     
       else
-        aStudy->SetString(std::string(aName.toLatin1().constData()),aValue.toStdString());
+        aStudy->SetString(std::string(aName.toUtf8().constData()),aValue.toStdString());
     }
   }
   myTable->ResetMaps();
