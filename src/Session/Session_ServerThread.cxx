@@ -260,9 +260,19 @@ void Session_ServerThread::ActivateRegistry(int argc,
     RegistryService *ptrRegistry = new RegistryService;
     ptrRegistry->SessionName( ptrSessionName );
     ptrRegistry->SetOrb(_orb);
-    varComponents = ptrRegistry->_this();
-    ptrRegistry->_remove_ref(); //let poa manage registry service deletion
-    // The RegistryService must not already exist.
+    //
+    CORBA::PolicyList policies;
+    policies.length(1);
+    PortableServer::ThreadPolicy_var threadPol(_root_poa->create_thread_policy(PortableServer::SINGLE_THREAD_MODEL));
+    policies[0]=PortableServer::ThreadPolicy::_duplicate(threadPol);
+    PortableServer::POAManager_var manager = _root_poa->the_POAManager();
+    PortableServer::POA_var poa2(_root_poa->create_POA("SingleThreadPOA4RegistryEmbedded",manager,policies));
+    threadPol->destroy();
+    //
+    PortableServer::ObjectId_var id(poa2->activate_object(ptrRegistry));
+    CORBA::Object_var pipo=poa2->id_to_reference(id);
+    varComponents = Registry::Components::_narrow(pipo) ;
+    ptrRegistry->_remove_ref(); //let poa manage registryservice deletion
     
     try {
       CORBA::Object_var pipo = _NS->Resolve( registryName );
