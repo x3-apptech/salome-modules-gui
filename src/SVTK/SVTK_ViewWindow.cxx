@@ -153,7 +153,7 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
 {
   myModel = theModel;
   myInteractor = new SVTK_RenderWindowInteractor(this,"SVTK_RenderWindowInteractor");
-  
+
   SVTK_Selector* aSelector = SVTK_Selector::New();
   int aPreselectionMode =  SUIT_Session::session()->resourceMgr()->
     integerValue( "VTKViewer", "preselection", Standard_Preselection );
@@ -162,31 +162,31 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   bool isSelectionEnabled = SUIT_Session::session()->resourceMgr()->
     booleanValue( "VTKViewer", "enable_selection", true );
   aSelector->SetSelectionEnabled( isSelectionEnabled );
-    
+
   SVTK_GenericRenderWindowInteractor* aDevice = SVTK_GenericRenderWindowInteractor::New();
   aDevice->SetRenderWidget(myInteractor);
   aDevice->SetSelector(aSelector);
-  
+
   SVTK_Renderer* aRenderer = SVTK_Renderer::New();
   aRenderer->Initialize(aDevice,aSelector);
-  
+
   myInteractor->Initialize(aDevice,aRenderer,aSelector);
-  
+
   aDevice->Delete();
   aRenderer->Delete();
   aSelector->Delete();
-  
+
   myToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_LABEL"),                       // title (language-dependant)
-					QString( "VTKViewerViewOperations" ),          // name (language-independant)
-					false );                                       // disable floatable toolbar
+                                        QString( "VTKViewerViewOperations" ),          // name (language-independant)
+                                        false );                                       // disable floatable toolbar
 
   myRecordingToolBar = toolMgr()->createToolBar( tr("LBL_TOOLBAR_RECORD_LABEL"),       // title (language-dependant)
-						 QString( "VTKRecordingOperations" ),  // name (language-independant)
-						 false );                              // disable floatable toolbar
-  
+                                                 QString( "VTKRecordingOperations" ),  // name (language-independant)
+                                                 false );                              // disable floatable toolbar
+
   createActions( SUIT_Session::session()->resourceMgr() );
   createToolBar();
-  
+
   SetEventDispatcher(myInteractor->GetDevice());
   myInteractor->setBackgroundRole( QPalette::NoRole );//NoBackground
   myInteractor->setFocusPolicy(Qt::StrongFocus);
@@ -195,7 +195,7 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
     booleanValue( "VTKViewer", "enable_quad_buffer_support", false );
   myInteractor->getRenderWindow()->SetStereoCapableWindow((int)isSupportQuadBuffer);
   setFocusProxy(myInteractor);
-  
+
   myUpdateRateDlg = new SVTK_UpdateRateDlg( getAction( UpdateRate ), this, "SVTK_UpdateRateDlg" );
   myNonIsometricDlg = new SVTK_NonIsometricDlg( getAction( NonIsometric ), this, "SVTK_NonIsometricDlg" );
   myCubeAxesDlg = new SVTK_CubeAxesDlg( getAction( GraduatedAxes ), this, "SVTK_CubeAxesDlg" );
@@ -245,13 +245,13 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   myEventCallbackCommand->SetCallback(SVTK_ViewWindow::ProcessEvents);
   myEventCallbackCommand->Delete();
 
-  GetInteractor()->GetInteractorStyle()->AddObserver(SVTK::OperationFinished, 
-						     myEventCallbackCommand.GetPointer(), 0.0);
-  myKeyFreeInteractorStyle->AddObserver(SVTK::OperationFinished, 
-					myEventCallbackCommand.GetPointer(), 0.0);
+  GetInteractor()->GetInteractorStyle()->AddObserver(SVTK::OperationFinished,
+                                                     myEventCallbackCommand.GetPointer(), 0.0);
+  myKeyFreeInteractorStyle->AddObserver(SVTK::OperationFinished,
+                                        myEventCallbackCommand.GetPointer(), 0.0);
 
 
-  
+
   myInteractor->getRenderWindow()->Render();
   setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
   onResetView();
@@ -610,17 +610,17 @@ void SVTK_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
     switch ( bgData.mode() ) {
     case Qtx::ColorBackground:
       {
-	QColor c = bgData.color();
-	if ( c.isValid() ) {
-	  // show solid-colored background
-	  getRenderer()->SetTexturedBackground( false );  // cancel texture mode
-	  getRenderer()->SetGradientBackground( false );  // cancel gradient mode
-	  getRenderer()->SetBackground( c.red()/255.0,
-					c.green()/255.0,
-					c.blue()/255.0 ); // set background color
-	  ok = true;
-	}
-	break;
+        QColor c = bgData.color();
+        if ( c.isValid() ) {
+          // show solid-colored background
+          getRenderer()->SetTexturedBackground( false );  // cancel texture mode
+          getRenderer()->SetGradientBackground( false );  // cancel gradient mode
+          getRenderer()->SetBackground( c.red()/255.0,
+                                        c.green()/255.0,
+                                        c.blue()/255.0 ); // set background color
+          ok = true;
+        }
+        break;
       }
     case Qtx::SimpleGradientBackground:
       {
@@ -649,11 +649,11 @@ void SVTK_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
       }
     case Qtx::CustomGradientBackground:
       {
-	// NOT IMPLEMENTED YET
-	getRenderer()->SetTexturedBackground( false );  // cancel texture mode
-	getRenderer()->SetGradientBackground( false );  // cancel gradient mode
-	// .........
-	break;
+        // NOT IMPLEMENTED YET
+        getRenderer()->SetTexturedBackground( false );  // cancel texture mode
+        getRenderer()->SetGradientBackground( false );  // cancel gradient mode
+        // .........
+        break;
       }
     default:
       break;
@@ -663,71 +663,71 @@ void SVTK_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
       int textureMode = bgData.texture( fileName );
       QFileInfo fi( fileName );
       if ( !fileName.isEmpty() && fi.exists() ) {
-	// read texture from file
-	QString extension = fi.suffix().toLower();
-	vtkImageReader2* aReader = 0;
-	if ( extension == "jpg" || extension == "jpeg" )
-	  aReader = vtkJPEGReader::New();
-	else if ( extension == "bmp" )
-	  aReader = vtkBMPReader::New();
-	else if ( extension == "tif" || extension == "tiff" )
-	  aReader = vtkTIFFReader::New();
-	else if ( extension == "png" )
-	  aReader = vtkPNGReader::New();
-	else if ( extension == "mhd" || extension == "mha" )
-	  aReader = vtkMetaImageReader::New();           
-	if ( aReader ) {
-	  // create texture
-	  aReader->SetFileName( fi.absoluteFilePath().toLatin1().constData() );
-	  aReader->Update();	  
-	  VTKViewer_Texture* aTexture = VTKViewer_Texture::New();	    
-	  vtkImageMapToColors* aMap = 0;
-	  vtkAlgorithmOutput* anOutput;
-	  /*
-	  // special processing for BMP reader
-	  vtkBMPReader* aBMPReader = (vtkBMPReader*)aReader;
-	  if ( aBMPReader ) {
-	  // Special processing for BMP file
-	  aBMPReader->SetAllow8BitBMP(1);
-	    
-	  aMap = vtkImageMapToColors::New();
-	  aMap->SetInputConnection( aBMPReader->GetOutputPort() );
-	  aMap->SetLookupTable( (vtkScalarsToColors*)aBMPReader->GetLookupTable() );
-	  aMap->SetOutputFormatToRGB();
-	    
-	  anOutput = aMap->GetOutputPort();
-	  }
-	  else {
-	  }
-	  */
-	  anOutput = aReader->GetOutputPort( 0 );
-	  aTexture->SetInputConnection( anOutput );
-	  // set texture mode
-	  // VSR: Currently, VTK only supports Stretch mode, so below code will give
-	  // the same results for all modes
-	  switch ( textureMode ) {
-	  case Qtx::TileTexture:
-	    aTexture->SetPosition((int)VTKViewer_Texture::Tiled);
-	    break;
-	  case Qtx::StretchTexture:
-	    aTexture->SetPosition((int)VTKViewer_Texture::Stretched);
-	    break;
-	  case Qtx::CenterTexture:
-	    aTexture->SetPosition((int)VTKViewer_Texture::Centered);
-	  default:
-	    break;
-	  }
-	  // show textured background
-	  getRenderer()->SetTexturedBackground( true );
-	  getRenderer()->SetBackgroundTexture( aTexture );
-	  
-	  // clean-up resources
-	  if ( aMap )
-	    aMap->Delete();
-	  aReader->Delete();
-	  aTexture->Delete();
-	  ok = true;
-	}
+        // read texture from file
+        QString extension = fi.suffix().toLower();
+        vtkImageReader2* aReader = 0;
+        if ( extension == "jpg" || extension == "jpeg" )
+          aReader = vtkJPEGReader::New();
+        else if ( extension == "bmp" )
+          aReader = vtkBMPReader::New();
+        else if ( extension == "tif" || extension == "tiff" )
+          aReader = vtkTIFFReader::New();
+        else if ( extension == "png" )
+          aReader = vtkPNGReader::New();
+        else if ( extension == "mhd" || extension == "mha" )
+          aReader = vtkMetaImageReader::New();
+        if ( aReader ) {
+          // create texture
+          aReader->SetFileName( fi.absoluteFilePath().toLatin1().constData() );
+          aReader->Update();
+          VTKViewer_Texture* aTexture = VTKViewer_Texture::New();
+          vtkImageMapToColors* aMap = 0;
+          vtkAlgorithmOutput* anOutput;
+          /*
+          // special processing for BMP reader
+          vtkBMPReader* aBMPReader = (vtkBMPReader*)aReader;
+          if ( aBMPReader ) {
+          // Special processing for BMP file
+          aBMPReader->SetAllow8BitBMP(1);
+
+          aMap = vtkImageMapToColors::New();
+          aMap->SetInputConnection( aBMPReader->GetOutputPort() );
+          aMap->SetLookupTable( (vtkScalarsToColors*)aBMPReader->GetLookupTable() );
+          aMap->SetOutputFormatToRGB();
+
+          anOutput = aMap->GetOutputPort();
+          }
+          else {
+          }
+          */
+          anOutput = aReader->GetOutputPort( 0 );
+          aTexture->SetInputConnection( anOutput );
+          // set texture mode
+          // VSR: Currently, VTK only supports Stretch mode, so below code will give
+          // the same results for all modes
+          switch ( textureMode ) {
+          case Qtx::TileTexture:
+            aTexture->SetPosition((int)VTKViewer_Texture::Tiled);
+            break;
+          case Qtx::StretchTexture:
+            aTexture->SetPosition((int)VTKViewer_Texture::Stretched);
+            break;
+          case Qtx::CenterTexture:
+            aTexture->SetPosition((int)VTKViewer_Texture::Centered);
+          default:
+            break;
+          }
+          // show textured background
+          getRenderer()->SetTexturedBackground( true );
+          getRenderer()->SetBackgroundTexture( aTexture );
+
+          // clean-up resources
+          if ( aMap )
+            aMap->Delete();
+          aReader->Delete();
+          aTexture->Delete();
+          ok = true;
+        }
       }
     }
   }
@@ -885,20 +885,20 @@ void SVTK_ViewWindow::SetProjectionMode(const int theMode)
   SVTK_Viewer* aViewer = dynamic_cast<SVTK_Viewer*>(myModel);
   QtxAction* aSwitchZoomingStyle = dynamic_cast<QtxAction*>( toolMgr()->action( SwitchZoomingStyleId ) );
   if ( theMode == Parallel && !aParallelAction->isChecked() ) {
-      aParallelAction->setChecked( true );
-	  aSwitchZoomingStyle->setEnabled(true);
-	  aStereoAction->setChecked( false );
+    aParallelAction->setChecked( true );
+    aSwitchZoomingStyle->setEnabled(true);
+    aStereoAction->setChecked( false );
   }
   if ( theMode == Projection && !aProjectionAction->isChecked() ) {
-      aProjectionAction->setChecked( true );
-	  aSwitchZoomingStyle->setEnabled(false);
+    aProjectionAction->setChecked( true );
+    aSwitchZoomingStyle->setEnabled(false);
   }
   if ( theMode == Stereo ) {
     aStereoAction->setChecked( true );
     if ( aParallelAction->isEnabled() ) {
-        aParallelAction->setEnabled( false );
-        aParallelAction->setChecked( false );
-        aStereoAction->setChecked( false );
+      aParallelAction->setEnabled( false );
+      aParallelAction->setChecked( false );
+      aStereoAction->setChecked( false );
     }
     else {
       aParallelAction->setEnabled( true );
@@ -1095,7 +1095,6 @@ void SVTK_ViewWindow::SetSelectionEnabled( bool theEnable )
   for (int i = 0; i < actors->GetNumberOfItems(); ++i )
     if (VTKViewer_Actor *actor = dynamic_cast<VTKViewer_Actor*>(actors->GetItemAsObject(i)))
     {
-      cout << "actor " << actor << endl;
       actor->EnableSelection( theEnable );
     }
 }
@@ -1871,7 +1870,7 @@ void SVTK_ViewWindow::setVisualParameters( const QString& parameters )
 */
 void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool baseParamsOnly )
 {
-  
+
   double pos[3], focalPnt[3], viewUp[3], parScale, scale[3];
 
   QXmlStreamReader aReader(parameters);
@@ -1882,7 +1881,7 @@ void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool bas
     if (aReader.isStartElement()) {
       QXmlStreamAttributes aAttr = aReader.attributes();
       //printf("### Name = %s\n", qPrintable(aReader.name().toString()));
-      if (aReader.name() == "Position") {       
+      if (aReader.name() == "Position") {
         pos[0] = aAttr.value("X").toString().toDouble();
         pos[1] = aAttr.value("Y").toString().toDouble();
         pos[2] = aAttr.value("Z").toString().toDouble();
@@ -1906,38 +1905,38 @@ void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool bas
         scale[1] = aAttr.value("Y").toString().toDouble();
         scale[2] = aAttr.value("Z").toString().toDouble();
         //printf("#### ViewScale %f; %f; %f\n", scale[0], scale[1], scale[2]);
-      } 
+      }
       else if (aReader.name() == "DisplayCubeAxis") {
-	if ( !baseParamsOnly ) {
-	  if (aAttr.value("Show") == "0")
-	    gradAxesActor->VisibilityOff();
-	  else
-	    gradAxesActor->VisibilityOn();
-	}
+        if ( !baseParamsOnly ) {
+          if (aAttr.value("Show") == "0")
+            gradAxesActor->VisibilityOff();
+          else
+            gradAxesActor->VisibilityOn();
+        }
       }
       else if (aReader.name() == "GraduatedAxis") {
-	if ( !baseParamsOnly ) {
-	  if(aAttr.value("Axis") == "X") 
-	    setGradAxisVisualParams(aReader, gradAxesActor->GetXAxisActor2D());
-	  else if(aAttr.value("Axis") == "Y")
-	    setGradAxisVisualParams(aReader, gradAxesActor->GetYAxisActor2D());
-	  else if(aAttr.value("Axis") == "Z")
-	    setGradAxisVisualParams(aReader, gradAxesActor->GetZAxisActor2D());
-	}
-      } 
+        if ( !baseParamsOnly ) {
+          if(aAttr.value("Axis") == "X")
+            setGradAxisVisualParams(aReader, gradAxesActor->GetXAxisActor2D());
+          else if(aAttr.value("Axis") == "Y")
+            setGradAxisVisualParams(aReader, gradAxesActor->GetYAxisActor2D());
+          else if(aAttr.value("Axis") == "Z")
+            setGradAxisVisualParams(aReader, gradAxesActor->GetZAxisActor2D());
+        }
+      }
       else if (aReader.name() == "Trihedron") {
-	if ( !baseParamsOnly ) {
-	  if (aAttr.value("isShown") == "0")
-	    GetTrihedron()->VisibilityOff();
-	  else
-	    GetTrihedron()->VisibilityOn();
-	  SetTrihedronSize(aAttr.value("Size").toString().toDouble());
-	}
+        if ( !baseParamsOnly ) {
+          if (aAttr.value("isShown") == "0")
+            GetTrihedron()->VisibilityOff();
+          else
+            GetTrihedron()->VisibilityOn();
+          SetTrihedronSize(aAttr.value("Size").toString().toDouble());
+        }
       }
       else if (aReader.name() == "Background") {
-	if ( !baseParamsOnly ) {
-	  setBackground( Qtx::stringToBackground( aAttr.value("Value").toString() ) );
-	}
+        if ( !baseParamsOnly ) {
+          setBackground( Qtx::stringToBackground( aAttr.value("Value").toString() ) );
+        }
       }
     }
   }
@@ -1967,7 +1966,7 @@ void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool bas
       scale[0] = paramsLst[10].toDouble();
       scale[1] = paramsLst[11].toDouble();
       scale[2] = paramsLst[12].toDouble();
-      
+
       // applying parameters
       vtkCamera* camera = getRenderer()->GetActiveCamera();
       camera->SetPosition( pos );
@@ -1976,31 +1975,31 @@ void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool bas
       camera->SetParallelScale( parScale );
       GetRenderer()->SetScale( scale );
       //SetScale( scale );
-      
+
       // apply graduated axes parameters
       if ( !baseParamsOnly ) {
-	SVTK_CubeAxesActor2D* gradAxesActor = GetCubeAxes();
-	if ( gradAxesActor && paramsLst.size() == nAllParams ) {
-	  int i = nNormalParams+1, j = i + nGradAxisParams - 1;
-	  ::setGradAxisVisualParams( gradAxesActor->GetXAxisActor2D(), parameters.section( '*', i, j ) ); 
-	  i = j + 1; j += nGradAxisParams;
-	  ::setGradAxisVisualParams( gradAxesActor->GetYAxisActor2D(), parameters.section( '*', i, j ) ); 
-	  i = j + 1; j += nGradAxisParams;
-	  ::setGradAxisVisualParams( gradAxesActor->GetZAxisActor2D(), parameters.section( '*', i, j ) ); 
-        
-	  if ( paramsLst[13].toUShort() )
-	    gradAxesActor->VisibilityOn();
-	  else
-	    gradAxesActor->VisibilityOff();
-	}
-	else if ( paramsLst.size() == nAllParams ) {
-	  if ( paramsLst[90].toUShort() )
-	    GetTrihedron()->VisibilityOn();
-	  else
-	    GetTrihedron()->VisibilityOff();
-        
-	  SetTrihedronSize(paramsLst[91].toDouble());
-	}
+        SVTK_CubeAxesActor2D* gradAxesActor = GetCubeAxes();
+        if ( gradAxesActor && paramsLst.size() == nAllParams ) {
+          int i = nNormalParams+1, j = i + nGradAxisParams - 1;
+          ::setGradAxisVisualParams( gradAxesActor->GetXAxisActor2D(), parameters.section( '*', i, j ) );
+          i = j + 1; j += nGradAxisParams;
+          ::setGradAxisVisualParams( gradAxesActor->GetYAxisActor2D(), parameters.section( '*', i, j ) );
+          i = j + 1; j += nGradAxisParams;
+          ::setGradAxisVisualParams( gradAxesActor->GetZAxisActor2D(), parameters.section( '*', i, j ) );
+
+          if ( paramsLst[13].toUShort() )
+            gradAxesActor->VisibilityOn();
+          else
+            gradAxesActor->VisibilityOff();
+        }
+        else if ( paramsLst.size() == nAllParams ) {
+          if ( paramsLst[90].toUShort() )
+            GetTrihedron()->VisibilityOn();
+          else
+            GetTrihedron()->VisibilityOff();
+
+          SetTrihedronSize(paramsLst[91].toDouble());
+        }
       }
     }
   }
@@ -2227,7 +2226,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   this->addAction(anAction);
   mgr->registerAction( anAction, FrontId );
 
-  anAction = new QtxAction(tr("MNU_BACK_VIEW"), 
+  anAction = new QtxAction(tr("MNU_BACK_VIEW"),
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BACK" ) ),
                            tr( "MNU_BACK_VIEW" ), 0, this, false, "Viewers:Back view");
   anAction->setStatusTip(tr("DSC_BACK_VIEW"));
@@ -2235,7 +2234,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   this->addAction(anAction);
   mgr->registerAction( anAction, BackId );
 
-  anAction = new QtxAction(tr("MNU_TOP_VIEW"), 
+  anAction = new QtxAction(tr("MNU_TOP_VIEW"),
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_TOP" ) ),
                            tr( "MNU_TOP_VIEW" ), 0, this, false, "Viewers:Top view");
   anAction->setStatusTip(tr("DSC_TOP_VIEW"));
@@ -2243,7 +2242,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   this->addAction(anAction);
   mgr->registerAction( anAction, TopId );
 
-  anAction = new QtxAction(tr("MNU_BOTTOM_VIEW"), 
+  anAction = new QtxAction(tr("MNU_BOTTOM_VIEW"),
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_BOTTOM" ) ),
                            tr( "MNU_BOTTOM_VIEW" ), 0, this, false, "Viewers:Bottom view");
   anAction->setStatusTip(tr("DSC_BOTTOM_VIEW"));
@@ -2251,7 +2250,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   this->addAction(anAction);
   mgr->registerAction( anAction, BottomId );
 
-  anAction = new QtxAction(tr("MNU_LEFT_VIEW"), 
+  anAction = new QtxAction(tr("MNU_LEFT_VIEW"),
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_LEFT" ) ),
                            tr( "MNU_LEFT_VIEW" ), 0, this, false, "Viewers:Left view");
   anAction->setStatusTip(tr("DSC_LEFT_VIEW"));
@@ -2259,7 +2258,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
   this->addAction(anAction);
   mgr->registerAction( anAction, LeftId );
 
-  anAction = new QtxAction(tr("MNU_RIGHT_VIEW"), 
+  anAction = new QtxAction(tr("MNU_RIGHT_VIEW"),
                            theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_RIGHT" ) ),
                            tr( "MNU_RIGHT_VIEW" ), 0, this, false, "Viewers:Right view");
   anAction->setStatusTip(tr("DSC_RIGHT_VIEW"));
@@ -2269,7 +2268,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
 
   // rotate anticlockwise
   anAction = new QtxAction(tr("MNU_ANTICLOCKWISE_VIEW"),
-			   theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ANTICLOCKWISE" ) ),
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_ANTICLOCKWISE" ) ),
                            tr( "MNU_ANTICLOCKWISE_VIEW" ), 0, this, false, "Viewers:Rotate anticlockwise");
   anAction->setStatusTip(tr("DSC_ANTICLOCKWISE_VIEW"));
   connect(anAction, SIGNAL(triggered()), this, SLOT(onAntiClockWiseView()));
@@ -2278,7 +2277,7 @@ void SVTK_ViewWindow::createActions(SUIT_ResourceMgr* theResourceMgr)
 
   // rotate clockwise
   anAction = new QtxAction(tr("MNU_CLOCKWISE_VIEW"),
-			   theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_CLOCKWISE" ) ),
+                           theResourceMgr->loadPixmap( "VTKViewer", tr( "ICON_VTKVIEWER_VIEW_CLOCKWISE" ) ),
                            tr( "MNU_CLOCKWISE_VIEW" ), 0, this, false, "Viewers:Rotate clockwise");
   anAction->setStatusTip(tr("DSC_CLOCKWISE_VIEW"));
   connect(anAction, SIGNAL(triggered()), this, SLOT(onClockWiseView()));
@@ -2715,9 +2714,9 @@ void SVTK_ViewWindow::emitTransformed() {
   Processes events
 */
 void SVTK_ViewWindow::ProcessEvents(vtkObject* vtkNotUsed(theObject),
-				    unsigned long theEvent,
-				    void* theClientData,
-				    void* theCallData)
+                                    unsigned long theEvent,
+                                    void* theClientData,
+                                    void* theCallData)
 {
   SVTK_ViewWindow* self = reinterpret_cast<SVTK_ViewWindow*>(theClientData);
   if(self)
