@@ -189,8 +189,8 @@ LightApp_VTKSelector
 {
   if( myViewer ) {
     if( SVTK_Viewer* aSViewer = dynamic_cast<SVTK_Viewer*>(myViewer) ) {
-      if( !aSViewer->isSelectionEnabled() ) 
-	return;
+      if( !aSViewer->isSelectionEnabled() )
+        return;
     }
     if(SUIT_ViewManager* aViewManager = myViewer->getViewManager()){
       if(SVTK_ViewManager* aViewMgr = dynamic_cast<SVTK_ViewManager*>(aViewManager)){
@@ -213,21 +213,22 @@ LightApp_VTKSelector
 /*!
   Sets selection to selector from data owner list \a theList.
 */
-void 
+void
 LightApp_VTKSelector
 ::setSelection( const SUIT_DataOwnerPtrList& theList )
 {
   SVTK_Viewer* aViewer = dynamic_cast<SVTK_Viewer*>(myViewer);
-  if(myViewer && aViewer && aViewer->isSelectionEnabled()){
+  if ( myViewer && aViewer && ( theList.isEmpty() || aViewer->isSelectionEnabled() )) {
     if(SUIT_ViewManager* aViewMgr = myViewer->getViewManager()){
       if(SVTK_ViewWindow* aView = dynamic_cast<SVTK_ViewWindow*>(aViewMgr->getActiveView())){
         if(SVTK_Selector* aSelector = aView->GetSelector()){
           SALOME_ListIO anAppendList;
           const SALOME_ListIO& aStoredList = aSelector->StoredIObjects();
           SUIT_DataOwnerPtrList::const_iterator anIter = theList.begin();
-          for(; anIter != theList.end(); ++anIter){
+          for(; anIter != theList.end(); ++anIter) {
             const SUIT_DataOwner* aDataOwner = (*anIter).get();
-            if(const LightApp_SVTKDataOwner* anOwner = dynamic_cast<const LightApp_SVTKDataOwner*>(aDataOwner)){
+            if(const LightApp_SVTKDataOwner* anOwner = dynamic_cast<const LightApp_SVTKDataOwner*>(aDataOwner))
+            {
               MESSAGE("aSelector->SetSelectionMode("<<anOwner->GetMode()<<");");
               aSelector->SetSelectionMode(anOwner->GetMode());
               Handle(SALOME_InteractiveObject) anIO = anOwner->IO();
@@ -236,8 +237,10 @@ LightApp_VTKSelector
 
               anAppendList.Append(anIO);
               aSelector->AddOrRemoveIndex(anIO,anOwner->GetIds(),false);
-            }else if(const LightApp_DataOwner* anOwner = dynamic_cast<const LightApp_DataOwner*>(aDataOwner)){
-              Handle(SALOME_InteractiveObject) anIO = 
+            }
+            else if(const LightApp_DataOwner* anOwner = dynamic_cast<const LightApp_DataOwner*>(aDataOwner))
+            {
+              Handle(SALOME_InteractiveObject) anIO =
                 new SALOME_InteractiveObject(anOwner->entry().toLatin1(),"");
               aSelector->AddIObject(anIO);
               anAppendList.Append(anIO);
@@ -255,10 +258,10 @@ LightApp_VTKSelector
             toRemove.remove( anIt.Value()->getEntry() );
 
           QMap< QString, Handle( SALOME_InteractiveObject )>::const_iterator RIt = toRemove.begin(),
-                                                                             REnd = toRemove.end();
+            REnd = toRemove.end();
           for( ; RIt!=REnd; RIt++ )
             aSelector->RemoveIObject( RIt.value() );
-          
+
           aView->onSelectionChanged();
         }
       }

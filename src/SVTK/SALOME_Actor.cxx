@@ -666,7 +666,7 @@ SALOME_Actor
             SVTK_SelectionEvent* theSelectionEvent,
             bool theIsHighlight)
 {
-  if ( !GetPickable() || !mySelector || !mySelector->IsSelectionEnabled() )
+  if ( !GetPickable() || !mySelector /*|| !mySelector->IsSelectionEnabled()*/ )
     return false;
 
   myOutlineActor->SetVisibility( false );
@@ -682,6 +682,9 @@ SALOME_Actor
 
   if ( !theIsHighlight )
     return true;
+
+  if ( !mySelector->IsSelectionEnabled() )
+    return false;
 
   double x = theSelectionEvent->myX;
   double y = theSelectionEvent->myY;
