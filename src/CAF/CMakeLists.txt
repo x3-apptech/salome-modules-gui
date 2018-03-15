@@ -24,17 +24,20 @@ INCLUDE(UseQtExt)
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${QT_INCLUDES}
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}/src/Qtx
   ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/STD
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${CAS_DEFINITIONS} ${QT_DEFINITIONS})
+ADD_DEFINITIONS(${OpenCASCADE_DEFINITIONS} ${QT_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${CAS_OCAF} ${CAS_OCAFVIS} qtx suit std)
+SET(_link_LIBRARIES ${QT_LIBRARIES} 
+    ${OpenCASCADE_ApplicationFramework_LIBRARIES}
+    ${OpenCASCADE_Visualization_LIBRARIES} 
+    qtx suit std)
 
 # --- headers ---
 

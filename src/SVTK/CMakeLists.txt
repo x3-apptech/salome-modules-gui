@@ -24,7 +24,7 @@ INCLUDE(${VTK_USE_FILE})
 
 # additional include directories
 INCLUDE_DIRECTORIES(
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${QT_INCLUDES}
   ${Boost_INCLUDE_DIRS}
   ${PTHREAD_INCLUDE_DIR}
@@ -38,14 +38,14 @@ INCLUDE_DIRECTORIES(
 )
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(${QT_DEFINITIONS} ${CAS_DEFINITIONS} ${BOOST_DEFINITIONS})
+ADD_DEFINITIONS(${QT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS} ${BOOST_DEFINITIONS})
 
 # libraries to link to
 SET(_link_LIBRARIES 
   ${QT_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${VTK_LIBRARIES}
-  ${CAS_KERNEL} ${CAS_VIEWER}
+  ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_Visualization_LIBRARIES}
   ${KERNEL_OpUtil}
   qtx suit ViewerTools SalomeObject SalomePrs VTKViewer OpenGLUtils
 )

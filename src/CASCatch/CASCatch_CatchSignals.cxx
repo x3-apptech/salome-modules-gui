@@ -57,9 +57,6 @@ CASCatch_CatchSignals::CASCatch_CatchSignals()
 #include <OSD_SIGBUS.hxx>
 #include <OSD_SIGSEGV.hxx>
 #include <OSD_SIGSYS.hxx>
-#ifndef LIN
-#include <exception.h>
-#endif
 
 typedef void (ACT_SIGIO_HANDLER)(void) ;
 ACT_SIGIO_HANDLER *ADR_ACT_SIGIO_HANDLER = NULL ;
@@ -80,17 +77,8 @@ typedef void (* SIG_PFV) (int);
 #include <signal.h>
 #include <sys/signal.h>
 
-#ifdef LIN
 # include <stdlib.h>
 # include <stdio.h>
-#else
-# ifdef SA_SIGINFO 
-#   ifndef AIX
-# include <sys/siginfo.h>
-#    endif
-# endif
-#endif
-
 
 #ifdef IRIX
 # include <sigfpe.h>
