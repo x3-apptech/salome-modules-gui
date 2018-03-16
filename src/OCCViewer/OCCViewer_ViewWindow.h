@@ -276,6 +276,8 @@ public:
   bool isActionVisible( ActionId theId ) const;
   void setActionVisible( ActionId theId, bool isVisible );
 
+  void resetState();
+
 public slots:
   virtual void onFrontView();
   virtual void onViewFitAll();
@@ -361,7 +363,6 @@ protected:
   void vpMouseReleaseEvent(QMouseEvent* theEvent);
   void vpMouseMoveEvent(QMouseEvent* theEvent);
 
-  void resetState();
   void drawRect();
   void endDrawRect();
 
