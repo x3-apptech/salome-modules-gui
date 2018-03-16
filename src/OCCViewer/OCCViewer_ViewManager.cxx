@@ -28,7 +28,8 @@
   Constructor
 */
 OCCViewer_ViewManager::OCCViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* theDesktop, bool DisplayTrihedron )
-: SUIT_ViewManager( study, theDesktop, new OCCViewer_Viewer( DisplayTrihedron ) )
+: SUIT_ViewManager( study, theDesktop, new OCCViewer_Viewer( DisplayTrihedron ) ),
+  myIsChainedOperations( false )
 {  
   setTitle( tr( "OCC_VIEW_TITLE" ) );
 }
@@ -49,4 +50,14 @@ void OCCViewer_ViewManager::contextMenuPopup( QMenu* popup )
   SUIT_ViewManager::contextMenuPopup( popup );
   // if it is necessary invoke method CreatePopup of ViewPort
   // be sure that existing QPopupMenu menu is used for that.
+}
+
+bool OCCViewer_ViewManager::isChainedOperations() const
+{
+  return myIsChainedOperations;
+}
+
+void OCCViewer_ViewManager::setChainedOperations( bool isChainedOperations )
+{
+  myIsChainedOperations = isChainedOperations;
 }

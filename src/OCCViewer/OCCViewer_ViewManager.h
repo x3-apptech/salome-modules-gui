@@ -40,6 +40,12 @@ public:
   OCCViewer_Viewer* getOCCViewer() { return (OCCViewer_Viewer*) myViewModel; }
 
   virtual void      contextMenuPopup( QMenu* );
+
+  bool isChainedOperations() const;
+  void setChainedOperations( bool );
+
+private:
+  bool myIsChainedOperations;
 };
 
 #endif
