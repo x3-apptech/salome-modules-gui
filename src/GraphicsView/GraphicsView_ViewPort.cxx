@@ -850,6 +850,11 @@ void GraphicsView_ViewPort::zoom( double theX1, double theY1, double theX2, doub
   aTransform.scale( aZoom, aZoom );
   double aM11 = aTransform.m11();
   double aM22 = aTransform.m22();
+
+
+  QGraphicsView::ViewportAnchor old_anchor = transformationAnchor();
+  setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
+
   // increasing of diagonal coefficients (>300) leads to a crash sometimes
   // at the values of 100 some primitives are drawn incorrectly
   if( qMax( aM11, aM22 ) < 100 )
@@ -858,6 +863,8 @@ void GraphicsView_ViewPort::zoom( double theX1, double theY1, double theX2, doub
   myIsTransforming = false;
 
   applyTransform();
+
+  setTransformationAnchor( old_anchor );
 }
 
 //================================================================

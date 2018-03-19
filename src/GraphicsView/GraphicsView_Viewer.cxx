@@ -37,6 +37,8 @@
 #include <QKeyEvent>
 #include <QMenu>
 
+#include <math.h>
+
 // testing ImageViewer
 /*
 #include "GraphicsView_PrsImage.h"
@@ -521,6 +523,16 @@ void GraphicsView_Viewer::handleWheel( QGraphicsSceneWheelEvent* e )
 {
   if( GraphicsView_ViewPort* aViewPort = getActiveViewPort() )
   {
+    if( aViewPort->hasInteractionFlag( GraphicsView_ViewPort::GlobalWheelScaling ) )
+    {
+      const double d = 1.05;
+      double q = pow( d, e->delta()/120 );
+      QGraphicsView::ViewportAnchor old_anchor = aViewPort->transformationAnchor();
+      aViewPort->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
+      aViewPort->scale( q, q );
+      aViewPort->setTransformationAnchor( old_anchor );
+    }
+
     if( aViewPort->hasInteractionFlag( GraphicsView_ViewPort::WheelScaling ) )
     {
       bool anIsScaleUp = e->delta() > 0;

@@ -143,7 +143,7 @@ class OCCVIEWER_EXPORT OCCViewer_ViewWindow : public SUIT_ViewWindow
   Q_OBJECT
 
 public:
-  enum { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
+  enum ActionId { DumpId, FitAllId, FitRectId, FitSelectionId, ZoomId, PanId, GlobalPanId,
          ChangeRotationPointId, RotationId,
          FrontId, BackId, TopId, BottomId, LeftId, RightId, ClockWiseId, AntiClockWiseId,
 	 ResetId, CloneId, ClippingId, MemId, RestoreId,
@@ -242,6 +242,9 @@ public:
   virtual bool                    isQuadBufferSupport() const;
   virtual void                    setQuadBufferSupport( const bool );
 
+  virtual bool                    isAutomaticZoom() const;
+  virtual void                    setAutomaticZoom( const bool );
+
   void setTransformEnabled( const OperationType, const bool );
   bool transformEnabled( const OperationType ) const;
 
@@ -269,6 +272,11 @@ public:
   virtual void                    clearViewAspects();
 
   virtual SUIT_CameraProperties   cameraProperties();
+
+  bool isActionVisible( ActionId theId ) const;
+  void setActionVisible( ActionId theId, bool isVisible );
+
+  void resetState();
 
 public slots:
   virtual void onFrontView();
@@ -308,6 +316,7 @@ public slots:
   virtual void onRayTracing();
   virtual void onEnvTexture();
   virtual void onLightSource();
+  virtual void onPanning();
 
   virtual void activateSetRotationGravity();
   virtual void activateSetRotationSelected( double theX, double theY, double theZ );
@@ -354,7 +363,6 @@ protected:
   void vpMouseReleaseEvent(QMouseEvent* theEvent);
   void vpMouseMoveEvent(QMouseEvent* theEvent);
 
-  void resetState();
   void drawRect();
   void endDrawRect();
 
@@ -366,6 +374,8 @@ protected:
   viewAspect getViewParams() const;
 
   bool computeGravityCenter( double& theX, double& theY, double& theZ );
+
+  void projAndPanToGravity(V3d_TypeOfOrientation CamOri);
 
   virtual void                          onSketchingStarted();
   virtual void                          onSketchingFinished();
@@ -405,7 +415,7 @@ protected:
   bool                  myPaintersRedrawing;  // set to draw with external painters  
   bool                  IsSketcherStyle;
   bool                  myIsKeyFree;
-  
+  bool                  myAutomaticZoom;
   QCursor               myCursor;
 
   double myCurScale;
@@ -430,6 +440,7 @@ private:
   Handle(V3d_Plane) myReserveClipPlane;
 
   viewAspectList myViewAspects;
+  bool myPanningByBtn;
 };
 
 #ifdef WIN32
