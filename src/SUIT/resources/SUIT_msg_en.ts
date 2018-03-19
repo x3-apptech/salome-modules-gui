@@ -16,10 +16,6 @@
         <translation>Images Files (*.bmp *.png *.jpg *.jpeg)</translation>
     </message>
     <message>
-        <source>POSTSCRIPT_FILES</source>
-        <translation>PostScript files (*.ps *.eps)</translation>
-    </message>
-    <message>
         <source>MEN_DESK_WINDOW_CASCADE</source>
         <translation>&amp;Cascade</translation>
     </message>
@@ -173,10 +169,6 @@ Do you want to overwrite it?</translation>
     <message>
         <source>TLT_IMAGE_FILES</source>
         <translation>Images Files (*.bmp *.png *.jpg *.jpeg)</translation>
-    </message>
-    <message>
-        <source>POSTSCRIPT_FILES</source>
-        <translation>PostScript files (*.ps *.eps)</translation>
     </message>
 </context>	
 </TS>

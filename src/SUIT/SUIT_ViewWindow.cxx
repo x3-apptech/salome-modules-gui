@@ -94,11 +94,6 @@ QImage SUIT_ViewWindow::dumpView()
   return QImage();
 }
 
-bool SUIT_ViewWindow::dumpViewToPSFormat(const QString& fileName)
-{
-  return false;
-}
-
 /*!
   Saves image to file according to the format
   \param image - image
@@ -177,16 +172,9 @@ void SUIT_ViewWindow::onDumpView()
 /*!
   \return filters for image files
 */
-QString SUIT_ViewWindow::filter(bool includePS) const
+QString SUIT_ViewWindow::filter() const
 {
-  QString aFilter = tr( "TLT_IMAGE_FILES" );
-  if (!includePS)
-    return aFilter;
-  else
-  {
-    aFilter+=";;"+tr( "POSTSCRIPT_FILES" );
-    return aFilter;
-  }
+  return tr( "TLT_IMAGE_FILES" );
 }
 
 /*! Reaction view window on event \a e.
@@ -199,26 +187,20 @@ bool SUIT_ViewWindow::event( QEvent* e )
     SUIT_Application* app = NULL;
     if (myManager && myManager->study() && myManager->study()->application())
       app = myManager->study()->application();
-    bool IncludePs = true;
     QString fileName;
     if (app)
-      fileName = app->getFileName( false, QString(), filter(IncludePs), tr( "TLT_DUMP_VIEW" ), 0 ); //old way
+      fileName = app->getFileName( false, QString(), filter(), tr( "TLT_DUMP_VIEW" ), 0 ); //old way
     else
     {
-      QStringList fls = filter(IncludePs).split( ";;", QString::SkipEmptyParts );
+      QStringList fls = filter().split( ";;", QString::SkipEmptyParts );
       fileName = SUIT_FileDlg::getFileName( NULL, QString(), fls, tr( "TLT_DUMP_VIEW" ), false, true );
     }
     if ( !fileName.isEmpty() )
     {
       QString fmt = SUIT_Tools::extension( fileName ).toUpper();
-      if (fmt == "PS" || fmt == "EPS" )
-        bOk = dumpViewToPSFormat(fileName);
-      else
-      {
-        QImage im = dumpView();	
-        Qtx::Localizer loc;
-        bOk = dumpViewToFormat( im, fileName, fmt );
-      }
+      QImage im = dumpView();	
+      Qtx::Localizer loc;
+      bOk = dumpViewToFormat( im, fileName, fmt );
     }
     else
       bOk = true; // cancelled

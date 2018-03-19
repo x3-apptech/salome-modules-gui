@@ -94,7 +94,7 @@ public:
   QImage                           dumpView( bool theWholeScene = false,
                                              QSizeF theSize = QSizeF() );
 
-  bool                             dumpViewToPSFormat(const QString& fileName);
+  bool                             dumpViewToFormat(const QString& fileName, const QString& format);
 
 public:
   // scene

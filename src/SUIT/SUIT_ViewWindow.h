@@ -53,7 +53,6 @@ public:
   bool              event(QEvent*);
 
   virtual QImage    dumpView();
-  virtual bool      dumpViewToPSFormat(const QString& fileName);
   bool              dumpViewToFormat( const QString& fileName, const QString& format );
 
   bool              onAccelAction( int );
@@ -94,7 +93,7 @@ signals:
 protected:
   void              closeEvent( QCloseEvent* );
   virtual void      contextMenuEvent( QContextMenuEvent* );
-  virtual QString   filter(bool includePS = false) const;
+  virtual QString   filter() const;
   virtual bool      action( const int );
   virtual bool      dumpViewToFormat( const QImage&, const QString& fileName, const QString& format );
 

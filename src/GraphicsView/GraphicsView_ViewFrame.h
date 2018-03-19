@@ -54,8 +54,7 @@ public:
   GraphicsView_ViewPort*  getViewPort() const  { return myViewPort; }
 
   virtual QImage          dumpView();
-  virtual bool            dumpViewToPSFormat(const QString& fileName);
-
+  
   virtual QString         getVisualParameters();
   virtual void            setVisualParameters( const QString& theParameters );
 
@@ -98,6 +97,8 @@ signals:
 protected:
   virtual void            createActions();
   virtual int             createToolBar();
+  virtual QString         filter() const;
+  virtual bool            dumpViewToFormat( const QImage&, const QString& fileName, const QString& format );
 
 private:
   GraphicsView_Viewer*    myViewer;

@@ -211,12 +211,15 @@ QImage GraphicsView_ViewFrame::dumpView()
 }
 
 //================================================================
-// Function : dumpViewToPSFormat
+// Function : dumpViewToFormat
 // Purpose  : 
 //================================================================
-bool GraphicsView_ViewFrame::dumpViewToPSFormat(const QString& fileName)
+bool GraphicsView_ViewFrame::dumpViewToFormat( const QImage& image, const QString& fileName, const QString& format )
 {
-  return myViewPort->dumpViewToPSFormat(fileName);
+  bool isOK = myViewPort->dumpViewToFormat(fileName, format);
+  if( !isOK )
+    isOK = SUIT_ViewWindow::dumpViewToFormat( image, fileName, format );
+  return isOK;
 }
 
 //================================================================
@@ -455,4 +458,14 @@ void GraphicsView_ViewFrame::showEvent( QShowEvent* theEvent )
 void GraphicsView_ViewFrame::hideEvent( QHideEvent* theEvent )
 {
   emit Hide( theEvent );
+}
+
+/*!
+  \return filters for image files
+*/
+QString GraphicsView_ViewFrame::filter() const
+{
+  QStringList filters = SUIT_ViewWindow::filter().split( ";;", QString::SkipEmptyParts );
+  filters << tr( "POSTSCRIPT_FILES" );
+  return filters.join( ";;" );
 }

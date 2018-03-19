@@ -474,8 +474,11 @@ QImage GraphicsView_ViewPort::dumpView( bool theWholeScene,
   return anImage;
 }
 
-bool GraphicsView_ViewPort::dumpViewToPSFormat(const QString& fileName)
+bool GraphicsView_ViewPort::dumpViewToFormat(const QString& fileName, const QString& format)
 {
+  if( format!="PS" && format!="EPS" )
+    return false;
+
   QPrinter printer(QPrinter::ScreenResolution);
   printer.setOutputFormat(QPrinter::PostScriptFormat);
   printer.setOutputFileName(fileName);
