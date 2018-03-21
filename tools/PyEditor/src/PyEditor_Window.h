@@ -46,6 +46,8 @@ public:
 
   void        loadFile( const QString&, bool = true );
   bool        saveFile( const QString&, bool = true );
+
+  PyEditor_Widget* editor();
   
 protected:
   virtual void closeEvent( QCloseEvent* );

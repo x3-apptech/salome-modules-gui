@@ -46,6 +46,7 @@ public:
   
   void    setSettings( const PyEditor_Settings& );
   const PyEditor_Settings& settings() const;
+
   QString text() const;
 
   QStringList keywords() const;
@@ -59,6 +60,7 @@ public Q_SLOTS:
   void deleteSelected();
   void append( const QString& );  
   void setText( const QString& text );
+  void setCurrentLine( int );
 
 protected:
   virtual void keyPressEvent( QKeyEvent* );
