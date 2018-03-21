@@ -20,6 +20,7 @@
 // Author : Vadim SANDLER, Open CASCADE S.A.S. (vadim.sandler@opencascade.com)
 //
 
+#include "PyEditor_Widget.h"
 #include "PyEditor_Window.h"
 #include "PyEditor_StdSettings.h"
 
@@ -110,6 +111,10 @@ int main( int argc, char *argv[] )
   QCommandLineParser parser;
   parser.setApplicationDescription( QApplication::translate( "PyEditor", "PROGRAM_DESCRIPTION" ) );
   parser.addHelpOption();
+  QCommandLineOption gotoOption( QStringList() << "l" << "line",
+				 QApplication::translate( "PyEditor", "Set initial line number." ),
+				 "line" );
+  parser.addOption( gotoOption );
   parser.addPositionalArgument( QApplication::translate( "PyEditor", "FILE_PARAM_NAME" ),
                                 QApplication::translate( "PyEditor", "FILE_PARAM_DESCRIPTION" ) );
 
@@ -121,8 +126,16 @@ int main( int argc, char *argv[] )
   window.resize( 650, 700 );
   window.show();
 
-  if ( args.count() > 0 )
+  if ( args.count() > 0 ) {
     window.loadFile( args[0], false );
+
+    if ( parser.isSet( gotoOption ) ) {
+      bool ok;
+      int line = parser.value( gotoOption ).toInt( &ok );
+      if ( ok )
+	window.editor()->setCurrentLine( line );
+    }
+  }
   
   return app.exec();
 }

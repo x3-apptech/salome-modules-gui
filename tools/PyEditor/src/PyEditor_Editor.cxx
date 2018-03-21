@@ -30,6 +30,7 @@
 #include <QMenu>
 #include <QPainter>
 #include <QTextBlock>
+#include <QScrollBar>
 
 #include <iostream>
 
@@ -919,4 +920,16 @@ PyEditor_Keywords* PyEditor_Editor::userKeywords() const
 PyEditor_Keywords* PyEditor_Editor::standardKeywords() const
 {
   return myStdKeywords;
+}
+
+/*!
+  \brief Move cursor to the given line.
+  \note Line count starts from 1.
+  \param line Line number.
+*/
+void PyEditor_Editor::setCurrentLine( int line )
+{
+  QTextCursor cursor( document()->findBlockByLineNumber( line - 1 ) );
+  setTextCursor( cursor );
+  ensureCursorVisible();
 }
