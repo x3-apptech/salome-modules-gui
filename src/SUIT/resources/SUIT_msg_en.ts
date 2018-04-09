@@ -160,4 +160,15 @@ Do you want to overwrite it?</translation>
         <translation>All files (*)</translation>
     </message>
 </context>
+<context>
+    <name>SUIT_ViewWindow</name>
+    <message>
+        <source>TLT_DUMP_VIEW</source>
+        <translation>Dump view to file</translation>
+    </message>
+    <message>
+        <source>TLT_IMAGE_FILES</source>
+        <translation>Images Files (*.bmp *.png *.jpg *.jpeg)</translation>
+    </message>
+</context>	
 </TS>

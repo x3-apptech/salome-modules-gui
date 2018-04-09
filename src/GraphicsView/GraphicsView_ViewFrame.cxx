@@ -49,7 +49,7 @@
 //=======================================================================
 GraphicsView_ViewFrame::GraphicsView_ViewFrame( SUIT_Desktop* d, GraphicsView_Viewer* vw, QWidget* w )
 : SUIT_ViewWindow( d ),
-  myViewer( vw )
+  myViewer( vw ), myToolBarId( -1 )
 {
   QFrame* aFrame = new QFrame( this );
   setCentralWidget( aFrame );
@@ -64,9 +64,6 @@ GraphicsView_ViewFrame::GraphicsView_ViewFrame( SUIT_Desktop* d, GraphicsView_Vi
     myViewPort = new GraphicsView_ViewPort( aFrame );
 
   aLayout->addWidget( myViewPort );
-
-  createActions();
-  myToolBarId = createToolBar();
 
   connect( myViewPort, SIGNAL( vpKeyEvent( QKeyEvent* ) ),
            this, SLOT( keyEvent( QKeyEvent* ) ) );
@@ -176,17 +173,19 @@ int GraphicsView_ViewFrame::createToolBar()
 				      false );                                 // disable floatable toolbar
   toolMgr()->append( DumpId, tid );
 
-  myScaleAction = new QtxMultiAction( this );
-  myScaleAction->insertAction( toolMgr()->action( FitAllId ) );
-  myScaleAction->insertAction( toolMgr()->action( FitRectId ) );
-  myScaleAction->insertAction( toolMgr()->action( FitSelectId ) );
-  myScaleAction->insertAction( toolMgr()->action( ZoomId ) );
-  toolMgr()->append( myScaleAction, tid );
+  QtxMultiAction* aScaleAction = new QtxMultiAction( this );
+  aScaleAction->insertAction( toolMgr()->action( FitAllId ) );
+  aScaleAction->insertAction( toolMgr()->action( FitRectId ) );
+  aScaleAction->insertAction( toolMgr()->action( FitSelectId ) );
+  aScaleAction->insertAction( toolMgr()->action( ZoomId ) );
+  toolMgr()->append( aScaleAction, tid );
+  myScaleAction = aScaleAction;
 
-  myPanAction = new QtxMultiAction( this );
-  myPanAction->insertAction( toolMgr()->action( PanId ) );
-  myPanAction->insertAction( toolMgr()->action( GlobalPanId ) );
-  toolMgr()->append( myPanAction, tid );
+  QtxMultiAction* aPanAction = new QtxMultiAction( this );
+  aPanAction->insertAction( toolMgr()->action( PanId ) );
+  aPanAction->insertAction( toolMgr()->action( GlobalPanId ) );
+  toolMgr()->append( aPanAction, tid );
+  myPanAction = aPanAction;
 
   toolMgr()->append( toolMgr()->action( ResetId ), tid );
 
@@ -209,6 +208,18 @@ int GraphicsView_ViewFrame::getToolBarId()
 QImage GraphicsView_ViewFrame::dumpView()
 {
   return myViewPort->dumpView();
+}
+
+//================================================================
+// Function : dumpViewToFormat
+// Purpose  : 
+//================================================================
+bool GraphicsView_ViewFrame::dumpViewToFormat( const QImage& image, const QString& fileName, const QString& format )
+{
+  bool isOK = myViewPort->dumpViewToFormat(fileName, format);
+  if( !isOK )
+    isOK = SUIT_ViewWindow::dumpViewToFormat( image, fileName, format );
+  return isOK;
 }
 
 //================================================================
@@ -261,14 +272,15 @@ void GraphicsView_ViewFrame::setVisualParameters( const QString& theParameters )
 //================================================================
 void GraphicsView_ViewFrame::expandToolBarActions()
 {
-  QList<QtxMultiAction*> anExpandableActions;
+  QList<QAction*> anExpandableActions;
   anExpandableActions.append( myScaleAction );
   anExpandableActions.append( myPanAction );
 
-  QListIterator<QtxMultiAction*> anIter( anExpandableActions );
+  QListIterator<QAction*> anIter( anExpandableActions );
   while( anIter.hasNext() )
   {
-    if( QtxMultiAction* aMultiAction = anIter.next() )
+    QtxMultiAction* aMultiAction = dynamic_cast<QtxMultiAction*>( anIter.next() );
+    if( aMultiAction )
     {
       QList<QAction*> aLocalActions = aMultiAction->actions();
       QListIterator<QAction*> aLocalIter( aLocalActions );
@@ -416,4 +428,44 @@ void GraphicsView_ViewFrame::contextMenuEvent( QGraphicsSceneContextMenuEvent* e
                                                       aPos, e->screenPos(), e->modifiers() );
   emit contextMenuRequested( anEvent );
   delete anEvent;
+}
+
+/*!
+  \brief Handle show event.
+
+  Emits Show() signal.
+
+  \param theEvent show event
+*/
+void GraphicsView_ViewFrame::showEvent( QShowEvent* theEvent )
+{
+  if( myToolBarId < 0 )
+  {
+    createActions();
+    myToolBarId = createToolBar();
+  }
+
+  emit Show( theEvent );
+}
+
+/*!
+  \brief Handle hide event.
+
+  Emits Hide() signal.
+
+  \param theEvent hide event
+*/
+void GraphicsView_ViewFrame::hideEvent( QHideEvent* theEvent )
+{
+  emit Hide( theEvent );
+}
+
+/*!
+  \return filters for image files
+*/
+QString GraphicsView_ViewFrame::filter() const
+{
+  QStringList filters = SUIT_ViewWindow::filter().split( ";;", QString::SkipEmptyParts );
+  filters << tr( "POSTSCRIPT_FILES" );
+  return filters.join( ";;" );
 }

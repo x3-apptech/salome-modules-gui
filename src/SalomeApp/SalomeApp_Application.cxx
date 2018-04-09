@@ -580,6 +580,8 @@ void SalomeApp_Application::onDesktopMessage( const QString& message )
 /*!SLOT. Copy objects to study maneger from selection maneger..*/
 void SalomeApp_Application::onCopy()
 {
+  LightApp_Application::onCopy();
+
   SALOME_ListIO list;
   LightApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(list);
@@ -594,11 +596,14 @@ void SalomeApp_Application::onCopy()
   if(it.More())
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
-      try {
-        studyMgr()->Copy(so);
-        onSelectionChanged();
-      }
-      catch(...) {
+      if( so )
+      {
+        try {
+          studyMgr()->Copy(so);
+          onSelectionChanged();
+        }
+        catch(...) {
+        }
       }
     }
 }
@@ -606,6 +611,8 @@ void SalomeApp_Application::onCopy()
 /*!SLOT. Paste objects to study maneger from selection manager.*/
 void SalomeApp_Application::onPaste()
 {
+  LightApp_Application::onPaste();
+
   SALOME_ListIO list;
   LightApp_SelectionMgr* mgr = selectionMgr();
   mgr->selectedObjects(list);
@@ -627,12 +634,15 @@ void SalomeApp_Application::onPaste()
   if(it.More())
     {
       _PTR(SObject) so = stdDS->FindObjectID(it.Value()->getEntry());
-      try {
-        studyMgr()->Paste(so);
-        updateObjectBrowser( true );
-        updateActions(); //SRN: BugID IPAL9377, case 3
-      }
-      catch(...) {
+      if( so )
+      {
+        try {
+          studyMgr()->Paste(so);
+          updateObjectBrowser( true );
+          updateActions(); //SRN: BugID IPAL9377, case 3
+        }
+        catch(...) {
+        }
       }
     }
 }

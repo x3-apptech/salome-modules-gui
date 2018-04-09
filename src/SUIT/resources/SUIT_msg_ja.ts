@@ -154,4 +154,15 @@
       <translation>すべてのファイル (*)</translation>
     </message>
   </context>
+<context>
+    <name>SUIT_ViewWindow</name>
+    <message>
+      <source>TLT_DUMP_VIEW</source>
+      <translation>ビューでファイルを保存します。</translation>
+    </message>
+    <message>
+      <source>TLT_IMAGE_FILES</source>
+      <translation>イメージ (*.bmp *.png *.jpg *.jpeg) ファイル</translation>
+    </message>
+</context>	
 </TS>

@@ -25,8 +25,10 @@
 // Purpose : Constructor
 //=======================================================================
 GraphicsView_ViewManager::GraphicsView_ViewManager( SUIT_Study* theStudy,
-                                                    SUIT_Desktop* theDesktop )
-: SUIT_ViewManager( theStudy, theDesktop, new GraphicsView_Viewer( "GraphicsView" ) )
+                                                    SUIT_Desktop* theDesktop,
+                                                    SUIT_ViewModel* theModel )
+: SUIT_ViewManager( theStudy, theDesktop, 
+    theModel ? theModel : new GraphicsView_Viewer( "GraphicsView" ) )
 {
   setTitle( tr( "GRAPHICS_VIEW_TITLE" ) );
 }

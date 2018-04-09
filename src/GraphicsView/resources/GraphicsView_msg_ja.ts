@@ -71,6 +71,10 @@
       <source>MNU_ZOOM_VIEW</source>
       <translation>&#x30BA;&#x30FC;&#x30E0;</translation>
     </message>
+    <message>
+        <source>POSTSCRIPT_FILES</source>
+        <translation>PostScript files (*.ps *.eps)</translation>
+    </message>
   </context>
   <context>
     <name>GraphicsView_Viewer</name>

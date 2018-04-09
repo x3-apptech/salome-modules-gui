@@ -81,6 +81,7 @@ signals:
 
 protected:
   virtual GraphicsView_ViewTransformer* createTransformer( int );
+  virtual GraphicsView_ViewFrame* createViewFrame( SUIT_Desktop* theDesktop, QWidget* theWidget );
 
   virtual void                  onTransformationStarted();
   virtual void                  onTransformationFinished();
@@ -111,13 +112,13 @@ protected slots:
   void                          onTestCropOperatorPerform( QPainterPath thePath );
   */
 
-private:
-  void                          handleKeyPress( QKeyEvent* );
-  void                          handleKeyRelease( QKeyEvent* );
-  void                          handleMouseMove( QGraphicsSceneMouseEvent* );
-  void                          handleMousePress( QGraphicsSceneMouseEvent* );
-  void                          handleMouseRelease( QGraphicsSceneMouseEvent* );
-  void                          handleWheel( QGraphicsSceneWheelEvent* );
+protected:
+  virtual void                  handleKeyPress( QKeyEvent* );
+  virtual void                  handleKeyRelease( QKeyEvent* );
+  virtual void                  handleMouseMove( QGraphicsSceneMouseEvent* );
+  virtual void                  handleMousePress( QGraphicsSceneMouseEvent* );
+  virtual void                  handleMouseRelease( QGraphicsSceneMouseEvent* );
+  virtual void                  handleWheel( QGraphicsSceneWheelEvent* );
 
   // testing ImageViewer
   enum QueueOperation { BringToFront, SendToBack, BringForward, SendBackward };

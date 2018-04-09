@@ -86,6 +86,7 @@ public:
   void                             addItem( QGraphicsItem* theItem );
   bool                             isItemAdded( QGraphicsItem* theItem );
   void                             removeItem( QGraphicsItem* theItem );
+  void                             clearItems();
 
   enum SortType { NoSorting, SelectedFirst, SortByZLevel };
   GraphicsView_ObjectList          getObjects( SortType theSortType = NoSorting ) const;
@@ -94,6 +95,8 @@ public:
 
   QImage                           dumpView( bool theWholeScene = false,
                                              QSizeF theSize = QSizeF() );
+
+  bool                             dumpViewToFormat(const QString& fileName, const QString& format);
 
 public:
   // scene
@@ -160,6 +163,12 @@ public:
 
   void                             applyTransform();
 
+  int                              zoomCoeff() const { return myZoomCoeff; }
+  void                             setZoomCoeff( const int& theZoomCoeff );
+
+  bool                             isUnlimitedPanning() const { return myUnlimitedPanning; }
+  void                             setUnlimitedPanning( const bool& theValue );
+
   // block status
   BlockStatus                      currentBlock();
 
@@ -200,6 +209,9 @@ public:
 
   // dragging
   bool                             isDragging() { return myIsDragging; }
+
+  bool                             isDraggingSelectedByLeftButton() const { return myDraggingSelectedByLeftButton; }
+  void                             setDraggingSelectedByLeftButton( const bool& theValue );
 
   // pulling
   bool                             startPulling( const QPointF& );
@@ -296,6 +308,10 @@ private:
   bool                             myIsTransforming;
   QTransform                       myCurrentTransform;
 
+  bool                             myUnlimitedPanning;
+  Qt::ScrollBarPolicy              myHBarPolicy;
+  Qt::ScrollBarPolicy              myVBarPolicy;
+
   // highlighting
   GraphicsView_Object*             myHighlightedObject;
   double                           myHighlightX;
@@ -323,6 +339,7 @@ private:
   int                              myIsDragging;
   QPointF                          myDragPosition;
   bool                             myIsDragPositionInitialized;
+  bool                             myDraggingSelectedByLeftButton;
 
   // pulling
   bool                             myIsPulling;
@@ -330,6 +347,9 @@ private:
 
   // cursor
   QCursor                          myStoredCursor;
+
+  // zoom diagonal coefficient
+  int                              myZoomCoeff;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS( GraphicsView_ViewPort::InteractionFlags )

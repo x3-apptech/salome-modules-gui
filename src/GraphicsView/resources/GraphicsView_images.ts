@@ -1,6 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
+    <name>GraphicsView_ViewFrame</name>
     <message>
         <source>ICON_GV_DUMP</source>
         <translation>graphics_view_dump.png</translation>
@@ -16,10 +16,6 @@
     <message>
         <source>ICON_GV_GLOBALPAN</source>
         <translation>graphics_view_glpan.png</translation>
-    </message>
-    <message>
-        <source>ICON_GV_CURSOR_ZOOM</source>
-        <translation>graphics_view_cursor_zoom.png</translation>
     </message>
     <message>
         <source>ICON_GV_FITALL</source>
@@ -40,6 +36,13 @@
     <message>
         <source>ICON_GV_ROTATE</source>
         <translation>graphics_view_rotate.png</translation>
+    </message>
+</context>
+<context>
+    <name>GraphicsView_ViewPort</name>
+    <message>
+        <source>ICON_GV_CURSOR_ZOOM</source>
+        <translation>graphics_view_cursor_zoom.png</translation>
     </message>
 </context>
 </TS>

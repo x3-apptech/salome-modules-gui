@@ -34,6 +34,8 @@
 #include <QRectF>
 #include <QRubberBand>
 #include <QScrollBar>
+#include <QPrinter>
+#include <QPainter>
 
 #include <math.h>
 
@@ -132,6 +134,7 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
   myForegroundItem( 0 ),
   myGridItem( 0 ),
   myIsTransforming( false ),
+  myUnlimitedPanning( false ),
   myHighlightedObject( 0 ),
   myHighlightX( 0 ),
   myHighlightY( 0 ),
@@ -145,9 +148,11 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
   myIsSketchingByPath( false ),
   myIsDragging( false ),
   myIsDragPositionInitialized( false ),
+  myDraggingSelectedByLeftButton( false ),
   myIsPulling( false ),
   myPullingObject( 0 ),
-  myStoredCursor( Qt::ArrowCursor )
+  myStoredCursor( Qt::ArrowCursor ),
+  myZoomCoeff( 100 )
 {
   // scene
   myScene = new GraphicsView_Scene( this );
@@ -190,6 +195,9 @@ GraphicsView_ViewPort::GraphicsView_ViewPort( QWidget* theParent )
                   QPainter::TextAntialiasing |
                   QPainter::SmoothPixmapTransform |
                   QPainter::HighQualityAntialiasing );
+
+  myHBarPolicy = horizontalScrollBarPolicy();
+  myVBarPolicy = verticalScrollBarPolicy();
 
   connect( myScene, SIGNAL( gsKeyEvent( QKeyEvent* ) ),
            this, SLOT( onKeyEvent( QKeyEvent* ) ) );
@@ -307,6 +315,15 @@ void GraphicsView_ViewPort::removeItem( QGraphicsItem* theItem )
   }
   else
     myScene->removeItem( theItem );
+  onBoundingRectChanged();
+}
+
+void GraphicsView_ViewPort::clearItems()
+{
+  myHighlightedObject = 0;
+  mySelectedObjects.clear();
+  myObjects.clear();
+  myScene->clear();
   onBoundingRectChanged();
 }
 
@@ -455,6 +472,38 @@ QImage GraphicsView_ViewPort::dumpView( bool theWholeScene,
   myScene->render( &aPainter, aTargetRect, aRect );
 
   return anImage;
+}
+
+bool GraphicsView_ViewPort::dumpViewToFormat(const QString& fileName, const QString& format)
+{
+  if( format!="PS" && format!="EPS" )
+    return false;
+
+  QPrinter printer(QPrinter::ScreenResolution);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+  printer.setOutputFormat(QPrinter::PostScriptFormat);
+#else
+  printer.setOutputFormat(QPrinter::PdfFormat);
+#endif
+  printer.setOutputFileName(fileName);
+  QPainter painter;  
+  if (!painter.begin(&printer))
+    return false;
+
+  QRect view( 0, 0, printer.pageRect().width(), printer.paperRect().height() );
+  QRectF bounds = myScene->itemsBoundingRect();
+    
+  if( !view.isEmpty() && !bounds.isEmpty() )
+  {
+    float SCALE = 0.5;//qMin( view.width()/bounds.width(), view.height()/bounds.height() );
+    painter.setViewport( view );
+    painter.scale( SCALE, SCALE );
+  }
+  myScene->render( &painter, QRectF( view ), bounds );
+
+  if (!painter.end())
+    return false;
+  return true;
 }
 
 //================================================================
@@ -805,9 +854,29 @@ void GraphicsView_ViewPort::pan( double theDX, double theDY )
     myViewLabel->setAcceptMoveEvents( false );
 
   if( QScrollBar* aHBar = horizontalScrollBar() )
+  {
+    if( isUnlimitedPanning() )
+    {
+      int aNewValue = aHBar->value() - theDX;
+      if( aNewValue < aHBar->minimum() )
+        aHBar->setMinimum( aNewValue );
+      if( aNewValue > aHBar->maximum() )
+        aHBar->setMaximum( aNewValue );
+    }
     aHBar->setValue( aHBar->value() - theDX );
+  }
   if( QScrollBar* aVBar = verticalScrollBar() )
+  {
+    if( isUnlimitedPanning() )
+    {
+      int aNewValue = aVBar->value() + theDY;
+      if( aNewValue < aVBar->minimum() )
+        aVBar->setMinimum( aNewValue );
+      if( aNewValue > aVBar->maximum() )
+        aVBar->setMaximum( aNewValue );
+    }
     aVBar->setValue( aVBar->value() + theDY );
+  }
 
   if( myViewLabel )
     myViewLabel->setAcceptMoveEvents( true );
@@ -857,7 +926,7 @@ void GraphicsView_ViewPort::zoom( double theX1, double theY1, double theX2, doub
 
   // increasing of diagonal coefficients (>300) leads to a crash sometimes
   // at the values of 100 some primitives are drawn incorrectly
-  if( qMax( aM11, aM22 ) < 100 )
+  if( myZoomCoeff < 0 || qMax( aM11, aM22 ) < myZoomCoeff )
     setTransform( aTransform );
 
   myIsTransforming = false;
@@ -971,6 +1040,41 @@ void GraphicsView_ViewPort::applyTransform()
   while( anIter.hasNext() )
     if( GraphicsView_Object* anObject = anIter.next() )
       anObject->setViewTransform( transform() );
+}
+
+//================================================================
+// Function : setZoomCoeff
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setZoomCoeff( const int& theZoomCoeff )
+{
+  myZoomCoeff = theZoomCoeff;
+}
+
+//================================================================
+// Function : setUnlimitedPanning
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setUnlimitedPanning( const bool& theValue )
+{
+  if ( myUnlimitedPanning == theValue )
+    return;
+
+  myUnlimitedPanning = theValue;
+
+  if( myUnlimitedPanning )
+  {
+    myHBarPolicy = horizontalScrollBarPolicy();
+    myVBarPolicy = verticalScrollBarPolicy();
+
+    setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+    setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn );
+  }
+  else
+  {
+    setHorizontalScrollBarPolicy( myHBarPolicy );
+    setVerticalScrollBarPolicy( myVBarPolicy );
+  }
 }
 
 //================================================================
@@ -1470,6 +1574,15 @@ bool GraphicsView_ViewPort::isSketching( bool* theIsPath ) const
 }
 
 //================================================================
+// Function : setDraggingSelectedByLeftButton
+// Purpose  : 
+//================================================================
+void GraphicsView_ViewPort::setDraggingSelectedByLeftButton( const bool& theValue )
+{
+  myDraggingSelectedByLeftButton = theValue;
+}
+
+//================================================================
 // Function : dragObjects
 // Purpose  : 
 //================================================================
@@ -1496,8 +1609,9 @@ void GraphicsView_ViewPort::dragObjects( QGraphicsSceneMouseEvent* e )
     else
       anObjectsToMove.append( anObject );
   }
-  else if( hasInteractionFlag( DraggingByMiddleButton ) &&
-           nbSelected() && ( e->buttons() & Qt::MidButton ) )
+  else if( ( hasInteractionFlag( DraggingByMiddleButton ) && ( e->buttons() & Qt::MidButton ) ||
+             isDraggingSelectedByLeftButton() && ( e->buttons() & Qt::LeftButton ) ) &&
+           nbSelected() )
   {
     for( initSelected(); moreSelected(); nextSelected() )
       if( GraphicsView_Object* aMovingObject = selectedObject() )
@@ -1692,8 +1806,9 @@ void GraphicsView_ViewPort::onMouseEvent( QGraphicsSceneMouseEvent* e )
         if( ( getHighlightedObject() &&
               getHighlightedObject()->isMovable() &&
               !( anAccel || e->button() != Qt::LeftButton ) ) ||
-            ( hasInteractionFlag( DraggingByMiddleButton ) &&
-              nbSelected() && !anAccel && e->button() == Qt::MidButton ) )
+            ( ( hasInteractionFlag( DraggingByMiddleButton ) && e->button() == Qt::MidButton ||
+                isDraggingSelectedByLeftButton() && e->button() == Qt::LeftButton ) &&
+              nbSelected() && !anAccel ) )
         {
           myIsDragging = true;
           myStoredCursor = cursor();

@@ -160,4 +160,15 @@ Voulez-vous l&apos;écraser ?</translation>
         <translation>Tous les fichiers (*)</translation>
     </message>
 </context>
+<context>
+    <name>SUIT_ViewWindow</name>
+    <message>
+        <source>TLT_DUMP_VIEW</source>
+        <translation>Enregistrer la vue dans le fichier</translation>
+    </message>
+    <message>
+        <source>TLT_IMAGE_FILES</source>
+        <translation>Fichiers images (*.bmp *.png *.jpg *.jpeg)</translation>
+    </message>
+</context>	
 </TS>

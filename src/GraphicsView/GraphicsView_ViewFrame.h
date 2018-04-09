@@ -28,7 +28,7 @@ class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneMouseEvent;
 class QGraphicsSceneWheelEvent;
 
-class QtxMultiAction;
+class QAction;
 
 class SUIT_Desktop;
 
@@ -50,17 +50,20 @@ public:
   GraphicsView_ViewFrame( SUIT_Desktop*, GraphicsView_Viewer*, QWidget* w = NULL );
   ~GraphicsView_ViewFrame();
 
-public:
   GraphicsView_Viewer*    getViewer() const { return myViewer; }
   GraphicsView_ViewPort*  getViewPort() const  { return myViewPort; }
 
   virtual QImage          dumpView();
-
+  
   virtual QString         getVisualParameters();
   virtual void            setVisualParameters( const QString& theParameters );
 
-  void                    expandToolBarActions();
+  virtual void            expandToolBarActions();
   int                     getToolBarId();
+
+public slots:
+  virtual void showEvent( QShowEvent* );
+  virtual void hideEvent( QHideEvent* );
 
 protected slots:
   void                    onViewPan();
@@ -88,17 +91,22 @@ signals:
 
   void                    sketchingFinished( QPainterPath );
 
-private:
-  void                    createActions();
-  int                     createToolBar();
+  void Show( QShowEvent* );
+  void Hide( QHideEvent* );
+
+protected:
+  virtual void            createActions();
+  virtual int             createToolBar();
+  virtual QString         filter() const;
+  virtual bool            dumpViewToFormat( const QImage&, const QString& fileName, const QString& format );
 
 private:
   GraphicsView_Viewer*    myViewer;
   GraphicsView_ViewPort*  myViewPort;
 
   int                     myToolBarId;
-  QtxMultiAction*         myScaleAction;
-  QtxMultiAction*         myPanAction;
+  QAction*                myScaleAction;
+  QAction*                myPanAction;
 };
 
 #endif
