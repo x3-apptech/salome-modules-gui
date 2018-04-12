@@ -634,7 +634,7 @@ void LightApp_Application::createActions()
 			      resMgr->loadPixmap( "LightApp", tr( "ICON_LIFE_RIGN" ), false ),
 			      video, video,
 			      0, desk, false, this, SLOT( onHelpOnline() ) );
-  av->setData( "www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc" );
+  av->setData( "www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc&disable_polymer=true" );
   createMenu( av, helpMenu, -1, 0 );
   id++;
 
