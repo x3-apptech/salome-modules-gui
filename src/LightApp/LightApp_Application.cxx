@@ -191,6 +191,7 @@
 #include <QTreeView>
 #include <QMimeData>
 #include <QShortcut>
+#include <QRegExp>
 
 #include <utilities.h>
 
@@ -597,47 +598,59 @@ void LightApp_Application::createActions()
                 tr( "MEN_DESK_PREFERENCES" ), tr( "PRP_DESK_PREFERENCES" ),
                 Qt::CTRL+Qt::Key_P, desk, false, this, SLOT( onPreferences() ) );
 
-  // Help menu:
-
-  // - Help for modules
+  // Help menu
 
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
-  createMenu( separator(), helpMenu, -1, 10 );
   
-  // Site && forum
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
 
-  QString site = tr ( "SALOME_SITE" );
-  QAction* as = createAction( id, site,
-			      resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
-			      site, site,
-			      0, desk, false, this, SLOT( onHelpOnline() ) );
-  as->setData( "salome-platform.org" );
-  createMenu( as, helpMenu, -1, 0 );
-  id++;
+  // a) Link to web site
+  QString url = resMgr->stringValue("GUI", "site_url");
+  if ( !url.isEmpty() ) {
+    QString title = tr ( "SALOME_SITE" );
+    QAction* as = createAction( id, title,
+				resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
+				title, title,
+				0, desk, false, this, SLOT( onHelpOnline() ) );
+    as->setData( url );
+    createMenu( as, helpMenu, -1, 0 );
+    id++;
+  }
 
-  QString forum = tr ( "SALOME_FORUM" );
+  // b) Link to Forum
+  url = resMgr->stringValue("GUI", "forum_url");
+  if ( !url.isEmpty() ) {
+    QString title = tr ( "SALOME_FORUM" );
+    QAction* af = createAction( helpMenu, title,
+				resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
+				title, title,
+				0, desk, false, this, SLOT( onHelpOnline() ) );
+    af->setData( url );
+    createMenu( af, helpMenu, -1, 0 );
+    id++;
+  }
 
-  QAction* af = createAction( helpMenu, forum,
-			      resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
-			      forum, forum,
-			      0, desk, false, this, SLOT( onHelpOnline() ) );
-  af->setData( "salome-platform.org/forum" );
-  createMenu( af, helpMenu, -1, 0 );
-  id++;
+  // c) Link to YouTube channel
+  url = resMgr->stringValue("GUI", "channel_url");
+  if ( !url.isEmpty() ) {
+    createMenu( separator(), helpMenu, -1, 0 );
+    QString title = tr ( "SALOME_VIDEO_TUTORIALS" );
+    QAction* av = createAction( helpMenu, title,
+				resMgr->loadPixmap( "LightApp", tr( "ICON_LIFE_RIGN" ), false ),
+				title, title,
+				0, desk, false, this, SLOT( onHelpOnline() ) );
+    av->setData( url );
+    createMenu( av, helpMenu, -1, 0 );
+    id++;
+  }
 
-  createMenu( separator(), helpMenu, -1, 0 );
+  // d) Help for modules
 
-  // YouTube channel
-  QString video = tr ( "SALOME_VIDEO_TUTORIALS" );
-  QAction* av = createAction( helpMenu, video,
-			      resMgr->loadPixmap( "LightApp", tr( "ICON_LIFE_RIGN" ), false ),
-			      video, video,
-			      0, desk, false, this, SLOT( onHelpOnline() ) );
-  av->setData( "www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc&disable_polymer=true" );
-  createMenu( av, helpMenu, -1, 0 );
-  id++;
-
+  // - First create top-level menus to preserve correct order
+  QString userGuide = "User's Guide";
+  QString devGuide = "Developer's Guide";
+  createMenu( userGuide, helpMenu, -1, 5 );
+  createMenu( devGuide, helpMenu, -1, 5 );
 
   QStringList aModuleList;
   modules( aModuleList, false );
@@ -652,8 +665,8 @@ void LightApp_Application::createActions()
     QString helpSubMenu;                                             // help submenu name (empty if not needed)
     QString modName = moduleName( aModule );                         // module name
     if ( modName.isEmpty() ) modName = aModule;                      // for KERNEL and GUI
-    QString rootDir = QString( "%1_ROOT_DIR" ).arg( modName );       // module root dir variable
-    QString modDir  = getenv( rootDir.toLatin1().constData() );      // module root dir
+    QString rootDir = QString( "%1_ROOT_DIR" ).arg( modName );       // module root dir env variable
+    QString modDir  = getenv( rootDir.toLatin1().constData() );      // module root dir path
     QString docSection;
     if (resMgr->hasValue( modName, "documentation" ) )
       docSection = resMgr->stringValue(modName, "documentation");
@@ -689,8 +702,15 @@ void LightApp_Application::createActions()
         helpFileName.replace( "//", "" );
       // obtain submenus hierarchy if given
       QStringList smenus = helpFileName.split( "/" );
-      helpFileName = smenus.last();
-      smenus.removeLast();
+      helpFileName = smenus.takeLast();
+      // workaround for User's Guide and Developer's Guide to avoid having single item in module's submenu.
+      if ( helpFileName == userGuide || helpFileName == devGuide ) {
+	QString menuPath = smenus.join( "/" );
+	QStringList allKeys = helpData.keys();
+	QStringList total = allKeys.filter( QRegExp( QString( "^%1" ).arg( menuPath ) ) );
+	if ( total.count() == 1 && smenus.count() > 0 )
+	  helpFileName = smenus.takeLast();
+      }
       QAction* a = createAction( id, helpFileName,
                                  resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false ),
                                  helpFileName, helpFileName,
@@ -701,17 +721,16 @@ void LightApp_Application::createActions()
       }
       // create sub-menus hierarchy
       int menuId = helpMenu;
-      foreach ( QString subMenu, smenus ) {
-        menuId = createMenu( subMenu, menuId, -1, 0 );
-      }
-      createMenu( a, menuId, -1, 0 );
+      foreach ( QString subMenu, smenus )
+        menuId = createMenu( subMenu, menuId, -1, 5 );
+      createMenu( a, menuId, -1, ( menuId != helpMenu && (helpFileName == userGuide || helpFileName == devGuide) ) ? 0 : 5 );
       id++;
     }
   }
 
   // - Additional help items
 
-  createMenu( separator(), helpMenu, -1, 5 );
+  createMenu( separator(), helpMenu, -1, 10 );
 
   QStringList addHelpItems = resMgr->parameters( "add_help" );
   foreach ( QString addHelpItem, addHelpItems ) {
@@ -722,7 +741,7 @@ void LightApp_Application::createActions()
                                  addHelpItem, addHelpItem,
                                  0, desk, false, this, SLOT( onHelpContentsModule() ) );
       a->setData( valueStr );
-      createMenu( a, helpMenu, -1, 5 );
+      createMenu( a, helpMenu, -1, 10 );
       id++;
     }
   }
