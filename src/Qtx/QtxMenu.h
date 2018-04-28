@@ -65,10 +65,16 @@ public:
 public slots:
   virtual void           setVisible( bool );
 
+protected:
+  virtual void           paintEvent( QPaintEvent* );
+
 private:
   void                   updateTitle();
   void                   insertTitle();
   void                   removeTitle();
+
+private  slots:
+  void                   resizeAfterRepaint();
 
 private:
   TitleMode              myMode;
