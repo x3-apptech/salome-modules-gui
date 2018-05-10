@@ -30,7 +30,6 @@
 #include <QWidgetAction>
 #include <QLinearGradient>
 #include <QAbstractTextDocumentLayout>
-#include <QTimer>
 
 /*!
   \class QtxMenu::Title
@@ -439,23 +438,4 @@ void QtxMenu::updateTitle()
 
   removeTitle();
   insertTitle();
-}
-
-/*!
-  \brief Paint event
-*/
-void QtxMenu::paintEvent( QPaintEvent* e )
-{
-  // Force menu resizing, see resizeAfterRepaint().
-  QMenu::paintEvent(e);
-  QTimer::singleShot( 0, this, SLOT( resizeAfterRepaint() ) );
-}
-
-void QtxMenu::resizeAfterRepaint()
-{
-  // this slot is used as a workaround about annoying problem
-  // on some X window System desktops like KDE 5, Unity and other
-  // that causes setting incorrect menu's geometry
-  // after it appears on a screen.
-  resize( sizeHint() );
 }
