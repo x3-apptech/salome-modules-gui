@@ -98,6 +98,21 @@ typedef GLfloat TBall;
 #define BallTextureId 0 
 
 
+
+void MessageCallback( GLenum source,
+                      GLenum type,
+                      GLuint id,
+                      GLenum severity,
+                      GLsizei length,
+                      const GLchar* message,
+                      const void* userParam )
+{
+  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+            type, severity, message );
+}
+
+
 //-----------------------------------------------------------------------------
 VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
 {
@@ -120,6 +135,11 @@ VTKViewer_PolyDataMapper::VTKViewer_PolyDataMapper()
 #endif
 
   this->OpenGLHelper.Init();
+
+  // For debug purposes only
+  // glEnable              ( GL_DEBUG_OUTPUT );
+  // glDebugMessageCallback( (GLDEBUGPROC) MessageCallback, 0 );
+
 }
 
 //-----------------------------------------------------------------------------
@@ -142,6 +162,8 @@ int VTKViewer_PolyDataMapper::InitShader()
     return false;
 
   // Get uniform locations.
+  GLint current_program;
+  glGetIntegerv( GL_CURRENT_PROGRAM, &current_program );
   this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
 
   this->myLocations.ModelViewProjection = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uModelViewProjectionMatrix" );
@@ -149,7 +171,7 @@ int VTKViewer_PolyDataMapper::InitShader()
   this->myLocations.GeneralPointSize    = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uGeneralPointSize" );
   this->myLocations.PointSprite         = this->OpenGLHelper.vglGetUniformLocationARB( this->PointProgram, "uPointSprite" );
 
-  this->OpenGLHelper.vglUseProgramObjectARB( 0 );
+  this->OpenGLHelper.vglUseProgramObjectARB( current_program );
 
   this->OpenGLHelper.vglGenVertexArraysARB(1, &this->VertexArrayObject);
 #else
@@ -501,7 +523,8 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     // make sure our window is current
     ren->GetRenderWindow()->MakeCurrent();
 
-
+    GLint current_program;
+    glGetIntegerv( GL_CURRENT_PROGRAM, &current_program );
     this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
 
 #ifndef VTK_OPENGL2
@@ -583,7 +606,7 @@ void VTKViewer_PolyDataMapper::RenderPiece( vtkRenderer* ren, vtkActor* act )
     //    this->RenderEdges(ren,act);
     //this->RenderPieceFinish(ren, act);
 #endif    
-    this->OpenGLHelper.vglUseProgramObjectARB( 0 );
+    this->OpenGLHelper.vglUseProgramObjectARB( current_program );
     this->CleanupPointSprites();
     glBindTexture( GL_TEXTURE_2D, 0 );
   }  
@@ -884,6 +907,8 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
 
       if( this->ExtensionsInitialized == ES_Ok ) {
 #ifdef VTK_OPENGL2
+	GLint current_program;
+	glGetIntegerv( GL_CURRENT_PROGRAM, &current_program );
         this->OpenGLHelper.vglUseProgramObjectARB( this->PointProgram );
 
         vtkOpenGLCamera *cam = (vtkOpenGLCamera *)(ren->GetActiveCamera());
@@ -962,7 +987,7 @@ void VTKViewer_PolyDataMapper::InternalDraw(vtkRenderer* ren, vtkActor* act ) {
        this->OpenGLHelper.vglDeleteBuffersARB( 1, &aBufferObjectID );
        this->OpenGLHelper.vglBindVertexArrayARB( 0 );
 
-       this->OpenGLHelper.vglUseProgramObjectARB( 0 );
+       this->OpenGLHelper.vglUseProgramObjectARB( current_program );
 #else
        GLuint aBufferObjectID, aDiamsID = 0;
        GLint attribute_diams = -1;
