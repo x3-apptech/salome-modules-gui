@@ -241,6 +241,9 @@
   </section>
   <section name="GUI" >
     <parameter name="documentation"     value="gui_help"/>
+    <parameter name="site_url"          value="www.salome-platform.org"/>
+    <parameter name="forum_url"         value="www.salome-platform.org/forum"/>
+    <parameter name="channel_url"       value="www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc&amp;disable_polymer=true"/>
   </section>
   <section name="KERNEL" >
     <parameter name="documentation"     value="kernel_help"/>
