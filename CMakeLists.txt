@@ -74,7 +74,7 @@ OPTION(SALOME_BUILD_TESTS "Build SALOME tests" ON)
 OPTION(SALOME_GUI_USE_OBSERVERS "Use study observers in GUI (advanced)" ON)
 OPTION(SALOME_BUILD_WITH_QT5 "Build SALOME with Qt 5" ON)
 CMAKE_DEPENDENT_OPTION(SALOME_GUI_BUILD_FRENCH_DOC "Generate SALOME GUI French documentation" OFF
-                       "NOT SALOME_BUILD_DOC" OFF)
+                       "SALOME_BUILD_DOC" OFF)
 
 # Advanced options:
 CMAKE_DEPENDENT_OPTION(SALOME_LIGHT_ONLY "Build SALOME Light only (no CORBA)" OFF
