@@ -301,12 +301,16 @@ public:
   static SALOME_Selection* getSelection() /Factory,ReleaseGIL/ ;
   static void              setSelection( const QStringList& ) /ReleaseGIL/ ;
   static int               getStudyId() /ReleaseGIL/ ;
-  static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
   static const QString     getActiveComponent() /ReleaseGIL/ ;
   static SIP_PYOBJECT      getActivePythonModule() /ReleaseGIL/ ;
   static bool              activateModule( const QString& ) /ReleaseGIL/ ;
   static void              updateObjBrowser( const int = 0, bool =  true ) /ReleaseGIL/ ;
-  
+
+  static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
+  static int               showNotification( const QString&, const QString&, const int = -1 ) /ReleaseGIL/ ;
+  static void              hideNotification( const QString& ) /ReleaseGIL/ ;
+  static void              hideNotification( const int ) /ReleaseGIL/ ;
+
   static bool              isModified() /ReleaseGIL/ ;
   static void              setModified( bool ) /ReleaseGIL/ ;
 

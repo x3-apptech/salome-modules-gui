@@ -255,6 +255,11 @@
   <section name="kernel_help" >
     <parameter name="Developer's Guide/KERNEL module" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html"/>
   </section>
+  <section name="notification" >
+    <parameter name="timeout" value="10"/>
+    <parameter name="animation" value="0"/>
+    <parameter name="size" value="300"/>
+  </section>
   <!--Salome shortcut settings-->
   <section name="shortcuts_settings">
     <parameter name="general_sections" value="General;Viewers"/>

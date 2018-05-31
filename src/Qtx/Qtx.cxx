@@ -276,34 +276,53 @@ void Qtx::simplifySeparators( QWidget* wid, const bool recursive )
   if ( !wid )
     return;
 
-  QList<QAction*> items = wid->actions();
-  if ( items.isEmpty() )
-    return;
-
-  bool action = false;
-  for ( int i = 0; i < items.count(); i++ )
+  if ( wid->inherits( "QMenu") || wid->inherits( "QMenuBar") )
   {
-    QAction* a = items[i];
-    if ( a->isSeparator() ) {
-      a->setVisible(action);
-      action = false;
-    }
-    else if ( a->isVisible() ) {
-      action = true;
-      if ( recursive && a->menu() )
-	simplifySeparators( a->menu(), recursive );
+    if ( qobject_cast<QMenu*>( wid ) )
+      qobject_cast<QMenu*>( wid )->setSeparatorsCollapsible( true );
+    if ( recursive )
+    {
+      foreach ( QAction* action, wid->actions() )
+      {
+	if ( action->menu() )
+	  simplifySeparators( action->menu(), recursive );
+      }
     }
   }
+  else
+  {
+    QList<QAction*> actions = wid->actions();
+    if ( actions.isEmpty() )
+      return;
 
-  action = false;
-  for ( int i = items.count() - 1; i > 0; i-- ) {
-    QAction* a = items[i];
-    if ( a->isSeparator() ) {
-      a->setVisible(action);
-      action = false;
+    bool is_action = false;
+    for ( int i = 0; i < actions.count(); i++ )
+    {
+      QAction* action = actions[i];
+      if ( action->isSeparator() )
+      {
+	action->setVisible( is_action );
+	is_action = false;
+      }
+      else if ( action->isVisible() )
+      {
+	is_action = true;
+      }
     }
-    else if ( a->isVisible() )
-      action = true;
+    is_action = false;
+    for ( int i = actions.count() - 1; i > 0; i-- )
+    {
+      QAction* action = actions[i];
+      if ( action->isSeparator() )
+      {
+	action->setVisible( is_action );
+	is_action = false;
+      }
+      else if ( action->isVisible() )
+      {
+	is_action = true;
+      }
+    }
   }
 }
 

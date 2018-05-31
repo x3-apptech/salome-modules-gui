@@ -751,6 +751,93 @@ void SalomePyQt::putInfo( const QString& msg, const int sec )
 }
 
 /*!
+  \fn int SalomePyQt::showNotification( const QString& msg, const QString& title, const int sec );
+  \brief Show notification in the application's desktop window.
+
+  Optional third delay parameter (\a sec) can be used to specify
+  time of the notification diplaying in seconds. If this parameter is less
+  or equal to zero, the permanent notification will be put.
+
+  Notification can be forcibly hidden via hideNotification() method.
+
+  \param msg message text 
+  \param title title text 
+  \param sec notification displaying time in seconds
+  \return unique ID of the notification (can be used to hide notification)
+  \sa hideNotification()
+*/
+
+class TShowNotifyEvent: public SALOME_Event
+{
+  QString myMsg;
+  QString myTitle;
+  int     mySecs;
+
+public:
+  typedef int TResult;
+  TResult myResult;
+
+public:
+  TShowNotifyEvent( const QString& msg, const QString& title, const int sec = -1 ) : myMsg( msg ), myTitle( title), mySecs( sec ), myResult( -1 ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      myResult = anApp->showNotification( myMsg, myTitle, mySecs * 1000 );
+    }
+  }
+};
+
+int SalomePyQt::showNotification( const QString& msg, const QString& title, const int sec )
+{
+  return ProcessEvent( new TShowNotifyEvent( msg, title, sec ) );
+}
+
+/*!
+  \fn void SalomePyQt::hideNotification( const QString& msg );
+  \brief Remove notification with given message text from the application's desktop.
+
+  \param msg message text
+  \sa showNotification()
+*/
+
+/*!
+  \fn void SalomePyQt::hideNotification( const int id );
+  \brief Remove notification with given \a id from the application's desktop.
+
+  \param id notification id
+  \sa showNotification()
+*/
+
+class THideNotifyEvent: public SALOME_Event
+{
+  int     myId;
+  QString myMsg;
+
+public:
+  THideNotifyEvent( const QString& msg ) : myId( -1 ), myMsg( msg ) {}
+  THideNotifyEvent( const int id ) : myId( id ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      if ( myId >= 0 )
+       anApp->hideNotification( myId );
+      else
+       anApp->hideNotification( myMsg );
+    }
+  }
+};
+
+void SalomePyQt::hideNotification( const QString& msg )
+{
+  ProcessVoidEvent( new THideNotifyEvent( msg ) );
+}
+
+void SalomePyQt::hideNotification( const int id )
+{
+  ProcessVoidEvent( new THideNotifyEvent( id ) );
+}
+
+/*!
   \fn const QString SalomePyQt::getActiveComponent();
   \brief Get the currently active module name (for the current study).
   \return active module name or empty string if there is no active module

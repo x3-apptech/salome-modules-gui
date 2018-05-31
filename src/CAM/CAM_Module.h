@@ -73,6 +73,10 @@ public:
 
   virtual void           putInfo( const QString&, const int = -1 );
 
+  int                    showNotification(const QString& message, const QString& title, int timeout = -1);
+  void                   hideNotification(const QString& message);
+  void                   hideNotification(int id);
+
   bool                   isActiveModule() const;
 
   virtual void           setMenuShown( const bool );

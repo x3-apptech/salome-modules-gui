@@ -528,7 +528,7 @@ The changes will be applied on the next application session.</translation>
         <source>NEW_WINDOW_6</source>
         <translation>ParaVie&amp;w view</translation>
     </message>
-	<message>
+    <message>
         <source>NEW_WINDOW_7</source>
         <translation>P&amp;ython view</translation>
     </message>
@@ -647,6 +647,14 @@ The changes will be applied on the next application session.</translation>
     <message>
         <source>PREF_DROP_DOWN_BUTTONS</source>
         <translation>Drop-down buttons in toolbars for action groups</translation>
+    </message>
+    <message>
+        <source>PREF_NOTIFY_TIMEOUT</source>
+        <translation>Notifications auto-hide timeout</translation>
+    </message>
+    <message>
+        <source>PREF_NOTIFY_TIMEOUT_NONE</source>
+        <translation>None</translation>
     </message>
     <message>
         <source>PREF_GROUP_COMMON</source>

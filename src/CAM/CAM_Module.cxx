@@ -328,6 +328,41 @@ void CAM_Module::putInfo( const QString& msg, const int msec )
 }
 
 /*!
+    \brief Shows the notifications with spectified text, title and automatic close timeout.
+    Notification will be automatically closed after specified timeout in msec. If
+    timeout is zero then automatic closing doesn't performed.
+    \param text - Notification text
+    \param title - Notification title
+    \param timeout - Notification close timeout in msec
+    \return notification identifier
+*/
+int CAM_Module::showNotification( const QString& message, const QString& title, int timeout )
+{
+  if ( application() )
+    application()->showNotification( message, title, timeout );
+}
+
+/*!
+    \brief Closes the notifications with spectified text.
+    \param text - Notification text
+*/
+void CAM_Module::hideNotification( const QString& message )
+{
+  if ( application() )
+    application()->hideNotification( message );
+}
+
+/*!
+    \brief Closes the notifications with spectified identifier.
+    \param text - Notification text
+*/
+void CAM_Module::hideNotification( int id )
+{
+  if ( application() )
+    application()->hideNotification( id );
+}
+
+/*!
   \brief Restore message info.
 
   Restores constant text message when previous information status message is removed.
