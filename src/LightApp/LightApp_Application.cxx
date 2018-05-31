@@ -2399,6 +2399,12 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->addPreference( tr( "PREF_OPAQUE_RESIZE" ), lookGroup, LightApp_Preferences::Bool, "desktop", "opaque_resize" );
   // .... -> drop-down buttons 
   pref->addPreference( tr( "PREF_DROP_DOWN_BUTTONS" ), lookGroup, LightApp_Preferences::Bool, "viewers", "drop_down_buttons" );
+  // .... -> Notification timeout
+  int delay = pref->addPreference( tr( "PREF_NOTIFY_TIMEOUT" ), lookGroup, LightApp_Preferences::IntSpin, "notification", "timeout" );
+  pref->setItemProperty( "special", tr("PREF_NOTIFY_TIMEOUT_NONE"), delay );
+  pref->setItemProperty( "min", 0, delay );
+  pref->setItemProperty( "max", 100, delay );
+  pref->setItemProperty( "suffix", " sec", delay );
   // ... "Look and feel" group <<end>>
 
   // ... "Study properties" group <<start>>

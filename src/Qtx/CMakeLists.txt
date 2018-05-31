@@ -61,6 +61,7 @@ SET(_moc_HEADERS
   QtxMainWindow.h
   QtxMenu.h
   QtxMultiAction.h
+  QtxNotify.h
   QtxPagePrefMgr.h
   QtxPathDialog.h
   QtxPathEdit.h
@@ -152,6 +153,7 @@ SET(_other_SOURCES
   QtxMainWindow.cxx
   QtxMenu.cxx
   QtxMultiAction.cxx
+  QtxNotify.cxx
   QtxPagePrefMgr.cxx
   QtxPathDialog.cxx
   QtxPathEdit.cxx

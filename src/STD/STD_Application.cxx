@@ -53,6 +53,7 @@ extern "C" STD_EXPORT SUIT_Application* createApplication()
 STD_Application::STD_Application()
 : SUIT_Application(),
   myActiveViewMgr( 0 ),
+  myNotify( 0 ),
   myExitConfirm( true ),
   myEditEnabled( true )
 {
@@ -721,6 +722,56 @@ void STD_Application::updateCommandsStatus()
     action( NewWindowId )->setEnabled( aHasStudy );
 }
 
+/*!
+  \brief Show notification with specified text and title.
+  
+  Notification will be automatically hidden after specified \a timeout
+  (given in milliseconds). If \a timeout is zero, the notification
+  is not automatically hidden; it can be only closed by the user manually.
+  
+  \param text - Notification text
+  \param title - Notification title
+  \param timeout - Timeout in milliseconds
+  \return Notification's unique identifier
+*/
+int STD_Application::showNotification(const QString& message, const QString& title, int timeout)
+{
+  QtxNotify* ntfMgr = notifyMgr();
+  if (ntfMgr)
+  {
+    int delay = timeout;
+    if (delay < 0)
+    {
+      SUIT_ResourceMgr* aResMgr = resourceMgr();
+      if (aResMgr)
+	delay = aResMgr->integerValue("notification", "timeout", 0) * 1000;
+    }
+    ntfMgr->showNotification(message, title, qMax(delay, 0));
+  }
+}
+
+/*!
+  \brief Close notifications with specified text.
+  \param text - Notification text
+*/
+void STD_Application::hideNotification(const QString& message)
+{
+  QtxNotify* ntfMgr = notifyMgr();
+  if (ntfMgr)
+    ntfMgr->hideNotification(message);
+}
+
+/*!
+  \brief Closes the notifications with specified identifier.
+  \param id - Notification identifier
+*/
+void STD_Application::hideNotification(int id)
+{
+  QtxNotify* ntfMgr = notifyMgr();
+  if (ntfMgr)
+    ntfMgr->hideNotification(id);
+}
+
 /*!\retval SUIT_ViewManager by viewer manager type name.*/
 SUIT_ViewManager* STD_Application::viewManager( const QString& vmType ) const
 {
@@ -1036,4 +1087,28 @@ int STD_Application::viewManagerId( const SUIT_ViewManager* theManager) const
 bool STD_Application::abortAllOperations()
 {
   return true;
+}
+
+/*!
+  \brief Gets the notification manager. Creates it if not exists.
+  \return \c notification manager instance
+*/
+QtxNotify* STD_Application::notifyMgr()
+{
+  if ( !myNotify )
+  {
+    myNotify = new QtxNotify(desktop());
+    myNotify->setWindow(desktop());
+
+    SUIT_ResourceMgr* aResMgr = resourceMgr();
+    if (aResMgr)
+    {
+      int anim = aResMgr->integerValue("notification", "animation", 0);
+      myNotify->setAnimationTime(anim);
+
+      double size = aResMgr->integerValue("notification", "size", 250);
+      myNotify->setNotificationSize(size);
+    }
+  }
+  return myNotify;
 }

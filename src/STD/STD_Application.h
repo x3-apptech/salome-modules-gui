@@ -27,7 +27,10 @@
 
 #include <SUIT_Application.h>
 
+#include <QtxNotify.h>
+
 #include <QList>
+#include <QPointer>
 
 class QMenu;
 class QCloseEvent;
@@ -104,6 +107,10 @@ public:
 
   virtual void          updateDesktopTitle();
 
+  int                   showNotification(const QString& message, const QString& title, int timeout = -1);
+  void                  hideNotification(const QString& message);
+  void                  hideNotification(int id);
+
 signals:
   /*!emit that view manager added*/
   void                  viewManagerAdded( SUIT_ViewManager* );
@@ -173,11 +180,15 @@ protected:
 
   virtual bool          abortAllOperations();
 
+ private:
+  QtxNotify*            notifyMgr();
+  
 private:
   ViewManagerList       myViewMgrs;
   SUIT_ViewManager*     myActiveViewMgr;
 
 private:
+  QPointer<QtxNotify>   myNotify;
   bool                  myExitConfirm;
   bool                  myEditEnabled;
 };

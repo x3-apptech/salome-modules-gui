@@ -47,6 +47,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
       <translation>Version %1</translation>
     </message>
     <message>
+        <source>SALOME_SITE</source>
+        <translation type="unfinished">SALOME Website</translation>
+    </message>
+    <message>
+        <source>SALOME_FORUM</source>
+        <translation type="unfinished">SALOME Forum</translation>
+    </message>
+    <message>
+        <source>SALOME_VIDEO_TUTORIALS</source>
+        <translation type="unfinished">Video Tutorials</translation>
+    </message>
+    <message>
       <source>ENTRY_COLUMN</source>
       <translation>エントリ</translation>
     </message>
@@ -635,6 +647,14 @@ Pythonファイルは、文字、数字、アンダースコアが含まれて�
     <message>
       <source>PREF_DROP_DOWN_BUTTONS</source>
       <translation>バーでのボタンの配置</translation>
+    </message>
+    <message>
+      <source>PREF_NOTIFY_TIMEOUT</source>
+      <translation type="unfinished">Notifications auto-hide timeout</translation>
+    </message>
+    <message>
+      <source>PREF_NOTIFY_TIMEOUT_NONE</source>
+      <translation type="unfinished">None</translation>
     </message>
     <message>
       <source>PREF_GROUP_COMMON</source>
