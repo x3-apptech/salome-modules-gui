@@ -554,6 +554,7 @@ bool LightApp_Application::activateModule( const QString& modName )
 
   if ( activeModule() ) activeModule()->updateModuleVisibilityState();
 
+  updateActions();
   return true;
 }
 
