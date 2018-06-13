@@ -736,6 +736,7 @@ void STD_Application::updateCommandsStatus()
 */
 int STD_Application::showNotification(const QString& message, const QString& title, int timeout)
 {
+  int uid = -1;
   QtxNotify* ntfMgr = notifyMgr();
   if (ntfMgr)
   {
@@ -746,8 +747,9 @@ int STD_Application::showNotification(const QString& message, const QString& tit
       if (aResMgr)
 	delay = aResMgr->integerValue("notification", "timeout", 0) * 1000;
     }
-    ntfMgr->showNotification(message, title, qMax(delay, 0));
+    uid = ntfMgr->showNotification(message, title, qMax(delay, 0));
   }
+  return uid;
 }
 
 /*!
