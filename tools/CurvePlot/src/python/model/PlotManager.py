@@ -16,7 +16,7 @@ class PlotManager(Model):
     return len(self._plotSets) == 0
   
   def setCurrentPlotSet(self, plotSetID, silent=False):
-    if not self._plotSets.has_key(plotSetID) and plotSetID != -1:
+    if plotSetID not in self._plotSets and plotSetID != -1:
       raise ValueError("Invalid plot set ID (%d)!" % plotSetID)
     self._currentPlotSet = self._plotSets.get(plotSetID, None)
     if not silent:
@@ -26,8 +26,8 @@ class PlotManager(Model):
     return self._currentPlotSet
   
   def getPlotSetContainingCurve(self, curveID):
-    for ps in self._plotSets.values():
-      if ps._curves.has_key(curveID):
+    for ps in list(self._plotSets.values()):
+      if curveID in ps._curves:
         return ps
     return None
   
@@ -67,8 +67,8 @@ class PlotManager(Model):
   
   def removeXYPlotSet(self, plotSetID):
     Logger.Debug("====> PlotManager::removeXYPlotSet() %d" % plotSetID)
-    if not self._plotSets.has_key(plotSetID):
-      print self._plotSets
+    if plotSetID not in self._plotSets:
+      print(self._plotSets)
       raise ValueError("Plot set ID (%d) not found for deletion!" % plotSetID)
     ps = self._plotSets.pop(plotSetID)
     if self._currentPlotSet is ps:

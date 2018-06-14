@@ -71,7 +71,7 @@
   This module provides an access to the SALOME GUI implementing set of functions
   which can be used from Python. This module is implemented using SWIG wrappings
   for some GUI functionality:
-  - getActiveStudyId(), getActiveStudyName() : get active study identifier and name
+  - getActiveStudyName() : get active study name
   - updateObjBrowser() : update contents of the Object Browser
   - SelectedCount() : get number of currently selected items
   - getSelected() : get entry of the speicified selected item
@@ -173,9 +173,8 @@ bool SALOMEGUI_Swig::hasDesktop()
 
 /*!
   \brief Update active study's Object Browser.
-  \param updateSelection this parameter is obsolete
 */
-void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
+void SALOMEGUI_Swig::updateObjBrowser()
 {
   class TEvent: public SALOME_Event
   {
@@ -190,30 +189,6 @@ void SALOMEGUI_Swig::updateObjBrowser( bool /*updateSelection*/ )
     }
   };
   ProcessVoidEvent( new TEvent() );
-}
-
-/*!
-  \fn int SALOMEGUI_Swig::getActiveStudyId()
-  \brief Get active study identifier
-  \return active study's ID or 0 if there is no active study
-*/
-
-class TGetActiveStudyIdEvent: public SALOME_Event
-{
-public:
-  typedef int TResult;
-  TResult myResult;
-  TGetActiveStudyIdEvent() : myResult( 0 ) {}
-  virtual void Execute()
-  {
-    if ( LightApp_Study* aStudy = getActiveStudy() ) {
-      myResult = aStudy->id();
-    }
-  }
-};
-int SALOMEGUI_Swig::getActiveStudyId()
-{
-  return ProcessEvent( new TGetActiveStudyIdEvent() );
 }
 
 /*!

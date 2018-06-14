@@ -286,8 +286,7 @@ bool SalomeApp_DataModel::open( const QString& name, CAM_Study* study, QStringLi
   if ( anId.isEmpty() )
     return true; // Probably nothing to load
 
-  _PTR(Study)      aStudy ( aDoc->studyDS() ); // shared_ptr cannot be used here
-  _PTR(SComponent) aSComp ( aStudy->FindComponentID( std::string( anId.toLatin1() ) ) );
+  _PTR(SComponent) aSComp ( SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toLatin1() ) ) );
   if ( aSComp )
     updateTree( aSComp, aDoc );
 
@@ -321,8 +320,7 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
       studyRoot = dynamic_cast<LightApp_RootObject*>( aSStudy->root() );
       QString anId = getRootEntry( aSStudy );
       if ( !anId.isEmpty() ){ // if nothing is published in the study for this module -> do nothing
-        _PTR(Study) aStudy ( aSStudy->studyDS() );
-        sobj = aStudy->FindComponentID( std::string( anId.toLatin1() ) );
+        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( anId.toLatin1() ) );
       }
     }
   }
@@ -331,9 +329,8 @@ void SalomeApp_DataModel::update( LightApp_DataObject*, LightApp_Study* study )
     if ( studyRoot ) {
       aSStudy = dynamic_cast<SalomeApp_Study*>( studyRoot->study() ); // <study> value should not change here theoretically, but just to make sure
       if ( aSStudy ) {
-        _PTR(Study) aStudy ( aSStudy->studyDS() );
         // modelRoot->object() cannot be reused here: it is about to be deleted by buildTree() soon
-        sobj = aStudy->FindComponentID( std::string( modelRoot->entry().toLatin1() ) );
+        sobj = SalomeApp_Application::getStudy()->FindComponentID( std::string( modelRoot->entry().toLatin1() ) );
       }
     }
   }

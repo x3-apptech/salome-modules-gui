@@ -131,13 +131,13 @@ bool PyConsole_Interp::runDirCommand( const QString& dirArgument, const QString&
       cmd.prepend( QString( "%1." ).arg( dirArgument ) );
     
     PyObject* str = PyRun_String( cmd.toStdString().c_str(), Py_eval_input, _global_context, _local_context );
-    if ( !str || str == Py_None || !PyString_Check( str ) )
+    if ( !str || str == Py_None || !PyUnicode_Check( str ) )
       {
         if ( !str )
           PyErr_Clear();
       }
     else {
-      docString = QString( PyString_AsString( str ) );
+      docString = QString( PyUnicode_AsUTF8( str ) );
     }
     Py_XDECREF( str );
   }
@@ -183,7 +183,7 @@ bool PyConsole_Interp::runDirAndExtract( const QString& dirArgument,
   for ( int i = 0; i < n; i++ ) {
     PyObject* it;
     it = PySequence_GetItem( plst, i );
-    QString s( PyString_AsString( it ) );
+    QString s( PyUnicode_AsUTF8( it ) );
     // if the method is not from swig, not static (guessed from the reg exp) and matches
     // what is already there
     if ( s.startsWith( startMatch ) ) {

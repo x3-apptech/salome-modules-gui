@@ -54,9 +54,6 @@ private:
   class XmlHandler;
   class InitLocker;
 
-  typedef QMap<int, PyInterp_Interp*> InterpMap;
-
-  static InterpMap           myInterpMap;          //!< study to Python subinterpreter map
   static LightApp_Module*    myInitModule;         //!< Python GUI being initialized (not zero only during the initialization)
 
   LightApp_Module*           myModule;             //!< GUI module
@@ -110,7 +107,7 @@ public slots:
   void                       onObjectBrowserClicked(SUIT_DataObject*, int);
 
 private:
-  void                       initInterp( int );
+  void                       initInterp();
   void                       importModule();
   void                       setWorkSpace();
 

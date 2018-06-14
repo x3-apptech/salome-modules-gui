@@ -20,6 +20,7 @@
 // Author: Guillaume Boulant (EDF/R&D)
 
 #include "SALOME_AppStudyEditor.hxx"
+#include "SALOME_GuiServices.hxx"
 
 #include <SalomeApp_Study.h>
 #include <SALOME_ListIO.hxx>
@@ -29,34 +30,12 @@ SALOME_AppStudyEditor::SALOME_AppStudyEditor(SalomeApp_Application * salomeApp)
   : SALOME_StudyEditor()
 {
   _salomeApp = salomeApp;
-  updateActiveStudy();
-}
-
-/**
- * This updates the editor with the current active study. If the
- * active study id is identical to the study id currently associated
- * to this object, then no update is performed.
- */
-int SALOME_AppStudyEditor::updateActiveStudy() {
-  int activeStudyId = SALOME_AppStudyEditor::getActiveStudyId(_salomeApp);
-  if ( activeStudyId != this->getStudyId() ) {
-    this->setStudyById(activeStudyId);
-  }
-  return activeStudyId;
-}
-
-// GUI context only
-int SALOME_AppStudyEditor::getActiveStudyId(SalomeApp_Application * salomeApp) {
-  SalomeApp_Study* appStudy = dynamic_cast<SalomeApp_Study*> (salomeApp->activeStudy());
-  _PTR(Study) aCStudy = appStudy->studyDS();
-  int studyId = aCStudy->StudyId();
-  return studyId;
 }
 
 SALOMEDS::SObject_ptr SALOME_AppStudyEditor::IObjectToSObject(const Handle(SALOME_InteractiveObject)& iobject) {
   if (!iobject.IsNull()) {
     if (iobject->hasEntry()) {
-      SALOMEDS::SObject_var sobject = _study->FindObjectID(iobject->getEntry());
+      SALOMEDS::SObject_var sobject = GUI::getStudyServant()->FindObjectID(iobject->getEntry());
       return sobject._retn();
     }
   }

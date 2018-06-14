@@ -378,7 +378,7 @@ int NoteBook_Table::getUniqueIndex() const
  *  Purpose  : Add variables in the table from theStudy
  */
 //============================================================================
-void NoteBook_Table::Init(_PTR(Study) theStudy)
+void NoteBook_Table::Init()
 {
   isProcessItemChangedSignal = false;
 
@@ -403,10 +403,10 @@ void NoteBook_Table::Init(_PTR(Study) theStudy)
   myVariableMap.clear();
 
   //Add all variables into the table
-  std::vector<std::string> aVariables = theStudy->GetVariableNames();
+  std::vector<std::string> aVariables = SalomeApp_Application::getStudy()->GetVariableNames();
   for(int iVar = 0; iVar < aVariables.size(); iVar++ ) {
     AddRow(QString(aVariables[iVar].c_str()),
-           Variable2String(aVariables[iVar],theStudy));
+           Variable2String(aVariables[iVar]));
   }
 
   //Add empty row
@@ -414,8 +414,6 @@ void NoteBook_Table::Init(_PTR(Study) theStudy)
   isProcessItemChangedSignal = true;
 
   ResetMaps();
-
-  myStudy = theStudy;
 }
 
 //============================================================================
@@ -423,18 +421,18 @@ void NoteBook_Table::Init(_PTR(Study) theStudy)
  *  Purpose  : Convert variable values to QString
  */
 //============================================================================
-QString NoteBook_Table::Variable2String(const std::string& theVarName,
-                                        _PTR(Study) theStudy)
+QString NoteBook_Table::Variable2String(const std::string& theVarName)
 {
+  _PTR(Study) aStudy = SalomeApp_Application::getStudy();
   QString aResult;
-  if( theStudy->IsReal(theVarName) )
-    aResult = QString::number(theStudy->GetReal(theVarName));
-  else if( theStudy->IsInteger(theVarName) )
-    aResult = QString::number(theStudy->GetInteger(theVarName));
-  else if( theStudy->IsBoolean(theVarName) )
-    aResult = theStudy->GetBoolean(theVarName) ? QString("True") : QString("False");
-  else if( theStudy->IsString(theVarName) )
-    aResult = theStudy->GetString(theVarName).c_str();
+  if( aStudy->IsReal(theVarName) )
+    aResult = QString::number(aStudy->GetReal(theVarName));
+  else if( aStudy->IsInteger(theVarName) )
+    aResult = QString::number(aStudy->GetInteger(theVarName));
+  else if( aStudy->IsBoolean(theVarName) )
+    aResult = aStudy->GetBoolean(theVarName) ? QString("True") : QString("False");
+  else if( aStudy->IsString(theVarName) )
+    aResult = aStudy->GetString(theVarName).c_str();
   
   return aResult;
 }
@@ -566,7 +564,7 @@ void NoteBook_Table::onItemChanged(QTableWidgetItem* theItem)
         if( myVariableMap.contains( anIndex ) )
         {
           const NoteBoox_Variable& aVariable = myVariableMap[ anIndex ];
-          if( !aVariable.Name.isEmpty() && myStudy->IsVariableUsed( std::string( aVariable.Name.toLatin1().constData() ) ) )
+          if( !aVariable.Name.isEmpty() && SalomeApp_Application::getStudy()->IsVariableUsed( std::string( aVariable.Name.toLatin1().constData() ) ) )
           {
             if( QMessageBox::warning( parentWidget(), tr( "WARNING" ),
                                       tr( "RENAME_VARIABLE_IS_USED" ).arg( aVariable.Name ),
@@ -661,6 +659,7 @@ bool NoteBook_Table::IsUniqueName(const NoteBook_TableRow* theRow) const
 //============================================================================
 void NoteBook_Table::RemoveSelected()
 {
+  _PTR(Study) aStudy = SalomeApp_Application::getStudy();
   isProcessItemChangedSignal = false;
   QList<QTableWidgetItem*> aSelectedItems = selectedItems();
   if( !(aSelectedItems.size() > 0)) {
@@ -678,7 +677,7 @@ void NoteBook_Table::RemoveSelected()
       else {
         int nRow = row(aSelectedItems[i]);
 
-        if( myStudy->IsVariableUsed( std::string( aRow->GetName().toLatin1().constData() ) ) )
+        if( aStudy->IsVariableUsed( std::string( aRow->GetName().toLatin1().constData() ) ) )
         {
           if( QMessageBox::warning( parentWidget(), tr( "WARNING" ),
                                     tr( "REMOVE_VARIABLE_IS_USED" ).arg( aRow->GetName() ),
@@ -696,7 +695,7 @@ void NoteBook_Table::RemoveSelected()
           myVariableMap.remove( index );
         removeRow(nRow);
         myRows.removeAt(nRow);
-        if(myStudy->IsVariable(aVarName.toLatin1().constData()))
+        if(aStudy->IsVariable(aVarName.toLatin1().constData()))
           removedFromStudy = true;
       }
     }
@@ -757,9 +756,8 @@ void NoteBook_Table::ResetMaps()
  *  Purpose  : Constructor
  */
 //============================================================================
-SalomeApp_NoteBook::SalomeApp_NoteBook(QWidget * parent, _PTR(Study) theStudy):
-  QWidget(parent),
-  myStudy(theStudy)
+SalomeApp_NoteBook::SalomeApp_NoteBook(QWidget * parent):
+  QWidget(parent)
 {
   setObjectName("SalomeApp_NoteBook");
   setWindowTitle(tr("NOTEBOOK_TITLE"));
@@ -789,7 +787,7 @@ SalomeApp_NoteBook::SalomeApp_NoteBook(QWidget * parent, _PTR(Study) theStudy):
   connect( myUpdateStudyBtn, SIGNAL(clicked()), this, SLOT(onUpdateStudy()) );
   connect( myRemoveButton, SIGNAL(clicked()), this, SLOT(onRemove()));
   
-  myTable->Init(myStudy);
+  myTable->Init();
 
   myDumpedStudyScript = "";  
   myIsDumpedStudySaved = false;
@@ -808,10 +806,8 @@ SalomeApp_NoteBook::~SalomeApp_NoteBook(){}
  *  Purpose  : init variable table
  */
 //============================================================================
-void SalomeApp_NoteBook::Init(_PTR(Study) theStudy){
-  if(myStudy!= theStudy)
-    myStudy = theStudy;
-  myTable->Init(myStudy);
+void SalomeApp_NoteBook::Init(){
+  myTable->Init();
 }
 
 
@@ -822,7 +818,7 @@ void SalomeApp_NoteBook::Init(_PTR(Study) theStudy){
 //============================================================================
 void SalomeApp_NoteBook::onVarUpdate(QString theVarName)
 {
-  myTable->Init(myStudy);
+  myTable->Init();
 }
 
 //============================================================================
@@ -837,6 +833,7 @@ void SalomeApp_NoteBook::onApply()
     SUIT_MessageBox::warning( this, tr( "WARNING" ), tr( "INCORRECT_DATA" ) );
     return;
   }
+  _PTR(Study) aStudy = SalomeApp_Application::getStudy();
 
   double aDVal;
   int    anIVal;
@@ -852,7 +849,7 @@ void SalomeApp_NoteBook::onApply()
     if( aVariableMapRef.contains( anIndex ) )
     {
       QString aRemovedVariable = aVariableMapRef[ anIndex ].Name;
-      myStudy->RemoveVariable( std::string( aRemovedVariable.toLatin1().constData() ) );
+      aStudy->RemoveVariable( std::string( aRemovedVariable.toLatin1().constData() ) );
     }
   }
 
@@ -874,22 +871,22 @@ void SalomeApp_NoteBook::onApply()
 
         if( !aNameRef.isEmpty() && !aValueRef.isEmpty() && aNameRef != aName )
         {
-          myStudy->RenameVariable( std::string( aNameRef.toLatin1().constData() ),
-                                   std::string( aName.toLatin1().constData() ) );
+          aStudy->RenameVariable( std::string( aNameRef.toLatin1().constData() ),
+                                  std::string( aName.toLatin1().constData() ) );
         }
       }
 
       if( NoteBook_TableRow::IsIntegerValue(aValue,&anIVal) )
-        myStudy->SetInteger(std::string(aName.toLatin1().constData()),anIVal);
+        aStudy->SetInteger(std::string(aName.toLatin1().constData()),anIVal);
 
       else if( NoteBook_TableRow::IsRealValue(aValue,&aDVal) )
-        myStudy->SetReal(std::string(aName.toLatin1().constData()),aDVal);
+        aStudy->SetReal(std::string(aName.toLatin1().constData()),aDVal);
     
       else if( NoteBook_TableRow::IsBooleanValue(aValue,&aBVal) )
-        myStudy->SetBoolean(std::string(aName.toLatin1().constData()),aBVal);
+        aStudy->SetBoolean(std::string(aName.toLatin1().constData()),aBVal);
     
       else
-        myStudy->SetString(std::string(aName.toLatin1().constData()),aValue.toStdString());
+        aStudy->SetString(std::string(aName.toLatin1().constData()),aValue.toStdString());
     }
   }
   myTable->ResetMaps();
@@ -898,7 +895,7 @@ void SalomeApp_NoteBook::onApply()
   if(app)
     app->updateActions();
   
-  myStudy->Modified();
+  aStudy->Modified();
 }
 
 //============================================================================

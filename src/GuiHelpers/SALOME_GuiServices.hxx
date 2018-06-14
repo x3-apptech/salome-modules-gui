@@ -58,8 +58,7 @@ namespace GUI {
   // depends of the SALOME module technical choices). In general, on
   // of the attribute of a SObject is a CORBA servant that handles the
   // data to work with
-  SALOMEGUIHELPERS_EXPORT SALOMEDS::Study_ptr getActiveStudy();
-  SALOMEGUIHELPERS_EXPORT int                 getActiveStudyId();
+  SALOMEGUIHELPERS_EXPORT SALOMEDS::Study_ptr getStudyServant();
 
   // Another way to get the active study (to be converted in
   // SALOMEDS::Study):

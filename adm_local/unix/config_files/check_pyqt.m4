@@ -236,7 +236,7 @@ if test "x$pyqt_ok" == "xyes" ; then
                     #    SUPPORTED=${QT_VERSION}
                     #fi
                     #SUPPORTED="Qt_`echo ${SUPPORTED} | sed -e 's/\./_/g'`"
-		    PYQT_SIPFLAGS=`python -c "from PyQt4 import pyqtconfig; print pyqtconfig.Configuration().pyqt_sip_flags"`
+		    PYQT_SIPFLAGS=`python -c "from PyQt4 import pyqtconfig; print(pyqtconfig.Configuration().pyqt_sip_flags)"`
                     PYQT_SIPFLAGS="${PYQT_SIPFLAGS} -s .cc -c . ${PYQT_INCLUDES}"
                     break
                 fi

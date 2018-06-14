@@ -37,12 +37,9 @@
 class SALOMEGUIHELPERS_EXPORT SALOME_AppStudyEditor: public SALOME_StudyEditor {
 public:
   SALOME_AppStudyEditor(SalomeApp_Application * salomeApp);
-  int updateActiveStudy();
   
   SALOMEDS::SObject_ptr IObjectToSObject(const Handle(SALOME_InteractiveObject)& iobject);
   SALOME_StudyEditor::SObjectList * getSelectedObjects();
-
-  static int getActiveStudyId(SalomeApp_Application * salomeApp);
 
 private:
   SalomeApp_Application * _salomeApp;

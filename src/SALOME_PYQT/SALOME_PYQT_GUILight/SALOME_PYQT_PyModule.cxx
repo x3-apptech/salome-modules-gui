@@ -609,7 +609,6 @@ void PyModuleHelper::XmlHandler::insertPopupItems( QDomNode& parentNode, QMenu* 
   SALOME GUI modules.
 */
 
-PyModuleHelper::InterpMap PyModuleHelper::myInterpMap;
 LightApp_Module*          PyModuleHelper::myInitModule = 0;
 
 /*!
@@ -1731,31 +1730,15 @@ QString PyModuleHelper::engineIOR() const
 /*!
   \brief Initialize python subinterpreter (one per study).
   \internal
-  \param studyId study ID
 */
-void PyModuleHelper::initInterp( int studyId )
+void PyModuleHelper::initInterp()
 {
   FuncMsg fmsg( "--- PyModuleHelper::initInterp()" );
 
-  // check study Id
-  if ( !studyId ) {
-    // Error! Study Id must not be 0!
-    myInterp = 0;
-    return;
-  }
-
   QMutexLocker ml( &myInitMutex );
-
-  // try to find the subinterpreter
-  if ( myInterpMap.contains( studyId ) ) {
-    // found!
-    myInterp = myInterpMap[ studyId ];
-    return;
-  }
 
   myInterp = new SALOME_PYQT_PyInterp();
   myInterp->initialize();
-  myInterpMap[ studyId ] = myInterp;
   
 #ifndef GUI_DISABLE_CORBA
   if ( !SUIT_PYTHON::initialized ) {
@@ -1772,7 +1755,7 @@ void PyModuleHelper::initInterp( int studyId )
     }
     // ... then call a method
     int embedded = 1;
-    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"ii", studyId, embedded ) );
+    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"i", embedded ) );
     if ( !aRes ) {
       // Error!
       PyErr_Print();
@@ -1906,10 +1889,9 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( app->activeStudy() );
   if ( !aStudy )
     return;
-  int aStudyId = aStudy ? aStudy->id() : 0;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp )
     return; // Error
 
@@ -1953,9 +1935,9 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
           // parse the return value
           // it should be a map: {integer:integer}
           int aKey, aValue;
-          if( key && PyInt_Check( key ) && value && PyInt_Check( value ) ) {
-            aKey   = PyInt_AsLong( key );
-            aValue = PyInt_AsLong( value );
+          if( key && PyLong_Check( key ) && value && PyLong_Check( value ) ) {
+            aKey   = PyLong_AsLong( key );
+            aValue = PyLong_AsLong( value );
             myWindowsMap[ aKey ] = aValue;
           }
         }
@@ -1973,16 +1955,16 @@ void PyModuleHelper::internalInitialize( CAM_Application* app )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res2 ) ) {
-        myViewMgrList.append( PyString_AsString( res2 ) );
+      if ( PyUnicode_Check( res2 ) ) {
+        myViewMgrList.append( PyUnicode_AsUTF8( res2 ) );
       }
       // ... or list of strings
       else if ( PyList_Check( res2 ) ) {
         int size = PyList_Size( res2 );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res2, i );
-          if( value && PyString_Check( value ) ) {
-            myViewMgrList.append( PyString_AsString( value ) );
+          if( value && PyUnicode_Check( value ) ) {
+            myViewMgrList.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2007,10 +1989,11 @@ void PyModuleHelper::internalActivate( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp ) {
     myLastActivateStatus = false;
     return; // Error
@@ -2059,10 +2042,11 @@ void PyModuleHelper::internalCustomize( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( aStudyId );
+  initInterp();
   if ( !myInterp ) {
     myLastActivateStatus = false;
     return; // Error
@@ -2135,7 +2119,8 @@ void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
   // Get study Id
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( theStudy );
-  int aStudyId = aStudy ? aStudy->id() : 0;
+  if ( !aStudy )
+    return;
 
   // check that Python subinterpreter is initialized and Python module is imported
   if ( !myInterp || !myPyModule ) {
@@ -2144,7 +2129,7 @@ void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
   }
   // then call Python module's deactivate() method
   if ( PyObject_HasAttrString( myPyModule , (char*)"closeStudy" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i", aStudyId ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i" ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2203,12 +2188,11 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
 
   // get study Id
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>( study );
-  int id = aStudy ? aStudy->id() : 0;
-
-  fmsg.message( QString( "study id = %1" ).arg( id ) );
+  if ( !aStudy )
+    return;
 
   // initialize Python subinterpreter (on per study) and put it in <myInterp> variable
-  initInterp( id );
+  initInterp();
   if ( !myInterp )
     return; // Error
 
@@ -2225,7 +2209,7 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
 
   // call Python module's activeStudyChanged() method
   if ( PyObject_HasAttrString( myPyModule, (char*)"activeStudyChanged" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"i", id ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"i" ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2538,8 +2522,8 @@ void PyModuleHelper::internalSave( QStringList& files, const QString& url )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res ) ) {
-        QString astr = PyString_AsString( res );
+      if ( PyUnicode_Check( res ) ) {
+        QString astr = PyUnicode_AsUTF8( res );
         files.append( astr );
       }
       //also result can be a list...
@@ -2547,8 +2531,8 @@ void PyModuleHelper::internalSave( QStringList& files, const QString& url )
         int size = PyList_Size( res );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res, i );
-          if ( value && PyString_Check( value ) ) {
-            files.append( PyString_AsString( value ) );
+          if ( value && PyUnicode_Check( value ) ) {
+            files.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2627,8 +2611,8 @@ void PyModuleHelper::internalDumpPython( QStringList& files )
     else {
       // parse the return value
       // result can be one string...
-      if ( PyString_Check( res ) ) {
-        QString astr = PyString_AsString( res );
+      if ( PyUnicode_Check( res ) ) {
+        QString astr = PyUnicode_AsUTF8( res );
         //SCRUTE(astr);
         files.append(astr);
       }
@@ -2637,8 +2621,8 @@ void PyModuleHelper::internalDumpPython( QStringList& files )
         int size = PyList_Size( res );
         for ( int i = 0; i < size; i++ ) {
           PyObject* value = PyList_GetItem( res, i );
-          if( value && PyString_Check( value ) ) {
-            files.append( PyString_AsString( value ) );
+          if( value && PyUnicode_Check( value ) ) {
+            files.append( PyUnicode_AsUTF8( value ) );
           }
         }
       }
@@ -2781,8 +2765,8 @@ QString PyModuleHelper::internalEngineIOR() const
       }
       else {
         // parse the return value, result chould be string
-        if ( PyString_Check( res ) ) {
-          ior = PyString_AsString( res );
+        if ( PyUnicode_Check( res ) ) {
+          ior = PyUnicode_AsUTF8( res );
         }
       }
     }

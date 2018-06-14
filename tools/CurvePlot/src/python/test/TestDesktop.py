@@ -177,21 +177,21 @@ class TestDesktop(QMainWindow):
       for _ in range(nC):
         x, y = self.__generateRandomData(1000)
         lx.append(x); ly.append(y)
-      print "Done generating"
+      print("Done generating")
       from time import time
       t0 = time()
       curveplot.LockRepaint()
       for i in range(nC): 
         curveplot.AddCurve(lx[i], ly[i], append=True)
       curveplot.UnlockRepaint()
-      print "Elapsed: %.2f" % ( time() - t0)
+      print("Elapsed: %.2f" % ( time() - t0))
 
     def clearPlotSet(self):
       curveplot.ClearPlotSet()
       
     def addPS(self):
       # Also a test for unicode!
-      curveplot.AddPlotSet(u'ça m embête')
+      curveplot.AddPlotSet('ça m embête')
       
     def addTab(self):
       pass
@@ -216,12 +216,12 @@ class TestDesktop(QMainWindow):
     @Slot()
     def memPrint(self):
       i, t = curveplot.GetAllPlotSets()
-      print zip(i, t)
+      print(list(zip(i, t)))
       new_id = curveplot.CopyCurve(curve_id=0, plot_set_id=1)
-      print "created  curve: %d" % new_id
+      print("created  curve: %d" % new_id)
       import resource
       m = resource.getrusage(resource.RUSAGE_SELF)[2]*resource.getpagesize()/1e6
-      print "** Used memory: %.2f Mb" % m
+      print("** Used memory: %.2f Mb" % m)
       if self.cnt >= 0 and self.cnt < self.MAX_CNT:
         self.cnt += 1
         QTimer.singleShot(self.timeLap, self, SLOT("curveSameFig()"))

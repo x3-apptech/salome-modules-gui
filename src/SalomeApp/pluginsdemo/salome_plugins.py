@@ -28,11 +28,11 @@ if DEMO_IS_ACTIVATED:
   try:
     import GEOM
     from salome.geom import geomBuilder
-    geompy = geomBuilder.New(salome.myStudy)
+    geompy = geomBuilder.New()
     
     import SMESH, SALOMEDS
     from salome.smesh import smeshBuilder
-    smesh =  smeshBuilder.New(salome.myStudy)
+    smesh =  smeshBuilder.New()
   except:
     DEMO_IS_ACTIVATED = False
 
@@ -48,8 +48,7 @@ if DEMO_IS_ACTIVATED:
       from salome.geom import geomBuilder
 
       # Intialize the geompy factory with the active study
-      activeStudy = context.study
-      geompy = geomBuilder.New(activeStudy)
+      geompy = geomBuilder.New()
 
       # Create the objects
       Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
@@ -76,8 +75,7 @@ if DEMO_IS_ACTIVATED:
       from salome.geom import geomBuilder
 
       # Intialize the geompy factory with the active study
-      activeStudy = context.study
-      geompy = geomBuilder.New(activeStudy)
+      geompy = geomBuilder.New()
 
       # Create the objects
       Vx = geompy.MakeVectorDXDYDZ(10, 0, 0)
@@ -122,7 +120,6 @@ if DEMO_IS_ACTIVATED:
 
   def tube_shapewithgui(context):
       global tubebuilder, xalome, dialog
-      activeStudy = context.study
 
       # Get the parameter values from a gui dialog box. If the dialog is
       # closed using the Ok button, then the data are requested from the
@@ -130,8 +127,8 @@ if DEMO_IS_ACTIVATED:
       dialog.exec_()
       if dialog.wasOk():
           radius, length, width = dialog.getData()
-          shape = tubebuilder.createGeometry(activeStudy, radius, length, width)
-          entry = xalome.addToStudy(activeStudy, shape, "Tube" )
+          shape = tubebuilder.createGeometry(radius, length, width)
+          entry = xalome.addToStudy(shape, "Tube" )
           xalome.displayShape(entry)
 
 
@@ -147,7 +144,6 @@ if DEMO_IS_ACTIVATED:
   #
   def tube_meshwithgui(context):
       global tube, dialog
-      activeStudy = context.study
 
       # Get the parameter values from a gui dialog box. If the dialog is
       # closed using the Ok button, then the data are requested from the
@@ -155,7 +151,7 @@ if DEMO_IS_ACTIVATED:
       dialog.exec_()
       if dialog.wasOk():
           radius, length, width = dialog.getData()
-          mesh = tubebuilder.createModel(activeStudy, radius, length, width)
+          mesh = tubebuilder.createModel(radius, length, width)
 
 
   salome_pluginsmanager.AddFunction('DEMO/Tube mesh from parameters',
@@ -179,7 +175,6 @@ if DEMO_IS_ACTIVATED:
   dialogWithApply.setData(tubebuilder.DEFAULT_RADIUS,
                           tubebuilder.DEFAULT_LENGTH,
                           tubebuilder.DEFAULT_WIDTH)
-  activeStudy = None
   previewShapeEntry = None
 
   DEFAULT_FOLDER_NAME="TubeList"
@@ -189,7 +184,7 @@ if DEMO_IS_ACTIVATED:
   def acceptCallback():
       """Action to be done when click on Ok"""
       global tubebuilder, xalome
-      global dialogWithApply, activeStudy
+      global dialogWithApply
       global previewShapeEntry, deletePreviewShape
       global DEFAULT_FOLDER_NAME,DEFAULT_SHAPE_NAME
 
@@ -199,8 +194,8 @@ if DEMO_IS_ACTIVATED:
           deletePreviewShape()
 
       radius, length, width = dialogWithApply.getData()
-      shape = tubebuilder.createGeometry(activeStudy, radius, length, width)
-      entry = xalome.addToStudy(activeStudy, shape, DEFAULT_SHAPE_NAME, DEFAULT_FOLDER_NAME)
+      shape = tubebuilder.createGeometry(radius, length, width)
+      entry = xalome.addToStudy(shape, DEFAULT_SHAPE_NAME, DEFAULT_FOLDER_NAME)
       xalome.displayShape(entry)
 
   def rejectCallback():
@@ -218,7 +213,7 @@ if DEMO_IS_ACTIVATED:
   def applyCallback():
       """Action to be done when click on Apply"""
       global tubebuilder, xalome
-      global dialogWithApply, activeStudy
+      global dialogWithApply
       global previewShapeEntry, deletePreviewShape
       global PREVIEW_COLOR, DEFAULT_SHAPE_NAME, DEFAULT_FOLDER_NAME, PREVIEW_SHAPE_NAME
 
@@ -228,16 +223,16 @@ if DEMO_IS_ACTIVATED:
 
       # Then we can create the new shape with the new parameter values
       radius, length, width = dialogWithApply.getData()
-      shape = tubebuilder.createGeometry(activeStudy, radius, length, width)
+      shape = tubebuilder.createGeometry(radius, length, width)
       # We apply a specific color on the shape for the preview state
       shape.SetColor(PREVIEW_COLOR)
-      previewShapeEntry = xalome.addToStudy(activeStudy, shape, PREVIEW_SHAPE_NAME, DEFAULT_FOLDER_NAME )
+      previewShapeEntry = xalome.addToStudy(shape, PREVIEW_SHAPE_NAME, DEFAULT_FOLDER_NAME )
       xalome.displayShape(previewShapeEntry)
 
   def deletePreviewShape():
       """This delete the shape currently being displayed as a preview"""
-      global activeStudy, previewShapeEntry, xsalome
-      xalome.deleteShape(activeStudy,previewShapeEntry)
+      global previewShapeEntry, xsalome
+      xalome.deleteShape(previewShapeEntry)
       previewShapeEntry = None
 
   # Connection of callback functions to the dialog butoon click signals
@@ -251,8 +246,7 @@ if DEMO_IS_ACTIVATED:
       required callback functions to be associated to the button
       signals.
       """
-      global dialogWithApply, activeStudy
-      activeStudy = context.study
+      global dialogWithApply
       dialogWithApply.open()
 
 
@@ -277,13 +271,13 @@ def runSalomeShellSession(context):
     elif os.path.exists("/usr/bin/xterm"):
       command = 'xterm -T "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
     else:
-      print "Neither xterm nor gnome-terminal nor konsole is installed."
+      print("Neither xterm nor gnome-terminal nor konsole is installed.")
 
     if command is not "":
       try:
         subprocess.check_call(command, shell = True)
-      except Exception, e:
-        print "Error: ",e
+      except Exception as e:
+        print("Error: ",e)
 
 
 salome_pluginsmanager.AddFunction('SALOME shell session',

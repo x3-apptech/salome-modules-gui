@@ -95,9 +95,8 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   NoteBook_Table(QWidget * parent = 0);
   virtual ~NoteBook_Table();
 
-  void Init(_PTR(Study) theStudy);
-  static QString Variable2String(const std::string& theVarName,
-                                 _PTR(Study) theStudy);
+  void Init();
+  static QString Variable2String(const std::string& theVarName);
 
   bool IsValid() const;
 
@@ -137,18 +136,16 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   QList<int>  myRemovedRows;
   VariableMap myVariableMapRef;
   VariableMap myVariableMap;
-
-  _PTR(Study)      myStudy;
 };
 
 class SALOMEAPP_EXPORT SalomeApp_NoteBook : public QWidget 
 {
   Q_OBJECT
  public:
-  SalomeApp_NoteBook(QWidget * parent , _PTR(Study) theStudy);
+  SalomeApp_NoteBook(QWidget * parent);
   virtual ~SalomeApp_NoteBook();
 
-  void Init(_PTR(Study) theStudy);
+  void Init();
 
   QString getDumpedStudyName() { return myDumpedStudyName; }
   void setDumpedStudyName(QString theName) { myDumpedStudyName = theName; }
@@ -170,7 +167,6 @@ class SALOMEAPP_EXPORT SalomeApp_NoteBook : public QWidget
   QPushButton*     myRemoveButton;
   QPushButton*     myUpdateStudyBtn;
   
-  _PTR(Study)      myStudy;
   QString          myDumpedStudyScript; // path to script of dumped study
   QString          myDumpedStudyName;
   bool             myIsDumpedStudySaved;

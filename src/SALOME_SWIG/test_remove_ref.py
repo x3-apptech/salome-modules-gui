@@ -30,22 +30,22 @@ myBuilder = myStudy.NewBuilder()
 
 
 obj1 = myStudy.FindObjectID("0:1")
-if obj1 is None: print "Is null obj1 "
-else: print obj1.GetID()
+if obj1 is None: print("Is null obj1 ")
+else: print(obj1.GetID())
 
 obj2 = myBuilder.NewObject(obj1)
-print "Obj2 ID = "+obj2.GetID()
+print("Obj2 ID = "+obj2.GetID())
 
 myBuilder.Addreference(obj1, obj2)
 
 (f, obj3) = obj1.ReferencedObject()
 
-print "Ref obj ID = "+obj3.GetID()
+print("Ref obj ID = "+obj3.GetID())
 
 
 myBuilder.RemoveReference(obj1)
 
 (f, obj4) = obj1.ReferencedObject()
 
-print "Ref is found ", f
+print("Ref is found ", f)
  

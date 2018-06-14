@@ -25,12 +25,12 @@
 //  Author : Paul RASCLE, EDF
 //  Module : SALOME
 
+#include <Container_init_python.hxx>
 #include <SALOME_NamingService.hxx>
 #include <SALOME_ModuleCatalog_impl.hxx>
 #include <SALOME_LifeCycleCORBA.hxx>
 #include <SALOME_Event.h>
 
-#include <Container_init_python.hxx>
 #include <ConnectionManager_i.hxx>
 #include <RegistryService.hxx>
 

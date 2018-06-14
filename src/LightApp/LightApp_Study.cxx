@@ -60,8 +60,6 @@ LightApp_Study::~LightApp_Study()
 */
 bool LightApp_Study::createDocument( const QString& theStr )
 {
-  setStudyName( QString( "Study%1" ).arg( LightApp_Application::studyId() ) );
-
   // create myRoot
   setRoot( new LightApp_RootObject( this ) );
 

@@ -51,7 +51,7 @@ def main(args) :
     trans = QTranslator()
     for f in ts_files:
       if not trans.load(f):
-        print "could not load translation %s!" % f
+        print("could not load translation %s!" % f)
     app.installTranslator(trans)
     dw = app.desktop()
     x, y = dw.width()*0.25, dw.height()*0.7

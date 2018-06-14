@@ -10,11 +10,11 @@ try:
   import matplotlib
   matplotlib.use('Qt4Agg')
   import matplotlib.pyplot as plt  # must come after the PySide/PyQt4 switch!
-  plt.rcParams['font.sans-serif'].insert(0, u"DejaVu Sans")
+  plt.rcParams['font.sans-serif'].insert(0, "DejaVu Sans")
 except:
-  print "Warning: could not switch matplotlib to 'Qt4agg' backend. Some characters might be displayed improperly!"
+  print("Warning: could not switch matplotlib to 'Qt4agg' backend. Some characters might be displayed improperly!")
 
-from PlotController import PlotController
+from .PlotController import PlotController
 from TableModel import TableModel
 from CurveModel import CurveModel
 from PlotManager import PlotManager

@@ -163,7 +163,7 @@ void CAM_Study::dataModelInserted( const CAM_DataModel* dModel )
 {
   CAM_DataModel* dm = (CAM_DataModel*)dModel;
 
-  if ( isSaved() ) // need to load data model from an exisitng file?
+  if ( isSaved() ) // need to load data model from an existing file?
     openDataModel( studyName(), dm );
   else // no, just need to update data model's connection to study tree 
        //(some application may want to show model's root in a study tree even if a model is empty)

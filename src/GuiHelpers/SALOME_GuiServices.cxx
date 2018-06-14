@@ -69,29 +69,12 @@ namespace GUI {
   // 
 
   /**
-   * This returns the current active study id if an active study is
-   * defined in the SALOME session, returns -1 otherwise. Note that
-   * the active study doesn't make sense outside of the GUI SALOME
-   * process, i.e. the SALOME_SessionServer embedding the
-   * SalomeApp_Application.
-   */
-  int getActiveStudyId() {
-    SALOME::Session_var aSession = KERNEL::getSalomeSession();
-    if ( CORBA::is_nil(aSession) ) {
-      INFOS("ERR: can't request for active study because the session is NULL");
-      return -1;
-    }
-    return aSession->GetActiveStudyId();
-  }
-
-  /**
    * This returns the current active study if an active study is
    * defined in the SALOME session, returns null otherwise.
    */
-  SALOMEDS::Study_ptr getActiveStudy() {
-    return KERNEL::getStudyById(getActiveStudyId());
+  SALOMEDS::Study_ptr getStudyServant() {
+    return SALOMEDS::Study::_duplicate(KERNEL::getStudyServant());
   }
-
 
   // __GBO__ Question: what is the difference between a
   // SALOMEDS::Study and a SalomeApp_Study?
@@ -120,9 +103,7 @@ namespace GUI {
           // retrieve the SALOMEDS::Study servant first and the to
           // request this servant to get the SObject given its entry.
           //
-          _PTR(Study) studyClient = appStudy->studyDS();
-          SALOMEDS::Study_var study = KERNEL::getStudyManager()->GetStudyByID(studyClient->StudyId());
-          SALOMEDS::SObject_ptr sobject = study->FindObjectID(iobject->getEntry());
+          SALOMEDS::SObject_ptr sobject = KERNEL::getStudyServant()->FindObjectID(iobject->getEntry());
           return sobject;
         }
       }

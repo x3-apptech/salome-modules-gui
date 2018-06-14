@@ -68,15 +68,15 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>STUDYCLOSE_DESCRIPTION</source>
-        <translation>You already have an active study in your session. It has to be closed before working with another study.</translation>
+        <translation>The current study has unsaved changes. Would you like to save before closing it?</translation>
     </message>
     <message>
         <source>APPCLOSE_SAVE</source>
-        <translation>&amp;Save &amp;&amp; Close</translation>
+        <translation>&amp;Yes</translation>
     </message>
     <message>
         <source>APPCLOSE_CLOSE</source>
-        <translation>Close &amp;w/o saving</translation>
+        <translation>&amp;No</translation>
     </message>
     <message>
         <source>APPCLOSE_CANCEL</source>

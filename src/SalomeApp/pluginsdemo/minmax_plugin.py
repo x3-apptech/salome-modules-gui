@@ -22,9 +22,8 @@
 from qtsalome import *
 
 def minmax(context):
-  # get context study, studyId, salomeGui
+  # get context study, salomeGui
   study = context.study
-  studyId = context.studyId
   sg = context.sg
 
   from minmax_ui import Ui_Dialog
@@ -32,7 +31,7 @@ def minmax(context):
   import salome
   import SMESH
   from salome.smesh import smeshBuilder
-  smesh = smeshBuilder.New(salome.myStudy)
+  smesh = smeshBuilder.New()
 
   controls_dict = {
     "Aspect Ratio 3D" :     SMESH.FT_AspectRatio3D,

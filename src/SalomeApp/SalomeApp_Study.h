@@ -43,7 +43,6 @@ public:
   SalomeApp_Study( SUIT_Application* );
   virtual ~SalomeApp_Study();
 
-  virtual int         id() const;
   virtual QString     studyName() const;
 
   virtual bool        createDocument( const QString& );
@@ -103,7 +102,7 @@ protected:
 protected:
   virtual void        dataModelInserted( const CAM_DataModel* );
   virtual bool        openDataModel( const QString&, CAM_DataModel* );
-  void                setStudyDS(const _PTR(Study)& s );
+
   virtual CAM_ModuleObject* createModuleObject( LightApp_DataModel* theDataModel, 
 						SUIT_DataObject* theParent ) const;
 protected slots:
@@ -111,9 +110,6 @@ protected slots:
 #ifndef DISABLE_PYCONSOLE
   void                onNoteBookVarUpdate( QString theVarName );
 #endif
-
-private:
-  QString             newStudyName() const;
 
 private:
   _PTR(Study)         myStudyDS;

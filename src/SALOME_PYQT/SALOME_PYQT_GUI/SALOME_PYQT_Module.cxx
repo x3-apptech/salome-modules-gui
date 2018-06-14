@@ -45,7 +45,7 @@
 // and to get C API from sip : sipBuildResult for example
 //
 
-#define INIT_FUNCTION initSalomePyQtGUILight
+#define INIT_FUNCTION PyInit_SalomePyQtGUILight
 #if defined(SIP_STATIC_MODULE)
 extern "C" void INIT_FUNCTION();
 #else

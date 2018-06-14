@@ -102,7 +102,7 @@ std::string PVServer_ServiceWrapper::FindOrStartPVServer(int port)
       PyErr_Print();
       throw SALOME_Exception("Unable to invoke PVSERVER service!");
     }
-  return std::string(PyString_AsString(obj));
+  return std::string(PyUnicode_AsUTF8(obj));
 }
 
 

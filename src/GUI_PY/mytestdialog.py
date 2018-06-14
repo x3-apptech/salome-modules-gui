@@ -18,11 +18,10 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-__author__="gboulant"
-__date__ ="$31 mars 2010 17:09:53$"
 from qtsalome import *
-from mytestdialog_ui import Ui_MyTestDialog
-from genericdialog import GenericDialog
+from salome.gui.genericdialog import GenericDialog
+from salome.gui.mytestdialog_ui import Ui_MyTestDialog
+
 
 class MyTestDialog(GenericDialog):
     """
@@ -115,12 +114,12 @@ def TEST_MyTestDialog_modal():
     dlg.displayAndWait()
     if dlg.wasOk():
         name = dlg.getData()
-        print "The name has been modified to",name
+        print("The name has been modified to",name)
 
 
 class DialogListener:
     def onProcessEvent(self):
-        print "onProcessEvent(): OK has been pressed"
+        print("onProcessEvent(): OK has been pressed")
         import sys
         sys.exit(0)
         

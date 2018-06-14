@@ -57,10 +57,9 @@ public:
   bool hasDesktop();
 
   /* update object browser*/
-  void updateObjBrowser(bool);
+  void updateObjBrowser();
 
   /* get active study */
-  int getActiveStudyId();
   const char *getActiveStudyName();
 
   /* get component name/username */

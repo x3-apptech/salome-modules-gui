@@ -55,23 +55,6 @@ SalomeGUI = libSALOME_Swig.SALOMEGUI_Swig()
 
 #
 # ==================================================================
-# General helper function for GUI programming actions
-# ==================================================================
-# 
-# Get the active study
-#
-def getActiveStudy():
-    """
-    This returns a study object that corresponds to the active
-    study. The active study is a GUI concept: it's the study currently
-    active on the desktop.
-    """
-    studyId = sgPyQt.getStudyId()
-    study = services.getStudyManager().GetStudyByID( studyId )
-    return study
-
-#
-# ==================================================================
 # Functions to manipulate the objects in the browser (generic)
 # ==================================================================
 #
@@ -84,7 +67,7 @@ def getSObjectSelected():
     '''
     sobj = None
     entry = None
-    study = getActiveStudy()
+    study = salome.myStudy
     if SalomeGUI.SelectedCount() == 1:
         # We only considere the first element of the list. If you need
         # something else, create another function in your own context.
@@ -103,7 +86,7 @@ def showSObjectSelected():
         test, attr = sobj.FindAttribute( "AttributeName" )
         if test:
             message = "My name is '%s'" % attr.Value()
-            print message
+            print(message)
     pass
 
 def deleteSObjectSelected(): 
@@ -112,10 +95,10 @@ def deleteSObjectSelected():
     '''
     sobj, entry = getSObjectSelected()
     if ( sobj ):
-        study = getActiveStudy()
+        study = salome.myStudy
         builder = study.NewBuilder()
         builder.RemoveObject( sobj )
-        SalomeGUI.updateObjBrowser(True)
+        SalomeGUI.updateObjBrowser()
     pass
 
 #
@@ -130,7 +113,7 @@ def deleteSObjectSelected():
 
 #
 # Definitions:
-# - the SObject is an item in the active study (Study Object).
+# - the SObject is an item in the study (Study Object).
 # - the entry is the identifier of an item.
 # - the object (geom object or smesh object) is a CORBA servant
 #   embedded in the SALOME component container and with a reference in
@@ -140,7 +123,7 @@ def deleteSObjectSelected():
 def TEST_getSObjectSelected():
     mySObject, myEntry = getSObjectSelected()
     myName = mySObject.GetName()
-    print "The name of the selected object is %s"%myName
+    print("The name of the selected object is %s"%myName)
 
 def TEST_showSObjectSelected():
     showSObjectSelected()

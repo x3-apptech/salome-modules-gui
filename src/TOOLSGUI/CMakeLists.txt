@@ -44,8 +44,10 @@ SET(_link_LIBRARIES
   ${OpenCASCADE_FoundationClasses_LIBRARIES}
   ${KERNEL_SalomeIDLKernel}
   ${KERNEL_SALOMELocalTrace}
+  ${KERNEL_SalomeDSClient}
   ${KERNEL_SalomeNS}
   ${KERNEL_OpUtil}
+  ${KERNEL_SalomeKernelHelpers}
   ${OMNIORB_LIBRARIES}
   qtx suit
 )

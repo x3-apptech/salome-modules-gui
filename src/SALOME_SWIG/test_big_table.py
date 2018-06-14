@@ -50,7 +50,7 @@ myVerNb = 200
 k={}
 for j in range(0,myHorNb):
    k[j] = j*10+1
-ARealTable.AddRow(k.values())
+ARealTable.AddRow(list(k.values()))
 ARealTable.SetRowTitle(1, "Frequency")
 ARealTable.SetRowUnit(1, "Hz")
 
@@ -60,12 +60,12 @@ for i in range(1,myVerNb+1):
          k[j] = math.log10(j*30*math.pi/180) * 20 + i * 15 + j*5
       else:
          k[j] = math.sin(j*30*math.pi/180) * 20 + i * 15 + j*5 
-   ARealTable.AddRow(k.values())
+   ARealTable.AddRow(list(k.values()))
    ARealTable.SetRowTitle(i+1, "Power " + str(i))
    ARealTable.SetRowUnit(i+1, "Wt")
 ARealTable.SetTitle("Very useful data")
 
 # >>> Updating Object Browser ================================================
-salome.sg.updateObjBrowser(True)
+salome.sg.updateObjBrowser()
 
 # ============================================================================

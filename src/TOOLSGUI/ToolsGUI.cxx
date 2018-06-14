@@ -25,6 +25,8 @@
 //  Author : Nicolas REJNERI
 //
 #include "ToolsGUI.h"
+#include <SALOMEDSClient_ClientFactory.hxx>
+#include <SALOME_KernelServices.hxx>
 
 /*!
   \class ToolsGUI
@@ -33,13 +35,11 @@
 
 /*!
   \brief Get visibility value of the "AttributeGraphic" attribute.
-  \param theStudy study
   \param theObj object
   \param theId sub-object identifier
   \return \c true if an object (sub-object) is visible
 */
-bool ToolsGUI::GetVisibility( _PTR(Study)   theStudy,
-                              _PTR(SObject) theObj,
+bool ToolsGUI::GetVisibility( _PTR(SObject) theObj,
                               void*         theId )
 {
   _PTR(GenericAttribute) anAttr;
@@ -54,17 +54,16 @@ bool ToolsGUI::GetVisibility( _PTR(Study)   theStudy,
 
 /*!
   \brief Set visibility value of the "AttributeGraphic" attribute.
-  \param theStudy study
   \param theObj object
   \return theValue new visibility value
   \param theId sub-object identifier
 */
-bool ToolsGUI::SetVisibility( _PTR(Study) theStudy,
-                              const char* theEntry,
+bool ToolsGUI::SetVisibility( const char* theEntry,
                               const bool  theValue,
                               void*       theId )
 {
-  _PTR(SObject) anObj ( theStudy->FindObjectID( theEntry ) );
+  _PTR(Study) aStudy = ClientFactory::Study(KERNEL::getStudyServant());
+  _PTR(SObject) anObj ( aStudy->FindObjectID( theEntry ) );
 
   if ( anObj )
   {
@@ -76,7 +75,7 @@ bool ToolsGUI::SetVisibility( _PTR(Study) theStudy,
     }
     else if ( theValue )
     {
-      _PTR(StudyBuilder) aBuilder (theStudy->NewBuilder());
+      _PTR(StudyBuilder) aBuilder (aStudy->NewBuilder());
       _PTR(AttributeGraphic) anAttr (aBuilder->FindOrCreateAttribute(anObj, "AttributeGraphic"));
       anAttr->SetVisibility( (unsigned long)theId, theValue );
     }

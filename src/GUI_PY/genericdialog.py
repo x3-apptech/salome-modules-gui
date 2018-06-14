@@ -18,12 +18,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-__author__="gboulant"
-__date__ ="$31 mars 2010 17:09:53$"
-
 from qtsalome import QDialog, QMessageBox
+from salome.gui.genericdialog_ui import Ui_GenericDialog
 
-from genericdialog_ui import Ui_GenericDialog
 
 class GenericDialog(QDialog):
     """
@@ -120,9 +117,9 @@ def TEST_GenericDialog():
     dlg=GenericDialog()
     dlg.displayAndWait()
     if dlg.wasOk():
-        print "OK has been pressed"
+        print("OK has been pressed")
     else:
-        print "Cancel has been pressed"
+        print("Cancel has been pressed")
         
 if __name__ == "__main__":
     TEST_GenericDialog()

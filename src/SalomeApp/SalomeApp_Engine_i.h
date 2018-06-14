@@ -56,17 +56,15 @@ public:
                                const char* theURL, 
                                bool isMultiFile );
 
-  virtual Engines::TMPFile* DumpPython(CORBA::Object_ptr theStudy,
-                                       CORBA::Boolean isPublished,
+  virtual Engines::TMPFile* DumpPython(CORBA::Boolean isPublished,
                                        CORBA::Boolean isMultiFile,
                                        CORBA::Boolean& isValidScript);
 
 public:
   typedef std::vector<std::string> ListOfFiles;
 
-  ListOfFiles             GetListOfFiles (const int          theStudyId);
-  void                    SetListOfFiles (const ListOfFiles& theListOfFiles,
-                                          const int          theStudyId);
+  ListOfFiles             GetListOfFiles ();
+  void                    SetListOfFiles (const ListOfFiles& theListOfFiles);
 
   static std::string         EngineIORForComponent( const char* theComponentName,
 						    bool toCreate );
@@ -86,7 +84,7 @@ public:
   char* IORToLocalPersistentID( SALOMEDS::SObject_ptr, const char*, CORBA::Boolean,  CORBA::Boolean )                                                {return 0;}
   char* LocalPersistentIDToIOR( SALOMEDS::SObject_ptr, const char*, CORBA::Boolean,  CORBA::Boolean )                                                {return 0;}
   bool CanPublishInStudy( CORBA::Object_ptr )                                                                                                        {return 0;}
-  SALOMEDS::SObject_ptr PublishInStudy(SALOMEDS::Study_ptr, SALOMEDS::SObject_ptr, CORBA::Object_ptr, const char* ) throw (SALOME::SALOME_Exception) {return 0;}
+  SALOMEDS::SObject_ptr PublishInStudy( SALOMEDS::SObject_ptr, CORBA::Object_ptr, const char* ) throw (SALOME::SALOME_Exception)                     {return 0;}
   CORBA::Boolean CanCopy( SALOMEDS::SObject_ptr )                                                                                                    {return 0;}
   SALOMEDS::TMPFile* CopyFrom( SALOMEDS::SObject_ptr, CORBA::Long& )                                                                                 {return 0;}
   CORBA::Boolean CanPaste( const char*, CORBA::Long )                                                                                                {return 0;}
@@ -99,8 +97,7 @@ private:
   static PortableServer::POA_var     poa();
   static SALOME_NamingService*       namingService();
 private:
-  typedef std::map<int, ListOfFiles> MapOfListOfFiles;
-  MapOfListOfFiles                   myMap;
+  ListOfFiles                        myListOfFiles;
 
   QString                            myComponentName;
 };

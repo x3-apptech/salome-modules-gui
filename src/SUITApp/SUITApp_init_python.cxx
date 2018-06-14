@@ -17,11 +17,26 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-
+//  Author : Roman NIKOLAEV, Open CASCADE S.A.S. (roman.nikolaev@opencascade.com)
+//  Date   : 22/06/2007
+//
 #include "SUITApp_init_python.hxx"
 #include <QString>
 
-bool SUIT_PYTHON::initialized = false;
+#if PY_VERSION_HEX < 0x03050000
+static char*
+Py_EncodeLocale(const wchar_t *arg, size_t *size)
+{
+	return _Py_wchar2char(arg, size);
+}
+static wchar_t*
+Py_DecodeLocale(const char *arg, size_t *size)
+{
+	return _Py_char2wchar(arg, size);
+}
+#endif
+
+bool SUIT_PYTHON::initialized                       = false;
 
 void SUIT_PYTHON::init_python(int argc, char **argv)
 {
@@ -29,9 +44,17 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   {
     return;
   }
-  Py_SetProgramName(argv[0]);
+
+  wchar_t **changed_argv = new wchar_t*[argc]; // Setting arguments
+  for (int i = 0; i < argc; i++)
+  {
+   changed_argv[i] = Py_DecodeLocale(argv[i], NULL);    
+  }
+
+  Py_SetProgramName(changed_argv[0]);
   Py_Initialize(); // Initialize the interpreter
-  PySys_SetArgv(argc, argv);
+
+  PySys_SetArgv(argc, changed_argv);
   PyRun_SimpleString("import threading\n");
   // VSR (22/09/2016): This is a workaround to prevent invoking qFatal() from PyQt5
   // causing application aborting

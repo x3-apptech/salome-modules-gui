@@ -135,7 +135,7 @@ public:
   virtual SUIT_ViewManager*           createViewManager( const QString& vmType, QWidget* w );
   virtual SUIT_ViewManager*           createViewManager( SUIT_ViewModel* );
 
-  QWidget*                            getWindow( const int, const int = -1 );
+  QWidget*                            getWindow( const int );
   QWidget*                            dockWindow( const int ) const;
   void                                removeDockWindow( const int );
   void                                insertDockWindow( const int, QWidget* );
@@ -153,8 +153,6 @@ public:
   SUIT_Accel*                         accel() const;
 
   void                                setDefaultStudyName( const QString& theName );
-
-  static int                          studyId();
 
   virtual bool                        event( QEvent* );
 
@@ -249,7 +247,7 @@ protected slots:
   virtual void                        onWindowActivated( SUIT_ViewWindow* theViewWindow );
 
   void                                onNewWindow();
-  void                                onModuleActivation( const QString& );
+  virtual void                        onModuleActivation( const QString& );
   void                                onCloseView( SUIT_ViewManager* );
 
   virtual void                        onStudyCreated( SUIT_Study* );
@@ -342,7 +340,6 @@ protected:
 
   static LightApp_Preferences*        _prefs_;
 
-  static int                          lastStudyId;
   QStringList                         myUserWmTypes;
 
   friend void LightAppCleanUpAppResources();
