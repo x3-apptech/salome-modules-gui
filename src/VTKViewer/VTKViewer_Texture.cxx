@@ -583,9 +583,10 @@ void VTKViewer_Texture::Load(vtkRenderer *ren)
 
       if (resampleNeeded)
         {
-        vtkDebugMacro(<< "Resampling texture to power of two for OpenGL");
-        resultData = this->ResampleToPowerOfTwo(xsize, ysize, dataPtr,
-                                                bytesPerPixel);
+          //ostate->vtkglGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxDimGL);
+          vtkDebugMacro(<< "Resampling texture to power of two for OpenGL");
+          resultData = this->ResampleToPowerOfTwo(xsize, ysize, dataPtr,
+                                                  bytesPerPixel, maxDimGL);
         }
 
       if (!resultData)
