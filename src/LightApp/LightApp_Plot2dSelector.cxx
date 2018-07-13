@@ -57,7 +57,7 @@ void LightApp_Plot2dSelector::getSelection( SUIT_DataOwnerPtrList& theList ) con
 {
   if( !myCurEntry.isNull() ) {
 #ifndef DISABLE_SALOMEOBJECT
-    theList.append( new LightApp_DataOwner( new SALOME_InteractiveObject(qPrintable(myCurEntry),"","") ) );
+    theList.append( new LightApp_DataOwner( new SALOME_InteractiveObject(qUtf8Printable(myCurEntry),"","") ) );
 #else
     theList.append( new LightApp_DataOwner( myCurEntry ) );
 #endif
@@ -76,7 +76,7 @@ void LightApp_Plot2dSelector::setSelection( const SUIT_DataOwnerPtrList& theList
 	    anIOList.Append(owner->IO());
       }
       else if ( !owner->entry().isEmpty() ) {
-	    anIOList.Append( new SALOME_InteractiveObject(qPrintable(owner->entry()),"","") );
+	    anIOList.Append( new SALOME_InteractiveObject(qUtf8Printable(owner->entry()),"","") );
       }      
     }
   }

@@ -241,7 +241,7 @@ LightApp_VTKSelector
             else if(const LightApp_DataOwner* anOwner = dynamic_cast<const LightApp_DataOwner*>(aDataOwner))
             {
               Handle(SALOME_InteractiveObject) anIO =
-                new SALOME_InteractiveObject(anOwner->entry().toLatin1(),"");
+                new SALOME_InteractiveObject(anOwner->entry().toUtf8(),"");
               aSelector->AddIObject(anIO);
               anAppendList.Append(anIO);
             }

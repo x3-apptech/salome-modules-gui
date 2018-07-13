@@ -553,7 +553,7 @@ void VTKViewer_ViewWindow::setBackground( const Qtx::BackgroundData& bgData )
 	  aReader = vtkMetaImageReader::New();           
 	if ( aReader ) {
 	  // create texture
-	  aReader->SetFileName( fi.absoluteFilePath().toLatin1().constData() );
+	  aReader->SetFileName( fi.absoluteFilePath().toUtf8().constData() );
 	  aReader->Update();
 	  
 	  VTKViewer_Texture* aTexture = VTKViewer_Texture::New();

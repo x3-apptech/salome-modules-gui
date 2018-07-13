@@ -117,7 +117,7 @@ void SalomeApp_Module::extractContainers( const SALOME_ListIO& source, SALOME_Li
                     val = valSO->GetName().c_str();
 
             Handle( SALOME_InteractiveObject ) new_obj =
-              new SALOME_InteractiveObject( id.toLatin1(), comp.toLatin1(), val.toLatin1() );
+              new SALOME_InteractiveObject( id.toUtf8(), comp.toLatin1(), val.toLatin1() );
             dest.Append( new_obj );
           }
           anIter->Next();

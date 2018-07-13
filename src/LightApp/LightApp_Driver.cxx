@@ -83,7 +83,7 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
   if(aFileBuffer == NULL)
     return false;
 
-  myTmpDir = QDir::toNativeSeparators( QFileInfo( theFileName ).absolutePath() + "/" ).toLatin1().constData() ;
+  myTmpDir = QDir::toNativeSeparators( QFileInfo( theFileName ).absolutePath() + "/" ).toUtf8().constData() ;
 
   int aCurrentPos = 0;
 
@@ -142,7 +142,7 @@ bool LightApp_Driver::ReadDatasFromFile( const char* theFileName, bool isMultiFi
   ifstream aFile(theFileName);
 #endif  
 
-  myTmpDir = QDir::toNativeSeparators( QFileInfo( theFileName ).absolutePath() + "/" ).toLatin1().constData() ;
+  myTmpDir = QDir::toNativeSeparators( QFileInfo( theFileName ).absolutePath() + "/" ).toUtf8().constData() ;
 
   aFile.seekg(0, ios::end);
   int aFileBufferSize = aFile.tellg();

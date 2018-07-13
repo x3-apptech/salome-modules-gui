@@ -884,7 +884,7 @@ bool QtxWorkstackArea::restoreState( QDataStream& stream, QMap<QString, QtxWorks
     QtxWorkstackChild* c = map.contains( name ) ? map[name] : 0;
     if ( !c )
     {
-      qWarning( "QtxWorkstack: Restored child widget \"%s\" not found.", (const char*)name.toLatin1() );
+      qWarning( "QtxWorkstack: Restored child widget \"%s\" not found.", (const char*)name.toUtf8() );
       return false;
     }
 
@@ -3127,7 +3127,7 @@ bool QtxWorkstack::restoreState( QDataStream& stream )
 
       map.insert( c->widget()->objectName(), c );
 
-      qDebug( "QtxWorkstack::restoreState: found widget \"%s\"", (const char*)c->widget()->objectName().toLatin1() );
+      qDebug( "QtxWorkstack::restoreState: found widget \"%s\"", (const char*)c->widget()->objectName().toUtf8() );
     }
   }
 

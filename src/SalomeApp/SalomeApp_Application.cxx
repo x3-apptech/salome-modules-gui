@@ -272,6 +272,7 @@ void SalomeApp_Application::start()
 
               script.remove( QRegExp("^python.*[\\s]+") );
               QString cmd = script+" "+args;
+
               QString command = QString( "exec(open(\"%1\", \"rb\").read())" ).arg(cmd.trimmed());
               pyConsole->exec(command);
             }
@@ -934,6 +935,7 @@ void SalomeApp_Application::onLoadScript( )
 
   if ( !aFile.isEmpty() )
   {
+
     QString command = QString("exec(open(\"%1\", \"rb\").read())").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
@@ -1201,7 +1203,7 @@ int SalomeApp_Application::openChoice( const QString& aName )
   } else { // file is not exist on disk
     SUIT_MessageBox::warning( desktop(),
                               QObject::tr("WRN_WARNING"),
-                              QObject::tr("WRN_FILE_NOT_EXIST").arg(aName.toLatin1().data()));
+                              QObject::tr("WRN_FILE_NOT_EXIST").arg(aName.toUtf8().data()));
     return false;
   }
 
@@ -1968,6 +1970,7 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
 
   // load study from the temporary directory
+
   QString command = QString( "exec(open(\"%1\" ,\"rb\").read())" ).arg( theDumpScript );
 
 #ifndef DISABLE_PYCONSOLE

@@ -48,7 +48,7 @@ namespace
     std::cout << std::endl;
     std::cout << "SALOME Help Browser" << std::endl;
     std::cout << std::endl;
-    std::cout << "usage: " << qPrintable( fi.fileName() ) << " [options] file" << std::endl;
+    std::cout << "usage: " << qUtf8Printable( fi.fileName() ) << " [options] file" << std::endl;
     std::cout << "    file is a help file to be opened" << std::endl;
     std::cout << std::endl;
     std::cout << "Options:" << std::endl;

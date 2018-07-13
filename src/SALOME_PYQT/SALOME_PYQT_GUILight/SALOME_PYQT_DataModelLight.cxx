@@ -91,7 +91,7 @@ bool SALOME_PYQT_DataModelLight::save( QStringList& theListOfFiles)
     return false;
   
 
-  std::string aTmpDir = study->GetTmpDir(myStudyURL.toLatin1().constData(), isMultiFile );
+  std::string aTmpDir = study->GetTmpDir(myStudyURL.toUtf8().constData(), isMultiFile );
 
   theListOfFiles.append(QString(aTmpDir.c_str()));
   int listSize = theListOfFiles.size();
@@ -141,7 +141,7 @@ bool SALOME_PYQT_DataModelLight::dumpPython( const QString& theURL,
   if(!aModule || !study)
     return false;
   
-  std::string aTmpDir = study->GetTmpDir( theURL.toLatin1().constData(), isMultiFile );
+  std::string aTmpDir = study->GetTmpDir( theURL.toUtf8().constData(), isMultiFile );
 
   theListOfFiles.append( QString( aTmpDir.c_str() ) );
   int oldSize = theListOfFiles.size();

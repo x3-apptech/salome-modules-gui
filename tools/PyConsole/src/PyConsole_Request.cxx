@@ -56,7 +56,7 @@ PyConsole_ExecCommand::PyConsole_ExecCommand( PyInterp_Interp*        theInterp,
 void PyConsole_ExecCommand::execute()
 {
   if ( myCommand != "" ) {
-    int ret = getInterp()->run( myCommand.toLatin1().data() );
+    int ret = getInterp()->run( myCommand.toUtf8().data() );
     if ( ret < 0 )
       myState = PyInterp_Event::ES_ERROR;
     else if ( ret > 0 )

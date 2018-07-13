@@ -365,7 +365,7 @@ private:
     while (o) {
       SalomeApp_DataObject* so = dynamic_cast<SalomeApp_DataObject*>( o );
       if ( so ) {
-        std::string entry = so->entry().toLatin1().constData();
+        std::string entry = so->entry().toUtf8().constData();
         if ( entry.size() )
           entry2SuitObject[entry] = so;
       }
@@ -1138,7 +1138,7 @@ LightApp_DataObject* SalomeApp_Study::findObjectByEntry( const QString& theEntry
 {
   LightApp_DataObject* o = 0;
   if ( myObserver ) {
-    o = dynamic_cast<LightApp_DataObject*>( myObserver->findObject( theEntry.toLatin1().constData() ) );
+    o = dynamic_cast<LightApp_DataObject*>( myObserver->findObject( theEntry.toUtf8().constData() ) );
   }
   if ( !o ) {
     o = LightApp_Study::findObjectByEntry( theEntry );

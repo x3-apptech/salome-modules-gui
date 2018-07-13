@@ -268,7 +268,7 @@ void OCCViewer_CubeAxesDlg::ApplyData( const Handle(V3d_View)& theView )
     // axes params
     for ( int i = 0; i < 3; i++ ) {
       Graphic3d_AxisAspect& aspect = gt.ChangeAxisAspect(i);
-      aspect.SetName(anAxisData[i].Name.toLatin1().constData());
+      aspect.SetName(anAxisData[i].Name.toUtf8().constData());
       aspect.SetDrawName(anAxisData[i].DrawName);
       aspect.SetDrawValues(anAxisData[i].DrawValues);
       aspect.SetDrawTickmarks(anAxisData[i].DrawTickmarks);

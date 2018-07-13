@@ -287,7 +287,7 @@ void VTKViewer_PolyDataMapper::SetBallEnabled( bool theBallEnabled )
       
       QString anAlphaTexture = getenv( "GUI_ROOT_DIR" );
       anAlphaTexture.append( "/share/salome/resources/gui/sprite_alpha.vti" );
-      vtkSmartPointer<vtkImageData> aTextureValue = VTK::MakeTexture( aMainTexture.toLatin1().constData(), anAlphaTexture.toLatin1().constData() );
+      vtkSmartPointer<vtkImageData> aTextureValue = VTK::MakeTexture( aMainTexture.toUtf8().constData(), anAlphaTexture.toUtf8().constData() );
       this->SpecialTextures[BallTextureId] = aTextureValue;
     }
     this->ImageData = this->SpecialTextures[BallTextureId];

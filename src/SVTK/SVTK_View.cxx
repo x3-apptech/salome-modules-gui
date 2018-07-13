@@ -335,7 +335,7 @@ SVTK_View
   ForEachIf<SALOME_Actor>(aCopy.GetActors(),
                           TIsSameIObject<SALOME_Actor>(theIObject),
                           TSetFunction<SALOME_Actor,const char*,const char*>
-                          (&SALOME_Actor::setName,theName.toLatin1().data()));
+                          (&SALOME_Actor::setName,theName.toUtf8().data()));
 }
 
 /*!

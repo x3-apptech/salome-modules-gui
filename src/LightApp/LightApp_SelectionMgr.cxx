@@ -155,7 +155,7 @@ void LightApp_SelectionMgr::selectedObjects( SALOME_ListIO& theList,
         if ( refEntry != entry ) {
           entry = refEntry;
           QString component = study->componentDataType( entry );
-          theList.Append( new SALOME_InteractiveObject( (const char*)entry.toLatin1(),
+          theList.Append( new SALOME_InteractiveObject( (const char*)entry.toUtf8(),
                                                         (const char*)component.toLatin1(),
                                                         ""/*refobj->Name().c_str()*/ ) );
         }
@@ -425,7 +425,7 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
     if ( subOwner )
     {
 //#ifndef WIN32
-      if ( !theMap.IsBound( TCollection_AsciiString(subOwner->entry().toLatin1().data()) ) )
+      if ( !theMap.IsBound( TCollection_AsciiString(subOwner->entry().toUtf8().data()) ) )
 //#else
 //      if ( !theMap.IsBound( subOwner->entry().toLatin1().data() ) )
 //#endif
@@ -442,7 +442,7 @@ void LightApp_SelectionMgr::selectedSubOwners( MapEntryOfMapOfInteger& theMap )
               anIndexes.Add( subOwner2->index() );
         }
         //
-        theMap.Bind( subOwner->entry().toLatin1().data(), anIndexes );
+        theMap.Bind( subOwner->entry().toUtf8().data(), anIndexes );
       }
     }
   }

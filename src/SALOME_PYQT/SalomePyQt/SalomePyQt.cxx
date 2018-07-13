@@ -180,7 +180,7 @@ namespace
     if ( app && !fileName.isEmpty() ) {
       QPixmap pixmap = app->resourceMgr()->loadPixmap( module, 
                                                        QApplication::translate( module.toLatin1().data(), 
-                                                                                fileName.toLatin1().data() ) );
+                                                                                fileName.toUtf8().data() ) );
       if ( !pixmap.isNull() )
         icon = QIcon( pixmap );
     }

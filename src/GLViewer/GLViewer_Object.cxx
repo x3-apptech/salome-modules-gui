@@ -140,7 +140,7 @@ QByteArray GLViewer_Object::getByteCopy()
     int anISize = sizeof( int );
 
     const char* aTypeStr = myType.toLatin1().constData();
-    const char* aToolTipStr = myToolTipText.toLatin1().constData();
+    const char* aToolTipStr = myToolTipText.toUtf8().constData();
 
     int aTypeLength = myType.length();
     int aToolTipLength = myToolTipText.length();

@@ -130,7 +130,7 @@ void SVTK_RecorderDlg::onStart()
   if( myFileName.isNull() )
     return;
 
-  myRecorder->SetName( (const char*)myFileName.toLatin1() );
+  myRecorder->SetName( (const char*)myFileName.toUtf8() );
 
   myRecorder->SetUseSkippedFrames( myRecordingModeComboBox->currentIndex() == 0 );
   myRecorder->SetNbFPS( myFPSSpinBox->value() );
