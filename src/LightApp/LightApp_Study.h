@@ -128,7 +128,7 @@ protected:
 protected:
   virtual bool        openDataModel  ( const QString&, CAM_DataModel* );
   virtual CAM_ModuleObject* createModuleObject( LightApp_DataModel* theDataModel, 
-						SUIT_DataObject* theParent ) const;
+                                                SUIT_DataObject* theParent ) const;
 
 signals:
   void                saved  ( SUIT_Study* );
