@@ -252,14 +252,14 @@ void SalomeApp_Application::start()
         if ( !getStudy()->GetProperties()->IsLocked() ) {
           // pyfiles[j] is a dictionary: {"/absolute/path/to/script.py": [script_args]}
           // Path is absolute, script has .py extension
-          for (uint j = 0; j < pyfiles.count(); j++ ) {
+          for (int j = 0; j < pyfiles.count(); j++ ) {
             // Extract scripts and their arguments, if any
             QRegExp rxp ("\"(.+)\":[\\s]*\\[(.*)\\]");
             if ( rxp.indexIn( pyfiles[j] ) >= 0 && rxp.capturedTexts().count() == 3 ) {
               QString script = rxp.capturedTexts()[1];
               QString args = "";
               QStringList argList = __getArgsList(rxp.capturedTexts()[2]);
-              for (uint k = 0; k < argList.count(); k++ ) {
+              for (int k = 0; k < argList.count(); k++ ) {
                 QString arg = argList[k].trimmed();
                 arg.remove( QRegExp("^[\"]") );
                 arg.remove( QRegExp("[\"]$") );
@@ -1658,7 +1658,7 @@ void SalomeApp_Application::updateSavePointDataObjects( SalomeApp_Study* study )
 
   // iterate new save points.  if DataObject with such ID not found in map - create DataObject
   // if in the map - remove it from map.
-  for ( int i = 0; i < savePoints.size(); i++ )
+  for ( size_t i = 0; i < savePoints.size(); i++ )
     if ( !mapDO.contains( savePoints[i] ) )
       new SalomeApp_SavePointObject( guiRootObj, savePoints[i], study );
     else

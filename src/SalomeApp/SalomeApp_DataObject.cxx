@@ -827,13 +827,13 @@ QString SalomeApp_RootObject::toolTip( const int id ) const
   \param id save point ID
   \param study study
 */
-SalomeApp_SavePointObject::SalomeApp_SavePointObject( SUIT_DataObject* parent, 
-                                                      const int id, 
+SalomeApp_SavePointObject::SalomeApp_SavePointObject( SUIT_DataObject* parent,
+                                                      const int id,
                                                       SalomeApp_Study* study )
-: LightApp_DataObject( parent ), 
-  CAM_DataObject( parent ),
-  myId( id ),
-  myStudy( study )
+  : CAM_DataObject( parent ),
+    LightApp_DataObject( parent ),
+    myId( id ),
+    myStudy( study )
 {
 }
 
