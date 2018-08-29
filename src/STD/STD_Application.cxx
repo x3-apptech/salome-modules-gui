@@ -157,8 +157,6 @@ void STD_Application::createActions()
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_NEW" ) ),
                 tr( "MEN_DESK_FILE_NEW" ), tr( "PRP_DESK_FILE_NEW" ),
                 Qt::CTRL+Qt::Key_N, desk, false, this, SLOT( onNewDoc() ) );
-  //no need at this action for mono-study application because study is always exists
-  action( FileNewId )->setVisible( false );
 
   createAction( FileOpenId, tr( "TOT_DESK_FILE_OPEN" ),
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_OPEN" ) ),
@@ -173,6 +171,8 @@ void STD_Application::createActions()
                 resMgr->loadPixmap( "STD", tr( "ICON_FILE_CLOSE" ) ),
                 tr( "MEN_DESK_FILE_CLOSE" ), tr( "PRP_DESK_FILE_CLOSE" ),
                 Qt::CTRL+Qt::Key_W, desk, false, this, SLOT( onCloseDoc() ) );
+  //no need in this action for mono-study application as it is same as NewDoc
+  action( FileCloseId )->setVisible( false );
 
   createAction( FileExitId, tr( "TOT_DESK_FILE_EXIT" ), QIcon(),
                 tr( "MEN_DESK_FILE_EXIT" ), tr( "PRP_DESK_FILE_EXIT" ),
@@ -257,7 +257,7 @@ void STD_Application::createActions()
   // Create tool bars
 
   int stdTBar = createTool( tr( "INF_DESK_TOOLBAR_STANDARD" ),  // title (language-dependant)
-			    QString( "SalomeStandard" ) );      // name (language-independant)
+                            QString( "SalomeStandard" ) );      // name (language-independant)
 
   // Create tool items
 
@@ -742,7 +742,7 @@ int STD_Application::showNotification(const QString& message, const QString& tit
     {
       SUIT_ResourceMgr* aResMgr = resourceMgr();
       if (aResMgr)
-	delay = aResMgr->integerValue("notification", "timeout", 0) * 1000;
+        delay = aResMgr->integerValue("notification", "timeout", 0) * 1000;
     }
     uid = ntfMgr->showNotification(message, title, qMax(delay, 0));
   }

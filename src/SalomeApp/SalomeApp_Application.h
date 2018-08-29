@@ -117,11 +117,15 @@ public:
   virtual bool                        renameObject( const QString&, const QString& );
 
 public slots:
+  virtual void                        onNewDoc();
   virtual void                        onLoadDoc();
   virtual void                        onNewWithScript();
   virtual bool                        onLoadDoc( const QString& );
   virtual void                        onUnloadDoc( bool ask = true);
   virtual void                        onCloseDoc( bool ask = true);
+  virtual void                        onOpenDoc();
+  virtual bool                        onOpenDoc( const QString& );
+  virtual bool                        onReopenDoc();
 
   virtual void                        onExit();
   virtual void                        onCopy();
@@ -195,6 +199,8 @@ private:
 #endif
   QMap<QString, QAction*>             myExtActions;      // Map <AttributeUserID, QAction>
   bool                                myIsCloseFromExit; // "Close from Exit" flag
+
+  bool                                myToIgnoreMessages;// to ignore messages from SALOMEDS
 
 signals:
   void                                dumpedStudyClosed( const QString& theDumpScript,

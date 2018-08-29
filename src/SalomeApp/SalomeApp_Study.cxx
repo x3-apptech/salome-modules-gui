@@ -413,6 +413,7 @@ SalomeApp_Study::~SalomeApp_Study()
   if ( myObserver ) {
     PortableServer::ObjectId_var oid = myObserver->_default_POA()->servant_to_id( myObserver );
     myObserver->_default_POA()->deactivate_object( oid.in() );
+    myObserver = 0;
   }
 }
 
@@ -571,6 +572,13 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
   while ( it.hasNext() )
     openDataModel( studyName(), it.next() );
 
+  bool res = CAM_Study::openDocument( theStudyName );
+
+  //rnv: to fix the "0051779: TC7.2.0: Save operation works incorrectly for study loaded from data server"
+  //     mark study as "not saved" after call openDocument( ... ) method.
+  setIsSaved(false);
+  emit opened( this ); // myRoot is set to Object Browser here
+
   // this will build a SUIT_DataObject-s tree under myRoot member field
   // passing "false" in order NOT to rebuild existing data models' trees - it was done in previous step
   // but tree that corresponds to not-loaded data models will be updated any way.
@@ -582,13 +590,6 @@ bool SalomeApp_Study::loadDocument( const QString& theStudyName )
   //attach an observer to the study with notification of modifications
   myStudyDS->attach(myObserver->_this(),true);
 #endif
-
-  bool res = CAM_Study::openDocument( theStudyName );
-  
-  //rnv: to fix the "0051779: TC7.2.0: Save operation works incorrectly for study loaded from data server"
-  //     mark study as "not saved" after call openDocument( ... ) method.
-  setIsSaved(false);
-  emit opened( this );
 
   bool restore = application()->resourceMgr()->booleanValue( "Study", "store_visual_state", true );
   if ( restore ) {

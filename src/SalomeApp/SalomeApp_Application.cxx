@@ -155,6 +155,24 @@ void SalomeApp_Updater::update( SUIT_DataObject* theObj, OB_ListItem* theItem )
   //}
 }*/
 
+namespace
+{
+  /*!
+    \brief Flag locker.
+  */
+  class MessageLocker
+  {
+  public:
+    //! Constructor. Sets passed boolean flag to \c true.
+    MessageLocker( bool& Lock ) : myPrevState( Lock ), myLock( Lock ) { myLock = true; }
+    //! Destructor. Clear external boolean flag passed as parameter to the constructor to \c false.
+    ~MessageLocker() { myLock = myPrevState; }
+  private:
+    bool  myPrevState;
+    bool& myLock; //! External 'Lock state' boolean flag
+  };
+}
+
 /*!Create new instance of SalomeApp_Application.*/
 extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 {
@@ -164,7 +182,8 @@ extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
 /*!Constructor.*/
 SalomeApp_Application::SalomeApp_Application()
   : LightApp_Application(),
-    myIsCloseFromExit( false )
+    myIsCloseFromExit( false ),
+    myToIgnoreMessages( false )
 {
 }
 
@@ -382,6 +401,8 @@ void SalomeApp_Application::createActions()
 */
 void SalomeApp_Application::onExit()
 {
+  //MessageLocker ml( myToIgnoreMessages );
+
   bool killServers = false;
   bool result = true;
 
@@ -398,9 +419,19 @@ void SalomeApp_Application::onExit()
   }
 }
 
+/*!SLOT. Create a document.*/
+void SalomeApp_Application::onNewDoc()
+{
+  MessageLocker ml( myToIgnoreMessages );
+
+  LightApp_Application::onNewDoc();
+}
+
 /*!SLOT. Load document.*/
 void SalomeApp_Application::onLoadDoc()
 {
+  MessageLocker ml( myToIgnoreMessages );
+
   QString studyName;
 
   // rnv: According to the single-study approach on the server side
@@ -549,6 +580,11 @@ bool SalomeApp_Application::onLoadDoc( const QString& aName )
 /*!SLOT. Parse message for desktop.*/
 void SalomeApp_Application::onDesktopMessage( const QString& message )
 {
+  if ( myToIgnoreMessages )
+    return; // a message from SALOMEDS is caused by GUI action
+
+  MessageLocker ml( myToIgnoreMessages );
+
   if (message.indexOf("studyCreated") == 0) {
     if (!activeStudy()) {
       onNewDoc();
@@ -566,7 +602,8 @@ void SalomeApp_Application::onDesktopMessage( const QString& message )
     }
   }
   else if ( message.toLower() == "connect_to_study" ) {
-    onLoadDoc();
+    if ( activeStudy() )
+      useStudy( activeStudy()->studyName() );
   }
   if (message.indexOf("studyNameChanged") == 0) {
     updateDesktopTitle();
@@ -672,10 +709,37 @@ void SalomeApp_Application::onCloseDoc( bool ask )
                                     SUIT_MessageBox::No) == SUIT_MessageBox::No ) return;
 
   }
+  MessageLocker ml( myToIgnoreMessages );
+
   LightApp_Application::onCloseDoc( ask );
 
   // reinitialize study to have empty data
-  getStudy()->Init();
+  //getStudy()->Init();
+}
+
+/*!SLOT. Reload document from the file.*/
+bool SalomeApp_Application::onReopenDoc()
+{
+  MessageLocker ml( myToIgnoreMessages );
+
+  return LightApp_Application::onReopenDoc();
+}
+
+
+/*!SLOT. Load document.*/
+void SalomeApp_Application::onOpenDoc()
+{
+  MessageLocker ml( myToIgnoreMessages );
+
+  LightApp_Application::onOpenDoc();
+}
+
+/*!SLOT. Load document.*/
+bool SalomeApp_Application::onOpenDoc(const QString& name)
+{
+  MessageLocker ml( myToIgnoreMessages );
+
+  return LightApp_Application::onOpenDoc(name);
 }
 
 /*!Sets enable or disable some actions on selection changed.*/
@@ -774,6 +838,8 @@ SUIT_Study* SalomeApp_Application::createNewStudy()
   connect( aStudy, SIGNAL(notebookVarUpdated(QString)),
            this, SIGNAL(notebookVarUpdated(QString)) );
 #endif
+
+  getStudy()->Init();
 
   return aStudy;
 }
