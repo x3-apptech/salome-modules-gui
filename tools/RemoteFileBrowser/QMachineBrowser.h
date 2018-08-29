@@ -21,13 +21,15 @@
 #ifndef __QMACHINEBROWSER__
 #define __QMACHINEBROWSER__
 
+#include "RemoteFileBrowser.h"
+
 #include <QWidget>
 #include <QComboBox>
 
 class QPushButton;
 class QLineEdit;
 
-class QMachineSelector : public QComboBox
+class QREMOTEFILEBROWSER_EXPORT QMachineSelector : public QComboBox
 {
   Q_OBJECT
 public:
@@ -42,7 +44,7 @@ private:
   void assignToLocalhost();
 };
 
-class QMachineManager : public QWidget
+class QREMOTEFILEBROWSER_EXPORT QMachineManager : public QWidget
 {
   Q_OBJECT
 public:
@@ -59,7 +61,7 @@ private:
 class QRemoteFileSystemModel;
 class FileLoader;
 
-class QMachineBrowser : public QWidget
+class QREMOTEFILEBROWSER_EXPORT QMachineBrowser : public QWidget
 {
   Q_OBJECT
 public:

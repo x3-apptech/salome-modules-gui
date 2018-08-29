@@ -2225,7 +2225,11 @@ void Qtx::initDefaultSurfaceFormat()
   fmt.setBlueBufferSize(1);
   fmt.setDepthBufferSize(1);
   fmt.setStencilBufferSize(0);
+#ifdef WIN32
+  fmt.setAlphaBufferSize(0);
+#else
   fmt.setAlphaBufferSize(1);
+#endif
   fmt.setStereo(false);
   fmt.setSamples(0);
   

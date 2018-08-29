@@ -104,7 +104,7 @@ void MessageCallback( GLenum source,
                       GLuint id,
                       GLenum severity,
                       GLsizei length,
-                      const GLchar* message,
+                      const GLcharARB* message,
                       const void* userParam )
 {
   fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
@@ -383,7 +383,7 @@ int VTKViewer_PolyDataMapper::InitExtensions()
   glGetIntegerv(GL_NUM_EXTENSIONS, &n);
   for (int i = 0; i < n; i++)
     {
-      const char *exti = (const char *)glGetStringi(GL_EXTENSIONS, i);
+      const char *exti = (const char *)this->OpenGLHelper.vglGetStringiARB(GL_EXTENSIONS, i);
       strm<< exti <<" ";
     }
   std::string s = strm.str();
@@ -447,7 +447,7 @@ void VTKViewer_PolyDataMapper::InitTextures()
     glGenTextures( 1, &this->PointSpriteTexture );
   }
 #ifdef VTK_OPENGL2
-  glActiveTexture( GL_TEXTURE0 );
+  this->OpenGLHelper.vglActiveTextureARB( GL_TEXTURE0 );
 #endif
   glBindTexture( GL_TEXTURE_2D, this->PointSpriteTexture );
   glTexEnvf( GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE );

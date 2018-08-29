@@ -18,8 +18,9 @@
 //
 // Author : Anthony GEAY (EDF R&D)
 
-#include "QRemoteCopyWidget"
-#include "QRemoteFileBrowser"
+#include "QRemoteCopyWidget.h"
+#include "QRemoteFileBrowser.h"
+
 #include "QVBoxLayout"
 #include "QPushButton"
 #include "QHeaderView"

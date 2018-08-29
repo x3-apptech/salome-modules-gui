@@ -24,6 +24,7 @@
 #define GL_GLEXT_PROTOTYPES
 #endif
 
+
 #include "OpenGLUtils_FrameBuffer.h"
 
 #include <utilities.h>
@@ -152,7 +153,7 @@ OpenGLUtils_FrameBuffer::~OpenGLUtils_FrameBuffer()
 
 bool OpenGLUtils_FrameBuffer::init( const GLsizei& xSize, const GLsizei& ySize )
 {
-#ifdef VTK_OPENGL2
+#if defined(VTK_OPENGL2) && ! defined(WIN32)
   int n = 0;
   std::ostringstream strm;
   glGetIntegerv(GL_NUM_EXTENSIONS, &n);

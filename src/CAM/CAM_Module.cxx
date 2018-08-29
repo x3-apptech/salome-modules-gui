@@ -338,8 +338,10 @@ void CAM_Module::putInfo( const QString& msg, const int msec )
 */
 int CAM_Module::showNotification( const QString& message, const QString& title, int timeout )
 {
+  int res = -1;
   if ( application() )
-    application()->showNotification( message, title, timeout );
+    res = application()->showNotification( message, title, timeout );
+  return res;
 }
 
 /*!

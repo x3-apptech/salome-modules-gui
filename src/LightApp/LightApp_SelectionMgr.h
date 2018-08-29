@@ -100,7 +100,7 @@ private:
   virtual void           selectionChanged( SUIT_Selector* );
 
 #ifndef DISABLE_SALOMEOBJECT
-  QList<Handle_SALOME_InteractiveObject> selectionCache( const QString& = QString() ) const;
+  QList<Handle(SALOME_InteractiveObject)> selectionCache( const QString& = QString() ) const;
 #else
   QStringList                            selectionCache( const QString& = QString() ) const;
 #endif
@@ -110,7 +110,7 @@ private:
 
 private:
 #ifndef DISABLE_SALOMEOBJECT
-  typedef Handle_SALOME_InteractiveObject SelObject;
+  typedef Handle(SALOME_InteractiveObject) SelObject;
 #else
   typedef QString                         SelObject;
 #endif

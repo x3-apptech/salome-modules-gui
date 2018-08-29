@@ -23,6 +23,8 @@
 #ifndef QTXNOTIFY_H
 #define QTXNOTIFY_H
 
+#include "Qtx.h"
+
 #include <QWidget>
 
 #include <QList>
@@ -30,7 +32,7 @@
 
 class QTimer;
 
-class QtxNotify : public QObject
+class QTX_EXPORT QtxNotify : public QObject
 {
     Q_OBJECT
 

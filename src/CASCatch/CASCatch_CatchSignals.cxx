@@ -201,7 +201,7 @@ void CASCatch_CatchSignals::Deactivate()
 
 #else
 //====================================== WIN32 part ====================================================
-#include <OSD_WNT_1.hxx>
+#include <OSD_WNT.hxx>
 
 #include <process.h>
 #include <signal.h>

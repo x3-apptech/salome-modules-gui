@@ -324,7 +324,11 @@ QString SUIT_Session::lastError() const
   ::FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
                    FORMAT_MESSAGE_IGNORE_INSERTS, 0, ::GetLastError(), 0, (LPTSTR)&lpMsgBuf, 0, 0 );
   LPTSTR msg = (LPTSTR)lpMsgBuf;
+#ifdef UNICODE
+  str = QString::fromWCharArray(msg);
+#else
   str = QString( SUIT_Tools::toQString( msg ) );
+#endif
   LocalFree( lpMsgBuf );
 #else
   str = QString( dlerror() );

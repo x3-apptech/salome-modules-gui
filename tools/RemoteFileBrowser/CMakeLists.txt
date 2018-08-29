@@ -55,9 +55,10 @@ SET(qremotefilebrowser_SOURCES
   )
 
 SET(qremotefilebrowser_HEADERS
-  QRemoteFileBrowser
-  QRemoteCopyWidget
-  QMachineBrowser
+  QRemoteFileBrowser.h
+  QRemoteCopyWidget.h
+  QMachineBrowser.h
+  RemoteFileBrowser.h 
   )
 
 SET(qremotefilebrowser_LIBRARIES
@@ -65,9 +66,9 @@ SET(qremotefilebrowser_LIBRARIES
   )
 
 SET(_moc_HEADERS
-  QRemoteFileBrowser
-  QMachineBrowser
-  QRemoteCopyWidget
+  QRemoteFileBrowser.h
+  QMachineBrowser.h
+  QRemoteCopyWidget.h
   )
 
 # sources / moc wrappings

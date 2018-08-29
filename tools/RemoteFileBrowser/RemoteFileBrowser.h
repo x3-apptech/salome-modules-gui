@@ -18,13 +18,19 @@
 //
 // Author : Anthony GEAY (EDF R&D)
 
-#include "QApplication"
-#include "QRemoteFileBrowser.h"
+#if !defined ( REMOTE_FILE_BROWSER_H )
+#define REMOTE_FILE_BROWSER_H
 
-int main(int argc, char *argv[])
-{
-  QApplication app(argc,argv);
-  QRemoteFileTransfer ft;
-  ft.show();
-  return app.exec();
-}
+// ========================================================
+// set dllexport type for Win platform 
+#ifdef WIN32
+# if defined QREMOTEFILEBROWSER_EXPORTS || defined qremotefilebrowser_EXPORTS
+#  define QREMOTEFILEBROWSER_EXPORT __declspec(dllexport)
+# else
+#  define QREMOTEFILEBROWSER_EXPORT __declspec(dllimport)
+# endif
+#else   // WIN32
+# define QREMOTEFILEBROWSER_EXPORT
+#endif  // WIN32
+
+#endif //REMOTE_FILE_BROWSER_H

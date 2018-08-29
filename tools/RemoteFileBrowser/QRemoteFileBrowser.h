@@ -21,6 +21,8 @@
 #ifndef __QREMOTEFILEBROWSER__
 #define __QREMOTEFILEBROWSER__
 
+#include "RemoteFileBrowser.h"
+
 #include "QWidget"
 #include "QTreeView"
 #include "QMimeData"
@@ -31,7 +33,7 @@ class QMachineBrowser;
 class QRemoteFileSystemModel;
 class TopDirDataStructure;
 
-class LoadingThread : public QThread
+class QREMOTEFILEBROWSER_EXPORT LoadingThread : public QThread
 {
   Q_OBJECT
 public:
@@ -48,7 +50,7 @@ private:
   QRemoteFileSystemModel *_model;
 };
 
-class QRemoteFileBrowser : public QWidget
+class QREMOTEFILEBROWSER_EXPORT QRemoteFileBrowser : public QWidget
 {
   Q_OBJECT
 public:
@@ -62,7 +64,7 @@ private:
   QMachineBrowser *_mb;
 };
 
-class QRemoteFileTransfer : public QWidget
+class QREMOTEFILEBROWSER_EXPORT QRemoteFileTransfer : public QWidget
 {
 public:
   QRemoteFileTransfer(QWidget *parent=0);
@@ -74,7 +76,7 @@ private:
 class DirDataStructure;
 class TopDirDataStructure;
 
-class DataStructure : public QObject
+class QREMOTEFILEBROWSER_EXPORT DataStructure : public QObject
 {
   Q_OBJECT
 public:
@@ -99,7 +101,7 @@ private:
   bool _selected;
 };
 
-class FileDataStructure : public DataStructure
+class QREMOTEFILEBROWSER_EXPORT FileDataStructure : public DataStructure
 {
 public:
   FileDataStructure(DirDataStructure *dds, const QString& name);
@@ -109,7 +111,7 @@ public:
   QString nameOnDrop() const;
 };
 
-class DirDataStructure : public DataStructure
+class QREMOTEFILEBROWSER_EXPORT DirDataStructure : public DataStructure
 {
 public:
   DirDataStructure(DirDataStructure *dds, const QString& name):DataStructure(dds,name),_is_loaded(false),_is_expanded(false) { }
@@ -131,7 +133,7 @@ private:
 
 class FileLoader;
 
-class TopDirDataStructure : public DirDataStructure
+class QREMOTEFILEBROWSER_EXPORT TopDirDataStructure : public DirDataStructure
 {
 public:
   TopDirDataStructure(QObject *dds, FileLoader *fl);
@@ -148,7 +150,7 @@ private:
 
 class QRemoteFileSystemModel;
 
-class MyTreeView : public QTreeView
+class QREMOTEFILEBROWSER_EXPORT MyTreeView : public QTreeView
 {
   Q_OBJECT
 public:
@@ -182,25 +184,25 @@ private:
 
 class AnotherTreeView;
 
-class AnotherTreeViewPainter
+class QREMOTEFILEBROWSER_EXPORT AnotherTreeViewPainter
 {
 public:
   virtual void paint(AnotherTreeView *atv, QPaintEvent *event) const = 0;
 };
 
-class AnotherTreeViewWaitPainter : public AnotherTreeViewPainter
+class QREMOTEFILEBROWSER_EXPORT AnotherTreeViewWaitPainter : public AnotherTreeViewPainter
 {
 public:
   void paint(AnotherTreeView *atv, QPaintEvent *event) const;
 };
 
-class AnotherTreeViewNothingPainter : public AnotherTreeViewPainter
+class QREMOTEFILEBROWSER_EXPORT AnotherTreeViewNothingPainter : public AnotherTreeViewPainter
 {
 public:
   void paint(AnotherTreeView *atv, QPaintEvent *event) const;
 };
 
-class AnotherTreeView : public QWidget
+class QREMOTEFILEBROWSER_EXPORT AnotherTreeView : public QWidget
 {
   Q_OBJECT
 public:
@@ -227,7 +229,7 @@ private:
   LoadingThread *_th;
 };
 
-class FileLoader
+class QREMOTEFILEBROWSER_EXPORT FileLoader
 {
 protected:
   FileLoader(const QString& dirName):_dirName(dirName) { }
@@ -243,7 +245,7 @@ private:
   QString _dirName;
 };
 
-class LocalFileLoader : public FileLoader
+class QREMOTEFILEBROWSER_EXPORT LocalFileLoader : public FileLoader
 {
 public:
   LocalFileLoader(const QString& dirName):FileLoader(dirName) { }
@@ -255,7 +257,7 @@ public:
   void removeFileArgs(const QString& filePath, QString& prg, QStringList& args) const;
 };
 
-class RemoteFileLoader : public FileLoader
+class QREMOTEFILEBROWSER_EXPORT RemoteFileLoader : public FileLoader
 {
 public:
   RemoteFileLoader(const QString& machine,const QString& dirName):FileLoader(dirName),_machine(machine) { }
@@ -269,7 +271,7 @@ private:
   QString _machine;
 };
 
-class SelectionMimeData : public QMimeData
+class QREMOTEFILEBROWSER_EXPORT SelectionMimeData : public QMimeData
 {
   Q_OBJECT
 public:
@@ -279,7 +281,7 @@ private:
   QModelIndexList _los;
 };
 
-class QRemoteFileSystemModel : public QAbstractItemModel
+class QREMOTEFILEBROWSER_EXPORT QRemoteFileSystemModel : public QAbstractItemModel
 {
   Q_OBJECT
 public:

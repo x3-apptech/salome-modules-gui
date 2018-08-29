@@ -71,6 +71,8 @@ VTKViewer_OpenGLHelper::VTKViewer_OpenGLHelper()
   vglBindVertexArrayARB          (NULL),
   vglUniform1iARB                (NULL),
   vglGetUniformLocationARB       (NULL),
+  vglActiveTextureARB            (NULL),
+  vglGetStringiARB               (NULL),
 #endif
   mIsInitialized                 (false)
 {
@@ -171,16 +173,24 @@ void VTKViewer_OpenGLHelper::Init()
   vglGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)GL_GetProcAddress( "glGetUniformLocationARB" );
   if( !vglGetUniformLocationARB )
     return;
-
-  vglGetShaderivARB = (PFNGLGETSHADERIVPROC)GL_GetProcAddress( "glGetShaderiv" );
+                       
+  vglGetShaderivARB = (PFNGLGETSHADERIVARBPROC)GL_GetProcAddress( "glGetShaderiv" );
   if( !vglGetShaderivARB )
     return;
 
-  vglGetProgramivARB = (PFNGLGETPROGRAMIVPROC)GL_GetProcAddress( "glGetProgramiv" );
+  vglActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)GL_GetProcAddress( "glActiveTexture" );
+  if (!vglActiveTextureARB)
+	  return;
+
+  vglGetStringiARB = (PFNGLGETSTRINGIPROC)GL_GetProcAddress("glGetStringi");
+  if (!vglGetStringiARB)
+	  return;
+
+  vglGetProgramivARB = (PFNGLGETPROGRAMIVARBPROC)GL_GetProcAddress( "glGetProgramiv" );
   if( !vglGetProgramivARB )
     return;
 
-  vglGetShaderInfoLogARB = (PFNGLGETSHADERINFOLOGPROC)GL_GetProcAddress( "glGetShaderInfoLog" );
+  vglGetShaderInfoLogARB = (PFNGLGETSHADERINFOLOGARBPROC)GL_GetProcAddress( "glGetShaderInfoLog" );
   if( !vglGetShaderInfoLogARB )
     return;
 
@@ -269,7 +279,7 @@ bool VTKViewer_OpenGLHelper::CreateShaderProgram (const std::string& theFilePath
   if (compileStatus != GL_TRUE)
   {
     GLint size;
-    GLchar info[1024];
+    GLcharARB info[1024];
 
     vglGetShaderInfoLogARB (theVertexShader, 1024, &size, info);
     std::cerr << "Can't compile vertex shader." << std::endl;
@@ -293,7 +303,7 @@ bool VTKViewer_OpenGLHelper::CreateShaderProgram (const std::string& theFilePath
   if (compileStatus != GL_TRUE)
   {
     GLint size;
-    GLchar info[1024];
+    GLcharARB info[1024];
 
     vglGetShaderInfoLogARB (theVertexShader, 1024, &size, info);
     std::cerr << "Can't compile fragment shader." << std::endl;

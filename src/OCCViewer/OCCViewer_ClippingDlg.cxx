@@ -1441,7 +1441,7 @@ void OCCViewer_ClippingDlg::onApply()
 /*!
   SLOT: Called when clip plane is clicked in viewer.
 */
-void OCCViewer_ClippingDlg::onPlaneClicked( const Handle(AIS_Plane)& thePlane )
+void OCCViewer_ClippingDlg::onPlaneClicked( const Handle_AIS_Plane& thePlane )
 {
   for ( int aPlaneIt = 0; aPlaneIt < myPreviewPlaneVector.size(); aPlaneIt++ )
   {
@@ -1460,7 +1460,7 @@ void OCCViewer_ClippingDlg::onPlaneClicked( const Handle(AIS_Plane)& thePlane )
 /*!
   SLOT: Called when clip plane is changed by dragging in viewer.
 */
-void OCCViewer_ClippingDlg::onPlaneDragged( const Handle(AIS_Plane)& thePlane )
+void OCCViewer_ClippingDlg::onPlaneDragged( const Handle_AIS_Plane& thePlane )
 {
   for ( int aPlaneIt = 0; aPlaneIt < myPreviewPlaneVector.size(); aPlaneIt++ )
   {

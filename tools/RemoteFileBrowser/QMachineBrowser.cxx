@@ -18,8 +18,8 @@
 //
 // Author : Anthony GEAY (EDF R&D)
 
-#include "QMachineBrowser"
-#include "QRemoteFileBrowser"
+#include "QMachineBrowser.h"
+#include "QRemoteFileBrowser.h"
 
 #include "QDir"
 #include "QFileInfo"

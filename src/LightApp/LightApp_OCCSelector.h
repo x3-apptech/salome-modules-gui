@@ -67,7 +67,7 @@ protected:
   virtual void      setSelection( const SUIT_DataOwnerPtrList& );
 
 #ifndef DISABLE_OCCVIEWER
-  virtual QString   entry( const Handle_AIS_InteractiveObject& ) const;
+  virtual QString   entry( const Handle(AIS_InteractiveObject)& ) const;
 #endif
 
   SUIT_DataOwnerPtrList mySelectedExternals;

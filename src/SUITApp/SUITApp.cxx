@@ -218,12 +218,17 @@ int main( int argc, char* argv[] )
 
 #ifdef WIN32
     DWORD aLen=1024;
-    char aStr[1024];
+    TCHAR aStr[1024];
     HANDLE aToken=0;
     HANDLE hProcess = GetCurrentProcess();
     OpenProcessToken(hProcess,TOKEN_QUERY,&aToken);
-    if( GetUserProfileDirectory( aToken, aStr, &aLen ) )
-      env = aStr;
+    if( GetUserProfileDirectory( aToken, aStr, &aLen ) ) {
+#ifdef UNICODE
+		env = QString::fromWCharArray(aStr);
+#else 
+		env = aStr;
+#endif
+	}
 
 #else
     if ( ::getenv( "HOME" ) )

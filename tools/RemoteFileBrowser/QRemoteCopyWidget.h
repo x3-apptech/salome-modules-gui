@@ -21,6 +21,8 @@
 #ifndef __QREMOTECOPYWIDGET__
 #define __QREMOTECOPYWIDGET__
 
+#include "RemoteFileBrowser.h"
+
 #include "QDialog"
 #include "QMutex"
 #include "QThread"
@@ -37,7 +39,7 @@ class QTableView;
 
 void PerformCopy(QWidget *parent, QRemoteFileSystemModel *srcModel, const QModelIndexList& srcSelectedFiles, DataStructure *ds);
 
-class CopierThread : public QThread
+class QREMOTEFILEBROWSER_EXPORT CopierThread : public QThread
 {
 public:
   CopierThread(QObject *parent, QFilesDirsCopierModel *model):QThread(parent),_model(model) { }
@@ -48,7 +50,7 @@ private:
   QFilesDirsCopierModel *_model;
 };
 
-class QFilesDirsCopierModel : public QAbstractListModel
+class QREMOTEFILEBROWSER_EXPORT QFilesDirsCopierModel : public QAbstractListModel
 {
   Q_OBJECT
 public:
@@ -87,7 +89,7 @@ public:
   static const char ATOMIC_STOP_MSG[];
 };
 
-class ProgressDelegate : public QItemDelegate
+class QREMOTEFILEBROWSER_EXPORT ProgressDelegate : public QItemDelegate
 {
 public:
   ProgressDelegate(QObject *parent, QFilesDirsCopierModel *model):QItemDelegate(parent),_model(model) { }
@@ -96,7 +98,7 @@ private:
   QFilesDirsCopierModel *_model;
 };
 
-class CopierTableView : public QTableView
+class QREMOTEFILEBROWSER_EXPORT CopierTableView : public QTableView
 {
 public:
   CopierTableView(QWidget *parent);
@@ -106,7 +108,7 @@ public:
   QSize sizeHint() const;
 };
    
-class FilesDirsCopier : public QDialog
+class QREMOTEFILEBROWSER_EXPORT FilesDirsCopier : public QDialog
 {
   Q_OBJECT
 public:

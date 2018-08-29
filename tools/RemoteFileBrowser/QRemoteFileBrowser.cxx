@@ -18,9 +18,9 @@
 //
 // Author : Anthony GEAY (EDF R&D)
 
-#include "QRemoteFileBrowser"
-#include "QMachineBrowser"
-#include "QRemoteCopyWidget"
+#include "QRemoteFileBrowser.h"
+#include "QMachineBrowser.h"
+#include "QRemoteCopyWidget.h"
 
 #include "QDirModel"
 #include "QFileSystemModel"

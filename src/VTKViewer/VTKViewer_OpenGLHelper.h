@@ -70,6 +70,33 @@ typedef ptrdiff_t GLsizeiptrARB;
 #define GL_STATIC_DRAW_ARB                0x88E4
 #endif
 
+#ifndef GL_COMPILE_STATUS
+#define GL_COMPILE_STATUS                 0x8B81
+#endif
+
+#ifndef GL_CURRENT_PROGRAM
+#define GL_CURRENT_PROGRAM                0x8B8D
+#endif
+
+#ifndef GL_DEBUG_TYPE_ERROR
+#define GL_DEBUG_TYPE_ERROR               0x824C
+#endif
+
+#ifndef GL_LINK_STATUS
+#define GL_LINK_STATUS                    0x8B82
+#endif
+
+#ifndef GL_TEXTURE0
+#define GL_TEXTURE0                       0x84C0
+#endif
+
+#ifndef GL_VALIDATE_STATUS
+#define GL_VALIDATE_STATUS                0x8B83
+#endif
+
+#ifndef GL_NUM_EXTENSIONS
+#define GL_NUM_EXTENSIONS                 0x821D
+#endif
 
 namespace GUI_OPENGL {
 char* readFromFile( std::string fileName );
@@ -117,17 +144,19 @@ protected:
   typedef void        (APIENTRYP PFNGLDISABLEVERTEXATTRIBARRAYARBPROC) (GLuint index);
 
 #ifdef VTK_OPENGL2
+  typedef void        (APIENTRYP PFNGLACTIVETEXTUREARBPROC)            (GLenum texture);
   typedef void        (APIENTRYP PFNGLDETACHOBJECTARBPROC)             (GLhandleARB containerObj, GLhandleARB obj);
   typedef void        (APIENTRYP PFNGLDELETEOBJECTARBPROC)             (GLhandleARB obj);
   typedef void        (APIENTRYP PFNGLVALIDATEPROGRAMARBPROC)          (GLhandleARB program);
   typedef GLint       (APIENTRYP PFNGLGETUNIFORMLOCATIONARBPROC)       (GLhandleARB program, const GLcharARB *name );
   typedef void        (APIENTRYP PFNGLGETSHADERIVARBPROC)              (GLuint shader, GLenum pname, GLint *params);
-  typedef void        (APIENTRYP PFNGLGETPROGRAMIVARBPROC)             (GLuint program, GLenum pname, GLint *params);
-  typedef void        (APIENTRYP PFNGLGETSHADERINFOLOGARBPROC)         (GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
+  typedef void        (APIENTRYP PFNGLGETPROGRAMIVARBPROC)             (GLenum target, GLenum pname, GLint *params);
+  typedef void        (APIENTRYP PFNGLGETSHADERINFOLOGARBPROC)         (GLuint shader, GLsizei maxLength, GLsizei *length, GLcharARB *infoLog);
   typedef void        (APIENTRYP PFNGLUNIFORMMATRIX4FVARBPROC)         (GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
   typedef void        (APIENTRYP PFNGLGENVERTEXARRAYSARBPROC)          (GLsizei n, GLuint *arrays);
   typedef void        (APIENTRYP PFNGLBINDVERTEXARRAYARBPROC)          (GLuint array);
   typedef void        (APIENTRYP PFNGLUNIFORM1IARBPROC)                (GLint location, GLint v0);
+  typedef const GLubyte *(APIENTRYP PFNGLGETSTRINGIPROC)               (GLenum name, GLuint index);
 #endif
 
 public:
@@ -161,6 +190,8 @@ public:
   PFNGLBINDVERTEXARRAYARBPROC          vglBindVertexArrayARB;
   PFNGLUNIFORM1IARBPROC                vglUniform1iARB;
   PFNGLGETUNIFORMLOCATIONARBPROC       vglGetUniformLocationARB;
+  PFNGLACTIVETEXTUREARBPROC            vglActiveTextureARB;  
+  PFNGLGETSTRINGIPROC                  vglGetStringiARB;
 #endif
 
 protected:
