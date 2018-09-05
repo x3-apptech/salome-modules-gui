@@ -72,7 +72,7 @@ int SalomeApp_PyInterp::beforeRun()
     int ret = simpleRun( "import salome", false );
     if ( ret )
       return ret;
-    ret = simpleRun( "salome.salome_init(1)", false );
+    ret = simpleRun( "salome.salome_init(embedded=True)", false );
     if ( ret )
       return ret;
   }

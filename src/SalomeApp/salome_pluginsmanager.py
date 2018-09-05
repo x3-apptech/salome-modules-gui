@@ -241,7 +241,7 @@ class PluginsManager:
     def importPlugins(self):
         """Execute the salome_plugins file that contains plugins definition """
         if self.lasttime ==0 or salome.myStudy == None:
-          salome.salome_init(embedded=1)
+          salome.salome_init(embedded=True)
 
         lasttime=0
 
