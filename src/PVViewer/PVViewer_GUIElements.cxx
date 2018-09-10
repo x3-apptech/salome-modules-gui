@@ -49,6 +49,8 @@
 #include <vtkSMSessionProxyManager.h>
 #include <vtkSMProxyIterator.h>
 
+#include <vtkPVConfig.h>
+
 #include <QAction>
 #include <QCoreApplication>
 #include <QLayout>
@@ -56,7 +58,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QToolBar>
-
 
 PVViewer_GUIElements * PVViewer_GUIElements::theInstance = 0;
 
@@ -122,7 +123,11 @@ void PVViewer_GUIElements::buildPVWidgets()
     // Catalyst Menu
     if (!catalystMenu) {
       catalystMenu = new QMenu(0);
+#if PARAVIEW_VERSION_MAJOR==5 && PARAVIEW_VERSION_MINOR>=6
+      pqParaViewMenuBuilders::buildCatalystMenu(*catalystMenu, myDesktop);
+#else
       pqParaViewMenuBuilders::buildCatalystMenu(*catalystMenu);
+#endif
     }
 
     mainToolBar = new pqMainControlsToolbar(myDesktop)
