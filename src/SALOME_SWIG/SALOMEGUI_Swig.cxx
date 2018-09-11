@@ -706,6 +706,63 @@ void SALOMEGUI_Swig::FitAll()
   ProcessVoidEvent( new TEvent() );
 }
 
+void SALOMEGUI_Swig::FitSelection()
+{
+  class TEvent: public SALOME_Event
+  {
+  public:
+    TEvent() {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+        if (!viewMgr) return;
+        SUIT_ViewWindow* window = viewMgr->getActiveView();
+        if ( window ) {
+#if !defined(DISABLE_SALOMEOBJECT) && !defined(DISABLE_VTKVIEWER)
+          if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
+            (dynamic_cast<SVTK_ViewWindow*>( window ))->onFitSelection();
+#endif
+#if !defined(DISABLE_OCCVIEWER)
+          if ( dynamic_cast<OCCViewer_ViewWindow*>( window ) )
+            (dynamic_cast<OCCViewer_ViewWindow*>( window ))->onFitSelection();
+#endif
+        }
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent() );
+}
+
+void SALOMEGUI_Swig::FitIObjects(const std::list<std::string>& entries)
+{
+  class TEvent: public SALOME_Event
+  {
+    const std::list<std::string>& myEntries;
+  public:
+    TEvent( const std::list<std::string>& objs ) : myEntries( objs ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        SUIT_ViewManager* viewMgr = anApp->activeViewManager();
+        if (!viewMgr) return;
+        SUIT_ViewWindow* window = viewMgr->getActiveView();
+        if ( window ) {
+	  SALOME_ListIO objects;
+	  std::list<std::string>::const_iterator it;
+	  for ( it = myEntries.begin(); it != myEntries.end(); ++it )
+	    objects.Append( new SALOME_InteractiveObject( (*it).c_str(), "" ) );
+#if !defined(DISABLE_SALOMEOBJECT) && !defined(DISABLE_VTKVIEWER)
+          if ( dynamic_cast<SVTK_ViewWindow*>( window ) )
+            (dynamic_cast<SVTK_ViewWindow*>( window ))->onFitIObjects( objects );
+#endif
+        }
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( entries ) );
+}
+
 /*!
   \brief Reset current view window to the default state.
 */

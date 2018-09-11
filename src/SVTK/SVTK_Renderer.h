@@ -29,6 +29,7 @@
 
 #include "SVTK.h"
 #include "VTKViewer.h"
+#include "SALOME_ListIO.hxx"
 
 #include <vtkObject.h>
 #include <vtkSmartPointer.h>
@@ -186,6 +187,9 @@ class SVTK_EXPORT SVTK_Renderer : public vtkObject
   //----------------------------------------------------------------------------
   //! Fit all selected presentation in the scene
   void onFitSelection();
+
+  //! Fit given presentations in the scene
+  void OnFitIObjects(const SALOME_ListIO& objects);
 
   //! Set camera into predefined state
   void OnResetView(); 

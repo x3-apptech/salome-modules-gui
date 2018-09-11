@@ -29,6 +29,12 @@
 %}
 
 %include "cpointer.i"
+%include "std_string.i"
+%include "std_list.i"
+
+#if SWIG_VERSION >= 0x010329
+%template() std::list<std::string>;
+#endif
 
 /* Exception handler for all functions */
 %exception {
@@ -85,6 +91,8 @@ public:
 
   /* view operations */
   void FitAll();
+  void FitSelection();
+  void FitIObjects(const std::list<std::string>&);
   void ResetView();
   void ViewTop();
   void ViewBottom();
