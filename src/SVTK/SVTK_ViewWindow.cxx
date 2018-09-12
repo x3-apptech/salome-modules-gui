@@ -460,6 +460,16 @@ void SVTK_ViewWindow::onFitSelection()
 }
 
 /*!
+  Processes transformation "fit given objects"
+*/
+void SVTK_ViewWindow::onFitIObjects(const SALOME_ListIO& objects)
+{
+  GetRenderer()->OnFitIObjects(objects);
+  Repaint();
+  emit transformed( this );
+}
+
+/*!
   SLOT: called if selection is changed
 */
 void SVTK_ViewWindow::onSelectionChanged()

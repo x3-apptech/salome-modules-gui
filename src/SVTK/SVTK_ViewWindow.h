@@ -33,6 +33,7 @@
 #include "SUIT_ViewWindow.h"
 
 #include "SALOME_InteractiveObject.hxx"
+#include "SALOME_ListIO.hxx"
 
 #include <QImage>
 #include <vtkSmartPointer.h>
@@ -380,6 +381,9 @@ public slots:
 
   //! Redirect the request to #SVTK_Renderer::OnFitSelection
   virtual void onFitSelection();
+
+  //! Redirect the request to #SVTK_Renderer::OnFitIObjects
+  virtual void onFitIObjects(const SALOME_ListIO&);
 
   //! Redirect the request to #SVTK_Renderer::OnViewTrihedron
   virtual void onViewTrihedron(bool); 

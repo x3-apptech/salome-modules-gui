@@ -726,6 +726,43 @@ void SVTK_Renderer::onFitSelection()
   }
 }
 
+void SVTK_Renderer::OnFitIObjects(const SALOME_ListIO& objects)
+{
+  vtkActorCollection* aSelectedCollection = vtkActorCollection::New();
+
+  VTK::ActorCollectionCopy aCopy( GetDevice()->GetActors() );
+  vtkActorCollection* aCollection = aCopy.GetActors();
+  aCollection->InitTraversal();
+  while ( vtkActor* aProp = aCollection->GetNextActor() )
+  {
+    if ( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aProp ) ) {
+      const Handle(SALOME_InteractiveObject)& io = anActor->getIO();
+      if ( anActor->GetVisibility() && !io.IsNull() ) {
+	SALOME_ListIteratorOfListIO iter( objects );
+	for ( ; iter.More(); iter.Next() ) {
+	  if ( iter.Value().IsNull() )
+	    continue;
+	  if ( io->isSame( iter.Value() ) ) {
+	    aSelectedCollection->AddItem( aProp );
+	    break;
+	  }
+	}
+      }
+    }
+  }
+
+  if( aSelectedCollection->GetNumberOfItems() == 0 )
+    return; // if collection is empty
+  
+  double bounds[6];
+  ::ComputeBounds( aSelectedCollection, bounds );
+
+  if ( aSelectedCollection->GetNumberOfItems() && ::isBoundValid( bounds ) ) {
+    GetDevice()->ResetCamera( bounds );
+    GetDevice()->ResetCameraClippingRange( bounds );
+  }
+}
+
 /*!
   Reset camera clipping range to adjust the range to the bounding box of the scene
 */

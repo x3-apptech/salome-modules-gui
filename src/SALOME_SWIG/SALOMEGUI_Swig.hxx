@@ -27,6 +27,9 @@
 #ifndef SALOMEGUI_SWIG_HXX
 #define SALOMEGUI_SWIG_HXX
 
+#include <string>
+#include <list>
+
 class SALOMEGUI_Swig
 {
 public:
@@ -57,6 +60,8 @@ public:
   void             UpdateView();
 
   void             FitAll();
+  void             FitSelection();
+  void             FitIObjects(const std::list<std::string>&);
   void             ResetView();
   void             ViewTop();
   void             ViewBottom();
