@@ -153,17 +153,26 @@ void VTKViewer_OpenGLRenderer::Clear(void)
       {
         case HorizontalGradient:
           corner1 = this->Background;
+          corner2 = this->Background;
+          corner3 = this->Background2;
+          corner4 = this->Background2;
+          break;
+        case VerticalGradient:
+          corner1 = this->Background;
           corner2 = this->Background2;
           corner3 = this->Background2;
           corner4 = this->Background;
           break;
-        case VerticalGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background2;
-          corner3 = this->Background;
-          corner4 = this->Background;
-          break;
         case FirstDiagonalGradient:
+          corner1 = this->Background;
+          corner3 = this->Background2;
+          dcorner1[0] = dcorner2[0] = 0.5F * ( corner1[0] + corner3[0] );
+          dcorner1[1] = dcorner2[1] = 0.5F * ( corner1[1] + corner3[1] );
+          dcorner1[2] = dcorner2[2] = 0.5F * ( corner1[2] + corner3[2] );
+          corner2 = dcorner1;
+          corner4 = dcorner2;
+          break;
+        case SecondDiagonalGradient:
           corner2 = this->Background2;
           corner4 = this->Background;
           dcorner1[0] = dcorner2[0] = 0.5F * ( corner2[0] + corner4[0] );
@@ -172,36 +181,27 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           corner1 = dcorner1;
           corner3 = dcorner2;
           break;
-        case SecondDiagonalGradient:
-          corner1 = this->Background2;  
-          corner3 = this->Background;
-          dcorner1[0] = dcorner2[0] = 0.5F * ( corner1[0] + corner3[0] );
-          dcorner1[1] = dcorner2[1] = 0.5F * ( corner1[1] + corner3[1] );
-          dcorner1[2] = dcorner2[2] = 0.5F * ( corner1[2] + corner3[2] );
-          corner2 = dcorner1;
-          corner4 = dcorner2;
-          break;
         case FirstCornerGradient:
+          corner1 = this->Background2;
+          corner2 = this->Background2;
+          corner3 = this->Background;
+          corner4 = this->Background2;
+          break;
+        case SecondCornerGradient:
           corner1 = this->Background2;
           corner2 = this->Background2;
           corner3 = this->Background2;
           corner4 = this->Background;
           break;
-        case SecondCornerGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background2;
-          corner3 = this->Background;
-          corner4 = this->Background2;
-          break;
         case ThirdCornerGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background;
+          corner1 = this->Background;
+          corner2 = this->Background2;
           corner3 = this->Background2;
           corner4 = this->Background2;
           break;
         case FourthCornerGradient:
-          corner1 = this->Background;
-          corner2 = this->Background2;
+          corner1 = this->Background2;
+          corner2 = this->Background;
           corner3 = this->Background2;
           corner4 = this->Background2;
           break;
@@ -320,7 +320,7 @@ void VTKViewer_OpenGLRenderer::Clear(void)
         if( aPosition == VTKViewer_Texture::Tiled )
         {
           texX = (GLfloat)aViewWidth / (GLfloat)aWidth;
-          texY = (GLfloat)aViewHeight / (GLfloat)aHeight;
+          texY = (GLfloat)aViewHeight / (GLfloat)aHeight; texY *= -1;
         }
 #ifdef VTK_OPENGL2
         if (this->OpenGLHelper.IsInitialized())
@@ -334,7 +334,7 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
 
           GLfloat dx = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aWidth / (GLfloat)aViewWidth )) : 1.0f;
-          GLfloat dy = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aHeight / (GLfloat)aViewHeight )) : 1.0f;
+          GLfloat dy = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aHeight / (GLfloat)aViewHeight )) : (aPosition == VTKViewer_Texture::Stretched) ? 1.0f : -1.0f;
 
 
           // First 4 components of Vertex is TexCoords now.
