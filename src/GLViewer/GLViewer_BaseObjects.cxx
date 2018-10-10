@@ -1469,9 +1469,13 @@ bool GLViewer_TextObject::translateToEMF( HDC dc, GLViewer_CoordSystem* aViewerC
 	LPTSTR str = new TCHAR[aText.length() + 1];
 	str[aText.toWCharArray(str)] = '\0';
 #else  
-	LPTSTR str = aText.toLatin1().constData();
+	QByteArray arr = FileName.toLatin1();
+	LPTSTR str = arr.constData();
 #endif
     TextOut( dc, x, y, str, aText.length() );
+#ifdef UNICODE
+        delete str;
+#endif
 
     SelectObject ( dc, old1 );
     SelectObject ( dc, old2 );

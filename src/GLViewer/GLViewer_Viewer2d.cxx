@@ -794,15 +794,19 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
         HDC bitDC = CreateCompatibleDC ( screen_dc ); //The context compatible with screen
 
 #ifdef UNICODE
-		LPTSTR str = new TCHAR[FileName.length() + 1];
-		str[FileName.toWCharArray(str)] = '\0';
-		LPTSTR empty = L"";
+	LPTSTR str = new TCHAR[FileName.length() + 1];
+	str[FileName.toWCharArray(str)] = '\0';
+	LPTSTR empty = L"";
 #else  
-		LPTSTR str = FileName.toLatin1().constData();
-		LPTSTR empty = "";
+	QByteArray arr = FileName.toLatin1();
+	LPTSTR str = arr.constData();
+	LPTSTR empty = "";
 #endif
 
         hMetaFileDC = CreateEnhMetaFile( bitDC, str, &r, empty );
+#ifdef UNICODE
+	delete str;
+#endif 
         SetMapMode( hMetaFileDC, MM_HIMETRIC );
         SetWindowOrgEx( hMetaFileDC, 0, r.bottom, NULL );
         HRGN ClipRgn = CreateRectRgn( 0, 0, AW, AH );
@@ -817,7 +821,7 @@ bool GLViewer_Viewer2d::translateTo( VectorFileType aType, QString FileName, Pap
         ReleaseDC( 0, screen_dc );
         DeleteDC( bitDC );
 
-        aCurVP->getGLWidget()->translateBackgroundToEMF( hMetaFileDC, &aViewerCS, &aPaperCS );
+        aCurVP->getGLWidget()->translateBackgroundToEMF( hMetaFileDC, &aViewerCS, &aPaperCS );	
     }
 #endif
 

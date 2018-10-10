@@ -320,14 +320,17 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
   GET_VERSION_FUNC getVersion = 0;
 
 #ifdef WIN32
-
 #ifdef UNICODE
   LPTSTR str_libname = new TCHAR[libName.length() + 1];
   str_libname[libName.toWCharArray(str_libname)] = '\0';
-#else  
-  LPTSTR str_libname = libName.toLatin1().constData();
+#else
+  QByteArray arr = libName.toLatin1();
+  LPTSTR str_libname = arr.constData();
 #endif
   HINSTANCE modLib = ::LoadLibrary( str_libname );
+#ifdef UNICODE
+  delete str_libname;
+#endif
   if ( !modLib )
   {
     LPVOID lpMsgBuf;
