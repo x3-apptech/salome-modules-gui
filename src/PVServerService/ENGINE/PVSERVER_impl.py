@@ -23,7 +23,8 @@ import subprocess as subp
 import socket
 from time import sleep
 import os
-from SALOME import SALOME_Exception
+import sys
+from SALOME import SALOME_Exception, ExceptionStruct, INTERNAL_ERROR
 #from SALOME_utilities import MESSAGE
 
 def MESSAGE(m):
@@ -49,13 +50,18 @@ class PVSERVER_impl(object):
             raise Exception("PVSERVER_Impl.__init__ : \"import paraview\" failed !")
         # deduce dynamically PARAVIEW_ROOT_DIR from the paraview module location
         self.PARAVIEW_ROOT_DIR = None
-        ZE_KEY_TO_FIND_PV_ROOT_DIR="lib"
+        if sys.platform == "win32":
+          ZE_KEY_TO_FIND_PV_ROOT_DIR="Lib"
+          upCount =2
+        else:
+          ZE_KEY_TO_FIND_PV_ROOT_DIR="lib"
+          upCount =1
         li=tmp.split(os.path.sep) ; li.reverse()
         if ZE_KEY_TO_FIND_PV_ROOT_DIR not in li:
-            raise SALOME_Exception(SALOME.ExceptionStruct(SALOME.INTERNAL_ERROR,
+            raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
                       "PVSERVER_Impl.__init__ : error during dynamic deduction of PARAVIEW_ROOT_DIR : Loc of paraview module is \"%s\" ! \"%s\" is supposed to be the key to deduce it !"%(tmp,ZE_KEY_TO_FIND_PV_ROOT_DIR),
                       "PVSERVER.py", 0))
-        li=li[li.index("lib")+1:] ; li.reverse()
+        li=li[li.index(ZE_KEY_TO_FIND_PV_ROOT_DIR)+upCount:] ; li.reverse()
         self.PARAVIEW_ROOT_DIR = os.path.sep.join(li)
 
     """
@@ -77,7 +83,7 @@ class PVSERVER_impl(object):
                 cnt += 1
                 currPort += 1
                 pass
-        raise SALOME_Exception(SALOME.ExceptionStruct(SALOME.INTERNAL_ERROR,
+        raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
                             "[PVSERVER] maximum number of tries to retrieve a free port for the PVServer",
                             "PVSERVER.py", 0))
                                            
@@ -111,7 +117,7 @@ class PVSERVER_impl(object):
             self.pvserverPort = port
             MESSAGE("[PVSERVER] pvserver successfully launched on port %d" % port)
         else:
-            raise SALOME_Exception(SALOME.ExceptionStruct(SALOME.INTERNAL_ERROR,
+            raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
                             "[PVSERVER] Unable to start PVServer on port %d!" % port,
                             "PVSERVER.py", 0))
         return "cs://%s:%d" % (host, self.pvserverPort)
