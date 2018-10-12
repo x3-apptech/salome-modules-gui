@@ -1755,7 +1755,7 @@ void PyModuleHelper::initInterp()
     }
     // ... then call a method
     int embedded = 1;
-    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"i", embedded ) );
+    PyObjWrapper aRes( PyObject_CallMethod( aMod, (char*)"salome_init", (char*)"si", NULL, embedded ) );
     if ( !aRes ) {
       // Error!
       PyErr_Print();
