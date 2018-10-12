@@ -66,7 +66,7 @@ const int DEFAULT_GROUP = 40;
 QMutex myInitMutex;
 
 /*! DEBUG mode */
-const bool DEBUG = false;
+const bool theDEBUG = false;
 
 /*!
   \var IsCallOldMethods
@@ -168,17 +168,17 @@ public:
   FuncMsg( const QString& funcName )
   {
     myName = funcName;
-    if ( DEBUG )
+    if ( theDEBUG )
       MESSAGE( qPrintable( myName ) << " [ begin ]" );
   }
   ~FuncMsg()
   {
-    if ( DEBUG )
+    if ( theDEBUG )
       MESSAGE( qPrintable( myName ) << " [ end ]" );
   }
   void message( const QString& msg )
   {
-    if ( DEBUG )
+    if ( theDEBUG )
       MESSAGE( qPrintable( myName ) << " : " << qPrintable( msg ) );
   }
 private:
