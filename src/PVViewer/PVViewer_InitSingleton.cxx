@@ -24,15 +24,15 @@
 
 bool PVViewer_InitSingleton::IS_INIT=false;
 
-void PVViewer_InitSingleton::Init(QMainWindow *aDesktop, LogWindow *logWindow)
+void PVViewer_InitSingleton::Init(QMainWindow* desktop)
 {
   if(IS_INIT)
     return ;
-  PVViewer_Core::ParaviewInitApp(aDesktop,logWindow);
+  PVViewer_Core::ParaviewInitApp(desktop);
   // Finish ParaView set up: behaviors, connection and configurations.
   const QString configPath(PVViewer_ViewManager::GetPVConfigPath());
-  PVViewer_Core::ParaviewInitBehaviors(true,aDesktop);
-  PVViewer_ViewManager::ConnectToExternalPVServer(aDesktop);
+  PVViewer_Core::ParaviewInitBehaviors(true, desktop);
+  PVViewer_ViewManager::ConnectToExternalPVServer(desktop);
   PVViewer_Core::ParaviewLoadConfigurations(configPath);
   IS_INIT=true;
 }

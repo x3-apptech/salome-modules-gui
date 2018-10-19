@@ -24,11 +24,11 @@
 #include "PVViewer_GUIElements.h"
 #include "PVViewer_ViewManager.h"
 
-#include <SUIT_ViewManager.h>
-#include <SUIT_ResourceMgr.h>
-#include <SUIT_Session.h>
-#include <SUIT_Desktop.h>
-#include <SUIT_Application.h>
+#include "SUIT_ViewManager.h"
+#include "SUIT_ResourceMgr.h"
+#include "SUIT_Session.h"
+#include "SUIT_Desktop.h"
+#include "SUIT_Application.h"
 
 #include <pqTabbedMultiViewWidget.h>
 #include <pqApplicationCore.h>
@@ -117,8 +117,3 @@ pqTabbedMultiViewWidget* PVViewer_ViewWindow::getMultiViewManager() const
 {
   return myPVMgr;
 }
-
-//void PVViewer_ViewWindow::onEmulateApply()
-//{
-//  emit this->applyRequest();
-//}

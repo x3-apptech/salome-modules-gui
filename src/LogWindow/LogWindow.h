@@ -37,7 +37,8 @@
 #  define LOGWINDOW_EXPORT
 #endif
 
-#include <SUIT_PopupClient.h>
+#include "QtxMsgHandler.h"
+#include "SUIT_PopupClient.h"
 
 #include <QWidget>
 #include <QMap>
@@ -50,7 +51,7 @@
 class QAction;
 class QTextEdit;
 
-class LOGWINDOW_EXPORT LogWindow : public QWidget, public SUIT_PopupClient
+class LOGWINDOW_EXPORT LogWindow : public QWidget, public SUIT_PopupClient, public QtxMsgHandlerCallback
 {
   Q_OBJECT
 
@@ -77,7 +78,7 @@ public:
   };
 
 public:
-  LogWindow( QWidget* theParent );
+  LogWindow( QWidget* );
   virtual ~LogWindow();
 
   virtual             QString popupClientType() const { return QString( "LogWindow" ); }
@@ -100,6 +101,8 @@ public:
   void                setMenuActions( const int );
   int                 menuActions() const;
 
+  void                handleQtMessages(bool);
+
 protected slots:
   void                onSaveToFile();
   void                onSelectAll();
@@ -107,8 +110,10 @@ protected slots:
   void                onCopy();
 
 private:
+  void                append( const QString text );
   void                createActions();
   void                updateActions();
+  void                qtMessage( QtMsgType, const QMessageLogContext&, const QString& );
 
 private:
   QTextEdit*          myView;           //!< internal view window

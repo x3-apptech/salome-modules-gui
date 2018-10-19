@@ -18,22 +18,22 @@
 //
 // Author: Adrien Bruneton (CEA)
 
-#ifndef PVVIEWERGUIELEMENTS_H_
-#define PVVIEWERGUIELEMENTS_H_
+#ifndef PVVIEWER_GUIELEMENTS_H
+#define PVVIEWER_GUIELEMENTS_H
 
 #include "PVViewer.h"
 
 #include <QObject>
 #include <QList>
 
-class pqPropertiesPanel;
-class pqPipelineBrowserWidget;
-class pqPipelineModel;
+class QAction;
 class QMainWindow;
 class QMenu;
 class QToolBar;
-class QAction;
 class pqAnimationTimeToolbar;
+class pqPipelineBrowserWidget;
+class pqPipelineModel;
+class pqPropertiesPanel;
 class pqVCRToolbar;
 
 /*!
@@ -45,10 +45,10 @@ class PVVIEWER_EXPORT PVViewer_GUIElements: public QObject
   Q_OBJECT
 
 public:
-  static PVViewer_GUIElements * GetInstance(QMainWindow * desk);
+  static PVViewer_GUIElements* GetInstance(QMainWindow*);
 
-  pqPropertiesPanel * getPropertiesPanel();
-  pqPipelineBrowserWidget * getPipelineBrowserWidget();
+  pqPropertiesPanel* getPropertiesPanel();
+  pqPipelineBrowserWidget* getPipelineBrowserWidget();
 
   QMenu* getFiltersMenu();
   QMenu* getSourcesMenu();
@@ -58,14 +58,14 @@ public:
   pqVCRToolbar* getVCRToolbar();
   pqAnimationTimeToolbar* getTimeToolbar();
 
-  void setToolBarVisible(bool show);
-  void setToolBarEnabled(bool enabled);
+  void setToolBarVisible(bool);
+  void setToolBarEnabled(bool);
   QList<QToolBar*> getToolbars();
 
-  void setVCRTimeToolBarVisible(bool show);
+  void setVCRTimeToolBarVisible(bool);
 
 private:
-  PVViewer_GUIElements(QMainWindow* desk);
+  PVViewer_GUIElements(QMainWindow*);
   virtual ~PVViewer_GUIElements() {}
 
   static PVViewer_GUIElements* theInstance;
@@ -98,7 +98,7 @@ private:
   QToolBar* dataToolbar;
   
   QMainWindow* myDesktop;
-  bool    myPVWidgetsFlag;
+  bool myPVWidgetsFlag;
 
 public:
   QAction* mainAction;
@@ -113,4 +113,4 @@ public:
   QAction* dataAction;
 };
 
-#endif /* PVVIEWERGUIELEMENTS_H_ */
+#endif // PVVIEWER_GUIELEMENTS_H

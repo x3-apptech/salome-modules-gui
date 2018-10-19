@@ -1654,7 +1654,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
       viewMgr->getActiveView()->setFocus();
       return 0;
     } else {
-      viewMgr = new PVViewer_ViewManager( activeStudy(), desktop(), logWindow() );
+      viewMgr = new PVViewer_ViewManager( activeStudy(), desktop() );
     }
   }
 #endif
@@ -2186,6 +2186,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
   else if ( flag == WT_LogWindow )
   {
     LogWindow* logWin = new LogWindow( desktop() );
+    logWin->handleQtMessages( true );
     logWin->setObjectName( "logWindow" );
     logWin->setWindowTitle( tr( "LOG_WINDOW" ) );
     logWin->setProperty( "shortcut", QKeySequence( "Alt+Shift+L" ) );

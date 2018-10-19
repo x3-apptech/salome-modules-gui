@@ -46,6 +46,7 @@
 #include "Session_Session_i.hxx"
 
 #include <Qtx.h>
+#include <QtxMsgHandler.h>
 #include <QtxSplash.h>
 
 #ifdef USE_SALOME_STYLE
@@ -95,27 +96,36 @@
  * - stop Session ( must be idle )
  * - get session state
  */
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-void MessageOutput( QtMsgType type, const char* msg )
-#else
-void MessageOutput( QtMsgType type, const QMessageLogContext &context, const QString &msg )
-#endif
+
+class SessionMsgHandler: public QtxMsgHandlerCallback
 {
-  switch ( type )
+public:
+  SessionMsgHandler() {}
+  void qtMessage(QtMsgType type, const QMessageLogContext& context, const QString& message)
   {
-  case QtDebugMsg:
+    switch ( type )
+    {
+    case QtDebugMsg:
 #ifdef QT_DEBUG_MESSAGE
-    MESSAGE( "Debug: " << qPrintable( QString(msg) ) );
+      MESSAGE( "Debug: " << qPrintable( message ) );
 #endif
-    break;
-  case QtWarningMsg:
-    MESSAGE( "Warning: " << qPrintable( QString(msg) ) );
-    break;
-  case QtFatalMsg:
-    MESSAGE( "Fatal: " << qPrintable( QString(msg) ) );
-    break;
+      break;
+    case QtWarningMsg:
+      MESSAGE( "Warning: " << qPrintable( message ) );
+      break;
+    case QtCriticalMsg:
+      MESSAGE( "Critical: " << qPrintable( message ) );
+      break;
+    case QtFatalMsg:
+      MESSAGE( "Fatal: " << qPrintable( message ) );
+      break;
+    case QtInfoMsg:
+    default:
+      MESSAGE( "Information: " << qPrintable( message ) );
+      break;
+    }
   }
-}
+};
 
 QString salomeVersion()
 {
@@ -332,11 +342,8 @@ void shutdownServers( SALOME_NamingService* theNS )
 int main( int argc, char **argv )
 {
   // Install Qt debug messages handler
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  qInstallMsgHandler( MessageOutput );
-#else
-  qInstallMessageHandler( MessageOutput );
-#endif
+  SessionMsgHandler msgHandler;
+  qInstallMessageHandler(QtxMsgHandler);
 
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

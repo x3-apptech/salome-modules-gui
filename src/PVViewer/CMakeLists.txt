@@ -25,13 +25,9 @@ INCLUDE(UseQtExt)
 # --- options ---
 
 INCLUDE_DIRECTORIES(
-  ${PROJECT_SOURCE_DIR}/src/SUIT
-  ${PROJECT_SOURCE_DIR}/src/STD
   ${PROJECT_SOURCE_DIR}/src/Qtx
-  ${PROJECT_SOURCE_DIR}/src/Event
-  ${PROJECT_SOURCE_DIR}/src/PyInterp
+  ${PROJECT_SOURCE_DIR}/src/SUIT
   ${PROJECT_SOURCE_DIR}/src/PVServerService
-  ${CMAKE_SOURCE_DIR}/src/LogWindow
   )
 
 ADD_DEFINITIONS(
@@ -42,9 +38,7 @@ ADD_DEFINITIONS(
 SET(_link_LIBRARIES 
   ${KERNEL_SALOMELocalTrace} 
   ${KERNEL_OpUtil}
-  PyInterp  
   suit 
-  Event 
   PVServerService
   pqApplicationComponents
   #vtkRenderingFreeTypeOpenGL
@@ -67,7 +61,7 @@ SET(_moc_HEADERS
 # header files / no moc processing
 SET(_other_HEADERS
   PVViewer.h
-  PVViewer_LogWindowAdapter.h
+  PVViewer_OutputWindow.h
   PVViewer_Core.h
 )
 # header files / to install
@@ -93,7 +87,7 @@ SET(_other_SOURCES
   PVViewer_ViewManager.cxx
   PVViewer_ViewModel.cxx
   PVViewer_ViewWindow.cxx
-  PVViewer_LogWindowAdapter.cxx
+  PVViewer_OutputWindow.cxx
   PVViewer_Behaviors.cxx
   PVViewer_GUIElements.cxx
   PVViewer_Core.cxx

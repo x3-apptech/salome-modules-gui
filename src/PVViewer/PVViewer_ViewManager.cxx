@@ -28,12 +28,11 @@
 
 #include <utilities.h>
 
-#include <LogWindow.h>
-#include <SUIT_Desktop.h>
-#include <SUIT_Study.h>
-#include <SUIT_Session.h>
-#include <SUIT_MessageBox.h>
-#include <SUIT_ResourceMgr.h>
+#include "SUIT_Desktop.h"
+#include "SUIT_Study.h"
+#include "SUIT_Session.h"
+#include "SUIT_MessageBox.h"
+#include "SUIT_ResourceMgr.h"
 
 #include <pqServer.h>
 #include <pqServerConnectReaction.h>
@@ -42,20 +41,18 @@
 /*!
   Constructor
 */
-PVViewer_ViewManager::PVViewer_ViewManager( SUIT_Study* study, SUIT_Desktop* desk, LogWindow * logWindow )
-: SUIT_ViewManager( study, desk, new PVViewer_Viewer() ),
-  desktop(desk)
+PVViewer_ViewManager::PVViewer_ViewManager(SUIT_Study* study, SUIT_Desktop* desktop)
+: SUIT_ViewManager( study, desktop, new PVViewer_Viewer() )
 {
   MESSAGE("PVViewer - view manager created ...")
   setTitle( tr( "PARAVIEW_VIEW_TITLE" ) );
 
   // Initialize minimal paraview stuff (if not already done)
-  PVViewer_InitSingleton::Init(desk, logWindow);
+  PVViewer_InitSingleton::Init(desktop);
 
-  connect( desk, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
+  connect( desktop, SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
            this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 }
-
 
 PVServer_ServiceWrapper * PVViewer_ViewManager::GetService()
 {
@@ -68,7 +65,7 @@ QString PVViewer_ViewManager::GetPVConfigPath()
   return resMgr->stringValue("resources", "PVViewer", QString());
 }
 
-bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
+bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* desktop)
 {
   SUIT_ResourceMgr* aResourceMgr = SUIT_Session::session()->resourceMgr();
   bool noConnect = aResourceMgr->booleanValue( "PARAVIS", "no_ext_pv_server", false );
@@ -77,23 +74,23 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
 
   pqServer* server = pqActiveObjects::instance().activeServer();
   if (server && server->isRemote())
-    {
-      // Already connected to an external server, do nothing
-      MESSAGE("connectToExternalPVServer(): Already connected to an external PVServer, won't reconnect.");
-      return false;
-    }
+  {
+    // Already connected to an external server, do nothing
+    MESSAGE("connectToExternalPVServer(): Already connected to an external PVServer, won't reconnect.");
+    return false;
+  }
 
   if (GetService()->GetGUIConnected())
-    {
-      // Should never be there as the above should already tell us that we are connected.
-      std::stringstream msg2;
-      msg2 << "Internal error while connecting to the pvserver.";
-      msg2 << "ParaView doesn't see a connection, but PARAVIS engine tells us there is already one!" << std::endl;
-      qWarning(msg2.str().c_str());  // will go to the ParaView console (see ParavisMessageOutput below)
-      SUIT_MessageBox::warning( aDesktop,
-                                      QString("Error connecting to PVServer"), QString(msg2.str().c_str()));
-      return false;
-    }
+  {
+    // Should never be there as the above should already tell us that we are connected.
+    std::stringstream msg2;
+    msg2 << "Internal error while connecting to the pvserver.";
+    msg2 << "ParaView doesn't see a connection, but PARAVIS engine tells us there is already one!" << std::endl;
+    qWarning(msg2.str().c_str());  // will go to the ParaView console (see ParavisMessageOutput below)
+    SUIT_MessageBox::warning( desktop,
+			      QString("Error connecting to PVServer"), QString(msg2.str().c_str()));
+    return false;
+  }
 
   std::stringstream msg;
 
@@ -101,43 +98,44 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* aDesktop)
   QString serverUrlEnv = getenv("PARAVIEW_PVSERVER_URL");
   std::string serverUrl;
   if (!serverUrlEnv.isEmpty())
+  {
     serverUrl = serverUrlEnv.toStdString();
+  }
   else
-    {
-      // Get the URL from the engine (possibly starting the pvserver)
-      serverUrl = GetService()->FindOrStartPVServer(0);  // take the first free port
-    }
-
+  {
+    // Get the URL from the engine (possibly starting the pvserver)
+    serverUrl = GetService()->FindOrStartPVServer(0);  // take the first free port
+  }
+  
   msg << "connectToExternalPVServer(): Trying to connect to the external PVServer '" << serverUrl << "' ...";
   MESSAGE(msg.str());
 
   if (!pqServerConnectReaction::connectToServer(pqServerResource(serverUrl.c_str())))
-    {
-      std::stringstream msg2;
-      msg2 << "Error while connecting to the requested pvserver '" << serverUrl;
-      msg2 << "'. Might use default built-in connection instead!" << std::endl;
-      qWarning(msg2.str().c_str());  // will go to the ParaView console (see ParavisMessageOutput below)
-      SUIT_MessageBox::warning( aDesktop,
-                                QString("Error connecting to PVServer"), QString(msg2.str().c_str()));
-      return false;
-    }
+  {
+    std::stringstream msg2;
+    msg2 << "Error while connecting to the requested pvserver '" << serverUrl;
+    msg2 << "'. Might use default built-in connection instead!" << std::endl;
+    qWarning(msg2.str().c_str());  // will go to the ParaView console (see ParavisMessageOutput below)
+    SUIT_MessageBox::warning( desktop,
+			      QString("Error connecting to PVServer"), QString(msg2.str().c_str()));
+    return false;
+  }
   else
-    {
-      MESSAGE("connectToExternalPVServer(): Connected!");
-      GetService()->SetGUIConnected(true);
-    }
+  {
+    MESSAGE("connectToExternalPVServer(): Connected!");
+    GetService()->SetGUIConnected(true);
+  }
   return true;
 }
-
 
 /*!Enable toolbars if view \a view is ParaView viewer and disable otherwise.
 */
 void PVViewer_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 {
   if (view)
-    {
+  {
     PVViewer_ViewWindow* pvWindow = dynamic_cast<PVViewer_ViewWindow*>(view);
-    PVViewer_GUIElements * guiElements = PVViewer_GUIElements::GetInstance(desktop);
+    PVViewer_GUIElements * guiElements = PVViewer_GUIElements::GetInstance( myDesktop );
     guiElements->setToolBarEnabled(pvWindow!=0);
-    }
+  }
 }

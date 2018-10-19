@@ -61,8 +61,7 @@
 
 PVViewer_GUIElements * PVViewer_GUIElements::theInstance = 0;
 
-PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desk) :
-  myDesktop(desk),
+PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desktop) :
   propertiesPanel(0),
   pipelineBrowserWidget(0),
   pipelineModel(0),
@@ -70,7 +69,28 @@ PVViewer_GUIElements::PVViewer_GUIElements(QMainWindow* desk) :
   filtersMenu(0),
   macrosMenu(0),
   catalystMenu(0),
-  myPVWidgetsFlag(false)
+  mainToolBar(0),
+  vcrToolbar(0),
+  timeToolbar(0),
+  colorToolbar(0),
+  reprToolbar(0),
+  cameraToolbar(0),
+  axesToolbar(0),
+  macrosToolbar(0),
+  commonToolbar(0),
+  dataToolbar(0),
+  myDesktop(desktop),
+  myPVWidgetsFlag(false),
+  mainAction(0),
+  vcrAction(0),
+  timeAction(0),
+  colorAction(0),
+  reprAction(0),
+  cameraAction(0),
+  axesAction(0),
+  macrosAction(0),
+  commonAction(0),
+  dataAction(0)
 {
 }
 

@@ -1,4 +1,7 @@
-// Copyright (C) 2014-2016  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2016  CEA/DEN, EDF R&D, OPEN CASCADE
+//
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,30 +19,31 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author: Adrien Bruneton (CEA)
 
-#ifndef PVVIEWER_VIEWMODEL_H
-#define PVVIEWER_VIEWMODEL_H
+#ifndef QTXMSGHANDLER_H
+#define QTXMSGHANDLER_H
 
-#include "PVViewer.h"
+#include "Qtx.h"
+#include <QList>
 
-#include "SUIT_ViewModel.h"
+void QTX_EXPORT QtxMsgHandler(QtMsgType, const QMessageLogContext&, const QString&);
 
-class SUIT_ViewWindow;
-class SUIT_Desktop;
-class SUIT_Desktop;
-
-class PVVIEWER_EXPORT PVViewer_Viewer: public SUIT_ViewModel
+class QTX_EXPORT QtxMsgHandlerCallback
 {
-  Q_OBJECT
+  friend void QtxMsgHandler(QtMsgType, const QMessageLogContext&, const QString&);
 
 public:
-  PVViewer_Viewer();
-  virtual ~PVViewer_Viewer() {}
+  QtxMsgHandlerCallback(bool = true);
+  virtual ~QtxMsgHandlerCallback();
 
-  virtual SUIT_ViewWindow* createView(SUIT_Desktop*);
-  virtual QString getType() const { return Type(); }
-  static QString Type() { return "ParaView"; }
+protected:
+  virtual void qtMessage(QtMsgType, const QMessageLogContext&, const QString&);
+
+  void activate();
+  void deactivate();
+
+private:
+  static QList<QtxMsgHandlerCallback*> callbacks;
 };
 
-#endif // PVVIEWER_VIEWMODEL_H
+#endif // QTXMSGHANDLER_H

@@ -18,13 +18,12 @@
 //
 // Author : Anthony GEAY (EDF R&D)
 
-#ifndef __PVVIEWER_INITSINGLETON_H__
-#define __PVVIEWER_INITSINGLETON_H__
+#ifndef PVVIEWER_INITSINGLETON_H
+#define PVVIEWER_INITSINGLETON_H
 
 #include "PVViewer.h"
 
 class QMainWindow;
-class LogWindow;
 
 /**
  * This class deals with initialization of SALOME_Session to make it a PV based application.
@@ -34,9 +33,9 @@ class LogWindow;
 class PVVIEWER_EXPORT PVViewer_InitSingleton
 {
 public:
-  static void Init(QMainWindow *aDesktop, LogWindow *logWindow);
+  static void Init(QMainWindow*);
 private:
   static bool IS_INIT;
 };
 
-#endif /* SRC_PVVIEWER_PVVIEWER_CORE_H_ */
+#endif // PVVIEWER_INITSINGLETON_H

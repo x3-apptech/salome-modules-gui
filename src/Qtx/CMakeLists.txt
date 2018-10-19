@@ -96,6 +96,7 @@ SET(_other_HEADERS
   Qtx.h
   QtxEvalExpr.h
   QtxMap.h
+  QtxMsgHandler.h
   QtxPreferenceMgr.h
   QtxResourceMgr.h
   QtxTranslator.h
@@ -152,6 +153,7 @@ SET(_other_SOURCES
   QtxMRUAction.cxx
   QtxMainWindow.cxx
   QtxMenu.cxx
+  QtxMsgHandler.cxx
   QtxMultiAction.cxx
   QtxNotify.cxx
   QtxPagePrefMgr.cxx

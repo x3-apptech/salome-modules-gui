@@ -21,13 +21,13 @@
 #define PVVIEWER_H
 
 #ifdef WIN32
-#if defined PVViewer_EXPORTS
-#define PVVIEWER_EXPORT __declspec(dllexport)
+#  if defined PVVIEWER_EXPORTS || defined PVViewer_EXPORTS
+#    define PVVIEWER_EXPORT __declspec(dllexport)
+#  else
+#    define PVVIEWER_EXPORT __declspec(dllimport)
+#  endif
 #else
-#define PVVIEWER_EXPORT __declspec(dllimport)
-#endif
-#else
-#define PVVIEWER_EXPORT
+#   define PVVIEWER_EXPORT
 #endif
 
-#endif //PVVIEWER_H
+#endif // PVVIEWER_H

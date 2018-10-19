@@ -31,6 +31,7 @@
 #include <QDate>
 #include <QFile>
 #include <QMenu>
+#include <QTextBlock>
 #include <QTextEdit>
 #include <QTextStream>
 #include <QTime>
@@ -43,29 +44,32 @@
 
 #define DEFAULT_SEPARATOR "***"
 
-/*!
-  \brief Convert rich text to plain text.
-  \internal
-  \param richText rich text string
-  \return converted plain text string
-*/
-static QString plainText( const QString& richText )
+namespace
 {
-  QString aText = richText;
-  int startTag = aText.indexOf( '<' );
-  while ( true )
+  /*!
+    \brief Convert rich text to plain text.
+    \internal
+    \param richText rich text string
+    \return converted plain text string
+  */
+  QString plainText( const QString& richText )
   {
-    if ( startTag < 0 )
-      break;
-
-    int finishTag = aText.indexOf( '>', startTag );
-    if ( finishTag < 0 )
-      break;
-
-    aText = aText.remove( startTag, finishTag - startTag + 1 );
-    startTag = aText.indexOf( '<' );
+    QString aText = richText;
+    int startTag = aText.indexOf( '<' );
+    while ( true )
+    {
+      if ( startTag < 0 )
+        break;
+      
+      int finishTag = aText.indexOf( '>', startTag );
+      if ( finishTag < 0 )
+        break;
+      
+      aText = aText.remove( startTag, finishTag - startTag + 1 );
+      startTag = aText.indexOf( '<' );
+    }
+    return aText;
   }
-  return aText;
 }
 
 /*!
@@ -88,8 +92,7 @@ static QString plainText( const QString& richText )
   \param parent parent widget
 */
 LogWindow::LogWindow( QWidget* parent )
-: QWidget( parent ),
-  SUIT_PopupClient()
+  : QWidget( parent ), SUIT_PopupClient(), QtxMsgHandlerCallback( false )
 {
   SUIT_ResourceMgr* resMgr = SUIT_Session::session()->resourceMgr();
 
@@ -100,13 +103,12 @@ LogWindow::LogWindow( QWidget* parent )
   myView = new QTextEdit( this );
   myView->setReadOnly( true );
   myView->viewport()->installEventFilter( this );
+  myView->setPlaceholderText( "Message Log" );
 
   QVBoxLayout* main = new QVBoxLayout( this );
   main->setMargin( 0 );
   main->addWidget( myView );
 
-  myBannerSize = 0;
-  myBanner = "<b>Message Log</b>\n********************";
   mySeparator = DEFAULT_SEPARATOR;
 
   clear();
@@ -124,12 +126,12 @@ LogWindow::~LogWindow()
 }
 
 /*!
-  \brief Get current banner (message log window header text).
+  \brief Get current banner (text shown when log window is empty).
   \return string representing the current banner
 */
 QString LogWindow::banner() const
 {
-  return myBanner;
+  return myView->placeholderText();
 }
 
 /*!
@@ -142,14 +144,12 @@ QString LogWindow::separator() const
 }
 
 /*!
-  \brief Set current banner (message log window header text).
+  \brief Set current banner (text shown when log window is empty).
   \param banner new banner
 */
 void LogWindow::setBanner( const QString& banner )
 {
-  myBanner = banner;
-
-  clear( false );
+  myView->setPlaceholderText( banner );
 }
 
 /*!
@@ -229,15 +229,33 @@ void LogWindow::putMessage( const QString& message, const QColor& color, const i
   if ( !dateTime.isEmpty() )
     msg = QString( "[%1] %2" ).arg( dateTime ).arg( msg );
 
-  myView->append( msg );
+  append( msg );
   myHistory.append( plainText( message ) );
 
   if ( flags & DisplaySeparator && !mySeparator.isEmpty() )
   {
-    myView->append( mySeparator );   // add separator
+    // add separator
+    append( mySeparator );
     myHistory.append( plainText( mySeparator ) );
   }
   myView->moveCursor( QTextCursor::End );
+}
+
+/*!
+  \brief Append text to the log window.
+  \param text Text being added.
+*/
+void LogWindow::append( const QString text )
+{
+  if ( !text.isEmpty() )
+  {
+    myView->append( text );
+    QTextBlock block = myView->document()->lastBlock();
+    QTextCursor cursor( block );
+    QTextBlockFormat format = cursor.blockFormat();
+    format.setBottomMargin( 10 );
+    cursor.setBlockFormat( format );
+  }
 }
 
 /*!
@@ -249,14 +267,6 @@ void LogWindow::clear( bool clearHistory )
   myView->clear();
   if ( clearHistory )
     myHistory.clear();
-
-  if ( !myBanner.isEmpty() )
-  {
-    myView->append( myBanner );
-    myBannerSize = myView->document()->blockCount();
-  }
-  else
-    myBannerSize = 0;
 }
 
 /*!
@@ -340,7 +350,7 @@ void LogWindow::contextMenuPopup( QMenu* popup )
 void LogWindow::updateActions()
 {
   myActions[CopyId]->setEnabled( myView->textCursor().hasSelection() );
-  myActions[ ClearId ]->setEnabled( myView->document()->blockCount() > myBannerSize );
+  myActions[ ClearId ]->setEnabled( !myView->document()->isEmpty() );
   myActions[SelectAllId]->setEnabled( !myView->document()->isEmpty() );
   myActions[ SaveToFileId ]->setEnabled( myHistory.count() > 0 );
 }
@@ -424,6 +434,49 @@ int LogWindow::menuActions() const
   ret = ret | ( myActions[SelectAllId]->isVisible() ? SelectAllId : 0 );
   ret = ret | ( myActions[SaveToFileId]->isVisible() ? SaveToFileId : 0 );
   return ret;
+}
+
+/*!
+  \brief Activate/deactivate Qt messages handling.
+  \param on If \c true, Qt messags are handled by log window.
+*/
+void LogWindow::handleQtMessages(bool on)
+{
+  if ( on )
+    activate();
+  else
+    deactivate();
+}
+
+/*!
+  \brief Handle Qt messages.
+  \param type Qt message type.
+  \param context Message context.
+  \param message Message text.
+*/
+void LogWindow::qtMessage( QtMsgType type, const QMessageLogContext&, const QString& message )
+{
+  QColor color;
+  switch ( type )
+  {
+  case QtInfoMsg:
+    color = QColor("#008000"); // dark green
+    break;
+  case QtCriticalMsg:
+    color = QColor("#ff0000"); // red
+    break;
+  case QtFatalMsg:
+    color = QColor("#800000"); // dark red
+    break;
+  case QtWarningMsg:
+    color = QColor("#ff9000"); // orange
+    break;
+  case QtDebugMsg:
+  default:
+    color = QColor("#000000"); // black
+    break;
+  }
+  putMessage( message, color, DisplayNormal);
 }
 
 /*!

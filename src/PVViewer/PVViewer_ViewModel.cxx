@@ -22,7 +22,7 @@
 #include "PVViewer_ViewWindow.h"
 
 #include <utilities.h>
-#include <SUIT_Desktop.h>
+#include "SUIT_Desktop.h"
 
 //----------------------------------------
 PVViewer_Viewer::PVViewer_Viewer()
@@ -35,9 +35,8 @@ PVViewer_Viewer::PVViewer_Viewer()
   Create new instance of view window on desktop \a theDesktop.
   \retval SUIT_ViewWindow* - created view window pointer.
 */
-SUIT_ViewWindow* PVViewer_Viewer::createView(SUIT_Desktop* theDesktop)
+SUIT_ViewWindow* PVViewer_Viewer::createView(SUIT_Desktop* desktop)
 {
-  PVViewer_ViewWindow* aPVView = new PVViewer_ViewWindow(theDesktop, this);
-  return aPVView;
+  return new PVViewer_ViewWindow(desktop, this);
 }
 

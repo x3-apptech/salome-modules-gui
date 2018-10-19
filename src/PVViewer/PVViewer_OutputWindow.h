@@ -17,28 +17,28 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _PVViewer_LogWindowAdapter_h
-#define _PVViewer_LogWindowAdapter_h
+#ifndef PVVIEWER_OUTPUTWINDOW_H
+#define PVVIEWER_OUTPUTWINDOW_H
 
 #include "PVViewer.h"
 
+#include <QMap>
 #include <vtkOutputWindow.h>
 
-class LogWindow;
-
-/*!
-vtkOutputWindow implementation that puts VTK output messages to SALOME log window.
-
-To use, create an instance of PVViewer_LogWindowAdapter and pass it to the
-vtkOutputWindow::setInstance() static method.
-
-This class is based on pqOutputWindow ParaView class.
-*/
-class PVVIEWER_EXPORT PVViewer_LogWindowAdapter : public vtkOutputWindow
+/**
+  vtkOutputWindow implementation that redirects VTK output messages
+  to dedicated sinals which are then handled by SALOME log window.
+  
+  To use, create an instance of PVViewer_OutputWindow and pass it to the
+  vtkOutputWindow::setInstance() static method.
+  
+  This class is based on pqOutputWindow ParaView class.
+ */
+class PVVIEWER_EXPORT PVViewer_OutputWindow : public vtkOutputWindow
 {
 public:
-  static PVViewer_LogWindowAdapter *New();
-  vtkTypeMacro(PVViewer_LogWindowAdapter, vtkOutputWindow);
+  static PVViewer_OutputWindow* New();
+  vtkTypeMacro(PVViewer_OutputWindow, vtkOutputWindow);
 
   //! Returns the number of text messages received
   const unsigned int getTextCount();
@@ -48,26 +48,19 @@ public:
   const unsigned int getWarningCount();
   //! Returns the number of generic warning messages received
   const unsigned int getGenericWarningCount();
-
-  void setLogWindow( LogWindow* w) { logWindow = w; }
-  LogWindow* getLogWindow() { return logWindow; }
+  //! Returns the number of debug messages received
+  const unsigned int getDebugCount();
 
 private:
-  PVViewer_LogWindowAdapter();
-  PVViewer_LogWindowAdapter(const PVViewer_LogWindowAdapter&);
-  PVViewer_LogWindowAdapter& operator=(const PVViewer_LogWindowAdapter&);
-  ~PVViewer_LogWindowAdapter();
+  PVViewer_OutputWindow();
+  PVViewer_OutputWindow(const PVViewer_OutputWindow&);
+  PVViewer_OutputWindow& operator=(const PVViewer_OutputWindow&);
+  ~PVViewer_OutputWindow();
 
-  unsigned int TextCount;
-  unsigned int ErrorCount;
-  unsigned int WarningCount;
-  unsigned int GenericWarningCount;
-  LogWindow * logWindow;
+  QMap<MessageTypes, int> myCounter;
 
-  virtual void DisplayText(const char*);
-  virtual void DisplayErrorText(const char*);
-  virtual void DisplayWarningText(const char*);
-  virtual void DisplayGenericWarningText(const char*);
+  void DisplayText(const char*);
+  int count(const MessageTypes&);
 };
 
-#endif // !_PVViewer_LogWindowAdapter_h
+#endif // PVVIEWER_OUTPUTWINDOW_H

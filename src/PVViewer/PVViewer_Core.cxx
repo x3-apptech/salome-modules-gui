@@ -20,7 +20,7 @@
 //
 
 #include "PVViewer_Core.h"
-#include "PVViewer_LogWindowAdapter.h"
+#include "PVViewer_OutputWindow.h"
 #include "PVViewer_GUIElements.h"
 #include "PVViewer_Behaviors.h"
 #include "PVViewer_Core.h"
@@ -58,7 +58,7 @@ pqPVApplicationCore * PVViewer_Core::GetPVApplication()
   \param fullSetup whether to instanciate all behaviors or just the minimal ones.
   \return \c true if ParaView has been initialized successfully, otherwise false
 */
-bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindow)
+bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop)
 {
   if ( ! MyCoreApp) {
       // Obtain command-line arguments
@@ -103,8 +103,7 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop, LogWindow * logWindo
       }
 
       // Direct VTK log messages to our SALOME window - TODO: review this
-      PVViewer_LogWindowAdapter * w = PVViewer_LogWindowAdapter::New();
-      w->setLogWindow(logWindow);
+      PVViewer_OutputWindow * w = PVViewer_OutputWindow::New();
       vtkOutputWindow::SetInstance(w);
 
       new pqTabbedMultiViewWidget(); // registers a "MULTIVIEW_WIDGET" on creation

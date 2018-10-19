@@ -18,8 +18,8 @@
 //
 // Author : Adrien Bruneton (CEA)
 
-#ifndef SRC_PVVIEWER_PVVIEWER_CORE_H_
-#define SRC_PVVIEWER_PVVIEWER_CORE_H_
+#ifndef PVVIEWER_CORE_H
+#define PVVIEWER_CORE_H
 
 #include "PVViewer.h"
 
@@ -27,7 +27,6 @@
 
 class PVServer_ServiceWrapper;
 class PVViewer_Behaviors;
-class LogWindow;
 class QMainWindow;
 class pqPVApplicationCore;
 
@@ -38,14 +37,13 @@ class pqPVApplicationCore;
 class PVVIEWER_EXPORT PVViewer_Core
 {
 public:
-  static pqPVApplicationCore * GetPVApplication();
-
+  static pqPVApplicationCore* GetPVApplication();
 
   //! Initialize ParaView if not yet done (once per session)
-  static bool   ParaviewInitApp(QMainWindow* aDesktop, LogWindow * w);
-  static void   ParaviewInitBehaviors(bool fullSetup=false, QMainWindow* aDesktop=0);
-  static void   ParaviewLoadConfigurations(const QString & configPath, bool force=false);
-  static void   ParaviewCleanup();
+  static bool ParaviewInitApp(QMainWindow*);
+  static void ParaviewInitBehaviors(bool = false, QMainWindow* = 0);
+  static void ParaviewLoadConfigurations(const QString&, bool = false);
+  static void ParaviewCleanup();
 
 private:
   PVViewer_Core();
@@ -53,7 +51,7 @@ private:
 
   static pqPVApplicationCore* MyCoreApp;
   static bool ConfigLoaded;
-  static PVViewer_Behaviors * ParaviewBehaviors;
+  static PVViewer_Behaviors* ParaviewBehaviors;
 };
 
-#endif /* SRC_PVVIEWER_PVVIEWER_CORE_H_ */
+#endif // PVVIEWER_CORE_H

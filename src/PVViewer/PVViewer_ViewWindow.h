@@ -18,13 +18,12 @@
 //
 // Author : Adrien Bruneton (CEA)
 
-
-#ifndef PVViewer_VIEWWINDOW_H
-#define PVViewer_VIEWWINDOW_H
+#ifndef PVVIEWER_VIEWWINDOW_H
+#define PVVIEWER_VIEWWINDOW_H
 
 #include "PVViewer.h"
 
-#include <SUIT_ViewWindow.h>
+#include "SUIT_ViewWindow.h"
 #include <QMap>
 
 class SUIT_Desktop;
@@ -39,17 +38,17 @@ public:
   PVViewer_ViewWindow( SUIT_Desktop*, PVViewer_Viewer* );
   virtual ~PVViewer_ViewWindow();
 
-  virtual QString   getVisualParameters();
-  virtual void      setVisualParameters( const QString& );
+  virtual QString getVisualParameters();
+  virtual void setVisualParameters( const QString& );
   
-  pqTabbedMultiViewWidget*    getMultiViewManager() const;
+  pqTabbedMultiViewWidget* getMultiViewManager() const;
 
   static void removePVMgr();
 
 private:
-  SUIT_Desktop*     myDesktop;
-  PVViewer_Viewer*     myModel;
-  pqTabbedMultiViewWidget*    myPVMgr;
+  SUIT_Desktop* myDesktop;
+  PVViewer_Viewer* myModel;
+  pqTabbedMultiViewWidget* myPVMgr;
 };
 
-#endif // PLOT2D_VIEWWINDOW_H
+#endif // PVVIEWER_VIEWWINDOW_H

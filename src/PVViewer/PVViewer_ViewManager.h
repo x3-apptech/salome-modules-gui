@@ -18,17 +18,16 @@
 //
 // Author: Adrien Bruneton (CEA)
 
-#ifndef PVViewer_VIEWMANAGER_H
-#define PVViewer_VIEWMANAGER_H
+#ifndef PVVIEWER_VIEWMANAGER_H
+#define PVVIEWER_VIEWMANAGER_H
 
 #include "PVViewer.h"
 
-#include <SUIT_ViewManager.h>
+#include "SUIT_ViewManager.h"
 
 class SUIT_Desktop;
 class SUIT_Study;
 class SUIT_ViewWindow;
-class LogWindow;
 class PVServer_ServiceWrapper;
 class QMainWindow;
 
@@ -37,24 +36,21 @@ class PVVIEWER_EXPORT PVViewer_ViewManager : public SUIT_ViewManager
   Q_OBJECT
 
 public:
-  PVViewer_ViewManager( SUIT_Study*, SUIT_Desktop*, LogWindow *);
+  PVViewer_ViewManager(SUIT_Study*, SUIT_Desktop*);
   ~PVViewer_ViewManager() {}
 
   //! Get the CORBA engine wrapper.
-  static PVServer_ServiceWrapper * GetService();
+  static PVServer_ServiceWrapper* GetService();
 
   //! Get PVViewer configuration path as stored by SALOME's resource manager:
   static QString GetPVConfigPath();
 
   //! Connect to the external PVServer, using the PARAVIS engine to launch it if it is not
   //! already up.
-  static bool   ConnectToExternalPVServer(QMainWindow* aDesktop);
+  static bool ConnectToExternalPVServer(QMainWindow*);
 
 protected slots:
   void onWindowActivated(SUIT_ViewWindow*);
-
-private:
-  SUIT_Desktop * desktop;
 };
 
-#endif
+#endif // PVVIEWER_VIEWMANAGER_H

@@ -19,8 +19,8 @@
 // Author: Adrien Bruneton (CEA)
 
 
-#ifndef PVGUIBEHAVIORS_H_
-#define PVGUIBEHAVIORS_H_
+#ifndef PVVIEWER_BEHAVIORS_H
+#define PVVIEWER_BEHAVIORS_H
 
 #include "PVViewer.h"
 
@@ -39,10 +39,10 @@ class PVVIEWER_EXPORT PVViewer_Behaviors: public QObject
   Q_OBJECT
 
 public:
-  PVViewer_Behaviors(QMainWindow * parent);
+  PVViewer_Behaviors(QMainWindow*);
 
-  void instanciateMinimalBehaviors(QMainWindow * desk);
-  void instanciateAllBehaviors(QMainWindow * desk);
+  void instanciateMinimalBehaviors(QMainWindow*);
+  void instanciateAllBehaviors(QMainWindow*);
 
   virtual ~PVViewer_Behaviors() {}
 
@@ -50,4 +50,4 @@ private:
   static int BehaviorLoadingLevel;
 };
 
-#endif /* PVGUIBEHAVIORS_H_ */
+#endif // PVVIEWER_BEHAVIORS_H
