@@ -2050,21 +2050,34 @@ public:
   CrTool( QAction* action, const QString& tBar, const int id, const int idx )
     : myCase( 4 ), myAction( action ), myTbTitle( tBar ), myId( id ), myIndex( idx ) {}
 
-  int execute( LightApp_Module* module ) const
+  int execute() const
   {
-    if ( module ) {
-      switch ( myCase ) {
-      case 0:
-        return module->createTool( myTbTitle, myTbName );
-      case 1:
-        return module->createTool( myId, myTbId, myIndex );
-      case 2:
-        return module->createTool( myId, myTbTitle, myIndex );
-      case 3:
-        return module->createTool( myAction, myTbId, myId, myIndex );
-      case 4:
-        return module->createTool( myAction, myTbTitle, myId, myIndex );
-      }
+    switch ( myCase ) {
+    case 0:
+      if ( getActiveModule() )
+        return getActiveModule()->createTool( myTbTitle, myTbName );
+      else if ( getApplication() )
+        return getApplication()->createTool( myTbTitle, myTbName );
+    case 1:
+      if ( getActiveModule() )
+        return getActiveModule()->createTool( myId, myTbId, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createTool( myId, myTbId, myIndex );
+    case 2:
+      if ( getActiveModule() )
+        return getActiveModule()->createTool( myId, myTbTitle, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createTool( myId, myTbTitle, myIndex );
+    case 3:
+      if ( getActiveModule() )
+        return getActiveModule()->createTool( myAction, myTbId, myId, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createTool( myAction, myTbId, myId, myIndex );
+    case 4:
+      if ( getActiveModule() )
+        return getActiveModule()->createTool( myAction, myTbTitle, myId, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createTool( myAction, myTbTitle, myId, myIndex );
     }
     return -1;
   }
@@ -2088,9 +2101,7 @@ public:
     : myResult( -1 ), myCrTool( crTool ) {}
   virtual void Execute() 
   {
-    LightApp_Module* module = getActiveModule();
-    if ( module )
-      myResult = myCrTool.execute( module );
+    myResult = myCrTool.execute();
   }
 };
 
@@ -2142,6 +2153,30 @@ int SalomePyQt::createTool( QAction* a, const int tBar, const int id, const int 
   return ProcessEvent( new TCreateToolEvent( CrTool( a, tBar, id, idx ) ) );
 }
 
+
+/*!
+  \brief Clear given toolbar.
+  \param title toolbar's title
+*/
+void SalomePyQt::clearTool( const QString& title )
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myTitle;
+  public:
+    TEvent( const QString& title ) 
+      : myTitle( title ) {}
+    virtual void Execute() 
+    {
+      if ( getActiveModule() )
+        return getActiveModule()->clearTool( myTitle );
+      else if ( getApplication() )
+        return getApplication()->clearTool( myTitle );
+    }
+  };
+  ProcessVoidEvent( new TEvent( title ) );
+}
+
 /*!
   \brief Insert action to the toolbar.
   \param a action
@@ -2171,23 +2206,39 @@ public:
   CrMenu( QAction* action, const QString& menu, const int id, const int group, const int idx ) 
     : myCase( 5 ), myAction( action ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
 
-  int execute( LightApp_Module* module ) const
+  int execute() const
   {
-    if ( module ) {
-      switch ( myCase ) {
-      case 0:
-        return module->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
-      case 1:
-        return module->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
-      case 2:
-        return module->createMenu( myId, myMenuId, myGroup, myIndex );
-      case 3:
-        return module->createMenu( myId, myMenuName, myGroup, myIndex );
-      case 4:
-        return module->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
-      case 5:
-        return module->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
-      }
+    switch ( myCase ) {
+    case 0:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
+    case 1:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
+    case 2:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( myId, myMenuId, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( myId, myMenuId, myGroup, myIndex );
+    case 3:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( myId, myMenuName, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( myId, myMenuName, myGroup, myIndex );
+    case 4:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
+    case 5:
+      if ( getActiveModule() )
+        return getActiveModule()->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
+      else if ( getApplication() )
+        return getApplication()->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
     }
     return -1;
   }
@@ -2212,9 +2263,7 @@ public:
     : myResult( -1 ), myCrMenu( crMenu ) {}
   virtual void Execute()
   {
-    LightApp_Module* module = getActiveModule();
-    if ( module )
-      myResult = myCrMenu.execute( module );
+    myResult = myCrMenu.execute();
   }
 };
 

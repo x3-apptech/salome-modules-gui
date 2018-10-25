@@ -113,6 +113,7 @@ public:
   int                    createTool( const int, const QString&, const int = -1 );
   int                    createTool( QAction*, const int, const int = -1, const int = -1 );
   int                    createTool( QAction*, const QString&, const int = -1, const int = -1 );
+  void                   clearTool( const QString& title );
 
   int                    createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1,QMenu * = 0);
   int                    createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );

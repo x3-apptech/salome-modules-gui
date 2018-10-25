@@ -600,6 +600,16 @@ int CAM_Module::createTool( const int id, const QString& tBar, const int idx )
 }
 
 /*!
+  Clears given toolbar.
+  \param title - title of toolbar
+*/
+void CAM_Module::clearTool( const QString& title )
+{
+  if ( toolMgr() )
+    toolMgr()->clear( title );
+}
+
+/*!
   \brief Create menu or submenu.
 
   Create main menu or popup submenu and register it with specified \a id.

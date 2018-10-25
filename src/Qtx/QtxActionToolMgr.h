@@ -99,6 +99,8 @@ public:
 
   void            remove( const int, const int );
   void            remove( const int, const QString& );
+  void            clear( const int );
+  void            clear( const QString& );
 
   QToolBar*       toolBar( const int ) const;
   QToolBar*       toolBar( const QString& ) const;

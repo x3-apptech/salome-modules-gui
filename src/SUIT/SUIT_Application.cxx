@@ -400,6 +400,16 @@ int SUIT_Application::createTool( const int id, const QString& tBar, const int i
 }
 
 /*!
+  Clears given toolbar.
+  \param title - title of toolbar
+*/
+void SUIT_Application::clearTool( const QString& title )
+{
+  if ( desktop() && desktop()->toolMgr() )
+    desktop()->toolMgr()->clear( title );
+}
+
+/*!
   Creates new menu item
   \return identificator of new action in menu manager
   \param subMenu - menu text of new item

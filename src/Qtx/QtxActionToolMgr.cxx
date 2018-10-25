@@ -443,6 +443,29 @@ void QtxActionToolMgr::remove( const int id, const QString& title )
 }
 
 /*!
+  \brief Remove all actions from toolbar.
+  \param tid toolbar ID
+*/
+void QtxActionToolMgr::clear( const int tid )
+{
+  if ( !myToolBars.contains( tid ) )
+    return;
+
+  myToolBars[tid].nodes.clear();
+
+  triggerUpdate( tid );
+}
+
+/*!
+  \brief Remove all actions from toolbar.
+  \param title toolbar title
+*/
+void QtxActionToolMgr::clear( const QString& title )
+{
+  clear( find( title ) );
+}
+
+/*!
   \brief Get toolbar by given \a tid.
   \param tid toolbar ID
   \return toolbar or 0 if it is not found

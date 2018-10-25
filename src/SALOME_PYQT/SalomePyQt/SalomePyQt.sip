@@ -359,6 +359,7 @@ public:
   static int               createTool( const int,  const QString&, const int = -1 ) /ReleaseGIL/ ;
   static int               createTool( QAction*,   const int,      const int = -1, const int = -1 ) /ReleaseGIL/ ;
   static int               createTool( QAction*,   const QString&, const int = -1, const int = -1 ) /ReleaseGIL/ ;
+  static void              clearTool( const QString& ) /ReleaseGIL/ ;
 
   static int               createMenu( const QString&, const int,
 				       const int = -1, const int = -1, const int = -1 ) /ReleaseGIL/ ;

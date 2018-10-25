@@ -118,6 +118,22 @@ public:
 
   void                  addPostRoutine( void (*theRoutine)() );
 
+  /** @name Create tool functions*/ //@{
+  int                   createTool( const QString&, const QString& = QString() );
+  int                   createTool( const int, const int, const int = -1 );
+  int                   createTool( const int, const QString&, const int = -1 );
+  int                   createTool( QAction*, const int, const int = -1, const int = -1 );
+  int                   createTool( QAction*, const QString&, const int = -1, const int = -1 );//@}
+  void                  clearTool( const QString& );
+
+  /** @name Create menu functions*/ //@{
+  int                   createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
+  int                   createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
+  int                   createMenu( const int, const int, const int = -1, const int = -1 );
+  int                   createMenu( const int, const QString&, const int = -1, const int = -1 );
+  int                   createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
+  int                   createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );//@}
+
 signals:
   void                  applicationClosed( SUIT_Application* );
   void                  activated( SUIT_Application* );
@@ -141,21 +157,6 @@ protected:
   virtual SUIT_Study*   createNewStudy();
   virtual void          setActiveStudy( SUIT_Study* );
   
-  /** @name Create tool functions*/ //@{
-  int                   createTool( const QString&, const QString& = QString() );
-  int                   createTool( const int, const int, const int = -1 );
-  int                   createTool( const int, const QString&, const int = -1 );
-  int                   createTool( QAction*, const int, const int = -1, const int = -1 );
-  int                   createTool( QAction*, const QString&, const int = -1, const int = -1 );//@}
-
-  /** @name Create menu functions*/ //@{
-  int                   createMenu( const QString&, const int, const int = -1, const int = -1, const int = -1 );
-  int                   createMenu( const QString&, const QString&, const int = -1, const int = -1, const int = -1 );
-  int                   createMenu( const int, const int, const int = -1, const int = -1 );
-  int                   createMenu( const int, const QString&, const int = -1, const int = -1 );
-  int                   createMenu( QAction*, const int, const int = -1, const int = -1, const int = -1 );
-  int                   createMenu( QAction*, const QString&, const int = -1, const int = -1, const int = -1 );//@}
-
   /** @name Set menu shown functions*/ //@{
   void                  setMenuShown( QAction*, const bool );
   void                  setMenuShown( const int, const bool );//@}

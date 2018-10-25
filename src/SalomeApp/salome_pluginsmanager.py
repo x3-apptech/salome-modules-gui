@@ -156,6 +156,7 @@ class PluginsManager:
         self.lasttime=0
         self.plugindirs=[]
         self.plugins_files=[]
+        self.toolbar = None
 
         # MODULES plugins directory.
         # The SALOME modules may provides natively some plugins. These
@@ -205,10 +206,13 @@ class PluginsManager:
         else:
           self.menu=QMenu(self.menuname,self.basemenu)
           self.basemenu.addMenu(self.menu)
+        self.toolbar=sgPyQt.createTool(self.menuname)
 
         self.menu.menuAction().setVisible(False)
 
         self.basemenu.aboutToShow.connect(self.importPlugins)
+
+        self.importPlugins() # to create toolbar immediately
 
     def analyseFile(self,filename):
       """
@@ -223,10 +227,10 @@ class PluginsManager:
           self.plugindirs.append(dirpath)
           logger.debug("The directory %s has been added to plugin paths"%dirpath)
         
-    def AddFunction(self,name,description,script):
+    def AddFunction(self,name,description,script,icon=None):
         """ Add a plugin function
         """
-        self.registry[name]=script,description
+        self.registry[name]=script,description,icon
         self.entries.append(name)
 
         def handler(obj=self,script=script):
@@ -287,6 +291,7 @@ class PluginsManager:
     def updateMenu(self):
         """Update the Plugins menu"""
         self.menu.clear()
+        sgPyQt.clearTool(self.menuname)
         for entry in self.entries:
           names=entry.split("/")
           if len(names) < 1:continue
@@ -312,14 +317,18 @@ class PluginsManager:
           name=names.pop(0)
           act=parentMenu.addAction(name,self.handlers[entry])
           act.setStatusTip(self.registry[entry][1])
+          icon = self.registry[entry][2] if len(self.registry[entry])>2 else None
+          if icon is not None and not icon.isNull() and icon.availableSizes():
+            act.setIcon(icon)
+            sgPyQt.createTool(act, self.toolbar)
 
         self.menu.menuAction().setVisible(True)
 
-def AddFunction(name,description,script):
+def AddFunction(name,description,script,icon=None):
    """ Add a plugin function
        Called by a user to register a function (script)
    """
-   return current_plugins_manager.AddFunction(name,description,script)
+   return current_plugins_manager.AddFunction(name,description,script,icon)
 
 def entries():
   """ Return the list of entries in menu: can be sorted or modified in place to customize menu content """
