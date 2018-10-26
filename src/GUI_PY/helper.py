@@ -36,6 +36,7 @@
 # ==================================================================
 #
 
+import salome
 from salome.kernel import services
 
 #
