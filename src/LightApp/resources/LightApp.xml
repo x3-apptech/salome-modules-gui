@@ -241,19 +241,19 @@
   </section>
   <section name="GUI" >
     <parameter name="documentation"     value="gui_help"/>
-    <parameter name="site_url"          value="www.salome-platform.org"/>
-    <parameter name="forum_url"         value="www.salome-platform.org/forum"/>
-    <parameter name="channel_url"       value="www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc&amp;disable_polymer=true"/>
+    <parameter name="site_url"          value="http://www.salome-platform.org"/>
+    <parameter name="forum_url"         value="http://www.salome-platform.org/forum"/>
+    <parameter name="channel_url"       value="https://www.youtube.com/playlist?list=PLgvBxFyGVRbZZz4wVvP36xXQL-S81RZsc&amp;disable_polymer=true"/>
   </section>
   <section name="KERNEL" >
     <parameter name="documentation"     value="kernel_help"/>
   </section>
   <section name="gui_help" >
-    <parameter name="User's Guide/GUI module"      value="${GUI_ROOT_DIR}/share/doc/salome/gui/GUI/index.html"/>
-    <parameter name="Developer's Guide/GUI module" value="${GUI_ROOT_DIR}/share/doc/salome/tui/GUI/index.html"/>
+    <parameter name="User's Guide/GUI module"      value="${GUI_ROOT_DIR}/share/doc/salome/gui/GUI/index.html;;http://docs.salome-platform.org/latest/gui/GUI/index.html"/>
+    <parameter name="Developer's Guide/GUI module" value="${GUI_ROOT_DIR}/share/doc/salome/tui/GUI/index.html;;http://docs.salome-platform.org/latest/tui/GUI/index.html"/>
   </section>
   <section name="kernel_help" >
-    <parameter name="Developer's Guide/KERNEL module" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html"/>
+    <parameter name="Developer's Guide/KERNEL module" value="${KERNEL_ROOT_DIR}/share/doc/salome/tui/KERNEL/index.html;;http://docs.salome-platform.org/latest/tui/KERNEL/index.html"/>
   </section>
   <section name="notification" >
     <parameter name="timeout" value="10"/>
@@ -292,7 +292,7 @@
   </section>
   <section name="add_help">
     <!-- Additional help resources -->
-    <parameter name="Developer resources"  value="${DOCUMENTATION_ROOT_DIR}/index.html" />
+    <parameter name="Developer resources"  value="${DOCUMENTATION_ROOT_DIR}/index.html;;http://docs.salome-platform.org/latest/index.html" />
   </section>
  <section name="windows_geometry">
   <parameter name="nomodule" value="#00 #00 #00 #FF #00 #00 #00 #00 #FD #00 #00 #00 #02 #00 #00 #00 #00 #00 #00 #01 #00 #00 #00 #02 #8D #FC #02 #00 #00 #00 #01 #FB #00 #00 #00 #22 #00 #6F #00 #62 #00 #6A #00 #65 #00 #63 #00 #74 #00 #42 #00 #72 #00 #6F #00 #77 #00 #73 #00 #65 #00 #72 #00 #44 #00 #6F #00 #63 #00 #6B #01 #00 #00 #00 #37 #00 #00 #02 #8D #00 #00 #00 #53 #00 #FF #FF #FF #00 #00 #00 #03 #00 #00 #05 #40 #00 #00 #00 #53 #FC #01 #00 #00 #00 #01 #FB #00 #00 #00 #22 #00 #70 #00 #79 #00 #74 #00 #68 #00 #6F #00 #6E #00 #43 #00 #6F #00 #6E #00 #73 #00 #6F #00 #6C #00 #65 #00 #44 #00 #6F #00 #63 #00 #6B #01 #00 #00 #00 #00 #00 #00 #05 #40 #00 #00 #00 #46 #00 #FF #FF #FF #00 #00 #04 #38 #00 #00 #02 #8D #00 #00 #00 #04 #00 #00 #00 #04 #00 #00 #00 #08 #00 #00 #00 #08 #FC #00 #00 #00 #01 #00 #00 #00 #02 #00 #00 #00 #02 #00 #00 #00 #1C #00 #53 #00 #61 #00 #6C #00 #6F #00 #6D #00 #65 #00 #53 #00 #74 #00 #61 #00 #6E #00 #64 #00 #61 #00 #72 #00 #64 #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #1A #00 #53 #00 #61 #00 #6C #00 #6F #00 #6D #00 #65 #00 #4D #00 #6F #00 #64 #00 #75 #00 #6C #00 #65 #00 #73 #01 #00 #00 #00 #CE #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00" />

@@ -196,7 +196,6 @@ signals:
 
 public slots:
   virtual void                        onHelpContentsModule();
-  virtual void                        onHelpOnline();
   virtual void                        onHelpContextModule( const QString&, const QString&, const QString& = QString() );
   virtual void                        onNewDoc();
   virtual void                        onOpenDoc();
@@ -209,6 +208,7 @@ public slots:
   virtual void                        onDockWindowVisibilityChanged( bool );
 
 protected:
+  void                                showHelp( const QString& );
   virtual void                        createActions();
   virtual void                        createActionForViewer( const int id,
                                                              const int parentId,

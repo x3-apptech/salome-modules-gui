@@ -604,7 +604,7 @@ void LightApp_Application::createActions()
     QAction* as = createAction( id, title,
 				resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
 				title, title,
-				0, desk, false, this, SLOT( onHelpOnline() ) );
+				0, desk, false, this, SLOT( onHelpContentsModule() ) );
     as->setData( url );
     createMenu( as, helpMenu, -1, 0 );
     id++;
@@ -617,7 +617,7 @@ void LightApp_Application::createActions()
     QAction* af = createAction( helpMenu, title,
 				resMgr->loadPixmap( "LightApp", tr( "ICON_WWW" ), false ),
 				title, title,
-				0, desk, false, this, SLOT( onHelpOnline() ) );
+				0, desk, false, this, SLOT( onHelpContentsModule() ) );
     af->setData( url );
     createMenu( af, helpMenu, -1, 0 );
     id++;
@@ -631,7 +631,7 @@ void LightApp_Application::createActions()
     QAction* av = createAction( helpMenu, title,
 				resMgr->loadPixmap( "LightApp", tr( "ICON_LIFE_RIGN" ), false ),
 				title, title,
-				0, desk, false, this, SLOT( onHelpOnline() ) );
+				0, desk, false, this, SLOT( onHelpContentsModule() ) );
     av->setData( url );
     createMenu( av, helpMenu, -1, 0 );
     id++;
@@ -659,23 +659,38 @@ void LightApp_Application::createActions()
     QString modName = moduleName( aModule );                         // module name
     if ( modName.isEmpty() ) modName = aModule;                      // for KERNEL and GUI
     QString rootDir = QString( "%1_ROOT_DIR" ).arg( modName );       // module root dir env variable
-    QString modDir  = getenv( rootDir.toUtf8().constData() );      // module root dir path
+    QString modDir  = getenv( rootDir.toUtf8().constData() );        // module root dir path
     QString docSection;
     if (resMgr->hasValue( modName, "documentation" ) )
       docSection = resMgr->stringValue(modName, "documentation");
     else if ( resMgr->hasSection( modName + "_documentation" ) )
       docSection = modName + "_documentation";
     if ( !docSection.isEmpty() ) {
-      helpSubMenu = resMgr->stringValue( docSection, "sub_menu", "" ).arg( aModule );
+      helpSubMenu = resMgr->stringValue( docSection, "sub_menu", "" );
+      if ( helpSubMenu.contains( "%1" ) )
+        helpSubMenu = helpSubMenu.arg( aModule );
       QStringList listOfParam = resMgr->parameters( docSection );
       foreach( QString paramName, listOfParam ) {
         QString valueStr = resMgr->stringValue( docSection, paramName );
         if ( !valueStr.isEmpty() ) {
-          QFileInfo fi( valueStr );
-          if ( fi.isRelative() && !modDir.isEmpty() )
-            valueStr = Qtx::addSlash( modDir ) + valueStr;
-          if ( QFile::exists( valueStr ) )
-            helpData.insert( paramName.arg( aModule ), valueStr );
+          QStringList valueItems = valueStr.split( ";;", QString::SkipEmptyParts );
+          foreach( QString item, valueItems ) {
+            if ( item.startsWith( "http", Qt::CaseInsensitive ) ) {
+              QString key = paramName.contains( "%1" ) ? paramName.arg( aModule ) : paramName;
+              helpData.insert( key, item );
+              break;
+            }
+            else {
+              QFileInfo fi( item );
+              if ( fi.isRelative() && !modDir.isEmpty() )
+                item = Qtx::addSlash( modDir ) + item;
+              if ( QFile::exists( item ) ) {
+                QString key = paramName.contains( "%1" ) ? paramName.arg( aModule ) : paramName;
+                helpData.insert( key, item );
+                break;
+              }
+            }
+          }
         }
       }
     }
@@ -689,24 +704,24 @@ void LightApp_Application::createActions()
 
     IMapConstIterator<QString, QString > fileIt;
     for ( fileIt = helpData.begin(); fileIt != helpData.end(); fileIt++ ) {
-      QString helpFileName = fileIt.key();
+      QString helpItemPath = fileIt.key();
       // remove all '//' occurances 
-      while ( helpFileName.contains( "//" ) )
-        helpFileName.replace( "//", "" );
+      while ( helpItemPath.contains( "//" ) )
+        helpItemPath.replace( "//", "" );
       // obtain submenus hierarchy if given
-      QStringList smenus = helpFileName.split( "/" );
-      helpFileName = smenus.takeLast();
+      QStringList smenus = helpItemPath.split( "/" );
+      helpItemPath = smenus.takeLast();
       // workaround for User's Guide and Developer's Guide to avoid having single item in module's submenu.
-      if ( helpFileName == userGuide || helpFileName == devGuide ) {
+      if ( helpItemPath == userGuide || helpItemPath == devGuide ) {
 	QString menuPath = smenus.join( "/" );
 	QStringList allKeys = helpData.keys();
 	QStringList total = allKeys.filter( QRegExp( QString( "^%1" ).arg( menuPath ) ) );
 	if ( total.count() == 1 && smenus.count() > 0 )
-	  helpFileName = smenus.takeLast();
+	  helpItemPath = smenus.takeLast();
       }
-      QAction* a = createAction( id, helpFileName,
-                                 resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false ),
-                                 helpFileName, helpFileName,
+      QPixmap helpIcon = fileIt.value().startsWith( "http", Qt::CaseInsensitive ) ? 
+        resMgr->loadPixmap( "STD", tr( "ICON_WWW" ), false ) : resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false );
+      QAction* a = createAction( id, helpItemPath, helpIcon, helpItemPath, helpItemPath,
                                  0, desk, false, this, SLOT( onHelpContentsModule() ) );
       a->setData( fileIt.value() );
       if ( !helpSubMenu.isEmpty() ) {
@@ -716,7 +731,7 @@ void LightApp_Application::createActions()
       int menuId = helpMenu;
       foreach ( QString subMenu, smenus )
         menuId = createMenu( subMenu, menuId, -1, 5 );
-      createMenu( a, menuId, -1, ( menuId != helpMenu && (helpFileName == userGuide || helpFileName == devGuide) ) ? 0 : 5 );
+      createMenu( a, menuId, -1, ( menuId != helpMenu && (helpItemPath == userGuide || helpItemPath == devGuide) ) ? 0 : 5 );
       id++;
     }
   }
@@ -726,16 +741,21 @@ void LightApp_Application::createActions()
   createMenu( separator(), helpMenu, -1, 10 );
 
   QStringList addHelpItems = resMgr->parameters( "add_help" );
-  foreach ( QString addHelpItem, addHelpItems ) {
-    QString valueStr = resMgr->stringValue( "add_help", addHelpItem );
-    if ( !valueStr.isEmpty() && QFile::exists( valueStr ) ) {
-      QAction* a = createAction( id, addHelpItem,
-                                 resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false ),
-                                 addHelpItem, addHelpItem,
-                                 0, desk, false, this, SLOT( onHelpContentsModule() ) );
-      a->setData( valueStr );
-      createMenu( a, helpMenu, -1, 10 );
-      id++;
+  foreach ( QString paramName, addHelpItems ) {
+    QString valueStr = resMgr->stringValue( "add_help", paramName );
+    if ( !valueStr.isEmpty() ) {
+      QStringList valueItems = valueStr.split( ";;", QString::SkipEmptyParts );
+      foreach( QString item, valueItems ) { 
+        if ( item.startsWith( "http", Qt::CaseInsensitive ) || QFile::exists( item ) ) {
+          QPixmap helpIcon = item.startsWith( "http", Qt::CaseInsensitive ) ? 
+            resMgr->loadPixmap( "STD", tr( "ICON_WWW" ), false ) : resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false );
+          QAction* a = createAction( id++, paramName, helpIcon, paramName, paramName,
+                                     0, desk, false, this, SLOT( onHelpContentsModule() ) );
+          a->setData( item );
+          createMenu( a, helpMenu, -1, 10 );
+          break;
+        }
+      }
     }
   }
 
@@ -1133,54 +1153,105 @@ void LightApp_Application::updateCommandsStatus()
 class RunBrowser: public QThread
 {
 public:
-  RunBrowser( LightApp_Application* app,
-              const QString&        theApp,
-              const QString&        theParams,
-              const QString&        theHelpFile,
-              const QString&        theContext = QString(),
-	      //For the external browser always specify 'file://' protocol,
-	      //because some WEB browsers (for example Mozilla Firefox) can't open local file without protocol.
-	      const QString&        theProtocol = QString("file://"),
-	      const bool            isFile = true)
-    : myApp( theApp ),
-      myParams( theParams ),
-      myContext( theContext ),
-      myStatus(0),
-      myLApp( app )
+  static void execute( LightApp_Application* application,
+                       const QString& browser,
+                       const QString& parameters,
+                       const QString& url )
   {
-    QString path_begin = theProtocol+"%1";
-    QString path_end = theHelpFile;
-    if( isFile ) {
-      path_end = QFileInfo( theHelpFile ).canonicalFilePath();
+    (new RunBrowser( application, browser, parameters, url ))->start();
+  }
+
+protected:
+  RunBrowser( LightApp_Application* application,
+              const QString&        browser,
+              const QString&        parameters,
+              const QString&        url)
+    : myApplication( application ),
+      myBrowser( browser ),
+      myParameters( parameters ),
+      myUrl( url )
+  {
+    if ( !myUrl.startsWith( "http", Qt::CaseInsensitive ) )
+    {
+      // normalize path
+      if ( myUrl.startsWith( "file://", Qt::CaseInsensitive ) )
+	myUrl = myUrl.remove( 0, QString( "file://" ).count() );
+      // For the external browser we always specify 'file://' protocol,
+      // because some web browsers (e.g. Mozilla Firefox) can't open local file without protocol.
+      myUrl = myUrl.prepend( "file://" );
     }
-    myHelpFile = path_begin.arg( path_end );
+    connect(this, SIGNAL(finished()), SLOT(deleteLater()));
   }
 
   virtual void run()
   {
-    if ( !myApp.isEmpty() && !myHelpFile.isEmpty()) {
-      QString aCommand = QString( "%1 %2 \"%3%4\"" ).arg( myApp, myParams, myHelpFile, myContext.isEmpty() ? QString("") : QString( "#%1" ).arg( myContext ) );
-
+    if ( !myBrowser.isEmpty() && !myUrl.isEmpty() )
+    {
+#ifdef WIN32
+      QString cmdLine = QString( "\"%1\" %2 \"%3\"" ).arg( myBrowser, myParameters, myUrl );
+#else
+      QString cmdLine = QString( "%1 %2 \"%3\"" ).arg( myBrowser, myParameters, myUrl );
+#endif
       QProcess* proc = new QProcess();
-
-      proc->start( aCommand );
-      if ( !proc->waitForStarted() ) {
+      proc->start( cmdLine );
+      if ( !proc->waitForStarted() )
+      {
         SALOME_CustomEvent* ce2000 = new SALOME_CustomEvent( 2000 );
-        QString* msg = new QString( QObject::tr( "EXTERNAL_BROWSER_CANNOT_SHOW_PAGE" ).arg( myApp, myHelpFile ) );
+        QString* msg = new QString( QObject::tr( "EXTERNAL_BROWSER_CANNOT_SHOW_PAGE" ).arg( myBrowser, myUrl ) );
         ce2000->setData( msg );
-        QApplication::postEvent( myLApp, ce2000 );
+        QApplication::postEvent( myApplication, ce2000 );
       }
     }
   }
 
 private:
-  QString               myApp;
-  QString               myParams;
-  QString               myHelpFile;
-  QString               myContext;
-  int                   myStatus;
-  LightApp_Application* myLApp;
+  LightApp_Application* myApplication;
+  QString               myBrowser;
+  QString               myParameters;
+  QString               myUrl;
 };
+
+void LightApp_Application::showHelp( const QString& path )
+{
+  SUIT_ResourceMgr* resMgr = resourceMgr();
+
+#if DISABLE_QTXWEBBROWSER
+  bool useExternalBrowser = true;
+#else  
+  bool useExternalBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
+#endif
+
+  if ( useExternalBrowser )
+  {
+#ifdef WIN32
+    QString browser = resMgr->stringValue( "ExternalBrowser", "winapplication" ) ;
+#else
+    QString browser = resMgr->stringValue( "ExternalBrowser", "application" );
+#endif
+    QString parameters = resMgr->stringValue("ExternalBrowser", "parameters");
+  
+    if ( !browser.isEmpty() )
+    {
+      RunBrowser::execute( this, browser, parameters, path );
+    }
+    else
+    {
+      if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
+                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
+                                      SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
+
+        showPreferences( tr( "PREF_APP" ) );
+    }
+  }
+  else
+  {
+    QStringList cmdLine;
+    cmdLine << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
+    cmdLine << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
+    cmdLine << path;
+    QProcess::startDetached( "HelpBrowser", cmdLine );
+  }
+}
 
 /*!
   SLOT: Displays help contents for choosen module
@@ -1189,174 +1260,36 @@ void LightApp_Application::onHelpContentsModule()
 {
   const QAction* a = (QAction*) sender();
   QString helpFile = a->data().toString();
-  if ( helpFile.isEmpty() ) return;
-
-  SUIT_ResourceMgr* resMgr = resourceMgr();
-  QString platform;
-#ifdef WIN32
-  platform = "winapplication";
-#else
-  platform = "application";
-#endif
-  QString anApp = resMgr->stringValue("ExternalBrowser", platform);
-#ifdef WIN32
-  QString quote("\"");
-  anApp.prepend( quote );
-  anApp.append( quote );
-#endif
-  QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
-#if DISABLE_QTXWEBBROWSER
-  bool useExtBrowser = true;
-#else  
-  bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
-#endif
-  
-  if( useExtBrowser ) {
-    if ( !anApp.isEmpty() ) {
-      RunBrowser* rs = new RunBrowser( this, anApp, aParams, helpFile );
-      rs->start();
-    }
-    else {
-      if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
-                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
-                                      SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
-
-        showPreferences( tr( "PREF_APP" ) );
-    }
-  }
-  else {
-    QStringList parameters;
-    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
-    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
-    parameters << helpFile;
-    QProcess::startDetached( "HelpBrowser", parameters );
-  }
+  if ( !helpFile.isEmpty() )
+    showHelp( helpFile );
 }
 
 /*!
-  SLOT: Displays help contents for choosen dialog
+  SLOT: Displays contextual help (e.g. for choosen dialog)
 */
-void LightApp_Application::onHelpContextModule( const QString& theComponentName,
-                                                const QString& theFileName,
-                                                const QString& theContext )
+void LightApp_Application::onHelpContextModule( const QString& component,
+                                                const QString& url,
+                                                const QString& context )
 {
-  QString fileName = theFileName;
-  QString context  = theContext;
-  if ( !QFile::exists( fileName ) && theContext.isEmpty() ) {
-    // context might be passed within theFileName argument
-    QStringList comps = fileName.split("#");
-    if ( comps.count() > 1 ) {
-      context = comps.last();
-      comps.removeLast();
-      fileName = comps.join("#");
+  QString path = url;
+  if ( !url.startsWith( "http", Qt::CaseInsensitive ) )
+  {
+    // local file path
+    QFileInfo fi( url );
+    if ( fi.isRelative() && !component.isEmpty() )
+    {
+      QString rootDir = getenv( (component + "_ROOT_DIR").toLatin1().constData() );
+      if ( !rootDir.isEmpty() )
+      {
+	path = (QStringList() << rootDir << "share" << "doc" << "salome" << "gui" << component << url).join( QDir::separator() );
+      }
     }
   }
-
-  QString homeDir = "";
-  if ( !theComponentName.isEmpty() ) {
-    QString dir = getenv( ( theComponentName + "_ROOT_DIR" ).toLatin1().constData() );
-    if ( !dir.isEmpty() )
-      homeDir = Qtx::addSlash( Qtx::addSlash( dir )      +
-                               Qtx::addSlash( "share" )  +
-                               Qtx::addSlash( "doc" )    +
-                               Qtx::addSlash( "salome" ) +
-                               Qtx::addSlash( "gui" )    +
-                               Qtx::addSlash( theComponentName ) );
+  if ( !context.isEmpty() )
+  {
+    path += QString( "#%1" ).arg( context );
   }
-
-  QString helpFile = QFileInfo( homeDir + fileName ).absoluteFilePath();
-  SUIT_ResourceMgr* resMgr = resourceMgr();
-        QString platform;
-#ifdef WIN32
-        platform = "winapplication";
-#else
-        platform = "application";
-#endif
-        QString anApp = resMgr->stringValue("ExternalBrowser", platform);
-#ifdef WIN32
-        QString quote("\"");
-        anApp.prepend( quote );
-        anApp.append( quote );
-#endif
-
-#if DISABLE_QTXWEBBROWSER
-  bool useExtBrowser = true;
-#else  
-  bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
-#endif
-
-  if(useExtBrowser) {
-    QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
-
-    if ( !anApp.isEmpty() ) {
-      RunBrowser* rs = new RunBrowser( this, anApp, aParams, helpFile, context );
-      rs->start();
-    }
-    else {
-      if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
-                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
-                                      SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
-        showPreferences( tr( "PREF_APP" ) );
-    }
-  }
-  else {
-    QStringList parameters;
-    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
-    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
-    parameters << QString( "%1#%2" ).arg( helpFile ).arg( context );
-    QProcess::startDetached( "HelpBrowser", parameters );
-  }
-}
-
-/*!
-  SLOT: Displays help contents for choosen module
-*/
-void LightApp_Application::onHelpOnline()
-{
-  const QAction* a = (QAction*) sender();
-  QString url = a->data().toString();
-  if ( url.isEmpty() ) return;
-
-  SUIT_ResourceMgr* resMgr = resourceMgr();
-  QString platform;
-#ifdef WIN32
-  platform = "winapplication";
-#else
-  platform = "application";
-#endif
-  QString anApp = resMgr->stringValue("ExternalBrowser", platform);
-#ifdef WIN32
-  QString quote("\"");
-  anApp.prepend( quote );
-  anApp.append( quote );
-#endif
-  QString aParams = resMgr->stringValue("ExternalBrowser", "parameters");
-#if DISABLE_QTXWEBBROWSER
-  bool useExtBrowser = true;
-#else  
-  bool useExtBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
-#endif
-  
-  if( useExtBrowser ) {
-    if ( !anApp.isEmpty() ) {
-      RunBrowser* rs = new RunBrowser( this, anApp, aParams, url, "", "http://", false );
-      rs->start();
-    }
-    else {
-      if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
-                                      SUIT_MessageBox::Yes | SUIT_MessageBox::No,
-                                      SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
-
-        showPreferences( tr( "PREF_APP" ) );
-    }
-  }
-  else {
-    QStringList parameters;
-    parameters << QString( "--language=%1" ).arg( resMgr->stringValue( "language", "language" ) );
-    parameters << QString( "--add=%1" ).arg( QApplication::instance()->applicationPid() );
-    parameters << "http://" + url;
-    QProcess::startDetached( "HelpBrowser", parameters );
-  }
+  showHelp( path );
 }
 
 /*!
@@ -2319,8 +2252,6 @@ void LightApp_Application::emptyPreferences( const QString& modName )
   QtxPreferenceItem* item = myPrefs->findItem( modName, true );
   if ( !item || !item->isEmpty() )
     return;
-
-  //  printf( "---------------------> Modify for empty module.\n" );
 
   QtxPagePrefFrameItem* frm = new QtxPagePrefFrameItem( item->title(), item->parentItem() );
   frm->setIcon( item->icon() );
