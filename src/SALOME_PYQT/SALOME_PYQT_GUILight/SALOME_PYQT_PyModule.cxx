@@ -2129,7 +2129,7 @@ void PyModuleHelper::internalClosedStudy( SUIT_Study* theStudy )
   }
   // then call Python module's deactivate() method
   if ( PyObject_HasAttrString( myPyModule , (char*)"closeStudy" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"i" ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"closeStudy", (char*)"" ) );
     if( !res ) {
       PyErr_Print();
     }
@@ -2209,7 +2209,7 @@ void PyModuleHelper::internalStudyChanged( SUIT_Study* study )
 
   // call Python module's activeStudyChanged() method
   if ( PyObject_HasAttrString( myPyModule, (char*)"activeStudyChanged" ) ) {
-    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"i" ) );
+    PyObjWrapper res( PyObject_CallMethod( myPyModule, (char*)"activeStudyChanged", (char*)"" ) );
     if( !res ) {
       PyErr_Print();
     }
