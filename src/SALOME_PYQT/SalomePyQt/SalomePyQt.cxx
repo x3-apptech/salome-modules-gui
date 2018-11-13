@@ -814,6 +814,36 @@ void SalomePyQt::hideNotification( const int id )
 }
 
 /*!
+  \fn QStringList SalomePyQt::getComponents();
+  \brief Get all modules used in current GUI session.
+  \return List of modules
+*/
+
+class TGetComponentsEvent: public SALOME_Event
+{
+public:
+  typedef QStringList TResult;
+  TResult myResult;
+  TGetComponentsEvent() {}
+  virtual void Execute() 
+  {
+    if ( LightApp_Application* anApp = getApplication() )
+    {
+      QStringList titles;
+      anApp->modules( titles, false );
+      foreach ( QString title, titles )
+      {
+	myResult << anApp->moduleName( title );
+      }
+    }
+  }
+};
+QStringList SalomePyQt::getComponents()
+{
+  return ProcessEvent( new TGetComponentsEvent() );
+}
+
+/*!
   \fn const QString SalomePyQt::getActiveComponent();
   \brief Get the currently active module name (for the current study).
   \return active module name or empty string if there is no active module
