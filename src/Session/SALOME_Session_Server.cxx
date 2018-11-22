@@ -460,6 +460,8 @@ int main( int argc, char **argv )
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
     ASSERT( SINGLETON_<ORB_INIT>::IsAlreadyExisting() );
     int orbArgc = 1;
+    if( std::string(argv[1]).find("-ORBInitRef") != std::string::npos )
+      orbArgc = 3;
     orb = init( orbArgc, argv );
 
     CORBA::Object_var obj = orb->resolve_initial_references( "RootPOA" );
