@@ -269,25 +269,30 @@ public:
 
   virtual bool notify( QObject* receiver, QEvent* e )
   {
-
-    try {
-      return myHandler ? myHandler->handle( receiver, e ) : QApplication::notify( receiver, e );
+    QString debug_exceptions = ::getenv("SALOME_DEBUG_EXCEPTIONS");
+    if ( debug_exceptions.length() > 0 ) {
+      return QApplication::notify( receiver, e );
     }
-    catch (std::exception& e) {
-      std::cerr << e.what()  << std::endl;
+    else {
+      try {
+        return myHandler ? myHandler->handle( receiver, e ) : QApplication::notify( receiver, e );
+      }
+      catch (std::exception& e) {
+        std::cerr << e.what()  << std::endl;
+      }
+      catch (CORBA::Exception& e) {
+        std::cerr << "Caught CORBA::Exception"  << std::endl;
+        CORBA::Any tmp;
+        tmp<<= e;
+        CORBA::TypeCode_var tc = tmp.type();
+        const char *p = tc->name();
+        std::cerr << "notify(): CORBA exception of the kind : " << p << " is caught" << std::endl;
+      }
+      catch (...) {
+        std::cerr << "Unknown exception caught in Qt handler: it's probably a bug in SALOME platform" << std::endl;
+      }
+      return false;  // return false when exception is caught
     }
-    catch (CORBA::Exception& e) {
-      std::cerr << "Caught CORBA::Exception"  << std::endl;
-      CORBA::Any tmp;
-      tmp<<= e;
-      CORBA::TypeCode_var tc = tmp.type();
-      const char *p = tc->name();
-      std::cerr << "notify(): CORBA exception of the kind : " << p << " is caught" << std::endl;
-    }
-    catch (...) {
-      std::cerr << "Unknown exception caught in Qt handler: it's probably a bug in SALOME platform" << std::endl;
-    }
-    return false;  // return false when exception is caught
   }
   SUIT_ExceptionHandler* handler() const { return myHandler; }
   void setHandler( SUIT_ExceptionHandler* h ) { myHandler = h; }
