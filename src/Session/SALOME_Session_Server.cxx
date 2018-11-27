@@ -342,10 +342,10 @@ void killOmniNames()
 }
 
 // shutdown standalone servers
-void shutdownServers( SALOME_NamingService* theNS )
+void shutdownServers( SALOME_NamingService* theNS, bool remoteLauncher )
 {
   SALOME_LifeCycleCORBA lcc(theNS);
-  lcc.shutdownServers();
+  lcc.shutdownServers(!remoteLauncher);
 }
 
 // ---------------------------- MAIN -----------------------
@@ -447,9 +447,13 @@ int main( int argc, char **argv )
   SALOME_NamingService* _NS = 0;
   GetInterfaceThread* guiThread = 0;
   Session_ServerLauncher* myServerLauncher = 0;
+
 #if defined(WIN32) && defined(UNICODE)
   char** new_argv = NULL;
 #endif
+
+  bool remoteLauncher = false;
+
   try {
     // ...initialize Python (only once)
     int   _argc   = 1;
@@ -460,8 +464,10 @@ int main( int argc, char **argv )
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
     ASSERT( SINGLETON_<ORB_INIT>::IsAlreadyExisting() );
     int orbArgc = 1;
-    if( std::string(argv[1]).find("-ORBInitRef") != std::string::npos )
+    if( std::string(argv[1]).find("-ORBInitRef") != std::string::npos ){
       orbArgc = 3;
+      remoteLauncher = true;
+    }
     orb = init( orbArgc, argv );
 
     CORBA::Object_var obj = orb->resolve_initial_references( "RootPOA" );
@@ -665,7 +671,7 @@ int main( int argc, char **argv )
     myServerLauncher->ShutdownAll(); // shutdown embedded servers
 
   if ( shutdownAll )                 // shutdown standalone servers
-    shutdownServers( _NS );
+    shutdownServers( _NS, remoteLauncher );
 
   if ( myServerLauncher )
     myServerLauncher->KillAll();     // kill embedded servers
@@ -699,7 +705,7 @@ int main( int argc, char **argv )
     abort(); //abort program to avoid deadlock in destructors or atexit when shutdown has been interrupted
   }
 
-    //Destroy orb from python (for chasing memory leaks)
+    //Destroy orb from python (for chasing msrc/Session/SALOME_Session_Server.cxxemory leaks)
   //PyRun_SimpleString("from omniORB import CORBA");
   //PyRun_SimpleString("orb=CORBA.ORB_init([''], CORBA.ORB_ID)");
   //PyRun_SimpleString("orb.destroy()");
