@@ -136,6 +136,7 @@ void SALOME_Session_i::NSunregister()
   try
     {
       _NS->Destroy_Name("/Kernel/Session");
+      _NS->Destroy_Directory("/Kernel");
     }
   catch (ServiceUnreachable&)
     {
