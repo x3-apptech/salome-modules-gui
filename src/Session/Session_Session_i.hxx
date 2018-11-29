@@ -95,6 +95,8 @@ protected:
   CORBA::ORB_var _orb;
   PortableServer::POA_var _poa;
   bool _isShuttingDown;
+
+  void deleteContainersinNS();
 };
 
 #endif

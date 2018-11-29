@@ -137,6 +137,7 @@ void SALOME_Session_i::NSunregister()
     {
       _NS->Destroy_Name("/Kernel/Session");
       _NS->Destroy_Directory("/Kernel");
+      deleteContainersinNS();
     }
   catch (ServiceUnreachable&)
     {
@@ -341,4 +342,31 @@ SALOME::StringSeq* SALOME_Session_i::getSelection()
   }
   _GUIMutex->unlock();
   return selection._retn();
+}
+
+void SALOME_Session_i::deleteContainersinNS()
+{
+// destroy of all containers and modules
+  _NS->Change_Directory("/Containers");
+  std::vector<std::string> machines = _NS->list_subdirs();
+  for(int i=0;i<machines.size();i++){
+    _NS->Change_Directory(machines[i].c_str());
+    std::vector<std::string> toto = _NS->list_directory();
+    for(int j=0;j<toto.size();j++)
+      _NS->Destroy_Name(toto[j].c_str());
+    std::vector<std::string> containers = _NS->list_subdirs();
+    for(int j=0;j<containers.size();j++){
+      _NS->Change_Directory(containers[j].c_str());
+      std::vector<std::string> modules = _NS->list_directory();
+      for(int k=0;k<modules.size();k++)
+        _NS->Destroy_Name(modules[k].c_str());
+      _NS->Change_Directory("/Containers");
+      _NS->Change_Directory(machines[i].c_str());
+      _NS->Destroy_Directory(containers[j].c_str());
+    }
+    _NS->Change_Directory("/Containers");
+    _NS->Destroy_Directory(machines[i].c_str());
+  }
+  _NS->Change_Directory("/");
+  _NS->Destroy_Directory("/Containers");
 }
