@@ -300,6 +300,7 @@ public:
   static void              disableSelector() /ReleaseGIL/ ;
   static SALOME_Selection* getSelection() /Factory,ReleaseGIL/ ;
   static void              setSelection( const QStringList& ) /ReleaseGIL/ ;
+  static QStringList       getComponents() /ReleaseGIL/ ;
   static const QString     getActiveComponent() /ReleaseGIL/ ;
   static SIP_PYOBJECT      getActivePythonModule() /ReleaseGIL/ ;
   static bool              activateModule( const QString& ) /ReleaseGIL/ ;

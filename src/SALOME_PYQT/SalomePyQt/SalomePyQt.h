@@ -188,6 +188,7 @@ public:
   static void              enableSelector();
   static void              disableSelector();
   static SALOME_Selection* getSelection();
+  static QStringList       getComponents();
   static void              setSelection( const QStringList& );
   static const QString     getActiveComponent();
   static PyObject*         getActivePythonModule();
