@@ -24,5 +24,8 @@ SET(_all_lib_SCRIPTS
     PlotManager.py
     XYPlotSetModel.py
 )
-    
+
 SALOME_INSTALL_SCRIPTS("${_all_lib_SCRIPTS}" ${SALOME_CURVEPLOT_INSTALL_PYTHON})
+
+# For test purposes
+FILE(COPY ${_all_lib_SCRIPTS} DESTINATION ${CRVPLOT_TEST_INSTALL})

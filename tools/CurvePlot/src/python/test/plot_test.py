@@ -22,16 +22,14 @@
 #
 # Author : A. Bruneton
 #
+from curveplot import *
+from curveplot.PlotTestBase import PlotTestBase, processDecorator
+from curveplot.PlotSettings import PlotSettings
 
-from PlotTestBase import PlotTestBase, runOnly, processDecorator
-
-from PlotController import PlotController
-from PlotSettings import PlotSettings
-
-from pyqtside.QtGui import QApplication
+from pyqtside.QtWidgets import QApplication
 import sys
-qapp = QApplication(sys.argv)  
-  
+qapp = QApplication(sys.argv)
+
 class PlotTest(PlotTestBase):
   """ Unit test suite for the curve plotter. The tests themselves are stored in this class,
   the screenshot comparison logic is in PlotTestBase.
@@ -43,10 +41,10 @@ class PlotTest(PlotTestBase):
   The decorator @runOnly can be used to run/rebuild a single test.
   """
   REBUILD_BASELINES = False
-  
+
   def __init__(self, methodName):
     PlotTestBase.__init__(self, methodName)
-  
+
   ###
   ### Data generation
   ###
@@ -55,24 +53,24 @@ class PlotTest(PlotTestBase):
     x = np.arange(100)
     y = np.sin(x*alpha/np.pi)
     return x, y
-  
+
   def generateExp(self, alpha=1.0):
     import numpy as np
     x = np.arange(20) + 1.0
     y = np.exp(x*alpha)
     return x, y
-   
+
   ###
   ### The tests themselves
   ###
-    
+
   #
   # Non GUI tests (some of them still need to show the widget to work properly but no
   # screenshot comparison is made).
   #
   def testTableModel(self):
     import numpy as np
-    from TableModel import TableModel
+    from curveplot.TableModel import TableModel
     t = TableModel(None)
     t.setTitle("coucou")
     t.addColumn([1.0,2.0,3.0,4.0])
@@ -85,25 +83,25 @@ class PlotTest(PlotTestBase):
     t.setColumnTitle(1, "a title")
     self.assertEqual("a title", t.getColumnTitle(1))
     self.assertEqual("", t.getColumnTitle(0))
-       
+
   def testGetAllPlotSets(self):
     self.showTabWidget()
     ids, titles = PlotController.GetAllPlotSets()
     self.assertEqual([], ids)
     self.assertEqual([], titles)
-         
+
     id1 = PlotController.AddPlotSet("toto")
     id2 = PlotController.AddPlotSet("tutu")
     id3 = PlotController.AddPlotSet("titi")
     ids, titles = PlotController.GetAllPlotSets()
     self.assertEqual([id1,id2,id3], ids)
     self.assertEqual(["toto","tutu","titi"], titles)
-     
+
   def testGetCurrentXX(self):
     self.showTabWidget()
     self.assertEqual(-1, PlotController.GetCurrentCurveID())
     self.assertEqual(-1, PlotController.GetCurrentPlotSetID())
-      
+
     x, y = self.generateSine()
     _, psID1 = PlotController.AddCurve(x, y, append=False)
     self.assertEqual(psID1, PlotController.GetCurrentPlotSetID())
@@ -116,7 +114,7 @@ class PlotTest(PlotTestBase):
     PlotController.DeletePlotSet(psID2)
     self.assertEqual(-1, PlotController.GetCurrentCurveID())
     self.assertEqual(-1, PlotController.GetCurrentPlotSetID())
-         
+
   def testGetPlotSetID(self):
     self.showTabWidget()
     x, y = self.generateSine()
@@ -125,7 +123,7 @@ class PlotTest(PlotTestBase):
     self.assertEqual(-1, PlotController.GetPlotSetID(145))  # invalid ID
     PlotController.DeletePlotSet(psID)
     self.assertEqual(-1, PlotController.GetPlotSetID(crvID))  # invalid ID
-        
+
   def testGetPlotSetIDByName(self):
     self.showTabWidget()
     self.assertEqual(-1,PlotController.GetPlotSetIDByName("invalid"))
@@ -133,7 +131,7 @@ class PlotTest(PlotTestBase):
     self.assertEqual(psID,PlotController.GetPlotSetIDByName("ps"))
     PlotController.DeletePlotSet(psID)
     self.assertEqual(-1,PlotController.GetPlotSetIDByName("ps"))
-        
+
   def testIsValidPlotSetID(self):
     self.showTabWidget()
     self.assertEqual(False,PlotController.IsValidPlotSetID(0))
@@ -141,16 +139,16 @@ class PlotTest(PlotTestBase):
     self.assertEqual(True,PlotController.IsValidPlotSetID(psID))
     PlotController.DeletePlotSet(psID)
     self.assertEqual(False,PlotController.IsValidPlotSetID(psID))
-      
+
   #
   # GUI tests
-  #    
+  #
   def testAddCurve(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
     PlotController.AddCurve(x, y, curve_label="My curve", x_label="Lèés X (unicode!)", y_label="Et des ŷ", append=False)
     self.assertTrue(self.areScreenshotEqual(tw))
-      
+
   def testAddCurveAppend(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
@@ -162,12 +160,12 @@ class PlotTest(PlotTestBase):
     tw = self.showTabWidget()
     PlotController.AddPlotSet("My plotset")
     self.assertTrue(self.areScreenshotEqual(tw))
-          
+
   def testClearPlotSet(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
     PlotController.AddCurve(x, y, curve_label="My curve", x_label="The X-s", y_label="The Y-s", append=False)
-    _, psID = PlotController.AddCurve(x, y, curve_label="My curve 2", append=True)    
+    _, psID = PlotController.AddCurve(x, y, curve_label="My curve 2", append=True)
     clearedID = PlotController.ClearPlotSet()
     self.assertEqual(clearedID, psID)
     self.assertTrue(self.areScreenshotEqual(tw))
@@ -179,7 +177,7 @@ class PlotTest(PlotTestBase):
     clearedID = PlotController.ClearPlotSet(psID)
     self.assertEqual(psID, clearedID)
     self.assertTrue(self.areScreenshotEqual(tw))
-          
+
   def testCopyCurve(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
@@ -189,7 +187,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentPlotSet(psID)
     self.assertNotEqual(crvID, newID)
     self.assertTrue(self.areScreenshotEqual(tw))
-          
+
   def testDeleteCurrentItem_curve(self):
     x, y = self.generateSine()
     tw = self.showTabWidget()
@@ -200,7 +198,7 @@ class PlotTest(PlotTestBase):
     self.assertFalse(b)
     self.assertEqual(crvID, anID)
     self.assertTrue(self.areScreenshotEqual(tw))
-          
+
   def testDeleteCurrentItem_plotSet(self):
     tw = self.showTabWidget()
     PlotController.AddPlotSet("tutu")
@@ -209,13 +207,13 @@ class PlotTest(PlotTestBase):
     self.assertTrue(b)
     self.assertEqual(psID, anID)
     self.assertTrue(self.areScreenshotEqual(tw))
-            
+
   def testDeleteCurrentItem_void(self):
     self.showTabWidget()
-    b, anID = PlotController.DeleteCurrentItem()  # nothing selected 
+    b, anID = PlotController.DeleteCurrentItem()  # nothing selected
     self.assertTrue(b)
     self.assertEqual(-1, anID)
-          
+
   def testDeleteCurve1(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -224,7 +222,7 @@ class PlotTest(PlotTestBase):
     cID = PlotController.DeleteCurve(crvID)
     self.assertEqual(crvID, cID)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testDeleteCurve2(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -234,16 +232,16 @@ class PlotTest(PlotTestBase):
     cID = PlotController.DeleteCurve()   # current curve
     self.assertEqual(crvID, cID)
     self.assertTrue(self.areScreenshotEqual(tw))
-     
+
   def testDeleteCurve3(self):
     """ resulting in an empty plot set, legend should be hidden """
     tw = self.showTabWidget()
     x, y = self.generateSine()
     crvID, _ = PlotController.AddCurve(x, y, append=False)
-    cID = PlotController.DeleteCurve(crvID) 
+    cID = PlotController.DeleteCurve(crvID)
     self.assertEqual(crvID, cID)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testDeletePlotSet1(self):
     tw = self.showTabWidget()
     psID = PlotController.AddPlotSet("tutu")
@@ -251,7 +249,7 @@ class PlotTest(PlotTestBase):
     psID2 = PlotController.DeletePlotSet(psID)
     self.assertEqual(psID2, psID)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testDeletePlotSet2(self):
     tw = self.showTabWidget()
     psID1 = PlotController.DeletePlotSet()
@@ -262,7 +260,7 @@ class PlotTest(PlotTestBase):
     psID3 = PlotController.DeletePlotSet()  # current plot set
     self.assertEqual(psID3, psID2)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testSetCurrentCurve(self):
     tw = self.showTabWidget()
     self.assertRaises(ValueError, PlotController.SetCurrentCurve, 23)
@@ -272,7 +270,7 @@ class PlotTest(PlotTestBase):
     psID2 = PlotController.SetCurrentCurve(crvID)
     self.assertEqual(psID, psID2)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testSetCurrentCurve2(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -283,7 +281,7 @@ class PlotTest(PlotTestBase):
     # on first plot set curve should not be selected anymore
     PlotController.SetCurrentPlotSet(psID)
     self.assertTrue(self.areScreenshotEqual(tw))
-  
+
   def testSetCurrentCurve3(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -292,7 +290,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentCurve(crvID)
     PlotController.SetCurrentCurve(-1)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
   def testSetCurrentPlotSet(self):
     tw = self.showTabWidget()
     psID = PlotController.AddPlotSet("tutu")
@@ -300,7 +298,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentPlotSet(psID)
     self.assertTrue(self.areScreenshotEqual(tw))
     self.assertRaises(ValueError, PlotController.SetCurrentPlotSet, 124) # invalid ps_id
-     
+
   def testSetLabelX(self):
     tw = self.showTabWidget()
     ps_id = PlotController.AddPlotSet("My plotset")
@@ -321,14 +319,14 @@ class PlotTest(PlotTestBase):
     PlotController.SetPlotSetTitle("un titre àé", ps_id)
     PlotController.SetCurrentPlotSet(ps_id)
     self.assertTrue(self.areScreenshotEqual(tw))
-        
+
 #   def testToggleCurveBrowser(self):
 #     # hard to test ...
 #     raise NotImplementedError
-          
+
   def testPlotCurveFromTable(self):
     tw = self.showTabWidget()
-    from TableModel import TableModel
+    from curveplot.TableModel import TableModel
     t = TableModel(None)
     t.setTitle("coucou")
     t.addColumn([1.0,2.0,3.0,4.0])
@@ -352,21 +350,21 @@ class PlotTest(PlotTestBase):
     def fun():
       dlg_test.setRGB(0,0,0)
       dlg_test.showLegendCheckBox.setChecked(True)
-      return True  
+      return True
     dlg_test.exec_ = fun
     t = list(PlotController.GetInstance()._curveTabsView._XYViews.items())
-    t[0][1].onSettings(dlg_test=dlg_test)  
+    t[0][1].onSettings(dlg_test=dlg_test)
     self.assertTrue(self.areScreenshotEqual(tw))
- 
+
   def testExtendCurve(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
     crvID, _ = PlotController.AddCurve(x, y, append=False)
     PlotController.SetCurrentCurve(crvID)
     PlotController.ExtendCurve(crvID, x+100.0, y*2.0)
-    # Curve must remain blue, bold and with first marker:      
+    # Curve must remain blue, bold and with first marker:
     self.assertTrue(self.areScreenshotEqual(tw))
-     
+
   def testResetCurve(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -374,7 +372,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentCurve(crvID)
     PlotController.ResetCurve(crvID)
     PlotController.ExtendCurve(crvID, x+100.0, y*x)
-    # Curve must remain blue, bold and with first marker:      
+    # Curve must remain blue, bold and with first marker:
     self.assertTrue(self.areScreenshotEqual(tw))
 
   def testSettingsCurveMarker(self):
@@ -387,19 +385,19 @@ class PlotTest(PlotTestBase):
     def fun():
       dlg_test.markerCurve.setCurrentIndex(2)
       dlg_test.showLegendCheckBox.setChecked(True)
-      return True  
+      return True
     dlg_test.exec_ = fun
     t = list(PlotController.GetInstance()._curveTabsView._XYViews.items())
-    t[0][1].onSettings(dlg_test=dlg_test)  
+    t[0][1].onSettings(dlg_test=dlg_test)
     self.assertTrue(self.areScreenshotEqual(tw))
-    
+
   def testSetCurveMarker(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
     crvID, _ = PlotController.AddCurve(x, y, append=False)
     PlotController.SetCurveMarker(crvID, "v")
     self.assertTrue(self.areScreenshotEqual(tw))
-  
+
   def testSetCurveLabel(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -408,7 +406,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentCurve(crvID)
     PlotController.SetCurveLabel(crvID, "tata")
     self.assertTrue(self.areScreenshotEqual(tw))
-    
+
   def testToggleXLog(self):
     tw = self.showTabWidget()
     x, y = self.generateExp()
@@ -424,7 +422,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetYLog(psID, True)
     PlotController.SetYSciNotation(psID, True)
     self.assertTrue(self.areScreenshotEqual(tw))
-  
+
   def testSetXSciNotation(self):
     tw = self.showTabWidget()
     x, y = self.generateSine()
@@ -438,7 +436,7 @@ class PlotTest(PlotTestBase):
     _, psID = PlotController.AddCurve(x*1.0e6, y*1.0e6, curve_label="titi", append=False)
     PlotController.SetYSciNotation(psID, True)
     self.assertTrue(self.areScreenshotEqual(tw))
-  
+
   def testRegisterCallback(self):
     global a_callb
     a_callb = 0
@@ -466,7 +464,7 @@ class PlotTest(PlotTestBase):
     PlotController.SetCurrentCurve(crvId)
     _, _ = PlotController.AddCurve(x, y)
     self.assertEqual(crvId, a_callb)
-    
+
   def testAddCurveEmptyPs(self):
     """ Adding a curve when no ps was active was buggy """
     self.showTabWidget()
@@ -478,7 +476,7 @@ class PlotTest(PlotTestBase):
     PlotController.AddCurve(x, y, append=True)
     l, _ = PlotController.GetAllPlotSets()
     self.assertEqual(2, len(l))
-    
+
   def test_onCurrentCurveChange(self):
     self.showTabWidget()
     x, y = self.generateSine()
@@ -517,10 +515,10 @@ class PlotTest(PlotTestBase):
     self.assertEqual(psID0, psID2)
     l, _ = PlotController.GetAllPlotSets()
     self.assertEqual(1, len(l))
-    
+
 # Even if not in main:
 processDecorator(__name__)
 
 if __name__ == "__main__":
-  import unittest    
+  import unittest
   unittest.main()

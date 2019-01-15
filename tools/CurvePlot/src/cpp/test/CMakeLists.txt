@@ -44,7 +44,7 @@ SET(_other_SOURCES
 # --- rules ---
 
 # sources / moc wrappings
-QT4_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
+QT5_WRAP_CPP(_moc_SOURCES ${_moc_HEADERS})
 
 ADD_EXECUTABLE(test_curveplot ${_other_SOURCES} ${_moc_SOURCES})
 TARGET_LINK_LIBRARIES(test_curveplot ${_link_LIBRARIES})

@@ -17,13 +17,13 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from pyqtside import QtGui
-from pyqtside.QtGui import QMenu
+from pyqtside import QtWidgets
+from pyqtside.QtWidgets import QMenu
 from pyqtside.QtCore import Qt
 
-from View import View
-from CurveTreeDockWidget import CurveTreeDockWidget
-from utils import Logger
+from .View import View
+from .CurveTreeDockWidget import CurveTreeDockWidget
+from .utils import Logger
 
 class CurveBrowserView( View, CurveTreeDockWidget) :
 
@@ -55,10 +55,10 @@ class CurveBrowserView( View, CurveTreeDockWidget) :
             
         # The second (hidden) column in the tree bares the ID of the object and its nature (plotset or curve)
         for p in list(plotSets.values()):
-          item = QtGui.QTreeWidgetItem([str(p.getTitle()), str(p.getID()) + '_set'])
+          item = QtWidgets.QTreeWidgetItem([str(p.getTitle()), str(p.getID()) + '_set'])
           treeWidget.addTopLevelItem(item)
           for c in list(p._curves.values()):
-            chld = QtGui.QTreeWidgetItem([str(c.getTitle()), str(c.getID()) + '_crv'])
+            chld = QtWidgets.QTreeWidgetItem([str(c.getTitle()), str(c.getID()) + '_crv'])
             item.addChild(chld)
           
         treeWidget.expandAll()

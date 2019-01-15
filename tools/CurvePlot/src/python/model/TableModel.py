@@ -18,8 +18,8 @@
 #
 
 import numpy as np
-from Model import Model
-from utils import toUnicodeWithWarning, Logger
+from .Model import Model
+from .utils import toUnicodeWithWarning, Logger
 
 class TableModel(Model):
   def __init__(self, controller):

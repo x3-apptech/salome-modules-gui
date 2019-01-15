@@ -19,16 +19,16 @@
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-from View import View
-from CurveView import CurveView
-
-from utils import Logger, trQ
-from PlotWidget import PlotWidget
-from PlotSettings import PlotSettings
-from pyqtside import QtGui, QtCore
+from pyqtside import QtWidgets, QtCore
 from pyqtside.QtCore import QObject
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg, NavigationToolbar2QT
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT
+
+from .View import View
+from .CurveView import CurveView
+from .PlotWidget import PlotWidget
+from .PlotSettings import PlotSettings
+from .utils import Logger, trQ
 
 class EventHandler(QObject):
   """ Handle the right-click properly so that it only triggers the contextual menu """
@@ -201,7 +201,7 @@ class XYView(View):
     self._toolbar = self._plotWidget.toolBar
     self.populateToolbar()
 
-    self._popupMenu = QtGui.QMenu()
+    self._popupMenu = QtWidgets.QMenu()
     self._popupMenu.addAction(self._actionLegend)
 
     # Connect evenement for the graphic scene
@@ -227,7 +227,7 @@ class XYView(View):
     self._panAction.setCheckable(True)
     self._toolbar.addSeparator()
     # Actions to change the representation of curves
-    self._curveActionGroup = QtGui.QActionGroup(self._plotWidget)
+    self._curveActionGroup = QtWidgets.QActionGroup(self._plotWidget)
     self._pointsAction = self.createAndAddLocalAction("draw_points.png", trQ("DRAW_POINTS_TXT"))
     self._pointsAction.setCheckable(True)
     self._linesAction = self.createAndAddLocalAction("draw_lines.png", trQ("DRAW_LINES_TXT"))
@@ -239,7 +239,7 @@ class XYView(View):
     self._curveActionGroup.setExclusive(True)
     self._toolbar.addSeparator()
     # Actions to draw horizontal curves as linear or logarithmic
-    self._horActionGroup = QtGui.QActionGroup(self._plotWidget)
+    self._horActionGroup = QtWidgets.QActionGroup(self._plotWidget)
     self._horLinearAction = self.createAndAddLocalAction("hor_linear.png", trQ("HOR_LINEAR_TXT"))
     self._horLinearAction.setCheckable(True)
     self._horLogarithmicAction = self.createAndAddLocalAction("hor_logarithmic.png", trQ("HOR_LOGARITHMIC_TXT"))
@@ -250,7 +250,7 @@ class XYView(View):
     self._horActionGroup.triggered.connect(self.onViewHorizontalMode)
     self._toolbar.addSeparator()
     # Actions to draw vertical curves as linear or logarithmic
-    self._verActionGroup = QtGui.QActionGroup(self._plotWidget)
+    self._verActionGroup = QtWidgets.QActionGroup(self._plotWidget)
     self._verLinearAction = self.createAndAddLocalAction("ver_linear.png", trQ("VER_LINEAR_TXT"))
     self._verLinearAction.setCheckable(True)
     self._verLogarithmicAction = self.createAndAddLocalAction("ver_logarithmic.png", trQ("VER_LOGARITHMIC_TXT"))
@@ -289,12 +289,14 @@ class XYView(View):
     pass
 
   def autoFit(self, check=True, repaint=True):
+    import numpy as np
     if self.__repaintOK():
       self._mplAxes.relim()
       xm, xM = self._mplAxes.xaxis.get_data_interval()
       ym, yM = self._mplAxes.yaxis.get_data_interval()
       i = yM-ym
-      self._mplAxes.axis([xm, xM, ym-i*self.AUTOFIT_MARGIN, yM+i*self.AUTOFIT_MARGIN])
+      if np.isfinite(xm) and np.isfinite(xM) and np.isfinite(ym) and np.isfinite(yM):
+        self._mplAxes.axis([xm, xM, ym-i*self.AUTOFIT_MARGIN, yM+i*self.AUTOFIT_MARGIN])
       if repaint:
         self.repaint()
 
@@ -501,7 +503,7 @@ class XYView(View):
       dlg.colorCurve.setEnabled(True)
       dlg.markerCurve.setEnabled(True)
       name = curr_crv.getTitle()
-      dlg.nameCurve.setText(name)
+      dlg.setSelectedCurveName(name)
       view = self._curveViews[curr_crv.getID()]
       marker = view.getMarker()
       color = view.getColor()
@@ -512,7 +514,7 @@ class XYView(View):
     else :
       dlg.colorCurve.setEnabled(False)
       dlg.markerCurve.setEnabled(False)
-      dlg.nameCurve.setText("")
+      dlg.setSelectedCurveName("")
       view = None
     if self._legend is None:
       dlg.showLegendCheckBox.setChecked(False)
@@ -561,6 +563,10 @@ class XYView(View):
       if view:
         view.setColor(dlg.getRGB())
         view.setMarker(self.CURVE_MARKERS[dlg.markerCurve.currentIndex()])
+        crvModel = view._model
+        if dlg.nameCurve.text() != crvModel.getTitle():
+          Logger.Debug("XYView : about to cahnge crv title after settings")
+          view._model.setTitle(dlg.nameCurve.text())
       self.showHideLegend(repaint=True)
       self._mplCanvas.draw()
     pass
@@ -577,6 +583,7 @@ class XYView(View):
     pass
 
   def onCurrentCurveChange(self):
+    Logger.Debug("XYView::onCurrentCurveChange()")
     curr_crv2 = self._model.getCurrentCurve()
     if curr_crv2 != self._currCrv:
       if self._currCrv is not None:
@@ -628,7 +635,7 @@ class XYView(View):
 
     if not len(self._curveViews):
       # Reset color cycle
-      self._mplAxes.set_color_cycle(None)
+      self._mplAxes.set_prop_cycle(None)
 
     for a in added:
       self.appendCurve(a)
@@ -645,7 +652,8 @@ class XYView(View):
     self.changeFormatAxis()
 
     # Redo auto-fit
-    self.autoFit(repaint=False)
+    if len(self._curveViews):
+      self.autoFit(repaint=False)
     self.repaint()
 
   def onDataChange(self):

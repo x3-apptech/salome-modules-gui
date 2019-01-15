@@ -21,7 +21,9 @@
 
 #include <Python.h>
 
-#define PY_ARRAY_UNIQUE_SYMBOL CURVEPLOT_ARRAY_API    // see initializeCurvePlot()
+// see  https://docs.scipy.org/doc/numpy/reference/c-api.array.html?highlight=import_array
+// and  https://docs.scipy.org/doc/numpy-1.15.0/reference/c-api.deprecations.html
+#define PY_ARRAY_UNIQUE_SYMBOL CURVEPLOT_ARRAY_API
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <numpy/ndarraytypes.h>
 #include <numpy/ndarrayobject.h>
@@ -52,12 +54,13 @@ namespace CURVEPLOT
   /**
    * To be called before doing anything
    */
-  void InitializeCurvePlot()
+  void* InitializeCurvePlot()
   {
     PyLockWrapper lock;
     // TODO: discuss where the below should really happen:
     // doc: http://docs.scipy.org/doc/numpy/reference/c-api.array.html#importing-the-api
-    import_array(); // a macro really!
+    import_array(); // a macro really which contains a return
+    return NULL;
   }
 
   class ColumnVector::Internal
@@ -153,9 +156,11 @@ namespace CURVEPLOT
                  PyObject_CallMethod((PyObject *)_impl->_npArray, (char *)"__str__", NULL)
                  );
        // Now extract the returned string
-       if(!PyString_Check(ret_py))
+       if(!PyUnicode_Check(ret_py))
          throw Exception("CurvePlot::toStdString(): Unexpected returned type!");
-       ret_str = std::string(PyString_AsString(ret_py));
+       Py_ssize_t size;
+       char *ptr = PyUnicode_AsUTF8AndSize(ret_py, &size);
+       ret_str = std::string(ptr);
     }
     return ret_str;
   }
@@ -188,13 +193,13 @@ namespace CURVEPLOT
 
   CurvePlot::CurvePlot(bool test_mode)
   {
-    // TODO: do use an intermediate variable '__cont', but use directly Py***CallMethod()
+    // TODO: do not use an intermediate variable '__cont', but use directly Py***CallMethod()
     _impl = new Internal();
     {
     PyLockWrapper lock;
     std::string code;
     if (test_mode)
-       code = std::string("import curveplot; from SalomePyQt_MockUp import SalomePyQt;") +
+       code = std::string("import curveplot; from curveplot.SalomePyQt_MockUp import SalomePyQt;") +
            std::string("__cont=curveplot.PlotController.GetInstance(sgPyQt=SalomePyQt())");
     else
        code = std::string("import curveplot;")+
@@ -266,13 +271,13 @@ namespace CURVEPLOT
     if(!PyTuple_Check(ret))
         throw Exception("CurvePlot::AddCurve(): Unexpected returned type!");
     PyObject * o1 = PyTuple_GetItem(ret, 0);
-    if (!PyInt_Check(o1))
+    if (!PyLong_Check(o1))
       throw Exception("CurvePlot::AddCurve(): Unexpected returned type!");
-    PlotID curveId = PyInt_AsLong(o1);
+    PlotID curveId = PyLong_AsLong(o1);
     PyObject * o2 = PyTuple_GetItem(ret, 1);
-    if (!PyInt_Check(o2))
+    if (!PyLong_Check(o2))
       throw Exception("CurvePlot::AddCurve(): Unexpected returned type!");
-    plot_set_id = PyInt_AsLong(o2);
+    plot_set_id = PyLong_AsLong(o2);
     return curveId;
   }
 

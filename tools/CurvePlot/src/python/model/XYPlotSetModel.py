@@ -17,8 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from Model import Model
-from utils import toUnicodeWithWarning
+from .Model import Model
+from .utils import toUnicodeWithWarning
 
 class XYPlotSetModel(Model):
   

@@ -32,7 +32,7 @@ namespace CURVEPLOT
   /**
    * This function should be called before doing anything in the CURVEPLOT namespace.
    */
-  void InitializeCurvePlot();
+  void* InitializeCurvePlot();
 
   class ColumnVector
   {

@@ -23,8 +23,8 @@
 # Author : A. Bruneton
 #
 
-from pyqtside.QtCore import SIGNAL, SLOT, Slot, Qt, QTimer
-from pyqtside.QtGui import QMainWindow,QMenu
+from pyqtside.QtCore import Qt, QTimer, pyqtSlot
+from pyqtside.QtWidgets import QMainWindow,QMenu
 import numpy as np
 
 import curveplot
@@ -70,15 +70,15 @@ class TestDesktop(QMainWindow):
         self.createMenus()
         self.createView()
         
-        self.connect(self.curveSameFigAction,SIGNAL("activated()"),self.curveSameFig)
-        self.connect(self.curveNewFigAction,SIGNAL("activated()"),self.curveNewFig)
-        self.connect(self.itemDelAction,SIGNAL("activated()"),self.itemDel)
-        self.connect(self.cpsAction,SIGNAL("activated()"),self.clearPlotSet)
-        self.connect(self.plotTableAction,SIGNAL("activated()"),self.plotTable)
-        self.connect(self.addPSAction,SIGNAL("activated()"),self.addPS)
-        self.connect(self.addTabAction,SIGNAL("activated()"),self.addTab)
-        self.connect(self.memAction,SIGNAL("activated()"),self.memPrint)
-        self.connect(self.perfTestAction,SIGNAL("activated()"),self.perfTest)
+        self.curveSameFigAction.triggered.connect(self.curveSameFig)
+        self.curveNewFigAction.triggered.connect(self.curveNewFig)
+        self.itemDelAction.triggered.connect(self.itemDel)
+        self.cpsAction.triggered.connect(self.clearPlotSet)
+        self.plotTableAction.triggered.connect(self.plotTable)
+        self.addPSAction.triggered.connect(self.addPS)
+        self.addTabAction.triggered.connect(self.addTab)
+        self.memAction.triggered.connect(self.memPrint)
+        self.perfTestAction.triggered.connect(self.perfTest)
 
     def generateID(self):
         self._currID += 1
@@ -152,7 +152,7 @@ class TestDesktop(QMainWindow):
 #       y = x
       return x, y
        
-    @Slot()  
+    @pyqtSlot()
     def curveSameFig(self):
       x, y = self.__generateRandomData()
       _, ps_id = curveplot.AddCurve(x, y, x_label="the x axis", y_label="the y axis", append=True)
@@ -164,13 +164,13 @@ class TestDesktop(QMainWindow):
       x, y = self.__generateRandomData()
       curveplot.AddCurve(x, y, x_label="the x axis", y_label="the y axis", append=False)
     
-    @Slot()
+    @pyqtSlot()
     def itemDel(self):
       curveplot.DeleteCurrentItem()
       if self.cnt >= 0:
         QTimer.singleShot(self.timeLap, self, SLOT("memPrint()"))
 
-    @Slot()
+    @pyqtSlot()
     def perfTest(self):
       lx, ly = [], []
       nC = 200
@@ -195,7 +195,7 @@ class TestDesktop(QMainWindow):
       
     def addTab(self):
       pass
-#      from PyQt4.QtGui import QPushButton
+#      from PyQt5.QtWidgets import QPushButton
 #      self.qp = QPushButton("Hi!")
 #      self._sgPyQt.createView("Dummy", self.qp)  
       
@@ -213,7 +213,7 @@ class TestDesktop(QMainWindow):
       cont.plotCurveFromTable(t, y_col_index=1, append=False)
       cont.plotCurveFromTable(t, y_col_index=2, append=True)
     
-    @Slot()
+    @pyqtSlot()
     def memPrint(self):
       i, t = curveplot.GetAllPlotSets()
       print(list(zip(i, t)))
@@ -224,4 +224,4 @@ class TestDesktop(QMainWindow):
       print("** Used memory: %.2f Mb" % m)
       if self.cnt >= 0 and self.cnt < self.MAX_CNT:
         self.cnt += 1
-        QTimer.singleShot(self.timeLap, self, SLOT("curveSameFig()"))
+        QTimer.singleShot(self.timeLap, self.curveSameFig)

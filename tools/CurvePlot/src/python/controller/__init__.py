@@ -25,19 +25,19 @@ try:
   # and the Bitstream font which is the first one by default. Try to use DejaVu which is more 
   # comprehensive.
   ## !!Order of the sequence below is highly sensitive!!
-  import pyqtside   # will trigger the PySide/PyQt4 switch
+  import pyqtside   # will trigger the PySide/PyQt switch
   import matplotlib
-  matplotlib.use('Qt4Agg')
-  import matplotlib.pyplot as plt  # must come after the PySide/PyQt4 switch!
+  matplotlib.use('Qt5Agg')
+  import matplotlib.pyplot as plt  # must come after the PySide/PyQt switch!
   plt.rcParams['font.sans-serif'].insert(0, "DejaVu Sans")
 except:
-  print("Warning: could not switch matplotlib to 'Qt4agg' backend. Some characters might be displayed improperly!")
+  print("Warning: could not switch matplotlib to 'Qt5agg' backend. Some characters might be displayed improperly!")
 
 from .PlotController import PlotController
-from TableModel import TableModel
-from CurveModel import CurveModel
-from PlotManager import PlotManager
-from XYPlotSetModel import XYPlotSetModel
+from .TableModel import TableModel
+from .CurveModel import CurveModel
+from .PlotManager import PlotManager
+from .XYPlotSetModel import XYPlotSetModel
 
 ## The static API of PlotController is the main interface of the package and is hence exposed at package level:
 AddCurve = PlotController.AddCurve

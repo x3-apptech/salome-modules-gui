@@ -17,9 +17,9 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from View import View
-from XYView import XYView
-from utils import Logger
+from .View import View
+from .XYView import XYView
+from .utils import Logger
 
 class CurveTabsView(View):
   def __init__(self, controller):

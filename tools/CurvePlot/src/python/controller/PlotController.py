@@ -17,23 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-from CurveBrowserView import CurveBrowserView
-from PlotManager import PlotManager
-from CurveTabsView import CurveTabsView
-from CurveModel import CurveModel
-from TableModel import TableModel
-from utils import Logger
+from .CurveBrowserView import CurveBrowserView
+from .PlotManager import PlotManager
+from .CurveTabsView import CurveTabsView
+from .CurveModel import CurveModel
+from .TableModel import TableModel
+from .utils import Logger
 import numpy as np
 
 class PlotController(object):
   """ Controller for 2D curve plotting functionalities.
   """
   __UNIQUE_INSTANCE = None  # my poor impl. of a singleton
-  
+
   ## For testing purposes:
   WITH_CURVE_BROWSER = True
   WITH_CURVE_TABS = True
-  
+
   def __init__(self, sgPyQt=None):
     if self.__UNIQUE_INSTANCE is None:
       self.__trueInit(sgPyQt)
@@ -50,32 +50,32 @@ class PlotController(object):
     self._blockNotifications = False
     self._blockViewClosing = False
     self._callbacks = []
-    
+
     self._plotManager = PlotManager(self)
-    
+
     if self.WITH_CURVE_BROWSER:
       self._curveBrowserView = CurveBrowserView(self)
       self.associate(self._plotManager, self._curveBrowserView)
     else:
-      self._curveBrowserView = None  
+      self._curveBrowserView = None
     if self.WITH_CURVE_TABS:
       self._curveTabsView = CurveTabsView(self)
       self.associate(self._plotManager, self._curveTabsView)
     else:
       self._curveTabsView = None
     PlotController.__UNIQUE_INSTANCE = self
-  
+
   @classmethod
   def GetInstance(cls, sgPyQt=None):
     if cls.__UNIQUE_INSTANCE is None:
       # First instanciation:
       PlotController(sgPyQt)
     return cls.__UNIQUE_INSTANCE
-  
+
   @classmethod
   def Destroy(cls):
     cls.__UNIQUE_INSTANCE = None
-  
+
   def setFixedSizeWidget(self):
     """ For testing purposes - ensure visible Qt widgets have a fixed size.
     """
@@ -83,7 +83,7 @@ class PlotController(object):
       self._curveBrowserView.treeWidget.resize(100,200)
     if self.WITH_CURVE_TABS:
       self._sgPyQt._tabWidget.resize(600,600)
-  
+
   def associate(self, model, view):
     """
     Associates a model to a view, and sets the view to listen to this model 
@@ -92,28 +92,28 @@ class PlotController(object):
     :param model: Model -- The model to be associated to the view.
     :param view: View -- The view.
     
-    """    
+    """
     if model is None or view is None:
         return
-  
+
     view.setModel(model)
     self.setModelListener(model, view)
-  
+
   def setModelListener(self, model, view):
     """
     Sets a view to listen to all changes of the given model
     """
     l = self._modelViews.setdefault(model, [])
     if not view in l and view is not None:
-      l.append(view) 
-  
+      l.append(view)
+
   def removeModelListeners(self, model):
     """ 
     Removes the given model from the list of listeners. All views previously connected to this model
     won't receive its update notification anymore.
     """
     self._modelViews.pop(model)
-  
+
   def notify(self, model, what=""):
     """
     Notifies the view when model changes.
@@ -122,10 +122,10 @@ class PlotController(object):
     """
     if model is None or self._blockNotifications:
       return
-    
+
     if model not in self._modelViews:
       return
-    
+
     for view in self._modelViews[model]:
       method = "on%s" % what
       if what != "" and what is not None and hasattr(view, method):
@@ -133,27 +133,27 @@ class PlotController(object):
       elif hasattr(view, "update"):
         # Generic update:
         view.update()
-    
+
   def setBrowserContextualMenu(self, menu):
     """ Provide a menu to be contextually shown in the curve browser """
     self._browserContextualMenu = menu
-    
+
   def setCurvePlotRequestingClose(self, bool):
     self._blockViewClosing = bool
-    
+
   def onCurrentCurveChange(self):
     ps = self._plotManager.getCurrentPlotSet()
     if not ps is None:
       crv = ps.getCurrentCurve()
       if crv is not None:
-        crv_id = crv.getID() 
+        crv_id = crv.getID()
         for c in self._callbacks:
           c(crv_id)
-    
+
   #####
   ##### Public static API
   #####
-  
+
   @classmethod
   def AddCurve(cls, x, y, curve_label="", x_label="", y_label="", append=True):
     """ Add a new curve and make the plot set where it is drawn the active one.
@@ -167,7 +167,7 @@ class PlotController(object):
         @param append whether to add the curve to the active plot set (default) or into a new one.
         @return the id of the created curve, and the id of the corresponding plot set.
     """
-    from XYView import XYView
+    from .XYView import XYView
     control = cls.GetInstance()
     pm = control._plotManager
     t = TableModel(control)
@@ -177,18 +177,18 @@ class PlotController(object):
     prevLock = pm.isRepaintLocked()
     if not prevLock:
       pm.lockRepaint()
-    curveID, plotSetID = control.plotCurveFromTable(t, x_col_index=0, y_col_index=1, 
+    curveID, plotSetID = control.plotCurveFromTable(t, x_col_index=0, y_col_index=1,
                                                     curve_label=curve_label, append=append)
     ps = pm._plotSets[plotSetID]
     if x_label != "":
       ps.setXLabel(x_label)
-    if y_label != "": 
+    if y_label != "":
       ps.setYLabel(y_label)
     if not prevLock:
       pm.unlockRepaint()
     return curveID, plotSetID
 
-  @classmethod  
+  @classmethod
   def ExtendCurve(cls, crv_id, x, y):
     """ Add new points to an already created curve
     @raise if invalid plot set ID is given
@@ -200,7 +200,7 @@ class PlotController(object):
     crv_mod = ps._curves[crv_id]
     data = np.transpose(np.vstack([x, y]))
     crv_mod.extendData(data)
-    
+
   @classmethod
   def ResetCurve(cls, crv_id):
     """ Reset a given curve: all data are cleared, but the curve is still 
@@ -214,7 +214,7 @@ class PlotController(object):
       raise ValueError("Curve ID (%d) not found for reset!" % crv_id)
     crv_mod = ps._curves[crv_id]
     crv_mod.resetData()
-    
+
   @classmethod
   def AddPlotSet(cls, title=""):
     """ Creates a new plot set (a tab with several curves) and returns its ID. A title can be passed,
@@ -229,7 +229,7 @@ class PlotController(object):
     if title != "":
       ps.setTitle(title)
     return ps.getID()
-            
+
   @classmethod
   def CopyCurve(cls, curve_id, plot_set_id):
     """ Copy a given curve to a given plot set ID
@@ -248,7 +248,7 @@ class PlotController(object):
     control.setModelListener(new_crv, control._curveBrowserView)
     plot_set_tgt.addCurve(new_crv)
     return new_crv.getID()
-      
+
   @classmethod
   def DeleteCurve(cls, curve_id=-1):
     """ By default, delete the current curve, if any. Otherwise do nothing.
@@ -261,8 +261,8 @@ class PlotController(object):
       curve_id = cls.GetCurrentCurveID()
       if curve_id == -1:
         # No current curve, do nothing
-        return -1 
-      
+        return -1
+
     psID = cls.GetPlotSetID(curve_id)
     if psID == -1:
       raise ValueError("Curve ID (%d) not found for deletion!" % curve_id)
@@ -270,7 +270,7 @@ class PlotController(object):
     control._plotManager._plotSets[psID].removeCurve(curve_id)
     control.removeModelListeners(crv)
     return curve_id
-  
+
   @classmethod
   def DeletePlotSet(cls, plot_set_id=-1):
     """ By default, delete the current plot set, if any. Otherwise do nothing.
@@ -290,11 +290,11 @@ class PlotController(object):
     for _, crv in list(ps._curves.items()):
       control.removeModelListeners(crv)
     control.removeModelListeners(ps)
-    psets = control._plotManager._plotSets 
+    psets = control._plotManager._plotSets
     if len(psets):
       control._plotManager.setCurrentPlotSet(list(psets.keys())[-1])
     return plot_set_id
-  
+
   @classmethod
   def usedMem(cls):
       import gc
@@ -302,7 +302,7 @@ class PlotController(object):
       import resource
       m = resource.getrusage(resource.RUSAGE_SELF)[2]*resource.getpagesize()/1e6
       print("** Used memory: %.2f Mb" % m)
-  
+
   @classmethod
   def DeleteCurrentItem(cls):
     """ Delete currently active item, be it a plot set or a curve.
@@ -315,7 +315,7 @@ class PlotController(object):
     if ps_id == -1:
       Logger.Info("PlotController.DeleteCurrentItem(): nothing selected, nothing to delete!")
       return True,-1
-    # Do we delete a curve or a full plot set    
+    # Do we delete a curve or a full plot set
     if c_id == -1:
       cls.DeletePlotSet(ps_id)
       ret = True, ps_id
@@ -323,7 +323,7 @@ class PlotController(object):
       cls.DeleteCurve(c_id)
       ret = False, c_id
     return ret
-  
+
   @classmethod
   def ClearPlotSet(cls, ps_id=-1):
     """ Clear all curves in a given plot set. By default clear the current plot set without deleting it,
@@ -341,7 +341,7 @@ class PlotController(object):
       raise ValueError("Invalid plot set ID (%d)!" % ps_id)
     ps.eraseAll()
     return ps_id
-  
+
 #   @classmethod
 #   def ClearAll(cls):
 #     # TODO: optimize
@@ -349,7 +349,7 @@ class PlotController(object):
 #     ids = pm._plotSets.keys()
 #     for i in ids:
 #       cls.DeletePlotSet(i)
-  
+
   @classmethod
   def SetXLabel(cls, x_label, plot_set_id=-1):
     """  By default set the X axis label for the current plot set, if any. Otherwise do nothing.
@@ -360,14 +360,14 @@ class PlotController(object):
       plot_set_id = cls.GetCurrentPlotSetID()
       if plot_set_id == -1:
         # Do nothing
-        return False 
+        return False
     ps = pm._plotSets.get(plot_set_id, None)
     if ps is None:
       raise Exception("Invalid plot set ID (%d)!" % plot_set_id)
     ps.setXLabel(x_label)
     return True
-     
-  @classmethod 
+
+  @classmethod
   def SetYLabel(cls, y_label, plot_set_id=-1):
     """ By default set the Y axis label for the current plot set, if any. Otherwise do nothing.
          @return True if the label was set
@@ -377,14 +377,14 @@ class PlotController(object):
       plot_set_id = cls.GetCurrentPlotSetID()
       if plot_set_id == -1:
         # Do nothing
-        return False 
+        return False
     ps = pm._plotSets.get(plot_set_id, None)
     if ps is None:
       raise Exception("Invalid plot set ID (%d)!" % plot_set_id)
     ps.setYLabel(y_label)
     return True
-     
-  @classmethod 
+
+  @classmethod
   def SetPlotSetTitle(cls, title, plot_set_id=-1):
     """ By default set the title for the current plot set, if any. Otherwise do nothing.
          @return True if the title was set
@@ -394,13 +394,13 @@ class PlotController(object):
       plot_set_id = cls.GetCurrentPlotSetID()
       if plot_set_id == -1:
         # Do nothing
-        return False 
+        return False
     ps = pm._plotSets.get(plot_set_id, None)
     if ps is None:
       raise Exception("Invalid plot set ID (%d)!" % plot_set_id)
     ps.setTitle(title)
     return True
-  
+
   @classmethod
   def GetPlotSetID(cls, curve_id):
     """ @return plot set id for a given curve or -1 if invalid curve ID
@@ -410,17 +410,17 @@ class PlotController(object):
     if cps is None:
       return -1
     return cps.getID()
-  
+
   @classmethod
   def GetPlotSetIDByName(cls, name):
     """ @return the first plot set whose name matches the provided name. Otherwise returns -1
-    """ 
+    """
     pm = cls.GetInstance()._plotManager
     for _, ps in list(pm._plotSets.items()):
       if ps._title == name:
         return ps.getID()
     return -1
-  
+
   @classmethod
   def GetAllPlotSets(cls):
     """ @return two lists: plot set names, and corresponding plot set IDs
@@ -428,12 +428,12 @@ class PlotController(object):
     pm = cls.GetInstance()._plotManager
     it = list(pm._plotSets.items())
     ids, inst, titles = [], [], []
-    if len(it):  
-      ids, inst = list(zip(*it))        
+    if len(it):
+      ids, inst = list(zip(*it))
     if len(inst):
       titles = [i.getTitle() for i in inst]
     return list(ids), titles
-  
+
   @classmethod
   def GetCurrentCurveID(cls):
     """ @return current curve ID or -1 if no curve is currently active
@@ -443,8 +443,8 @@ class PlotController(object):
     if crv is None:
       return -1
     return crv.getID()
-     
-  @classmethod   
+
+  @classmethod
   def GetCurrentPlotSetID(cls):
     """ @return current plot set ID or -1 if no plot set is currently active
     """
@@ -452,7 +452,7 @@ class PlotController(object):
     cps = control._plotManager.getCurrentPlotSet()
     if cps is None:
       return -1
-    return cps.getID()  
+    return cps.getID()
 
   @classmethod
   def SetCurrentPlotSet(cls, ps_id):
@@ -489,7 +489,7 @@ class PlotController(object):
     if cls.__UNIQUE_INSTANCE is not None:
       raise Exception("ToggleCurveBrowser() must be invoked before doing anything in plot2D!")
     cls.WITH_CURVE_BROWSER = active
-    
+
   @classmethod
   def IsValidPlotSetID(cls, plot_set_id):
     """ 
@@ -548,11 +548,11 @@ class PlotController(object):
                    ]
     @raise if invalid curve ID or marker
     """
-    from XYView import XYView
-    from CurveView import CurveView
+    from .XYView import XYView
+    from .CurveView import CurveView
     if not marker in XYView.CURVE_MARKERS:
       raise ValueError("Invalid marker: '%s'" % marker)
-    
+
     cont = cls.GetInstance()
     for mod, views in list(cont._modelViews.items()):
       if isinstance(mod, CurveModel) and mod.getID() == crv_id:
@@ -563,7 +563,7 @@ class PlotController(object):
             v._parentXYView.repaint()
             v._parentXYView.showHideLegend()
             found = True
-        
+
     if not found:
       raise Exception("Invalid curve ID or curve currently not displayed (curve_id=%d)!" % crv_id)
 
@@ -581,9 +581,9 @@ class PlotController(object):
   @classmethod
   def __XYViewOperation(cls, func, ps_id, args, kwargs):
     """ Private. To factorize methods accessing the XYView to change a display element. """
-    from XYPlotSetModel import XYPlotSetModel
-    from XYView import XYView
-    
+    from .XYPlotSetModel import XYPlotSetModel
+    from .XYView import XYView
+
     cont = cls.GetInstance()
     for mod, views in list(cont._modelViews.items()):
       if isinstance(mod, XYPlotSetModel) and mod.getID() == ps_id:
@@ -614,7 +614,7 @@ class PlotController(object):
     """
     args, kwargs = [log], {}
     cls.__XYViewOperation("setYLog", ps_id, args, kwargs)
-     
+
   @classmethod
   def SetXSciNotation(cls, ps_id, sciNotation=False):
     """ Change the format (scientific notation or not) of the X axis.
@@ -624,7 +624,7 @@ class PlotController(object):
     """
     args, kwargs = [sciNotation], {}
     cls.__XYViewOperation("setXSciNotation", ps_id, args, kwargs)
-   
+
   @classmethod
   def SetYSciNotation(cls, ps_id, sciNotation=False):
     """ Change the format (scientific notation or not) of the Y axis.
@@ -644,7 +644,7 @@ class PlotController(object):
     """
     args, kwargs = [visible], {}
     cls.__XYViewOperation("setLegendVisible", ps_id, args, kwargs)
-    
+
 
   ###
   ### More advanced functions
@@ -653,28 +653,28 @@ class PlotController(object):
   def RegisterCallback(cls, callback):
     cont = cls.GetInstance()
     cont._callbacks.append(callback)
-  
+
   @classmethod
   def ClearCallbacks(cls):
     cont = cls.GetInstance()
     cont._callbacks = []
-  
+
   @classmethod
   def LockRepaint(cls):
     control = cls.GetInstance()
     control._plotManager.lockRepaint()
-  
+
   @classmethod
   def UnlockRepaint(cls):
     control = cls.GetInstance()
-    control._plotManager.unlockRepaint()  
-  
+    control._plotManager.unlockRepaint()
+
   def createTable(self, data, table_name="table"):
     t = TableModel(self)
     t.setData(data)
     t.setTitle(table_name)
     return t
-     
+
   def plotCurveFromTable(self, table, x_col_index=0, y_col_index=1, curve_label="", append=True):
     """
     :returns: a tuple containing the unique curve ID and the plot set ID 
@@ -690,15 +690,15 @@ class PlotController(object):
       cps_title = None
 
     cps = self._plotManager.getCurrentPlotSet()
-    
+
     cm = CurveModel(self, table, y_col_index)
     cm.setXAxisIndex(x_col_index)
-    
+
     # X axis label
     tix = table.getColumnTitle(x_col_index)
     if tix != "":
       cps.setXLabel(tix)
-    
+
     # Curve label
     if curve_label != "":
       cm.setTitle(curve_label)
@@ -709,21 +709,21 @@ class PlotController(object):
 
     # Plot set title
     if cps_title != "" and cps_title is not None:
-      Logger.Debug("about to set title to: " + cps_title)  
+      Logger.Debug("about to set title to: " + cps_title)
       cps.setTitle(cps_title)
-    
+
     cps.addCurve(cm)
     mp = self._curveTabsView.mapModId2ViewId()
     xyview_id = mp[cps.getID()]
     xyview = self._curveTabsView._XYViews[xyview_id]
-    
+
     if cps_title is None:  # no plot set was created above
       self._plotManager.setCurrentPlotSet(cps.getID())
-      
+
     # Make CurveBrowser and CurveView depend on changes in the curve itself:
     self.setModelListener(cm, self._curveBrowserView)
     self.setModelListener(cm, xyview._curveViews[cm.getID()])
     # Upon change on the curve also update the full plot, notably for the auto-fit and the legend:
     self.setModelListener(cm, xyview)
-        
+
     return cm.getID(),cps.getID()

@@ -19,9 +19,10 @@
 // Author : Adrien BRUNETON
 //
 
+#include <PyInterp_Utils.h>  // GUI - must come first to avoid conflict on the token "slots" defined in both Qt and Python ...
+
 #include "test_curveplot.hxx"
 
-#include <PyInterp_Utils.h>  // GUI
 #include <iostream>
 #include <vector>
 #include "CurvePlot.hxx"
@@ -70,14 +71,20 @@ void TestCurvePlot::onClicked()
   std::cout << "setting X label " << CurvePlot::SetXLabel("tôtô") << std::endl;
 }
 
+/*!
+ * Similar to: SUIT_PYTHON::init_python() from GUI
+ *  or         KERNEL_PYTHON::init_python() from KERNEL
+ */
 void initPython()
 {
   if (!Py_IsInitialized()){
       // Python is not initialized
       Py_Initialize(); // Initialize the interpreter
 
-      PyEval_InitThreads(); // Create (and acquire) the Python global interpreter lock (GIL)
-      PyEval_ReleaseLock();
+      PyRun_SimpleString("import threading\n");
+
+      PyThreadState *pts = PyGILState_GetThisThreadState();
+      PyEval_ReleaseThread(pts);
   }
 }
 
@@ -107,7 +114,7 @@ int main(int argc, char ** argv)
   mw.resize((int)(dw->width()*0.25), (int)(dw->height()*0.7));
   mw.show();
 
-  initPython();
+  initPython();   // mimic SALOME Python's initialisation.
   InitializeCurvePlot();
 
   {

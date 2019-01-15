@@ -78,20 +78,20 @@ class Logger(object):
       
 def trQ(tag, context="CURVEPLOT"):
   """ @return a QString read from the translation file """
-  from pyqtside.QtGui import QApplication 
+  from pyqtside.QtWidgets import QApplication 
   return QApplication.translate(context, tag) 
 
 def trU(tag, context="CURVEPLOT"):
   """ @return same as above, but returns a Python unicode string.  """
   qs = trQ(tag, context)
-  return unicode(qs, 'utf-8')
+  return str(qs, 'utf-8')
 
 def toUnicodeWithWarning(s, method_name):
   try: 
-    s = unicode(s)
+    s = str(s)
   except:
     Logger.Warning("%s - warning, passing non-unicode, non-ASCII string '%s'! Trying to convert myself to UTF-8 ..." % (method_name, s))
-    s = unicode(s, 'utf-8')
+    s = str(s, 'utf-8')
   return s
 
 def completeResPath(fileName):
@@ -100,5 +100,7 @@ def completeResPath(fileName):
   rd = os.environ.get("CURVEPLOT_ROOT_DIR", None)
   if rd is None:
     raise Exception("CURVEPLOT_ROOT_DIR is not defined!")
+  if @SALOME_CURVEPLOT_TEST_MODE@:   # do not remove automatically modified in CMake config
+    subPath = "@CRVPLOT_TEST_INSTALL@"
   filePath = os.path.join(rd, subPath, fileName)
   return filePath

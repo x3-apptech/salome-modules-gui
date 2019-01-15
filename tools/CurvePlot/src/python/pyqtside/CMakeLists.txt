@@ -21,8 +21,12 @@ SET(_pyqtside_SCRIPTS
     __init__.py
     QtCore.py
     QtGui.py
+    QtWidgets.py
     pyside_dynamic.py
     uic.py
 )
 
 SALOME_INSTALL_SCRIPTS("${_pyqtside_SCRIPTS}" ${SALOME_INSTALL_PYTHON}/pyqtside)
+
+# For test purposes
+FILE(COPY ${_pyqtside_SCRIPTS} DESTINATION ${PYQTSIDE_TEST_INSTALL})

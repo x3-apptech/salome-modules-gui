@@ -147,7 +147,7 @@
           <x>11</x>
           <y>35</y>
           <width>291</width>
-          <height>57</height>
+          <height>74</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -162,72 +162,14 @@
            </item>
            <item>
             <widget class="QLineEdit" name="nameCurve">
-             <property name="palette">
-              <palette>
-               <active>
-                <colorrole role="WindowText">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>145</red>
-                   <green>145</green>
-                   <blue>145</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-                <colorrole role="Text">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>105</red>
-                   <green>105</green>
-                   <blue>105</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </active>
-               <inactive>
-                <colorrole role="WindowText">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>145</red>
-                   <green>145</green>
-                   <blue>145</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-                <colorrole role="Text">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>105</red>
-                   <green>105</green>
-                   <blue>105</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </inactive>
-               <disabled>
-                <colorrole role="WindowText">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>149</red>
-                   <green>151</green>
-                   <blue>153</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-                <colorrole role="Text">
-                 <brush brushstyle="SolidPattern">
-                  <color alpha="255">
-                   <red>158</red>
-                   <green>158</green>
-                   <blue>158</blue>
-                  </color>
-                 </brush>
-                </colorrole>
-               </disabled>
-              </palette>
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string/>
              </property>
              <property name="readOnly">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
             </widget>
            </item>

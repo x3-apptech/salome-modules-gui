@@ -22,8 +22,8 @@
 #
 # Author : A. Bruneton
 #
-from pyqtside.QtGui import QApplication 
-from pyqtside.QtCore import SIGNAL, SLOT, QTimer, QTranslator
+from pyqtside.QtWidgets import QApplication
+from pyqtside.QtCore import QTimer, QTranslator
 
 from TestDesktop import TestDesktop
 import SalomePyQt_MockUp
@@ -43,31 +43,23 @@ def activeViewChanged( viewID ):
 
 def main(args) :
     global desktop
-      
+
     app = QApplication(args)
-    ts_files = ["/export/home/adrien/Projets/salome/modules/V7_main/CURVEPLOT_INSTALL/share/salome/resources/curveplot/CURVEPLOT_msg_fr.qm",
-                "/export/home/adrien/Projets/salome/modules/V7_main/CURVEPLOT_INSTALL/share/salome/resources/curveplot/CURVEPLOT_msg_en.qm"
-                ]
-    trans = QTranslator()
-    for f in ts_files:
-      if not trans.load(f):
-        print("could not load translation %s!" % f)
-    app.installTranslator(trans)
     dw = app.desktop()
     x, y = dw.width()*0.25, dw.height()*0.7
-    
+
     desktop = TestDesktop(None)
     sgPyQt = SalomePyQt_MockUp.SalomePyQt(desktop)
     sgPyQt.currentTabChanged.connect(activeViewChanged)
-    desktop._sgPyQt = sgPyQt 
+    desktop._sgPyQt = sgPyQt
     desktop.initialize()
     desktop.resize(x,y)
     desktop.show()
     activate()
     #
-    QTimer.singleShot(200, desktop, SLOT("curveSameFig()"))
+    QTimer.singleShot(200, desktop.curveSameFig)
     #
-    app.connect(app,SIGNAL("lastWindowClosed()"),app,SLOT("quit()"))
+    app.lastWindowClosed.connect(app.quit)
     app.exec_()
 
 if __name__ == "__main__" :

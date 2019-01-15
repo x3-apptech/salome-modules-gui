@@ -131,7 +131,11 @@ TrgItem synchronize( const SrcItem& r1, const TrgItem& r2, const TreeData& td )
       const DiffItem<SrcItem,TrgItem>& item = *anIt;
       if ( item.mySrc == td.nullSrc() ) {
         if ( item.myTrg == td.nullTrg() )
+        {
+#ifdef _DEBUG_
           qDebug( "error: both null" );
+#endif
+        }
         else
           // delete item
           td.deleteItemWithChildren( item.myTrg );
