@@ -1953,6 +1953,7 @@ bool SalomeApp_Application::updateStudy()
 
   // get unique temporary directory name
   QString aTmpDir = QString::fromStdString( SALOMEDS_Tool::GetTmpDir() );
+
   if( aTmpDir.isEmpty() )
     return false;
 
@@ -2039,8 +2040,8 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
 
   // load study from the temporary directory
-
-  QString command = QString( "exec(open(\"%1\" ,\"rb\").read())" ).arg( theDumpScript );
+  QFileInfo aScriptInfo = QFileInfo(theDumpScript);
+  QString command = QString( "exec(open(\"%1\" ,\"rb\").read())" ).arg(aScriptInfo.canonicalFilePath());
 
 #ifndef DISABLE_PYCONSOLE
   PyConsole_Console* pyConsole = app->pythonConsole();
@@ -2049,7 +2050,6 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 #endif
 
   // remove temporary directory
-  QFileInfo aScriptInfo = QFileInfo( theDumpScript );
   QString aStudyName = aScriptInfo.baseName();
   QDir aDir = aScriptInfo.absoluteDir();
   QStringList aFiles = aDir.entryList( QStringList( "*.py*" ) );
