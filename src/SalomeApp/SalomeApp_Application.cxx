@@ -276,23 +276,19 @@ void SalomeApp_Application::start()
             QRegExp rxp ("\"(.+)\":[\\s]*\\[(.*)\\]");
             if ( rxp.indexIn( pyfiles[j] ) >= 0 && rxp.capturedTexts().count() == 3 ) {
               QString script = rxp.capturedTexts()[1];
-              QString args = "";
+              QStringList args;
               QStringList argList = __getArgsList(rxp.capturedTexts()[2]);
               for (int k = 0; k < argList.count(); k++ ) {
                 QString arg = argList[k].trimmed();
                 arg.remove( QRegExp("^[\"]") );
                 arg.remove( QRegExp("[\"]$") );
-                args += arg+",";
+                args << QString("\"%1\"").arg(arg);
               }
-              args.remove( QRegExp("[,]$") );
-              if (!args.isEmpty()) {
-                args = "args:"+args;
-              }
+              if (args.count() == 1)
+                args << "";
 
               script.remove( QRegExp("^python.*[\\s]+") );
-              QString cmd = script+" "+args;
-
-              QString command = QString( "exec(open(\"%1\", \"rb\").read())" ).arg(cmd.trimmed());
+              QString command = QString( "exec(open(\"%1\", \"rb\").read(), args=(%2))" ).arg(script).arg(args.join(","));
               pyConsole->exec(command);
             }
           } // end for loop on pyfiles QStringList
