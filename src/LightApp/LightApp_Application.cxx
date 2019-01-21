@@ -1020,10 +1020,15 @@ void LightApp_Application::onOpenDoc()
 {
   SUIT_Study* study = activeStudy();
   
-  if ( !checkExistingDoc() )
+  if ( !checkExistingDoc( false ) )
     return;
   
-  CAM_Application::onOpenDoc();
+  QString aName = getFileName( true, QString(), getFileFilter( true ), QString(), 0 );
+  if ( aName.isNull() ) //Cancel
+    return;
+  
+  closeDoc();
+  onOpenDoc( aName );
   
   if ( !study ) // new study will be create in THIS application
   {
@@ -5157,7 +5162,7 @@ void LightApp_Application::onViewManagerRemoved( SUIT_ViewManager* )
 /*!
   Check existing document.
 */
-bool LightApp_Application::checkExistingDoc()
+bool LightApp_Application::checkExistingDoc( bool closeExistingDoc )
 {
   bool result = true;
   if( activeStudy() ) {
@@ -5181,7 +5186,9 @@ bool LightApp_Application::checkExistingDoc()
       }
     }
     else if( answer == 1 ) {
-      closeDoc( false );
+      if (closeExistingDoc) {
+	closeDoc( false );
+      }
     } else if( answer == 2 ) {
       result = false;
     }
