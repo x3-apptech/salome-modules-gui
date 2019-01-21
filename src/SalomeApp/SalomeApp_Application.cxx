@@ -276,23 +276,19 @@ void SalomeApp_Application::start()
             QRegExp rxp ("\"(.+)\":[\\s]*\\[(.*)\\]");
             if ( rxp.indexIn( pyfiles[j] ) >= 0 && rxp.capturedTexts().count() == 3 ) {
               QString script = rxp.capturedTexts()[1];
-              QString args = "";
+              QStringList args;
               QStringList argList = __getArgsList(rxp.capturedTexts()[2]);
               for (int k = 0; k < argList.count(); k++ ) {
                 QString arg = argList[k].trimmed();
                 arg.remove( QRegExp("^[\"]") );
                 arg.remove( QRegExp("[\"]$") );
-                args += arg+",";
+                args << QString("\"%1\"").arg(arg);
               }
-              args.remove( QRegExp("[,]$") );
-              if (!args.isEmpty()) {
-                args = "args:"+args;
-              }
+              if (args.count() == 1)
+                args << "";
 
               script.remove( QRegExp("^python.*[\\s]+") );
-              QString cmd = script+" "+args;
-
-              QString command = QString( "exec(open(\"%1\", \"rb\").read())" ).arg(cmd.trimmed());
+              QString command = QString( "exec(open(\"%1\", \"rb\").read(), args=(%2))" ).arg(script).arg(args.join(","));
               pyConsole->exec(command);
             }
           } // end for loop on pyfiles QStringList
@@ -1953,6 +1949,7 @@ bool SalomeApp_Application::updateStudy()
 
   // get unique temporary directory name
   QString aTmpDir = QString::fromStdString( SALOMEDS_Tool::GetTmpDir() );
+
   if( aTmpDir.isEmpty() )
     return false;
 
@@ -2039,8 +2036,8 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
 
   // load study from the temporary directory
-
-  QString command = QString( "exec(open(\"%1\" ,\"rb\").read())" ).arg( theDumpScript );
+  QFileInfo aScriptInfo = QFileInfo(theDumpScript);
+  QString command = QString( "exec(open(\"%1\" ,\"rb\").read())" ).arg(aScriptInfo.canonicalFilePath());
 
 #ifndef DISABLE_PYCONSOLE
   PyConsole_Console* pyConsole = app->pythonConsole();
@@ -2049,7 +2046,6 @@ bool SalomeApp_Application::onRestoreStudy( const QString& theDumpScript,
 #endif
 
   // remove temporary directory
-  QFileInfo aScriptInfo = QFileInfo( theDumpScript );
   QString aStudyName = aScriptInfo.baseName();
   QDir aDir = aScriptInfo.absoluteDir();
   QStringList aFiles = aDir.entryList( QStringList( "*.py*" ) );
