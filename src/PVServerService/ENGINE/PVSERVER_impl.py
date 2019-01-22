@@ -56,6 +56,7 @@ class PVSERVER_impl(object):
         else:
           ZE_KEY_TO_FIND_PV_ROOT_DIR="lib"
           upCount =1
+        tmp = os.path.sep.join(tmp.split('/'))
         li=tmp.split(os.path.sep) ; li.reverse()
         if ZE_KEY_TO_FIND_PV_ROOT_DIR not in li:
             raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
