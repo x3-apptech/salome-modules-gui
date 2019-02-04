@@ -1027,7 +1027,7 @@ void LightApp_Application::onOpenDoc()
   if ( aName.isNull() ) //Cancel
     return;
   
-  closeDoc();
+  closeDoc(false);
   onOpenDoc( aName );
   
   if ( !study ) // new study will be create in THIS application
@@ -5176,10 +5176,14 @@ bool LightApp_Application::checkExistingDoc( bool closeExistingDoc )
     if(answer == 0) {
       if ( activeStudy()->isSaved() ) {
         onSaveDoc();
-        closeDoc( false );
+		if (closeExistingDoc) {
+			closeDoc(false);
+		}
       } else if ( onSaveAsDoc() ) {
-         if( !closeDoc( false ) ) {
-           result = false;
+         if (closeExistingDoc) {
+           if( !closeDoc( false ) ) {
+             result = false;
+           }
         }
       } else {
         result = false;
