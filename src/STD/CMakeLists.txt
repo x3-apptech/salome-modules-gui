@@ -76,7 +76,6 @@ SET(_other_RESOURCES
   resources/redo.png
   resources/reset.png
   resources/save.png
-  resources/std.ini
   resources/undo.png
   resources/vtile.png
   resources/about.png

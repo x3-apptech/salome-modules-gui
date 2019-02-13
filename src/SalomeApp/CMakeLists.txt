@@ -177,7 +177,6 @@ SET(_ts_RESOURCES
 
 # resource files / static
 SET(_other_RESOURCES
-  resources/SalomeApp.ini
   resources/SalomeApp.xml
 )
 

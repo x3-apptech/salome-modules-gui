@@ -229,7 +229,6 @@ SET(_other_RESOURCES
   resources/icon_select.png
   resources/icon_earth.png
   resources/icon_life_ring.png
-  resources/LightApp.ini
   resources/LightApp.xml
 )
 
