@@ -75,11 +75,13 @@
 #include <Graphic3d_ClipPlane.hxx>
 #include <OpenGl_GraphicDriver.hxx>
 #include <OpenGLUtils_FrameBuffer.h>
-
+#include <Basics_OCCTVersion.hxx>
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
 #include <Graphic3d_MapOfStructure.hxx>
 #include <Graphic3d_Structure.hxx>
+#if OCC_VERSION_LARGE <= 0x07030000
 #include <Graphic3d_ExportFormat.hxx>
+#endif
 #include <Graphic3d_StereoMode.hxx>
 #include <Graphic3d_RenderingParams.hxx>
 #include <Graphic3d_BndBox3d.hxx>
@@ -388,7 +390,11 @@ bool OCCViewer_ViewWindow::eventFilter( QObject* watched, QEvent* e )
 
         if ( aEvent->modifiers().testFlag(Qt::ControlModifier) ) {
           Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-          if ( isPreselectionEnabled() && myModel->useLocalSelection() ) {
+          if ( isPreselectionEnabled() 
+#if OCC_VERSION_LARGE <= 0x07030000
+	       && myModel->useLocalSelection()
+#endif
+	     ) {
             if ( aEvent->delta() > 0 ) {
               ic->HilightNextDetected( myViewPort->getView() );
             } else {
@@ -573,7 +579,12 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
           }
           if ( ic->NbSelected() == 0 ) myCurrPointType = myPrevPointType;
           if ( mySetRotationPointDlg ) mySetRotationPointDlg->toggleChange();
+#if OCC_VERSION_LARGE <= 0x07030000
           ic->CloseAllContexts( Standard_True );
+#else
+	  ic->Deactivate();
+	  ic->Activate(0);
+#endif
           myOperation = NOTHING;
           myViewPort->setCursor( myCursor );
           myCursorIsHand = false;
@@ -771,7 +782,12 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+#if OCC_VERSION_LARGE <= 0x07030000
     ic->CloseAllContexts( Standard_True );
+#else
+    ic->Deactivate();
+    ic->Activate(0);
+#endif
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
@@ -811,7 +827,12 @@ void OCCViewer_ViewWindow::activateSetRotationSelected( double theX, double theY
   if ( myRotationPointSelection )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
+#if OCC_VERSION_LARGE < 0x07030000
     ic->CloseAllContexts( Standard_True );
+#else
+    ic->Deactivate();
+    ic->Activate(0);
+#endif
     myOperation = NOTHING;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
@@ -833,8 +854,11 @@ void OCCViewer_ViewWindow::activateStartPointSelection( TopAbs_ShapeEnum theShap
 
   // activate selection ------>
   Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-
+#if OCC_VERSION_LARGE <= 0x07030000
   ic->OpenLocalContext();
+#else
+  ic->Deactivate();
+#endif
 
   AIS_ListOfInteractive aList;
   ic->DisplayedObjects( aList );
@@ -2317,6 +2341,8 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
   bool res = false;
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
+  // OCCT version > 7.3.0 is not support export to PS and EPS
+#if OCC_VERSION_LARGE <= 0x07030000
   Handle(Graphic3d_CView) a3dView = myViewPort->getView()->View();
 
   if (format == "PS") {
@@ -2335,9 +2361,12 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
     res = a3dView->Export(strdup(qUtf8Printable(fileName)), Graphic3d_EF_EnhPostScript);
     aCaps->ffpEnable = prev;
   }
-  else {
+  else { 
+#endif
     res = myViewPort->getView()->Dump( fileName.toStdString().c_str() );
+#if OCC_VERSION_LARGE <= 0x07030000
   }
+#endif
 
   QApplication::restoreOverrideCursor();
   return res;
@@ -2346,7 +2375,12 @@ bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
 
 QString OCCViewer_ViewWindow::filter() const
 {
+#if OCC_VERSION_LARGE <= 0x07030000
   return tr( "OCC_IMAGE_FILES" );
+#else
+  QString formats = tr( "OCC_IMAGE_FILES" );
+  return formats.remove(" *.eps *.ps");
+#endif
 }
 
 

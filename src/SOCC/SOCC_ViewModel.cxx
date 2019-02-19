@@ -74,7 +74,9 @@ SOCC_Viewer::~SOCC_Viewer()
 bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
                              bool hilight, bool upd )
 {
+#if OCC_VERSION_LARGE <= 0x07030000
   bool isInLocal = getAISContext()->HasOpenedContext();
+#endif
   //SUIT_Study* ActiveStudy = SUIT_Application::getDesktop()->getActiveStudy();
   //SALOME_Selection* Sel = SALOME_Selection::Selection( ActiveStudy->getSelection() );
 
@@ -89,9 +91,12 @@ bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
 
     if ( !anObj.IsNull() && anObj->hasEntry() && anObj->isSame( obj ) )
     {
+#if OCC_VERSION_LARGE <= 0x07030000
       if ( !isInLocal )
+#endif
           OCCViewer_Viewer::highlight( ite.Value(), hilight, false );
       // highlight sub-shapes only when local selection is active
+#if OCC_VERSION_LARGE <= 0x07030000
       else
       {
         /*if ( ite.Value()->IsKind( STANDARD_TYPE( SALOME_AISShape ) ) )
@@ -102,6 +107,7 @@ bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
           aSh->highlightSubShapes( MapIndex, highlight );
         }*/
       }
+#endif
       break;
     }
   }
@@ -503,10 +509,14 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<i
   
   // Open local context if there is no one
   bool allObjects = thePrs == 0 || thePrs->IsNull();
+#if OCC_VERSION_LARGE <= 0x07030000
   if ( !ic->HasOpenedContext() ) {
     ic->ClearCurrents( false );
     ic->OpenLocalContext( Standard_False, Standard_True, Standard_True );
   }
+#else
+  ic->Deactivate();
+#endif
 
   AIS_ListOfInteractive anObjs;
   // Get objects to be activated
@@ -561,7 +571,12 @@ void SOCC_Viewer::GlobalSelection( const bool update ) const
   Handle(AIS_InteractiveContext) ic = getAISContext();
   if ( !ic.IsNull() )
   {
+#if OCC_VERSION_LARGE <= 0x07030000
     ic->CloseAllContexts( false );
+#else
+    ic->Deactivate();
+    ic->Activate( 0 );
+#endif
     if ( update )
       ic->CurrentViewer()->Redraw();
   }

@@ -40,6 +40,8 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 class QKeyEvent;
 class QMouseEvent;
 
@@ -136,8 +138,10 @@ public:
 
   virtual OCCViewer_ViewWindow*   createSubWindow();
 
+#if OCC_VERSION_LARGE <= 0x07030000
   void                            setUseLocalSelection(bool theIsUseLocalSelection);
   bool                            useLocalSelection() const;
+#endif
 
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
@@ -287,7 +291,9 @@ protected:
   QString                         myClippingTexture;
   bool                            myTextureModulated;
   double                          myClippingTextureScale;
+#if OCC_VERSION_LARGE <= 0x07030000
   bool                            myIsUseLocalSelection;
+#endif
 };
 
 #ifdef WIN32

@@ -68,6 +68,8 @@
 #include <V3d_DirectionalLight.hxx>
 #include <V3d_AmbientLight.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats
 */
@@ -110,8 +112,10 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myIsRelative(true),
   myTopLayerId( 0 ),
   myTrihedronSize(100),
-  myClippingDlg (NULL),
-  myIsUseLocalSelection(false)
+#if OCC_VERSION_LARGE <= 0x07030000
+  myIsUseLocalSelection(false),
+#endif
+  myClippingDlg (NULL)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
@@ -353,7 +357,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
   if (!aHasShift) {
-    myAISContext->ClearCurrents( false );
+    myAISContext->ClearSelected( false );
     emit deselection();
   }
 
@@ -414,7 +418,7 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
   switch ( theEvent->key() ) {
   case  Qt::Key_S:
     if (!aHasShift) {
-      myAISContext->ClearCurrents( false );
+      myAISContext->ClearSelected( false );
       emit deselection();
     }
 
@@ -435,13 +439,17 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
     break;
   case  Qt::Key_N:
     if ( isPreselectionEnabled() ) {
+#if OCC_VERSION_LARGE <= 0x07030000
       if ( useLocalSelection() )
+#endif
 	getAISContext()->HilightNextDetected( aView->getViewPort()->getView() );
     }
     break;
   case  Qt::Key_P:
     if ( isPreselectionEnabled() ) {
-      if ( getAISContext()->HasOpenedContext() )
+#if OCC_VERSION_LARGE <= 0x07030000
+      if ( useLocalSelection() )
+#endif
 	getAISContext()->HilightPreviousDetected( aView->getViewPort()->getView() );
     }
     break;
@@ -882,10 +890,13 @@ void OCCViewer_Viewer::setClippingColor( const QColor& theColor )
   Graphic3d_MaterialAspect aMaterialAspect = Graphic3d_MaterialAspect();
   aMaterialAspect.SetColor( Quantity_Color( theColor.redF(), theColor.greenF(),
                                             theColor.blueF(), Quantity_TOC_RGB ) );
-
+#if OCC_VERSION_LARGE <= 0x07030000
   for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
     myInternalClipPlanes.Value(i)->SetCappingMaterial( aMaterialAspect );
-
+#else
+  for ( Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt ( myInternalClipPlanes ); aPlaneIt.More(); aPlaneIt.Next() )
+    aPlaneIt.Value()->SetCappingMaterial( aMaterialAspect );
+#endif
   update();
 }
 
@@ -934,9 +945,13 @@ void OCCViewer_Viewer::setClippingTextureParams( const bool isDefault, const QSt
   Handle(Graphic3d_Texture2Dmanual) aTexture =
     initClippingTexture( myDefaultTextureUsed, myClippingTexture,
                          myTextureModulated, myClippingTextureScale );
-
+#if OCC_VERSION_LARGE <= 0x07030000
   for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
     myInternalClipPlanes.Value(i)->SetCappingTexture( aTexture );
+#else
+  for ( Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt ( myInternalClipPlanes ); aPlaneIt.More(); aPlaneIt.Next() )
+    aPlaneIt.Value()->SetCappingTexture( aTexture );
+#endif
 
   update();
 }
@@ -1115,19 +1130,23 @@ void OCCViewer_Viewer::setDefaultLights()
 bool OCCViewer_Viewer::highlight( const Handle(AIS_InteractiveObject)& obj,
                                   bool hilight, bool update )
 {
-  bool isInLocal = myAISContext->HasOpenedContext();
-  if( !obj.IsNull() )
-    if( !isInLocal )
-    {
-      if ( hilight && !myAISContext->IsSelected( obj ) )
-        myAISContext->AddOrRemoveCurrentObject( obj, false );
-      else if ( !hilight && myAISContext->IsSelected( obj ) )
-        myAISContext->AddOrRemoveCurrentObject( obj, false );
-    }
+  if( !obj.IsNull() ) {
+#if OCC_VERSION_LARGE <= 0x07030000
+    if( !myAISContext->HasOpenedContext() )
+      {
+#endif
+	if ( hilight && !myAISContext->IsSelected( obj ) )
+	  myAISContext->AddOrRemoveSelected( obj, false );
+	else if ( !hilight && myAISContext->IsSelected( obj ) )
+	  myAISContext->AddOrRemoveSelected( obj, false );
+#if OCC_VERSION_LARGE <= 0x07030000
+      }
+#endif
+  }
 
   if ( update )
     myV3dViewer->Redraw();
-    
+  
   return false;
 }
 
@@ -1137,20 +1156,17 @@ bool OCCViewer_Viewer::highlight( const Handle(AIS_InteractiveObject)& obj,
 */
 bool OCCViewer_Viewer::unHighlightAll( bool updateviewer, bool unselect )
 {
+#if OCC_VERSION_LARGE <= 0x07030000
   if ( myAISContext->HasOpenedContext() ) {
+#endif
     if ( unselect ) {
       myAISContext->ClearSelected( updateviewer );
     } else {
       myAISContext->UnhilightSelected( updateviewer );
     }
-  } else {
-    if ( unselect ) {
-      myAISContext->ClearCurrents( updateviewer );
-    } else {
-      myAISContext->UnhilightCurrents( updateviewer );
-    }
+#if OCC_VERSION_LARGE <= 0x07030000
   }
-
+#endif
   return false;
 }
 
@@ -1358,6 +1374,7 @@ OCCViewer_ViewWindow* OCCViewer_Viewer::createSubWindow()
   return new OCCViewer_ViewWindow(0,  this);
 }
 
+#if OCC_VERSION_LARGE <= 0x07030000
 /*!
   Sets using local selection state
   \param theIsUseLocalSelection - state
@@ -1374,10 +1391,10 @@ bool OCCViewer_Viewer::useLocalSelection() const
 {
   if (myIsUseLocalSelection)
     return true;
-
   Handle(AIS_InteractiveContext) ic = getAISContext();
   return !ic.IsNull() && ic->HasOpenedContext();
 }
+#endif
 
 // obsolete  
 QColor OCCViewer_Viewer::backgroundColor( int theViewId ) const
