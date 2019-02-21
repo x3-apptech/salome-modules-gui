@@ -42,6 +42,8 @@
 #include <vtkCommand.h>
 #include <vtkCellData.h>
 
+#include <Basics_Utils.hxx>
+
 #ifndef WIN32
 # ifndef GLX_GLXEXT_LEGACY
 #  define GLX_GLXEXT_LEGACY
@@ -157,7 +159,12 @@ VTKViewer_PolyDataMapper::~VTKViewer_PolyDataMapper()
 int VTKViewer_PolyDataMapper::InitShader()
 {
 #ifdef VTK_OPENGL2
+#if defined(WIN32) && defined(UNICODE)
+	std::wstring wFilePath = std::wstring(_wgetenv(L"GUI_ROOT_DIR")) + L"/share/salome/resources/gui/Point";
+	std::string filePath = Kernel_Utils::utf8_encode_s(wFilePath.c_str());
+#else
   std::string filePath = std::string( getenv( "GUI_ROOT_DIR") ) + "/share/salome/resources/gui/Point";
+#endif
   if( !this->OpenGLHelper.CreateShaderProgram(filePath, this->PointProgram, this->VertexShader, this->FragmentShader) )
     return false;
 
@@ -175,8 +182,13 @@ int VTKViewer_PolyDataMapper::InitShader()
 
   this->OpenGLHelper.vglGenVertexArraysARB(1, &this->VertexArrayObject);
 #else
+#if defined(WIN32) && defined(UNICODE)
+	std::wstring wFilePath = std::wstring(_wgetenv( L"GUI_ROOT_DIR" ) ) + L"/share/salome/resources/gui/Vertex_Program_ARB.txt";
+	std::string fileName = Kernel_Utils::utf8_encode( wFilePath.c_str() );
+#else
   std::string fileName = std::string( getenv( "GUI_ROOT_DIR") ) +
                          "/share/salome/resources/gui/Vertex_Program_ARB.txt";
+#endif
 
   char* shader = GUI_OPENGL::readFromFile( fileName );
 

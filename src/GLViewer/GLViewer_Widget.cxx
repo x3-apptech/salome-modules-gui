@@ -265,7 +265,7 @@ void GLViewer_Widget::initializeGL()
     
     //get image
     QImage buf; 
-    QString aPicturePath = getenv("GLViewer__Background_Picture");
+    QString aPicturePath = Qtx::getenv("GLViewer__Background_Picture");
     
     if ( !aPicturePath.isEmpty() && buf.load( aPicturePath ) ) 
     {  // Load first image from file

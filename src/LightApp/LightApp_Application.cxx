@@ -659,7 +659,7 @@ void LightApp_Application::createActions()
     QString modName = moduleName( aModule );                         // module name
     if ( modName.isEmpty() ) modName = aModule;                      // for KERNEL and GUI
     QString rootDir = QString( "%1_ROOT_DIR" ).arg( modName );       // module root dir env variable
-    QString modDir  = getenv( rootDir.toUtf8().constData() );        // module root dir path
+    QString modDir  = Qtx::getenv( rootDir.toUtf8().constData() );        // module root dir path
     QString docSection;
     if (resMgr->hasValue( modName, "documentation" ) )
       docSection = resMgr->stringValue(modName, "documentation");
@@ -1283,7 +1283,7 @@ void LightApp_Application::onHelpContextModule( const QString& component,
     QFileInfo fi( url );
     if ( fi.isRelative() && !component.isEmpty() )
     {
-      QString rootDir = getenv( (component + "_ROOT_DIR").toLatin1().constData() );
+      QString rootDir = Qtx::getenv( (component + "_ROOT_DIR").toLatin1().constData() );
       if ( !rootDir.isEmpty() )
       {
 	path = (QStringList() << rootDir << "share" << "doc" << "salome" << "gui" << component << url).join( QDir::separator() );
@@ -3969,11 +3969,11 @@ bool LightApp_Application::checkModule( const QString& title )
 
   QStringList paths;
 #if defined(WIN32)
-  paths = QString( ::getenv( "PATH" ) ).split( ";", QString::SkipEmptyParts );
+  paths = QString( Qtx::getenv( "PATH" ) ).split( ";", QString::SkipEmptyParts );
 #elif defined(__APPLE__)
-  paths = QString( ::getenv( "DYLD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
+  paths = QString( Qtx::getenv( "DYLD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
 #else
-  paths = QString( ::getenv( "LD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
+  paths = QString( Qtx::getenv( "LD_LIBRARY_PATH" ) ).split( ":", QString::SkipEmptyParts );
 #endif
 
   bool isFound = false;

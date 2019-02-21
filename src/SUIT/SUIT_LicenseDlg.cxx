@@ -32,6 +32,8 @@
 
 #include <math.h>
 
+#include <Qtx.h>
+
 #ifdef WIN32
 #include <UserEnv.h>
 #endif
@@ -47,10 +49,7 @@ SUIT_LicenseDlg::SUIT_LicenseDlg( bool firstShow, QWidget* parent, const char* n
 {
   setObjectName( name );
   setModal( modal );
-  QString env;
-  if ( ::getenv( "SALOME_LICENSE_FILE" ) )
-    env = ::getenv( "SALOME_LICENSE_FILE" );
- 
+  QString env = Qtx::getenv( "SALOME_LICENSE_FILE" ); 
   QFile file( env ); // Read the text from a file
   
   if ( !file.exists() || !file.open( QIODevice::ReadOnly ) )

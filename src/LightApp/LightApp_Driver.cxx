@@ -33,6 +33,8 @@
 #include <QFileInfo>
 #include <QDir>
 
+#include <Qtx.h>
+
 #ifdef WIN32
 #include <time.h>
 #endif

@@ -25,6 +25,8 @@
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_Session.h>
 
+#include <Qtx.h>
+
 #include <QtxDoubleSpinBox.h>
 #include <QtxIntSpinBox.h>
 
@@ -173,7 +175,7 @@ bool SVTK_RecorderDlg::onBrowseFile()
   aFilter.append( tr( "FLT_AVI_FILES" ) );
   aFilter.append( tr( "FLT_ALL_FILES" ) );
 
-  QString aFileName = SUIT_FileDlg::getFileName( this, getenv( "HOME" ), aFilter,
+  QString aFileName = SUIT_FileDlg::getFileName( this, Qtx::getenv( "HOME" ), aFilter,
                                                  tr( "FILE_NAME" ), false );
 
   if( aFileName.isNull() )

@@ -67,6 +67,9 @@
 
 #ifdef WIN32
 #define sleep _sleep
+#include <windows.h>
+#include <stdio.h>
+#include <shellapi.h>
 #endif
 
 #include <time.h>
@@ -78,6 +81,8 @@
 #include <QWaitCondition>
 #include <QRegExp>
 #include <QTextStream>
+
+#include <Basics_Utils.hxx> 
 
 /*! - read arguments, define list of server to launch with their arguments.
  * - wait for naming service
@@ -397,7 +402,7 @@ int main( int argc, char **argv )
   _qappl.setApplicationVersion( salomeVersion() );
 
   // Add application library path (to search style plugin etc...)
-  QString path = QDir::toNativeSeparators( SUIT_Tools::addSlash( QString( ::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
+  QString path = QDir::toNativeSeparators( SUIT_Tools::addSlash( QString( Qtx::getenv( "GUI_ROOT_DIR" ) ) ) + QString( "bin/salome" ) );
   _qappl.addLibraryPath( path );
 
   bool isGUI    = isFound( "GUI",    argc, argv );
@@ -442,7 +447,9 @@ int main( int argc, char **argv )
   SALOME_NamingService* _NS = 0;
   GetInterfaceThread* guiThread = 0;
   Session_ServerLauncher* myServerLauncher = 0;
-
+#if defined(WIN32) && defined(UNICODE)
+  char** new_argv = NULL;
+#endif
   try {
     // ...initialize Python (only once)
     int   _argc   = 1;
@@ -499,7 +506,21 @@ int main( int argc, char **argv )
     // ...lock mutex to block embedded servers launching thread until wait( mutex )
     _GUIMutex.lock();  
     // ...create launcher
+#if defined(WIN32) && defined(UNICODE)
+	LPWSTR *szArglist = NULL;
+	int nArgs;
+	int i;
+	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);	
+	new_argv = new char*[nArgs];
+	for (i = 0; i < nArgs; i++) {
+		new_argv[i] = (char*) Kernel_Utils::utf8_encode(szArglist[i]);
+	}
+	// Free memory allocated for CommandLineToArgvW arguments.
+	LocalFree(szArglist);
+	myServerLauncher = new Session_ServerLauncher(nArgs, new_argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted);	
+#else
     myServerLauncher = new Session_ServerLauncher( argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted );
+#endif
     // ...block this thread until launcher is ready
     _ServerLaunch.wait( &_GUIMutex );
     
@@ -656,6 +677,9 @@ int main( int argc, char **argv )
   delete guiThread;
   delete myServerLauncher;
   delete _NS;
+#if defined(WIN32) && defined(UNICODE)
+  delete[] new_argv;
+#endif
 
   try  {
     orb->shutdown(0);

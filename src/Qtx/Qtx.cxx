@@ -47,6 +47,13 @@
 #include <stdarg.h>
 #include <clocale>
 
+#ifdef WIN32
+#include <windows.h>
+#define MAX_VALUE_SIZE 32767 // Limit according to http://msdn.microsoft.com/en-us/library/ms683188.aspx
+#endif
+
+#include <iostream>
+
 #define BICOLOR_CHANGE_HUE
 
 /*!
@@ -484,18 +491,18 @@ QString Qtx::library( const QString& str )
 */
 QString Qtx::tmpDir()
 {
-  const char* tmpdir = ::getenv( "TEMP" );
-  if ( !tmpdir )
-    tmpdir = ::getenv ( "TMP" );
-  if ( !tmpdir )
+  QString tmpdir = getenv( "TEMP" );
+  if ( tmpdir.isEmpty() )
+    tmpdir = getenv ( "TMP" );
+  if ( tmpdir.isEmpty() )
   {
 #ifdef WIN32
-    tmpdir = "C:\\";
+    tmpdir = QString("C:\\");
 #else
-    tmpdir = "/tmp";
+    tmpdir = QString("/tmp");
 #endif
   }
-  return QString( tmpdir );
+  return tmpdir;
 }
 
 /*!
@@ -746,8 +753,8 @@ QString Qtx::makeEnvVarSubst( const QString& str, const SubstMode mode )
         break;
 
       QString newStr;
-      if ( ::getenv( envName.toUtf8() ) || mode == Always )
-        newStr = QString( ::getenv( envName.toUtf8() ) );
+      if ( getenv( envName ).isEmpty() || mode == Always )
+        newStr = QString( getenv( envName ) );
 
       if ( newStr.isNull() )
       {
@@ -2113,10 +2120,12 @@ long Qtx::versionToId( const QString& version )
 
 QString Qtx::qtDir( const QString& context )
 {
-  const char* vars[] = { "QT5_ROOT_DIR", "QT4_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
+
+  QStringList vars = { "QT5_ROOT_DIR", "QT4_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
   QString qtPath;
-  for (uint i = 0; i < sizeof(vars)/sizeof(vars[0]) && qtPath.isEmpty(); i++ )
-    qtPath = qgetenv( vars[i] );
+  for (uint i = 0; i < vars.length() && qtPath.isEmpty(); i++ ) {
+    qtPath = getenv(vars[i]);
+  }
   if ( !qtPath.isEmpty() && !context.isEmpty() )
     qtPath = QDir( qtPath ).absoluteFilePath( context );
   return qtPath;
@@ -2131,6 +2140,36 @@ QFont Qtx::stringToFont( const QString& fontDescription )
   if ( fontDescription.trimmed().isEmpty() || !font.fromString( fontDescription ) )
     font = QFont( "Courier", 11 );
   return font;
+}
+
+QString Qtx::getenv(const QString & envVar)
+{
+	QString value;
+#ifndef WIN32
+	value = qgetenv(envVar.toLocal8Bit().constData());
+#else
+	LPTSTR buff = new TCHAR[MAX_VALUE_SIZE];
+#ifdef UNICODE
+	LPTSTR anEnvVar = new TCHAR[envVar.length() + 1];	
+	anEnvVar[envVar.toWCharArray(anEnvVar)] = '\0';
+#else
+	const TCHAR* anEnvVar = envVar.toLocal8Bit(buff).constData();
+#endif 
+	const DWORD ret = GetEnvironmentVariable(anEnvVar, buff, MAX_VALUE_SIZE);
+	buff[ret] = '\0';
+	if (ret > 0) {
+#ifdef UNICODE
+		value = QString::fromWCharArray(buff);
+#else
+		value = QString::fromLocal8Bit(buff);
+#endif 
+	}
+	delete buff;
+#ifdef UNICODE
+	delete anEnvVar;
+#endif
+#endif
+	return value;
 }
 
 #if !defined WIN32 && !defined __APPLE__ 

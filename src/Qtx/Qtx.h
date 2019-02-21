@@ -279,6 +279,8 @@ public:
 
   static QFont   stringToFont( const QString& fontDescription );
 
+  static QString     getenv( const QString& envVar );
+
 #ifndef WIN32
   static void*       getDisplay();
   static Qt::HANDLE  getVisual();

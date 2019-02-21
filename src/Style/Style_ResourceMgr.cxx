@@ -43,8 +43,9 @@
 Style_ResourceMgr::Style_ResourceMgr()
   : QtxResourceMgr( "SalomeStyle", "%1Config" )
 {
-  if ( dirList().isEmpty() && ::getenv( "GUI_ROOT_DIR" ) )
-    setDirList( QStringList() << Qtx::addSlash( ::getenv( "GUI_ROOT_DIR" ) ) + "share/salome/resources/gui" );
+  QString gui_root = Qtx::getenv( "GUI_ROOT_DIR" );
+  if ( dirList().isEmpty() && !gui_root.isEmpty() )
+    setDirList( QStringList() << Qtx::addSlash( gui_root ) + "share/salome/resources/gui" );
   setCurrentFormat( "xml" );
 }
 

@@ -25,6 +25,8 @@
 #include "PVViewer_Behaviors.h"
 #include "PVViewer_Core.h"
 
+#include <Qtx.h>
+
 #include <QApplication>
 #include <QStringList>
 #include <QDir>
@@ -64,7 +66,7 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop)
       // Obtain command-line arguments
       int argc = 0;
       char** argv = 0;
-      QString aOptions = getenv("PARAVIEW_OPTIONS");
+      QString aOptions = Qtx::getenv("PARAVIEW_OPTIONS");
       QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
       argv = new char*[aOptList.size() + 4]; // add one, MPI requires argv[argc] = 0!
       for (int i =0; i< aOptList.size() + 4; i++)

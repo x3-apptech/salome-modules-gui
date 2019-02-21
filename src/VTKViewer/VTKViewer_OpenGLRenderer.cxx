@@ -41,6 +41,8 @@
 #include <vtkOpenGL.h>
 #include <vtkObjectFactory.h>
 
+#include <Basics_Utils.hxx>
+
 vtkStandardNewMacro(VTKViewer_OpenGLRenderer);
 
 VTKViewer_OpenGLRenderer::VTKViewer_OpenGLRenderer()
@@ -74,7 +76,13 @@ void VTKViewer_OpenGLRenderer::Clear(void)
   {
     if (this->BackgroundProgram == 0)
     {
-      std::string filePath = std::string( getenv( "GUI_ROOT_DIR") ) + "/share/salome/resources/gui/Background";
+#if defined(WIN32) && defined(UNICODE)
+	std::wstring wFilePath = std::wstring( _wgetenv(L"GUI_ROOT_DIR") ) + L"/share/salome/resources/gui/Background";
+	std::string filePath = Kernel_Utils::utf8_encode_s( wFilePath );
+#else
+	std::string filePath = std::string(getenv("GUI_ROOT_DIR")) + "/share/salome/resources/gui/Background";
+#endif
+      
       if (!this->OpenGLHelper.CreateShaderProgram (filePath,
                                                    this->BackgroundProgram,
                                                    this->BackgroundVertexShader,

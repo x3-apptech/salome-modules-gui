@@ -462,8 +462,9 @@ QString QtxResourceMgr::Resources::makeSubstitution( const QString& str, const Q
     QString newStr = constants.value( envName, QString() );
 
     // Then we check for environment variable
-    if ( newStr.isEmpty() && ::getenv( envName.toLatin1() ) )
-      newStr = QString( ::getenv( envName.toLatin1() ) );
+	QString tmpValue = Qtx::getenv( envName );
+    if ( newStr.isEmpty() && !tmpValue.isEmpty() )
+      newStr = tmpValue;
 
     if ( newStr.isEmpty() )
     {
@@ -1251,8 +1252,9 @@ QtxResourceMgr::QtxResourceMgr( const QString& appName, const QString& resVarTem
     envVar = envVar.arg( appName );
 
   QString dirs;
-  if ( ::getenv( envVar.toLatin1() ) )
-    dirs = ::getenv( envVar.toLatin1() );
+  QString tmpValue = Qtx::getenv( envVar );
+  if ( !tmpValue.isEmpty() )
+    dirs = tmpValue;
 #ifdef WIN32
   QString dirsep = ";";      // for Windows: ";" is used as directories separator
 #else

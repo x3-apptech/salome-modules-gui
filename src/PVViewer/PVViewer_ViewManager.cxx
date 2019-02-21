@@ -95,7 +95,7 @@ bool PVViewer_ViewManager::ConnectToExternalPVServer(QMainWindow* desktop)
   std::stringstream msg;
 
   // Try to connect to the external PVServer - gives priority to an externally specified URL:
-  QString serverUrlEnv = getenv("PARAVIEW_PVSERVER_URL");
+  QString serverUrlEnv = Qtx::getenv("PARAVIEW_PVSERVER_URL");
   std::string serverUrl;
   if (!serverUrlEnv.isEmpty())
   {

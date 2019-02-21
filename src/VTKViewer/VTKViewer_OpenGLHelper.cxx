@@ -22,6 +22,7 @@
 
 
 #include "VTKViewer_OpenGLHelper.h"
+#include <Basics_Utils.hxx>
 
 #ifndef WIN32
 # ifndef GLX_GLXEXT_LEGACY
@@ -219,8 +220,12 @@ namespace GUI_OPENGL
 {
 	char* readFromFile( std::string fileName )
 	{
+#if defined(WIN32) && defined(UNICODE)
+	  const wchar_t* wFileName = Kernel_Utils::utf8_decode( fileName.c_str() );
+	  FILE* file = _wfopen( wFileName, L"r" );
+#else
 	  FILE* file = fopen( fileName.c_str(), "r" );
-
+#endif
 	  char* content = NULL;
 	  int count = 0;
 

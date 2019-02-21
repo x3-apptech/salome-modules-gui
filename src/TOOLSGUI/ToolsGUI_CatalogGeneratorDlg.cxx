@@ -43,6 +43,8 @@
 #include <QIntValidator>
 #include <QFile>
 
+#include <Qtx.h>
+
 #include <OSD_Process.hxx>
 #include <OSD_Path.hxx>
 #include <TCollection_AsciiString.hxx>
@@ -399,8 +401,9 @@ void ToolsGUI_CatalogGeneratorDlg::onApply()
     }
     else {
       QString command = "";
-      if ( getenv("KERNEL_ROOT_DIR")  )
-        command = QString( getenv( "KERNEL_ROOT_DIR" ) ) + "/bin/salome/runIDLparser -K " + IDLpath + " -Wbcatalog=" + XmlFile;
+      QString kernel_root = Qtx::getenv("KERNEL_ROOT_DIR"); 
+      if ( !kernel_root.isEmpty() )
+        command = kernel_root + "/bin/salome/runIDLparser -K " + IDLpath + " -Wbcatalog=" + XmlFile;
       else {
         SUIT_MessageBox::critical( this, 
                                    tr("TOOLS_ERR_ERROR"), 
