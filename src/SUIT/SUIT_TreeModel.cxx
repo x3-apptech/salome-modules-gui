@@ -1849,7 +1849,7 @@ SUIT_ProxyModel::SUIT_ProxyModel( SUIT_AbstractModel* model, QObject* parent )
   connect( *model, SIGNAL( clicked( SUIT_DataObject*, int ) ), this, SIGNAL( clicked( SUIT_DataObject*, int ) ) );
   connect( *model, SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ),
            this,   SIGNAL( dropped( const QList<SUIT_DataObject*>&, SUIT_DataObject*, int, Qt::DropAction ) ) );
-  connect( *model, SIGNAL( renamed( SUIT_DataObject* ) ), this, SIGNAL( rename( SUIT_DataObject* ) ) );
+  connect( *model, SIGNAL( renamed( SUIT_DataObject* ) ), this, SIGNAL( renamed( SUIT_DataObject* ) ) );
   setSourceModel( *model );
   setDynamicSortFilter( true );
 }
