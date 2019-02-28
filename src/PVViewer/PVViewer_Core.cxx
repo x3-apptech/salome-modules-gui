@@ -66,7 +66,9 @@ bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop)
       char** argv = 0;
       QString aOptions = getenv("PARAVIEW_OPTIONS");
       QStringList aOptList = aOptions.split(":", QString::SkipEmptyParts);
-      argv = new char*[aOptList.size() + 3];
+      argv = new char*[aOptList.size() + 4]; // add one, MPI requires argv[argc] = 0!
+      for (int i =0; i< aOptList.size() + 4; i++)
+          argv[i] = 0;
       QStringList args = QApplication::arguments();
       argv[0] = (args.size() > 0)? strdup(args[0].toLatin1().constData()) : strdup("paravis");
       argc++;
