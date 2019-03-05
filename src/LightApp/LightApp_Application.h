@@ -180,7 +180,7 @@ public:
   void                                updateVisibilityState( DataObjectList& theList,
                                                              SUIT_ViewModel* theViewModel );  
 
-  virtual bool                        checkExistingDoc( bool checkExistingDoc = true );
+  virtual bool                        checkExistingDoc( bool = true );
 
 #ifndef DISABLE_PYCONSOLE
   PyConsole_Interp*                   getPyInterp();
