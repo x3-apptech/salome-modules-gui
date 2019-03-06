@@ -1165,6 +1165,12 @@ bool OCCViewer_Viewer::unHighlightAll( bool updateviewer, bool unselect )
       myAISContext->UnhilightSelected( updateviewer );
     }
 #if OCC_VERSION_LARGE <= 0x07030000
+  } else {
+   if ( unselect ) {
+      myAISContext->ClearCurrents( updateviewer );
+    } else {
+      myAISContext->UnhilightCurrents( updateviewer );
+    }
   }
 #endif
   return false;
