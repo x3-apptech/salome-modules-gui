@@ -31,10 +31,10 @@
 class MyDataObject: public DataObject {
 public:
   MyDataObject();
-  virtual string getPath();
-  static const string PROPERTY_KEY_TYPE;
-  static const string PROPERTY_KEY_CIRCUIT;
-  static const string PROPERTY_KEY_REPFONC;
+  virtual std::string getPath();
+  static const std::string PROPERTY_KEY_TYPE;
+  static const std::string PROPERTY_KEY_CIRCUIT;
+  static const std::string PROPERTY_KEY_REPFONC;
 };
 
 

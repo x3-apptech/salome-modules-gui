@@ -25,9 +25,9 @@
 // =================================================================
 //
 
-const string MyDataObject::PROPERTY_KEY_TYPE    = "type";
-const string MyDataObject::PROPERTY_KEY_CIRCUIT ="circuit";
-const string MyDataObject::PROPERTY_KEY_REPFONC ="rf";
+const std::string MyDataObject::PROPERTY_KEY_TYPE    = "type";
+const std::string MyDataObject::PROPERTY_KEY_CIRCUIT ="circuit";
+const std::string MyDataObject::PROPERTY_KEY_REPFONC ="rf";
 
 MyDataObject::MyDataObject() : DataObject() {
   this->setProperty(PROPERTY_KEY_TYPE, "Tuyauterie");
@@ -38,15 +38,15 @@ MyDataObject::MyDataObject() : DataObject() {
 /*! This function specified the localization of the object in the
  * hierarchical organization
  */
-string MyDataObject::getPath() {
+std::string MyDataObject::getPath() {
   // We choose here a convention for organizing the path for this
   // class of object.
   /*
-  string path = getProperty(PROPERTY_KEY_CIRCUIT) + pathsep
+  std::string path = getProperty(PROPERTY_KEY_CIRCUIT) + pathsep
     + getProperty(PROPERTY_KEY_REPFONC) + pathsep
     + getProperty(PROPERTY_KEY_TYPE);
   */
-  string path = getProperty(PROPERTY_KEY_TYPE) + pathsep
+  std::string path = getProperty(PROPERTY_KEY_TYPE) + pathsep
     + getProperty(PROPERTY_KEY_CIRCUIT) + pathsep
     + getProperty(PROPERTY_KEY_REPFONC);
     

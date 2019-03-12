@@ -24,8 +24,8 @@
 
 // Static assignement
 int DataObject::_lastId=0;
-const string DataObject::_BASENAME = string("object_");
-const string DataObject::pathsep = string("/");
+const std::string DataObject::_BASENAME = std::string("object_");
+const std::string DataObject::pathsep = std::string("/");
 
 DataObject::DataObject() {
   _nameId = _BASENAME+ToString(_lastId);
@@ -39,33 +39,33 @@ DataObject::~DataObject() {
   _properties.clear();
 }
 
-void DataObject::setLabel(string label) {
+void DataObject::setLabel(std::string label) {
   _label = label;
 }
-string DataObject::getLabel() {
+std::string DataObject::getLabel() {
   return _label;
 }
 
-string DataObject::getPathName() {
-  string pathName;
+std::string DataObject::getPathName() {
+  std::string pathName;
   pathName = this->getPath() + pathsep + this->getLabel();
   return pathName;
 }
 
 
-string DataObject::getNameId() {
+std::string DataObject::getNameId() {
   return _nameId;
 }
 
-void DataObject::setProperty(string key, string value) {
+void DataObject::setProperty(std::string key, std::string value) {
   _properties[key] = value;
 }
-string DataObject::getProperty(string key) {
+std::string DataObject::getProperty(std::string key) {
   return _properties[key];
 }
 
-string DataObject::toString() {
-  string serialize="\n";
+std::string DataObject::toString() {
+  std::string serialize="\n";
   serialize+="nameId = "+getNameId()+"\n";
   serialize+="label  = "+getLabel()+"\n";
   serialize+="path   = "+getPath();

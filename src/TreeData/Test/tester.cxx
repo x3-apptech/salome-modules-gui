@@ -48,7 +48,7 @@ void TEST_DataModel() {
   MyDataModel * dataModel = new MyDataModel();
 
   int refIter = 53;
-  string refNameId;
+  std::string refNameId;
 
   DataObject * dataObject;
   for (int i=0; i<100; i++) {

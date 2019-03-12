@@ -33,7 +33,7 @@ bool DataModel::addDataObject(DataObject * dataObject) {
   _mapDataObjects[dataObject->getNameId()] = dataObject;
   return true;
 }
-bool DataModel::removeDataObject(string nameId) {
+bool DataModel::removeDataObject(std::string nameId) {
   _mapDataObjects.erase(nameId);
   return true;
 }
@@ -42,16 +42,16 @@ bool DataModel::removeDataObject(DataObject * dataObject) {
   return removeDataObject(dataObject->getNameId());
 }
 
-DataObject * DataModel::getDataObject(string id) {
+DataObject * DataModel::getDataObject(std::string id) {
   return _mapDataObjects[id];
 }
 
 
 
-map<string, DataObject *>::iterator DataModel::begin() {
+std::map<std::string, DataObject *>::iterator DataModel::begin() {
   return _mapDataObjects.begin();
 }
 
-map<string, DataObject *>::iterator DataModel::end() {
+std::map<std::string, DataObject *>::iterator DataModel::end() {
   return _mapDataObjects.end();
 }

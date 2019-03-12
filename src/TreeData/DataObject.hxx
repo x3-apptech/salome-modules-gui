@@ -26,7 +26,6 @@
 
 #include <map>
 #include <string>
-using namespace std;
 
 class TREEDATA_EXPORT DataObject {
 
@@ -34,35 +33,35 @@ public:
   DataObject();
   ~DataObject();
 
-  void setLabel(string label);
-  string getLabel();
-  void setProperty(string key, string value);
-  string getProperty(string key);
+  void setLabel(std::string label);
+  std::string getLabel();
+  void setProperty(std::string key, std::string value);
+  std::string getProperty(std::string key);
 
   /*!
    * This function specifies the localization of the object in the
    * hierarchical organization that can be defined by the DataModel it
    * belongs to.
    */
-  virtual string getPath() = 0;
-  string getPathName();
-  string getNameId();
+  virtual std::string getPath() = 0;
+  std::string getPathName();
+  std::string getNameId();
 
-  static const string pathsep;
+  static const std::string pathsep;
 
   /*! This function can be used for debug */
-  string toString();
+  std::string toString();
 
 private:
   /*! The name this object can be displayed with */
-  string _label;
+  std::string _label;
   /*! The identifier of this object. An identifier is invariant all the session long */
-  string _nameId;
+  std::string _nameId;
   /*! The dictionnary of properties that characterize this object */
-  map<string, string> _properties;
+  std::map<std::string, std::string> _properties;
 
   static int _lastId;
-  static const string _BASENAME;
+  static const std::string _BASENAME;
 };
 
 #endif // DATAOBJECT_H

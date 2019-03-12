@@ -47,16 +47,16 @@ public:
   /*! Function to add data object to the model */
   bool addDataObject(DataObject * dataObject);
   /*! Functions to remove data object from the model */
-  bool removeDataObject(string nameId);
+  bool removeDataObject(std::string nameId);
   bool removeDataObject(DataObject * dataObject);
   /*! Function to retrieve a data object in the model */
-  DataObject * getDataObject(string nameId);
+  DataObject * getDataObject(std::string nameId);
 
-  map<string, DataObject *>::iterator begin();
-  map<string, DataObject *>::iterator end();
+  std::map<std::string, DataObject *>::iterator begin();
+  std::map<std::string, DataObject *>::iterator end();
 
 private:
-  map<string, DataObject *> _mapDataObjects;
+  std::map<std::string, DataObject *> _mapDataObjects;
   
 
 };
