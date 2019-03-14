@@ -357,7 +357,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
   if (!aHasShift) {
-    myAISContext->ClearSelected( false );
+    myAISContext->ClearCurrents( false );
     emit deselection();
   }
 
@@ -418,7 +418,7 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
   switch ( theEvent->key() ) {
   case  Qt::Key_S:
     if (!aHasShift) {
-      myAISContext->ClearSelected( false );
+      myAISContext->ClearCurrents( false );
       emit deselection();
     }
 
