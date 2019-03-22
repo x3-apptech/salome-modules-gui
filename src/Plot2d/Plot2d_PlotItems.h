@@ -180,10 +180,15 @@ public:
 
   QList<QRect>     getBars() const;
 
-  virtual void     updateLegend( QwtPlotItem*,
-                                 QList<QwtLegendData>& );
+
+  virtual void     updateLegend( const QwtPlotItem *,
+                                  const QList<QwtLegendData> & );
   virtual void     draw( QPainter*, const QwtScaleMap&,
                          const QwtScaleMap&, const QRectF& ) const;
+
+  virtual void     itemChanged();
+
+  virtual QwtGraphic legendIcon( int index, const QSizeF & ) const;
 
   void             setCrossItems( bool theCross );
   bool             isCrossItems() const;

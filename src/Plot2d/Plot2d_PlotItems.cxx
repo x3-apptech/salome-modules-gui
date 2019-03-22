@@ -856,8 +856,8 @@ QList<QRect> Plot2d_HistogramItem::getBars() const
 /*!
   Set to legend item symbol with color of item
 */
-void Plot2d_HistogramItem::updateLegend( QwtPlotItem* thePlotItem,
-                                         QList<QwtLegendData>& theLegendData )
+void Plot2d_HistogramItem::updateLegend( const QwtPlotItem* thePlotItem,
+                                         const QList<QwtLegendData>& theLegendData )
 {
   if ( !thePlotItem || !thePlotItem->plot() )
     return;
@@ -868,15 +868,18 @@ void Plot2d_HistogramItem::updateLegend( QwtPlotItem* thePlotItem,
   QwtLegend *legend = dynamic_cast<QwtLegend *>( thePlotItem->plot()->legend() );
   QWidget* widget = legend->legendWidget( itemInfo );
 
-  if ( !widget || !widget->inherits( "QwtLegendItem" ) )
+  if ( !widget || !widget->inherits( "QwtLegendLabel" ) )
     return;
 
   QwtLegendLabel* label = dynamic_cast<QwtLegendLabel*>( widget );
   if( Plot2d_QwtLegendLabel* anItem = (Plot2d_QwtLegendLabel*)( label ) ) {
     QFontMetrics aFMetrics( anItem->font() );
     int aSize = aFMetrics.height();
+    QPen aPen( legendPen().color() );
+    aPen.setStyle(Qt::NoPen);
+    anItem->setPen(aPen);
     QwtSymbol* aSymbol = new QwtSymbol( QwtSymbol::Rect, QBrush( legendPen().color() ),
-                                        QPen( legendPen().color() ), QSize( aSize, aSize ) );
+					aPen, QSize( aSize, aSize ) );
     anItem->setSymbol( aSymbol );
     if( Plot2d_Plot2d* plot = dynamic_cast<Plot2d_Plot2d*>( thePlotItem->plot() ) )
       anItem->setSymbolType( plot->getLegendSymbolType() );
@@ -994,6 +997,15 @@ void Plot2d_HistogramItem::drawRectAndLowers( QPainter* thePainter,
   drawBar( thePainter, Qt::Horizontal, aRect );
 }
 
+void Plot2d_HistogramItem::itemChanged()
+{
+  if ( plot() )
+    updateLegend( this, legendData() );
+
+  QwtPlotItem::itemChanged();
+}
+
+
 /*!
   Returns top value of the given rect in the context of other bars.
 
@@ -1028,6 +1040,11 @@ int Plot2d_HistogramItem::getCrossedTop( const QRect& theRect ) const
     }
   }
   return aRes;
+}
+
+QwtGraphic Plot2d_HistogramItem::legendIcon( int index, const QSizeF &size ) const
+{   
+    return defaultIcon( color(), size );
 }
 
 Plot2d_QwtLegend::Plot2d_QwtLegend( QWidget *parent ):
