@@ -147,7 +147,7 @@ enum {
   \param toCreate window find/create mode
   \return VTK window pointer or 0 if it could not be found/created
 */
-static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
+static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate, int toKeepDetached = 0 ) {
   SVTK_ViewWindow* aVW = 0;
   if ( SUIT_Session::session() ) {
     // get application
@@ -170,7 +170,9 @@ static SVTK_ViewWindow* GetVTKViewWindow( int toCreate = __FindOrCreate ) {
           }
         }
         else {
+          anApp->setProperty("keep_detached", toKeepDetached != 0 );
           SVTK_ViewManager* aVM = dynamic_cast<SVTK_ViewManager*>( anApp->getViewManager( "VTKViewer", toCreate == __FindOrCreate ) );
+          anApp->setProperty("keep_detached", QVariant());
           if ( aVM ) {
             aVW = dynamic_cast<SVTK_ViewWindow*>( aVM->getActiveView() );
             // VSR : When new view window is created it can be not active yet at this moment,
@@ -209,13 +211,14 @@ public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
-  TGetRendererEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate ) {}
+  int     myKeepDetached;
+  TGetRendererEvent( bool toCreate, bool toKeepDetached )
+    : myResult( Py_None ), myCreate( toCreate ), myKeepDetached( toKeepDetached ) {}
   virtual void Execute()
   {
     PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderer" );
     SVTK_ViewWindow* aVTKViewWindow = 
-      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderer* aVTKObject = aVTKViewWindow->getRenderer();
 #if VTK_XVERSION < 50700
@@ -231,10 +234,11 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderer( PyObject* self, Py
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple( args, "|i:getRenderer", &toCreate ) )
+  int toKeepDetached = 0;
+  if ( !PyArg_ParseTuple( args, "|ii:getRenderer", &toCreate, &toKeepDetached ) )
     PyErr_Print();
   else
-    aResult = ProcessEvent( new TGetRendererEvent( toCreate ) );
+    aResult = ProcessEvent( new TGetRendererEvent( toCreate, toKeepDetached ) );
   return aResult;
 }
 
@@ -262,13 +266,14 @@ public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
-  TGetRenderWindowEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate ) {}
+  int     myKeepDetached;
+  TGetRenderWindowEvent( bool toCreate, bool toKeepDetached )
+    : myResult( Py_None ), myCreate( toCreate ), myKeepDetached( toKeepDetached ) {}
   virtual void Execute()
   {
     PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderWindow" );
     SVTK_ViewWindow* aVTKViewWindow = 
-      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindow* aVTKObject = aVTKViewWindow->getRenderWindow();
 #if VTK_XVERSION < 50700
@@ -284,10 +289,11 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindow( PyObject* self
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple( args, "|i:getRenderWindow", &toCreate ) )
+  int toKeepDetached = 0;
+  if ( !PyArg_ParseTuple( args, "|ii:getRenderWindow", &toCreate, &toKeepDetached ) )
     PyErr_Print();
   else
-    aResult = ProcessEvent( new TGetRenderWindowEvent( toCreate ) );
+    aResult = ProcessEvent( new TGetRenderWindowEvent( toCreate, toKeepDetached ) );
   return aResult;
 }
 
@@ -315,13 +321,14 @@ public:
   typedef PyObject* TResult;
   TResult myResult;
   int     myCreate;
-  TGetRenderWindowInteractorEvent( bool toCreate )
-    : myResult( Py_None ), myCreate( toCreate ) {}
+  int     myKeepDetached;
+  TGetRenderWindowInteractorEvent( bool toCreate, bool toKeepDetached )
+    : myResult( Py_None ), myCreate( toCreate ), myKeepDetached( toKeepDetached ) {}
   virtual void Execute()
   {
     PyTypeObject* aPyClass = ::GetPyClass( "vtkRenderWindowInteractor" );
     SVTK_ViewWindow* aVTKViewWindow = 
-      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate );
+      ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindowInteractor* aVTKObject = aVTKViewWindow->getInteractor();
 #if VTK_XVERSION < 50700
@@ -337,10 +344,11 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindowInteractor( PyOb
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
-  if ( !PyArg_ParseTuple( args, "|i:getRenderWindowInteractor", &toCreate ) )
+  int toKeepDetached = 0;
+  if ( !PyArg_ParseTuple( args, "|ii:getRenderWindowInteractor", &toCreate, &toKeepDetached ) )
     PyErr_Print();
   else
-    aResult = ProcessEvent( new TGetRenderWindowInteractorEvent( toCreate ) );
+    aResult = ProcessEvent( new TGetRenderWindowInteractorEvent( toCreate, toKeepDetached ) );
   return aResult;
 }
 
