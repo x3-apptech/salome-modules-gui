@@ -1510,7 +1510,8 @@ SUIT_ViewManager* LightApp_Application::getViewManager( const QString& vmType, c
       aVM = anActiveVM;
     }
 
-  if ( aVM && !aVM->getDetached() && create )
+  bool keepDetached = property("keep_detached").toBool();
+  if ( aVM && (!aVM->getDetached() || keepDetached) && create )
   {
     if ( !aVM->getActiveView() )
       {

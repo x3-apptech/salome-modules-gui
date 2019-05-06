@@ -777,7 +777,8 @@ SUIT_ViewManager* STD_Application::viewManager( const QString& vmType ) const
   SUIT_ViewManager* vm = 0;
   for ( QList<SUIT_ViewManager*>::const_iterator it = myViewMgrs.begin(); it != myViewMgrs.end() && !vm; ++it )
   {
-    if ( (*it)->getType() == vmType && !(*it)->getDetached())
+    bool keepDetached = property("keep_detached").toBool();
+    if ( (*it)->getType() == vmType && (!(*it)->getDetached() || keepDetached))
       vm = *it;
   }
   return vm;

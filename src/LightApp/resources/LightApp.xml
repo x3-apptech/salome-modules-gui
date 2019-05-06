@@ -6,7 +6,7 @@
     <parameter name="file"       value="no"/>
     <parameter name="key"        value="no"/>
     <parameter name="interp"     value="no"/>
-    <parameter name="modules"    value="LIGHT,PYLIGHT"/>
+    <parameter name="modules"    value="SHAPER,LIGHT,PYLIGHT"/>
   </section>
   <section name="language">
     <!-- Language settings (resource manager)-->
