@@ -3997,8 +3997,11 @@ bool LightApp_Application::checkModule( const QString& title )
   if ( isPyModule )
   {
     QString pyModule = QString( "%1GUI.py" ).arg( name );
-    paths = QString( ::getenv( "PYTHONPATH" ) ).split( ":", QString::SkipEmptyParts );
-
+#if defined(WIN32)
+    paths = QString( Qtx::getenv( "PYTHONPATH" ) ).split( ";", QString::SkipEmptyParts );
+#else
+    paths = QString( Qtx::getenv( "PYTHONPATH" ) ).split( ":", QString::SkipEmptyParts );
+#endif
     isFound = false;
     for ( it = paths.begin(); it != paths.end() && !isFound; ++it )
     {
