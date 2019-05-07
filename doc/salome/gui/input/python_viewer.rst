@@ -135,9 +135,13 @@ The following options are available:
 - **Save settings as default** button stores the applied Python viewer settings in the SALOME preferences .xml file. The settings will be restored in the current and next SALOME sessions.
 
 The buttons in in the bottom part of dialog box peform the following actions:
+
 - **OK** button applies preferences to the editor;
+
 - **Cancel** button rejects changes;
+
 - **Defaults** button restores preferences from applicaion's defaults;
+
 - **Help** button opens Help browser.
 
 
