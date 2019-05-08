@@ -790,9 +790,6 @@ void LightApp_Application::createActions()
     QStringList::Iterator it;
     for ( it = modList.begin(); it != modList.end(); ++it )
     {
-      if ( !isModuleAccessible( *it ) )
-        continue;
-
       QString modName = moduleName( *it );
 
       QString iconName;
@@ -1244,8 +1241,12 @@ void LightApp_Application::showHelp( const QString& path )
       if ( SUIT_MessageBox::question( desktop(), tr( "WRN_WARNING" ), tr( "DEFINE_EXTERNAL_BROWSER" ),
                                       SUIT_MessageBox::Yes | SUIT_MessageBox::No,
                                       SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
-
-        showPreferences( tr( "PREF_APP" ) );
+      {
+        QStringList path;
+        path << tr( "PREF_CATEGORY_SALOME" ) << tr( "PREF_TAB_GENERAL" )
+             << tr( "PREF_GROUP_EXT_BROWSER" ) << tr( "PREF_APP" );
+        showPreferences( path );
+      }
     }
   }
   else
@@ -1975,7 +1976,12 @@ void LightApp_Application::onPreferences()
 }
 
 /*!Private SLOT. On preferences.*/
-void LightApp_Application::showPreferences( const QString& itemText )
+void LightApp_Application::showPreferences( const QString& path )
+{
+  showPreferences( QStringList() << path );
+}
+
+void LightApp_Application::showPreferences( const QStringList& path )
 {
   QApplication::setOverrideCursor( Qt::WaitCursor );
 
@@ -1986,7 +1992,7 @@ void LightApp_Application::showPreferences( const QString& itemText )
   if ( !prefDlg )
     return;
 
-  preferences()->activateItem( itemText );
+  preferences()->activateItem( path );
 
   if ( ( prefDlg->exec() == QDialog::Accepted || prefDlg->isSaved() ) &&  resourceMgr() )
   {
@@ -2194,42 +2200,48 @@ LightApp_Preferences* LightApp_Application::preferences( const bool crt ) const
     if ( !app )
       continue;
 
-    QStringList modNameList;
-    app->modules( modNameList, false );
+    // all modules available in current session
+    QStringList names;
+    app->modules( names, false );
 
-    QMap<QString, QString> iconMap;
-    app->moduleIconNames( iconMap );
+    // icons of modules
+    QMap<QString, QString> icons;
+    app->moduleIconNames( icons );
 
-    for ( QStringList::const_iterator it = modNameList.begin(); it != modNameList.end(); ++it )
+    // step 1: iterate through list of all available modules
+    // and add empty preferences page
+    for ( QStringList::const_iterator it = names.begin(); it != names.end(); ++it )
     {
-      if ( !app->isModuleAccessible( *it ) || _prefs_->hasModule( *it ) )
-        continue;
-
-      int modId = _prefs_->addPreference( *it );
-      if ( iconMap.contains( *it ) )
-        _prefs_->setItemIcon( modId, Qtx::scaleIcon( resMgr->loadPixmap( moduleName( *it ), iconMap[*it], false ), 20 ) );
+      if ( !_prefs_->hasModule( *it ) ) // prevent possible duplications
+      {
+        int modId = _prefs_->addPreference( *it ); // add empty page
+        if ( icons.contains( *it ) )               // set icon
+          _prefs_->setItemIcon( modId, Qtx::scaleIcon( resMgr->loadPixmap( moduleName( *it ),
+                                                                           icons[*it], false ), 20 ) );
+      }
     }
 
-    ModuleList modList;
-    app->modules( modList );
-    QListIterator<CAM_Module*> itr( modList );
+    // step 2: iterate through list of all loaded modules
+    // and initialize their preferences
+    ModuleList loadedModules;
+    app->modules( loadedModules );
+    QListIterator<CAM_Module*> itr( loadedModules );
     while ( itr.hasNext() )
     {
-      LightApp_Module* mod = 0;
+      LightApp_Module* module = 0;
+      CAM_Module* m = itr.next();
+      if ( m->inherits( "LightApp_Module" ) )
+        module = (LightApp_Module*)m;
 
-      CAM_Module* anItem = itr.next();
-      if ( anItem->inherits( "LightApp_Module" ) )
-        mod = (LightApp_Module*)anItem;
-
-      if ( mod && !_prefs_->hasModule( mod->moduleName() ) )
+      if ( module && !_prefs_->hasModule( module->moduleName() ) )
       {
-        _prefs_->addPreference( mod->moduleName() );
-        mod->createPreferences();
-        that->emptyPreferences( mod->moduleName() );
+        _prefs_->addPreference( module->moduleName() ); // add page (for sure, had to be done at step 1)
+        module->createPreferences();                    // initialize preferences
+        that->emptyPreferences( module->moduleName() ); // show dummy page if module does not export any preferences
       }
     }
   }
-  _prefs_->setItemProperty( "info", tr( "PREFERENCES_NOT_LOADED" ) );
+  _prefs_->setItemProperty( "info", tr( "PREFERENCES_NOT_LOADED" ) ); // dummy page for modules which are not loaded yet
 
   return myPrefs;
 }
@@ -3929,17 +3941,8 @@ void LightApp_Application::afterCloseDoc()
 void LightApp_Application::updateModuleActions()
 {
   QString modName;
-  if ( activeModule() ) {
+  if ( activeModule() )
     modName = activeModule()->moduleName();
-    if ( !isModuleAccessible( modName ) ) {
-      QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
-      foreach( SUIT_Application* app, apps ) {
-        LightApp_Application* lapp = dynamic_cast<LightApp_Application*>( app );
-        if ( lapp && lapp != this )
-          lapp->removeModuleAction( modName );
-      }
-    }
-  }
 
   LightApp_ModuleAction* moduleAction =
     qobject_cast<LightApp_ModuleAction*>( action( ModulesListId ) );
@@ -4614,7 +4617,12 @@ bool LightApp_Application::event( QEvent* e )
                                   d ? *d : "",
                                   SUIT_MessageBox::Yes | SUIT_MessageBox::No,
                                   SUIT_MessageBox::Yes ) == SUIT_MessageBox::Yes )
-      showPreferences( tr( "PREF_APP" ) );
+    {
+      QStringList path;
+      path << tr( "PREF_CATEGORY_SALOME" ) << tr( "PREF_TAB_GENERAL" )
+           << tr( "PREF_GROUP_EXT_BROWSER" ) << tr( "PREF_APP" );
+      showPreferences( path );
+    }
     if( d )
       delete d;
     return true;

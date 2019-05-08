@@ -30,6 +30,7 @@
 #include <SUIT_PreferenceMgr.h>
 
 #include <QMap>
+#include <QStringList>
 
 class QtxResourceMgr;
 
@@ -53,7 +54,8 @@ public:
 
   bool                 hasModule( const QString& ) const;
 
-  void                 activateItem( const QString& ) const;
+  void                 activateItem( const QString& );
+  void                 activateItem( const QStringList& );
 
 protected:
   void                 changedResources( const ResourceMap& );

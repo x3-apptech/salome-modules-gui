@@ -307,6 +307,7 @@ protected:
   virtual bool                        openAction( const int, const QString& );
 
   void                                showPreferences( const QString& = QString() );
+  void                                showPreferences( const QStringList& );
 
 private:
   void                                emptyPreferences( const QString& );

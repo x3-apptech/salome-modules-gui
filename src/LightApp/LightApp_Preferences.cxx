@@ -72,15 +72,25 @@ bool LightApp_Preferences::hasModule( const QString& mod ) const
   return res;
 }
 
-void LightApp_Preferences::activateItem( const QString& mod ) const
+void LightApp_Preferences::activateItem( const QString& path )
 {
-  QtxPreferenceItem* item = findItem( mod, true );
+  activateItem( QStringList() << path );
+}
 
-  if ( !item )
-    return;
-
-  item->ensureVisible();
-  item->activate();
+void LightApp_Preferences::activateItem( const QStringList& path )
+{
+  QtxPreferenceItem* item = root();
+  foreach( QString label, path )
+  {
+    if ( !item )
+      break;
+    item = item->findItem( label, false );
+  }
+  if ( item )
+  {
+    item->ensureVisible();
+    item->activate();
+  }
 }
 
 /*!Do nothing.*/

@@ -268,9 +268,6 @@ void CAM_Application::loadModules()
 {
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end(); ++it )
   {
-    if ( !isModuleAccessible( (*it).title ) ) {
-      continue;
-    }
     CAM_Module* mod = loadModule( (*it).title );
     if ( mod )
       addModule( mod );
@@ -300,11 +297,6 @@ CAM_Module* CAM_Application::loadModule( const QString& modName, const bool show
   if ( myInfoList.isEmpty() )
   {
     qWarning( qPrintable( tr( "Modules configuration is not defined." ) ) );
-    return 0;
-  }
-
-  if ( !isModuleAccessible( modName ) ) {
-    qWarning( qPrintable( tr( "Module \"%1\" cannot be loaded in this application." ).arg( modName ) ) );
     return 0;
   }
 
@@ -495,12 +487,10 @@ bool CAM_Application::activateModule( CAM_Module* mod )
 */
 bool CAM_Application::activateOperation( const QString& modName, int actionId )
 {
-  if (isModuleAccessible(modName)) {
-    CAM_Module* mod = loadModule(modName, false);
-    if (mod) {
-      addModule(mod);
-      return mod->activateOperation(actionId);
-    }
+  CAM_Module* mod = loadModule(modName, false);
+  if (mod) {
+    addModule(mod);
+    return mod->activateOperation(actionId);
   }
   return false;
 }
@@ -514,12 +504,10 @@ bool CAM_Application::activateOperation( const QString& modName, int actionId )
 */
 bool CAM_Application::activateOperation( const QString& modName, const QString& actionId )
 {
-  if (isModuleAccessible(modName)) {
-    CAM_Module* mod = loadModule(modName, false);
-    if (mod) {
-      addModule(mod);
-      return mod->activateOperation(actionId);
-    }
+  CAM_Module* mod = loadModule(modName, false);
+  if (mod) {
+    addModule(mod);
+    return mod->activateOperation(actionId);
   }
   return false;
 }
@@ -537,12 +525,10 @@ bool CAM_Application::activateOperation( const QString& modName,
                                          const QString& actionId,
                                          const QString& pluginName )
 {
-  if (isModuleAccessible(modName)) {
-    CAM_Module* mod = loadModule(modName, false);
-    if (mod) {
-      addModule(mod);
-      return mod->activateOperation(actionId, pluginName);
-    }
+  CAM_Module* mod = loadModule(modName, false);
+  if (mod) {
+    addModule(mod);
+    return mod->activateOperation(actionId, pluginName);
   }
   return false;
 }
@@ -664,40 +650,6 @@ QString CAM_Application::moduleIcon( const QString& name )
       res = (*it).icon;
   }
   return res;
-}
-
-/*!
-  \brief Returns \c true if module is accessible for the current application.
-  Singleton module can be loaded only in one application object. In other application
-  objects this module will be unavailable.
-  \param title module title (user name)
-  \return \c true if module is accessible (can be loaded) or \c false otherwise
- */
-bool CAM_Application::isModuleAccessible( const QString& title )
-{
-  bool found   = false;
-  bool blocked = false;
-  bool statusOK = false;
-  
-  QStringList somewhereLoaded;
-  QList<SUIT_Application*> apps = SUIT_Session::session()->applications();
-  foreach( SUIT_Application* app, apps ) {
-    CAM_Application* camApp = dynamic_cast<CAM_Application*>( app );
-    if ( !camApp ) continue;
-    QStringList loaded;
-    camApp->modules( loaded, true );
-    foreach( QString lm, loaded ) {
-      if ( !somewhereLoaded.contains( lm ) ) somewhereLoaded << lm;
-    }
-  }
-
-  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && !found; ++it )
-  {
-    found = (*it).title == title;
-    blocked = (*it).isSingleton && somewhereLoaded.contains((*it).title);
-    statusOK = (*it).status == stReady;
-  }
-  return found && statusOK && !blocked;
 }
 
 /*!
@@ -835,7 +787,6 @@ void CAM_Application::readModuleList()
     else
       modLibrary = modName;
 
-    bool aIsSingleton = resMgr->booleanValue( *it, "singleton", false );
     bool hasGui = resMgr->booleanValue( *it, "gui", true );
     QString version = resMgr->stringValue( *it, "version", QString() );
 
@@ -845,7 +796,6 @@ void CAM_Application::readModuleList()
     inf.status = hasGui ? stUnknown : stNoGui;
     if ( hasGui ) inf.library = modLibrary;
     inf.icon = modIcon;
-    inf.isSingleton = aIsSingleton;
     inf.version = version;
     myInfoList.append( inf );
   }

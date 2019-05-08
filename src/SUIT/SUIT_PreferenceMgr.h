@@ -57,6 +57,7 @@ public:
 protected:
   virtual QVariant   optionValue( const QString& ) const;
   virtual void       setOptionValue( const QString&, const QVariant& );
+  QtxPreferenceItem* root() const;
 
 private:
   QtxPreferenceItem* myRoot;

@@ -70,22 +70,25 @@ int SUIT_PreferenceMgr::addItem( const QString& title, const int pId,
                                  const SUIT_PreferenceMgr::PrefItemType type,
                                  const QString& sect, const QString& param )
 {
-  QtxPreferenceItem* parent = pId == -1 ? this : findItem( pId, true );
-
-  if ( !parent )
-    return -1;
-
-  QtxPreferenceItem* item = parent->findItem( title, true );
-
-  if ( item && item->depth() < 5 )
-    return item->id();
-
+  QtxPreferenceItem* parent = 0;
   if ( pId == -1 )
   {
     if ( !myRoot )
       myRoot = new QtxPagePrefListItem( QString( "root" ), this );
     parent = myRoot;
   }
+  else
+  {
+    parent = findItem( pId, true );
+  }
+
+  if ( !parent )
+    return -1;
+
+  QtxPreferenceItem* item = parent->findItem( title, false );
+
+  if ( item && item->depth() < 5 )
+    return item->id();
 
   switch( type )
   {
@@ -184,4 +187,9 @@ void SUIT_PreferenceMgr::setOptionValue( const QString& name, const QVariant& va
   QtxPagePrefMgr::setOptionValue( name, val );
   if ( myRoot )
     myRoot->setOption( name, val );
+}
+
+QtxPreferenceItem* SUIT_PreferenceMgr::root() const
+{
+  return myRoot;
 }
