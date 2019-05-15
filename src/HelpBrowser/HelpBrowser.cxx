@@ -107,15 +107,17 @@ public:
   }
   void load( const QString& url )
   {
-    QtxWebBrowser::load( url );
-    RaiseWindowHelper* helper = new RaiseWindowHelper( this );
+	if( ! url.startsWith("--remove") ) {
+	  QtxWebBrowser::load( url );
+      RaiseWindowHelper* helper = new RaiseWindowHelper( this );
+	}
   }
 };
 
 int main( int argc, char **argv )
 {
   // Set application name (for preferences)
-  HelpBrowser_Application::setApplicationName( "salome" );
+  HelpBrowser_Application::setApplicationName("salome");
 
   // Specify application identifier via its name
   QFileInfo fi( argv[0] );
