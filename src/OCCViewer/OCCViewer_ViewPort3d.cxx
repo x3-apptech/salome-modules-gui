@@ -547,9 +547,6 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
     mapView( activeView() );
 #endif
   if ( !myWindow.IsNull() ) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QApplication::syncX();
-#endif
     if ( !myPaintersRedrawing ) {
       activeView()->Redraw();
     }
@@ -563,13 +560,10 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 */
 void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 {
-#if defined WIN32 || QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#if defined WIN32
   /* Win32 : map before first show to avoid flicker */
   if ( !mapped( activeView() ) )
     mapView( activeView() );
-#endif
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QApplication::syncX();
 #endif
   QTimer::singleShot( 0, this, SLOT( repaintViewAfterMove() ) );
   emit vpResizeEvent( e );

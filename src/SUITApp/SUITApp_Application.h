@@ -43,10 +43,6 @@ class SUITAPP_EXPORT SUITApp_Application : public QApplication
 
 public:
   SUITApp_Application( int&, char**, SUIT_ExceptionHandler* = 0 );
-// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  SUITApp_Application( int&, char**, Type, SUIT_ExceptionHandler* = 0 );
-#endif
   virtual bool notify( QObject* receiver, QEvent* e );
 
   SUIT_ExceptionHandler* handler() const;

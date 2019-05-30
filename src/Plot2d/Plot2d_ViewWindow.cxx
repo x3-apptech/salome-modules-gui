@@ -787,16 +787,6 @@ void Plot2d_ViewWindow::onPrintView()
   if ( !myViewFrame )
     return;
 
-#if !defined(WIN32) && !defined(QT_NO_CUPS)
-#if QT_VERSION < 0x040303
-  if ( !Qtx::hasAnyPrinters() ) {
-    SUIT_MessageBox::warning( this, tr( "WRN_WARNING" ),
-                              tr( "WRN_NO_PRINTERS" ) );
-    return;
-  }
-#endif
-#endif
-
   // stored settings for further starts
   static QString aPrinterName;
   static int aColorMode = -1;

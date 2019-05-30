@@ -33,11 +33,7 @@
 extern "C"
 {
 #include <X11/X.h>
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <X11/Xlib.h>
-#else
 #include <xcb/xcb.h>
-#endif
 }
 #endif
 
@@ -63,37 +59,6 @@ class SVTK_SpaceMouse
 
   int spaceMouseOn;
 };
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-
-class SVTK_SpaceMouseX: public SVTK_SpaceMouse
-{
-
-public:
-  SVTK_SpaceMouseX();
-
-  // access to SpaceMouse utility class
-  static SVTK_SpaceMouseX* getInstance();
-
-#if !defined WIN32 && !defined __APPLE__
-  int initialize     ( Display*, Window );
-  int setWindow      ( Display*, Window );
-  int translateEvent ( Display*, XEvent*, MoveEvent*, double, double );
-  int close          ( Display* );
-
-private:
-  Atom XMotionEvent;
-  Atom XButtonPressEvent;
-  Atom XButtonReleaseEvent;
-  Atom XCommandEvent;
-  Window win;
-#endif
-
-  static SVTK_SpaceMouseX* myInstance;
-
-};
-
-#else
 
 class SVTK_SpaceMouseXCB: public SVTK_SpaceMouse
 {
@@ -121,5 +86,4 @@ private:
 
 };
 
-#endif
 #endif

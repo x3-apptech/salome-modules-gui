@@ -2104,11 +2104,7 @@ QWidget* LightApp_Application::createWindow( const int flag )
 
     // Create OBSelector
     new LightApp_OBSelector( ob, mySelMgr );
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    ob->treeView()->header()->setResizeMode(SUIT_DataObject::VisibilityId, QHeaderView::Fixed);
-#else
     ob->treeView()->header()->setSectionResizeMode(SUIT_DataObject::VisibilityId, QHeaderView::Fixed);
-#endif
     ob->treeView()->header()->moveSection(SUIT_DataObject::NameId,SUIT_DataObject::VisibilityId);
     ob->treeView()->setColumnWidth(SUIT_DataObject::VisibilityId, VISIBILITY_COLUMN_WIDTH);
     ob->setProperty( "shortcut", QKeySequence( "Alt+Shift+O" ) );

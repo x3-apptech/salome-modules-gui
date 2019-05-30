@@ -107,17 +107,10 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
     QVariant appropriate = model()->headerData( i, orientation(), Qtx::AppropriateRole );
     QIcon icon;
     if ( iconData.isValid() ) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-      if ( iconData.canConvert( QVariant::Icon ) )
-        icon = iconData.value<QIcon>();
-      else if ( iconData.canConvert( QVariant::Pixmap ) )
-        icon = iconData.value<QPixmap>();
-#else
       if ( iconData.canConvert( QMetaType::QIcon ) )
         icon = iconData.value<QIcon>();
       else if ( iconData.canConvert( QMetaType::QPixmap ) )
         icon = iconData.value<QPixmap>();
-#endif
     }
     if( ( !lab.isEmpty() || !icon.isNull() ) && 
             appropriate.isValid() ? appropriate.toInt()==Qtx::Toggled : true )
@@ -143,11 +136,7 @@ void QtxTreeView::Header::contextMenuEvent( QContextMenuEvent* e )
     }
     else if ( a && a == sortAction ) {
       setSortIndicatorShown( a->isChecked() );
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-      setClickable( a->isChecked() );
-#else
       setSectionsClickable( a->isChecked() );
-#endif
       QtxTreeView* view = qobject_cast<QtxTreeView*>( parent() );
       if ( view ) {
         view->emitSortingEnabled( a->isChecked() );
@@ -192,11 +181,7 @@ QtxTreeView::QtxTreeView( QWidget* parent )
 : QTreeView( parent )
 {
   setHeader( new Header( false, this ) );
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  header()->setMovable( true );
-#else
   header()->setSectionsMovable( true );
-#endif
 }
 
 /*!
@@ -208,11 +193,7 @@ QtxTreeView::QtxTreeView( const bool enableSortMenu, QWidget* parent )
 : QTreeView( parent )
 {
   setHeader( new Header( enableSortMenu, this ) );
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  header()->setMovable( true );
-#else
   header()->setSectionsMovable( true );
-#endif
 }
 
 /*!

@@ -35,20 +35,12 @@
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <X11/Xlib.h>
-#else
 #include <xcb/xcb.h>
-#endif
 #endif
 
 #include "SVTK_SpaceMouse.h"
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-SVTK_SpaceMouseX* SVTK_SpaceMouseX::myInstance = 0;
-#else
 SVTK_SpaceMouseXCB* SVTK_SpaceMouseXCB::myInstance = 0;
-#endif
 
 /*!
   Constructor
@@ -57,174 +49,6 @@ SVTK_SpaceMouse::SVTK_SpaceMouse()
 {
   spaceMouseOn = 0;
 }
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-/*!
-  Constructor
-*/
-SVTK_SpaceMouseX::SVTK_SpaceMouseX()
-: SVTK_SpaceMouse()
-{
-#if !defined WIN32 && !defined __APPLE__
-  win = InputFocus;
-#endif
-}
-
-/*!
-  \return shared instance of object (creates if there is no one)
-*/
-SVTK_SpaceMouseX* SVTK_SpaceMouseX::getInstance()
-{
-  if ( !myInstance )
-    myInstance = new SVTK_SpaceMouseX();
-  return myInstance;
-}
-
-#if !defined WIN32 && !defined __APPLE__
-
-static int errorCallback( Display *display, XErrorEvent *Error )
-{
-  char msg[ 128 ];
-  if ( Error->error_code != BadWindow ) {
-    XGetErrorText( display,Error->error_code,msg,sizeof( msg ) );
-    fprintf( stderr, "SpaceMouse reported error = %s. Exit ... \n", msg );
-  }
-  return 0;
-}
-
-/*!
-  Initialization
-*/
-int SVTK_SpaceMouseX::initialize( Display *display, Window window )
-{
-  XMotionEvent        = XInternAtom( display, "MotionEvent",        1 );
-  XButtonPressEvent   = XInternAtom( display, "ButtonPressEvent",   1 );
-  XButtonReleaseEvent = XInternAtom( display, "ButtonReleaseEvent", 1 );
-  XCommandEvent       = XInternAtom( display, "CommandEvent",       1 );
-
-  spaceMouseOn = (XMotionEvent        != 0) &&
-                 (XButtonPressEvent   != 0) &&
-                 (XButtonReleaseEvent != 0) &&
-                 (XCommandEvent       != 0);
-  if ( !spaceMouseOn )
-    return 0;
-
-  spaceMouseOn = setWindow( display, window );
-  if ( !spaceMouseOn )
-    return 0;
- 
-  return spaceMouseOn;
-}
-
-/*!
-  Initialize by window
-*/
-int SVTK_SpaceMouseX::setWindow( Display *display, Window window )
-{
-  XTextProperty winName;
-  XEvent xEvent;
-  Atom type;
-  int format;
-  unsigned long NItems, BytesReturn;
-  unsigned char *PropReturn;
-  Window root;
-  int (*errorHandler)(Display *,XErrorEvent *);
-
-  errorHandler = XSetErrorHandler( errorCallback );
- 
-  root = RootWindow( display, DefaultScreen(display) );
-
-  PropReturn = NULL;
-  XGetWindowProperty( display, root, XCommandEvent, 0,1, 0,
-                      AnyPropertyType, &type, &format, &NItems,
-                      &BytesReturn, &PropReturn );
-
-  win = InputFocus;
-  if ( PropReturn != NULL ) {
-    win = *(Window *) PropReturn;
-    XFree( PropReturn );
-  }
-  else
-    return 0;
-
-  if ( XGetWMName( display, win, &winName ) == 0 )
-    return 0;
-
-  if ( strcmp( (char *) "Magellan Window", (char *) winName.value) != 0 )
-    return 0;
-
-  xEvent.type = ClientMessage;
-  xEvent.xclient.format = 16;
-  xEvent.xclient.send_event = 0;
-  xEvent.xclient.display = display;
-  xEvent.xclient.window = win;
-  xEvent.xclient.message_type = XCommandEvent;
-  
-  xEvent.xclient.data.s[0] = (short) ((window>>16)&0x0000FFFF);
-  xEvent.xclient.data.s[1] = (short)  (window&0x0000FFFF);
-  xEvent.xclient.data.s[2] = 27695;
-
-  if ( XSendEvent( display, win, 0, 0x0000, &xEvent ) == 0 )
-    return 0;
-
-  XFlush( display );
-
-  XSetErrorHandler( errorHandler );
-  return 1;
-}
-
-/*!
-  Close
-*/
-int SVTK_SpaceMouseX::close(Display *display)
-{
-  initialize( display, (Window)InputFocus );
-  spaceMouseOn = 0;
-  
-  return 1;
-}
-
-/*!
-  Custom event handler
-*/
-int SVTK_SpaceMouseX::translateEvent( Display* display, XEvent* xEvent, MoveEvent* spaceMouseEvent,
-                    double scale, double rScale )
-{
-  if ( !spaceMouseOn )
-    return 0;
-
-  if ( xEvent->type == ClientMessage ) {
-    if ( xEvent->xclient.message_type == XMotionEvent ) {
-      spaceMouseEvent->type = SpaceMouseMove;
-      spaceMouseEvent->data[ x ] =
-        xEvent->xclient.data.s[2] * scale;
-      spaceMouseEvent->data[ y ] =
-        xEvent->xclient.data.s[3] * scale;
-      spaceMouseEvent->data[ z ] =
-        xEvent->xclient.data.s[4] * scale;
-      spaceMouseEvent->data[ a ] =
-        xEvent->xclient.data.s[5] * rScale;
-      spaceMouseEvent->data[ b ] =
-        xEvent->xclient.data.s[6] * rScale;
-      spaceMouseEvent->data[ c ] =
-        xEvent->xclient.data.s[7] * rScale;
-      spaceMouseEvent->period = xEvent->xclient.data.s[8];
-      return 1;
-    }
-    else if ( xEvent->xclient.message_type == XButtonPressEvent ) {
-      spaceMouseEvent->type = SpaceButtonPress;
-      spaceMouseEvent->button = xEvent->xclient.data.s[2];
-      return 2;
-    }
-    else if ( xEvent->xclient.message_type == XButtonReleaseEvent ) {
-      spaceMouseEvent->type = SpaceButtonRelease;
-      spaceMouseEvent->button = xEvent->xclient.data.s[2];
-      return 3;
-    }
-  }
-  return (!display);
-}
-#endif
-#else
 
 /*!
   Constructor
@@ -398,5 +222,4 @@ int SVTK_SpaceMouseXCB::translateEvent( xcb_connection_t* connection, xcb_client
   }
   return (!connection);
 }
-#endif
 #endif

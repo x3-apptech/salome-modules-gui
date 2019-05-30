@@ -285,10 +285,7 @@ public:
   static void*       getDisplay();
   static Qt::HANDLE  getVisual();
 #endif
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
   static void initDefaultSurfaceFormat();
-#endif
 };
 
 #endif

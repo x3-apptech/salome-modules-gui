@@ -30,49 +30,6 @@
 #include <QMenu>
 #include <QVariant>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
- 
-/*!
-  \brief Used for comparing of two QVariant values.
-  \param v1 first argument for comparison
-  \param v2 second argument for comparison
-  \return \c true if \a v1 less than \a v2
-*/
-bool operator<( const QVariant& v1, const QVariant& v2 )
-{
-  QVariant::Type t1 = v1.type(), t2 = v2.type();
-  if ( t1 == t2 )
-  {
-    switch( t1 )
-    {
-    case QVariant::Int:
-      return v1.toInt() < v2.toInt();
-    case QVariant::Double:
-      return v1.toDouble() < v2.toDouble();
-    case QVariant::String:
-      return v1.toString() < v2.toString();
-    case QVariant::StringList:
-    case QVariant::List:
-    {
-      const QList<QVariant>& aList1 = v1.toList(), aList2 = v2.toList();
-      QList<QVariant>::const_iterator anIt1 = aList1.begin(), aLast1 = aList1.end(),
-        anIt2 = aList2.begin(), aLast2 = aList2.end();
-      for ( ; anIt1 != aLast1 && anIt2 != aLast2;  anIt1++, anIt2++ )
-      {
-        if ( (*anIt1) != (*anIt2) )
-          return (*anIt1) < (*anIt2);
-      }
-      return anIt1 == aLast1 && anIt2 != aLast2;
-    }
-    default:
-      return v1.toString() < v2.toString();
-    }
-  }
-  return t1 < t2;
-}
-
-#else
-
 bool operator<( const QList<QVariant>& v1, const QList<QVariant>& v2 )
 {
   QList<QVariant>::const_iterator anIt1 = v1.begin(), aLast1 = v1.end(),
@@ -84,8 +41,6 @@ bool operator<( const QList<QVariant>& v1, const QList<QVariant>& v2 )
   }
   return anIt1 == aLast1 && anIt2 != aLast2;
 }
-
-#endif // QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 
 /*!
   \class QtxPopupMgr::PopupCreator

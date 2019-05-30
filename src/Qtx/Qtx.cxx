@@ -38,9 +38,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QtDebug>
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 #include <QSurfaceFormat>
-#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -2108,7 +2106,6 @@ long Qtx::versionToId( const QString& version )
   
   The function tries to detect qt installation directory by analyzing the system variables in the following order:
   - QT5_ROOT_DIR
-  - QT4_ROOT_DIR
   - QT_ROOT_DIR
   - QTDIR
 
@@ -2121,7 +2118,7 @@ long Qtx::versionToId( const QString& version )
 QString Qtx::qtDir( const QString& context )
 {
 
-  QStringList vars = { "QT5_ROOT_DIR", "QT4_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
+  QStringList vars = { "QT5_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
   QString qtPath;
   for (uint i = 0; i < vars.length() && qtPath.isEmpty(); i++ ) {
     qtPath = getenv(vars[i]);
@@ -2242,8 +2239,6 @@ Qt::HANDLE Qtx::getVisual()
 
 #endif // WIN32
 
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
 /*!
   \brief Set default QSurfaceFormat for an application.
 
@@ -2279,7 +2274,6 @@ void Qtx::initDefaultSurfaceFormat()
 
   QSurfaceFormat::setDefaultFormat(fmt);
 }
-#endif
 
 /*!
   \class Qtx::CmdLineArgs

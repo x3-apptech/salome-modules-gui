@@ -263,13 +263,7 @@ class SALOME_QApplication : public QApplication
 public:
   SALOME_QApplication( int& argc, char** argv )
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if !defined(WIN32) && !defined(__APPLE__) && (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-  // san: Opening an X display and choosing a visual most suitable for 3D visualization
-  // in order to make SALOME viewers work with non-native X servers
-  : QApplication( (Display*)Qtx::getDisplay(), argc, argv, Qtx::getVisual() ),
-#else
   : QApplication( argc, argv ), 
-#endif
     myHandler ( 0 ) {}
 
   virtual bool notify( QObject* receiver, QEvent* e )
@@ -355,16 +349,6 @@ int main( int argc, char **argv )
   SessionMsgHandler msgHandler;
   qInstallMessageHandler(QtxMsgHandler);
 
-// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  //Set a "native" graphic system in case if application runs on the remote host
-  QString remote(getenv("REMOTEHOST"));
-  QString client(getenv("SSH_CLIENT"));
-  if(remote.length() > 0 || client.length() > 0 ) {
-    QApplication::setGraphicsSystem(QLatin1String("native"));
-  }
-#endif
-
   // add <qtdir>/plugins dir to the pluins search path for image plugins
   QString qtdir = Qtx::qtDir( "plugins" );
   if ( !qtdir.isEmpty() )
@@ -384,15 +368,12 @@ int main( int argc, char **argv )
     }
   }
   
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
-
   // RNV: setup the default format:
   // QSurfaceFormat should be set before creation of QApplication,  
   // so to avoid conflicts beetween SALOME and ParaView QSurfaceFormats we should merge theirs formats
   // (see void Qtx::initDefaultSurfaceFormat()) and set the resultant format here.
   Qtx::initDefaultSurfaceFormat(); 
 
-#endif
 
   // Create Qt application instance;
   // this should be done the very first!

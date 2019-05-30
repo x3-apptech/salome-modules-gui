@@ -63,25 +63,6 @@ QtxTranslator::~QtxTranslator()
 {
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-
-/*!
-  \brief Returns the translation for the key.
-  \param context message context
-  \param sourceText message source name
-  \param disambiguation message comment (optional)
-  \return Translated text if found or \a sourceText otherwise
-*/
-QString QtxTranslator::translate( const char* context, const char* sourceText, const char* disambiguation ) const
-{
-  QString res = QTranslator::translate( context, sourceText, disambiguation );
-  if ( res.isNull() )
-    res = QTranslator::translate( GLOBAL_CONTEXT, sourceText, disambiguation );
-  return res;
-}
-
-#else
-
 /*!
   \brief Returns the translation for the key.
   \param context message context
@@ -98,4 +79,3 @@ QString QtxTranslator::translate( const char* context, const char* sourceText, c
   return res;
 }
 
-#endif // QT_VERSION < QT_VERSION_CHECK(5, 0, 0)

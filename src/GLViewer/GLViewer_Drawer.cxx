@@ -400,9 +400,6 @@ static GLuint displayListBase( QFont* theFont )
     listBase += 256;
 
     HDC glHdc = ::wglGetCurrentDC();
- #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    ::SelectObject( glHdc, theFont->handle() );
- #endif
     if ( !::wglUseFontBitmaps( glHdc, 0, 256, listBase ) )
       listBase = 0;
     aList = listBase;
@@ -474,33 +471,24 @@ static GLuint displayListBase( QFont* theFont )
     QString aFontDef = theFont->toString();
     char** xFontList = XListFonts( aDisp, aFontDef.toLatin1()/*aFindFont.myFontString.data()*/, 1, &aFontCont  );
 // TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    if( !theFont->handle() )
+#ifdef _DEBUG_
+    printf( "Can't load font %s. loading default font....\n", aFontDef.toLatin1().data()/*aFindFont.myFontString.data()*/ );
+#endif
+    QString aFontMask ("-*-*-*-r-*-*-");
+    aFontMask += aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 );
+#ifdef _DEBUG_
+    printf( "Height of Default font: %s\n", aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 ).data() );
+#endif
+    aFontMask += "-*-*-*-m-*-*-*";
+    xFontList = XListFonts( aDisp, aFontMask.toLatin1().constData()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
+    if( aFontCont == 0 )
     {
-#endif
 #ifdef _DEBUG_
-      printf( "Can't load font %s. loading default font....\n", aFontDef.toLatin1().data()/*aFindFont.myFontString.data()*/ );
+      printf( "Can't load default font\n" );
 #endif
-      QString aFontMask ("-*-*-*-r-*-*-");
-      aFontMask += aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 );
-#ifdef _DEBUG_
-      printf( "Height of Default font: %s\n", aFontDef/*aFindFont.myFontString*/.section( ',', 1, 1 ).data() );
-#endif
-      aFontMask += "-*-*-*-m-*-*-*";
-      xFontList = XListFonts( aDisp, aFontMask.toLatin1().constData()/*"-*-*-*-r-*-*-12-*-*-*-m-*-*-*"*/, 1, &aFontCont  );
-      if( aFontCont == 0 )
-      {
-#ifdef _DEBUG_
-        printf( "Can't load default font\n" );
-#endif
-        return 0;
-      }
-      glXUseXFont( (Font)(XLoadFont( aDisp,xFontList[0] )), 0, 256, listBase );
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+      return 0;
     }
-    else
-      glXUseXFont( (Font)(theFont->handle()), 0, 256, listBase );
-#endif
+    glXUseXFont( (Font)(XLoadFont( aDisp,xFontList[0] )), 0, 256, listBase );
     aList = listBase;
     GLViewer_TexFont::BitmapFontCache[aFindFont] = aList;
   }

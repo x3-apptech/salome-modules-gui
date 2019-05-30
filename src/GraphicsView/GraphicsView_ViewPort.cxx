@@ -480,11 +480,7 @@ bool GraphicsView_ViewPort::dumpViewToFormat(const QString& fileName, const QStr
     return false;
 
   QPrinter printer(QPrinter::ScreenResolution);
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  printer.setOutputFormat(QPrinter::PostScriptFormat);
-#else
   printer.setOutputFormat(QPrinter::PdfFormat);
-#endif
   printer.setOutputFileName(fileName);
   QPainter painter;  
   if (!painter.begin(&printer))

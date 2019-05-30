@@ -179,28 +179,17 @@ int main( int argc, char* argv[] )
     }
   }
 
-#if QT_VERSION > QT_VERSION_CHECK(5, 0, 0)
+
   // RNV: setup the default format:
   // QSurfaceFormat should be set before creation of QApplication,  
   // so to avoid conflicts beetween SALOME and ParaView QSurfaceFormats we should merge theirs formats
   // (see void Qtx::initDefaultSurfaceFormat()) and set the resultant format here.
   Qtx::initDefaultSurfaceFormat();
-#endif
 
   // add <qtdir>/plugins directory to the pluins search path for image plugins
   QString qtdir = Qtx::qtDir( "plugins" );
   if ( !qtdir.isEmpty() )
     QApplication::addLibraryPath( qtdir );
-
-// TODO (QT5 PORTING) Below is a temporary solution, to allow compiling with Qt 5
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  //Set a "native" graphic system in case if application runs on the remote host
-  QString remote(::getenv("REMOTEHOST"));
-  QString client(::getenv("SSH_CLIENT"));
-  if(remote.length() > 0 || client.length() > 0 ) {
-    QApplication::setGraphicsSystem(QLatin1String("native"));
-  }
-#endif
   
   SUITApp_Application app( argc, argv );
   QString cfgAppName = getAppName( argList.isEmpty() ? QString() : argList.first() );

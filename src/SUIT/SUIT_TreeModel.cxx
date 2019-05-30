@@ -500,9 +500,7 @@ SUIT_TreeModel::~SUIT_TreeModel()
 void SUIT_TreeModel::registerColumn( const int group_id, const QString& name, const int custom_id )
 {
   bool found = false;
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   beginResetModel();
-#endif
   for ( int i=0, n=myColumns.size(); i<n && !found; i++ ) {
     if ( name == myColumns[i].myName ) {
       myColumns[i].myIds.insert( group_id, custom_id );
@@ -518,11 +516,7 @@ void SUIT_TreeModel::registerColumn( const int group_id, const QString& name, co
     int n = myColumns.size();
     myColumns.resize( n+1 );
     myColumns[n] = inf;
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     endResetModel();
-#else
-    reset();
-#endif
   }
 }
 
@@ -540,18 +534,12 @@ void SUIT_TreeModel::registerColumn( const int group_id, const QString& name, co
 void SUIT_TreeModel::unregisterColumn( const int group_id, const QString& name )
 {
   for ( int i = 0, n = myColumns.size(); i < n; i++ ) {
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
     beginResetModel();
-#endif
     if ( myColumns[i].myName == name ) {
       myColumns[i].myIds.remove( group_id );
       if ( myColumns[i].myIds.isEmpty() ) {
         myColumns.remove( i );
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
         endResetModel();
-#else
-        reset();
-#endif
       }
       break;
     }
@@ -760,10 +748,7 @@ void SUIT_TreeModel::setRoot( SUIT_DataObject* r )
 {
   if ( root() == r )
     return;
-
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   beginResetModel();
-#endif
 
   if ( autoDeleteTree() ) {
     SUIT_DataObject::disconnect( SIGNAL( inserted( SUIT_DataObject*, SUIT_DataObject* ) ),
@@ -784,11 +769,7 @@ void SUIT_TreeModel::setRoot( SUIT_DataObject* r )
   myRoot = r;
 
   //initialize();
-#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
   endResetModel();
-#else
-  reset();
-#endif
   emit modelUpdated();
 }
 
@@ -2318,8 +2299,6 @@ void SUIT_ItemDelegate::paint( QPainter* painter,
 QSize SUIT_ItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
     QSize size = QItemDelegate::sizeHint ( option, index );
-#if QT_VERSION >= 0x040500
     size.setHeight( size.height() + 1 );
-#endif
     return size;
 }

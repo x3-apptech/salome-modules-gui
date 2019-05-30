@@ -1638,9 +1638,6 @@ void Style_Salome::drawPrimitive( PrimitiveElement pe, const QStyleOption* opt,
         p->setPen(opt->palette.text().color());
      } // Fall through!
     case PE_IndicatorViewItemCheck:
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    case PE_Q3CheckListIndicator:
-#endif
     {
       if (!doRestore) {
         p->save();
@@ -2107,11 +2104,7 @@ QIcon Style_Salome::standardIconImplementation( StandardPixmap standardIcon,
                                                 const QWidget* w ) const
 {
   if ( checkDebugLevel(10) ) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    return BaseStyle::standardIconImplementation( standardIcon, opt, w );
-#else
     return QCommonStyle::standardIcon( standardIcon, opt, w );
-#endif
   }
 
   switch ( standardIcon )
@@ -2127,11 +2120,7 @@ QIcon Style_Salome::standardIconImplementation( StandardPixmap standardIcon,
   default:
     break;
   }
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  return BaseStyle::standardIconImplementation( standardIcon, opt, w );
-#else
   return BaseStyle::standardIcon( standardIcon, opt, w );
-#endif
 }
 
 /*!

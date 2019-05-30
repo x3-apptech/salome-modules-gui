@@ -25,13 +25,9 @@
 
 #include <QtGlobal>
 #include "Style.h"
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <QWindowsStyle>
-#define BaseStyle QWindowsStyle
-#else
 #include <QCommonStyle>
 #define BaseStyle QCommonStyle
-#endif
+
 class Style_Model;
 
 class QApplication;

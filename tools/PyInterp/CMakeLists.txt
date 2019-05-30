@@ -44,7 +44,6 @@ INCLUDE(SalomeSetupPlatform)
 
 # Options
 # =======
-OPTION(PYINTERP_BUILD_WITH_QT5 "Build PYINTERP with Qt 5" ON)
 
 #
 # Set list of prerequisites
@@ -53,11 +52,7 @@ OPTION(PYINTERP_BUILD_WITH_QT5 "Build PYINTERP with Qt 5" ON)
 FIND_PACKAGE(SalomePythonInterp REQUIRED)
 FIND_PACKAGE(SalomePythonLibs REQUIRED)
 # Qt
-IF(NOT PYINTERP_BUILD_WITH_QT5)
-  FIND_PACKAGE(SalomeQt4 REQUIRED)
-ELSE()
-  FIND_PACKAGE(SalomeQt5 REQUIRED)
-ENDIF()
+FIND_PACKAGE(SalomeQt5 REQUIRED)
 
 # Detection report
 SALOME_PACKAGE_REPORT_AND_CHECK()

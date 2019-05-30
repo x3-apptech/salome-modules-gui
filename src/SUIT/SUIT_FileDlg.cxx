@@ -131,13 +131,9 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
     setWindowIcon( parent->windowIcon() );
 
   // GDD
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-  myUrls.insert(0,QUrl::fromLocalFile(QDesktopServices::storageLocation(QDesktopServices::ApplicationsLocation)));
-  myUrls.insert(0,QUrl::fromLocalFile(QDesktopServices::storageLocation(QDesktopServices::HomeLocation)));
-#else
   myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)));
   myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)));
-#endif
+
   setSidebarUrls(myUrls);
 
   // add quick directories widgets
