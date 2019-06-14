@@ -560,11 +560,9 @@ void OCCViewer_ViewPort3d::paintEvent( QPaintEvent* e )
 */
 void OCCViewer_ViewPort3d::resizeEvent( QResizeEvent* e )
 {
-#if defined WIN32
-  /* Win32 : map before first show to avoid flicker */
+  /* Map before first show to avoid flicker */
   if ( !mapped( activeView() ) )
     mapView( activeView() );
-#endif
   QTimer::singleShot( 0, this, SLOT( repaintViewAfterMove() ) );
   emit vpResizeEvent( e );
 }
