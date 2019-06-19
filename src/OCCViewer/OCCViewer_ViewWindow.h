@@ -152,6 +152,7 @@ public:
 	 SwitchPreselectionId, SwitchSelectionId,
 	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
 	 OrthographicId, PerspectiveId, StereoId, RayTracingId, EnvTextureId, LightSourceId,
+   RectangleSelectionStyleId, CircleSelectionStyleId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
@@ -201,7 +202,7 @@ public:
   virtual void      setVisualParameters( const QString& parameters );
 
   virtual void                    initSketchers();
-  virtual OCCViewer_ViewSketcher* getSketcher( const int );
+  virtual OCCViewer_ViewSketcher* getSketcher( const int ) const;
 
   virtual void                    activateSketching( int );
 
@@ -218,6 +219,9 @@ public:
  
   virtual int                     projectionType() const;
   virtual void                    setProjectionType( int );
+
+  virtual int                     selectionStyle() const;
+  virtual void                    setSelectionStyle(int);
 
   virtual int                     stereoType() const;
   virtual void                    setStereoType( const int );
@@ -313,6 +317,7 @@ public slots:
   virtual void onSwitchZoomingStyle( bool on );
   virtual void onSwitchPreselection( bool on );
   virtual void onSwitchSelection( bool on );
+  virtual void onSwitchSelectionStyle(QAction* theAction);
   virtual void onRayTracing();
   virtual void onEnvTexture();
   virtual void onLightSource();

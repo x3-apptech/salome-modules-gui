@@ -149,6 +149,8 @@ SET(_other_RESOURCES
   resources/occ_view_ray_tracing.png
   resources/occ_view_env_texture.png
   resources/occ_view_light_source.png
+  resources/occ_view_circle_style.png
+  resources/occ_view_rect_style.png
 )
 
 # --- sources ---

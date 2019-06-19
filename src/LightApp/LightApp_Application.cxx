@@ -1633,6 +1633,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
                                resMgr->doubleValue( "OCCViewer", "focus_value", vm->stereographicFocusValue() ));
     vm->setInterocularDistance( resMgr->integerValue( "OCCViewer", "iod_type", vm->interocularDistanceType() ),
                                 resMgr->doubleValue( "OCCViewer", "iod_value", vm->interocularDistanceValue() ));
+    vm->setSelectionStyle( resMgr->integerValue( "OCCViewer", "adv_selection_mode", vm->selectionStyle() ) );
 
     vm->setReverseStereo( resMgr->booleanValue( "OCCViewer", "reverse_stereo", vm->isReverseStereo() ) );
     vm->setVSync( resMgr->booleanValue( "OCCViewer", "enable_vsync", vm->isVSync() ) );
@@ -2596,13 +2597,22 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
 
   // ... "Selection" group <<start>>
   int occSelectionGroup = pref->addPreference( tr( "PREF_GROUP_SELECTION" ), occGroup );
-  pref->setItemProperty( "columns", 2, occSelectionGroup );
+  pref->setItemProperty( "columns", 3, occSelectionGroup );
   // .... -> enable preselection
   pref->addPreference( tr( "PREF_ENABLE_PRESELECTION" ), occSelectionGroup,
                        LightApp_Preferences::Bool, "OCCViewer", "enable_preselection" );
   // .... -> enable selection
   pref->addPreference( tr( "PREF_ENABLE_SELECTION" ), occSelectionGroup,
                        LightApp_Preferences::Bool, "OCCViewer", "enable_selection" );
+  // .... -> selection style
+  int aSeleStyle = pref->addPreference( tr( "PREF_SELECTION_STYLE" ), occSelectionGroup,
+                       LightApp_Preferences::Selector, "OCCViewer", "adv_selection_mode" );
+  aValuesList.clear();
+  anIndicesList.clear();
+  aValuesList   << tr("PREF_POLYGON_SELECTION") << tr("PREF_CIRCLE_SELECTION");
+  anIndicesList << 0 << 1;
+  pref->setItemProperty( "strings", aValuesList, aSeleStyle);
+  pref->setItemProperty( "indexes", anIndicesList, aSeleStyle);
   // ... "Selection" group <<end>>
 
   // ... "Clipping" group <<start>>
@@ -3312,6 +3322,27 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
     }
   }
 #endif
+
+
+#ifndef DISABLE_OCCVIEWER
+  if (sec == QString("OCCViewer") && param == QString("adv_selection_mode"))
+  {
+    int mode = resMgr->integerValue("OCCViewer", "adv_selection_mode", 0);
+    QList<SUIT_ViewManager*> lst;
+    viewManagers(OCCViewer_Viewer::Type(), lst);
+    QListIterator<SUIT_ViewManager*> it(lst);
+    while (it.hasNext())
+    {
+      SUIT_ViewModel* vm = it.next()->getViewModel();
+      if (!vm || !vm->inherits("OCCViewer_Viewer"))
+        continue;
+
+      OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
+      occVM->setSelectionStyle(mode);
+    }
+  }
+#endif
+
 
 #ifndef DISABLE_OCCVIEWER
   if ( sec == QString( "OCCViewer" ) && param == QString( "stereo_type" ) )

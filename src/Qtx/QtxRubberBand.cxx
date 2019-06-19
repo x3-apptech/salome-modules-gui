@@ -30,6 +30,8 @@
 #include <QShowEvent>
 #include <QVectorIterator>
 
+#include <math.h>
+
 /*!
   \class QtxAbstractRubberBand
   \brief Analog of class QRubberBand with possibility of creation non-rectangular contour for selection.
@@ -95,7 +97,7 @@ void QtxAbstractRubberBand::paintEvent( QPaintEvent* theEvent )
       QPainter aPainter( this );
       aPainter.setRenderHint( QPainter::Antialiasing );
       QRect r = myPoints.boundingRect();
-      aPainter.setClipRegion( r.normalized().adjusted( -1, -1, 2, 2 ) );
+      //aPainter.setClipRegion( r.normalized().adjusted( -1, -1, 2, 2 ) );
       aPainter.drawTiledPixmap( 0, 0, width(), height(), tiledPixmap);
 
       aPainter.end();
@@ -310,4 +312,96 @@ void QtxPolyRubberBand::setClosed( bool theFlag )
       myIsClosed = theFlag;
       updateMask();
     }
+}
+
+QtxCircleRubberBand::QtxCircleRubberBand(QWidget* parent)
+  :QtxAbstractRubberBand(parent), myHasCenter(false)
+{
+  myPoints.resize(2);
+  myIsClosed = true;
+}
+
+QtxCircleRubberBand::~QtxCircleRubberBand()
+{
+}
+
+void QtxCircleRubberBand::initGeometry(const QPoint& thePoint)
+{
+  myIsClosed = false;
+  myHasCenter = true;
+  myPoints.clear();
+  myPoints << thePoint;
+  updateMask();
+}
+
+void QtxCircleRubberBand::setRadius(const QPoint& thePoint)
+{
+  if (myPoints.size() == 1)
+    myPoints << thePoint;
+  else
+    myPoints.setPoint(1, thePoint);
+  myIsClosed = true;
+  updateMask();
+}
+
+void QtxCircleRubberBand::updateMask()
+{
+  int aLen = radius();
+  if (aLen > MIN_RADIUS) {
+    QRegion aReg1(myPoints[0].x() - aLen,
+      myPoints[0].y() - aLen, aLen * 2, aLen * 2, QRegion::Ellipse);
+    QRegion aReg2(myPoints[0].x() - aLen + 2,
+      myPoints[0].y() - aLen + 2, aLen * 2 - 4, aLen * 2 - 4, QRegion::Ellipse);
+    setMask(aReg1 - aReg2);
+  }
+}
+
+bool QtxCircleRubberBand::isCenterDefined() const
+{
+  return myHasCenter;
+}
+
+void QtxCircleRubberBand::clearGeometry()
+{
+  QtxAbstractRubberBand::clearGeometry();
+  myHasCenter = false;
+  myIsClosed = false;
+}
+
+QPoint rotatePoint(const QPoint& theStart, const QPoint& theCenter, double theAngle)
+{
+  double cosTheta = cos(theAngle);
+  double sinTheta = sin(theAngle);
+  int aX = (int)(cosTheta * (theStart.x() - theCenter.x()) -
+    sinTheta * (theStart.y() - theCenter.y()) + theCenter.x());
+  int aY = (int)(sinTheta * (theStart.x() - theCenter.x()) +
+    cosTheta * (theStart.y() - theCenter.y()) + theCenter.y());
+  return QPoint(aX, aY);
+}
+
+static double m_pi = 4 * atan(1);
+static double angle_deg = 360. / CIRCLE_NB_POINTS;
+static double angle_rad = angle_deg * (m_pi / 180.);
+
+
+void QtxCircleRubberBand::getPoligon(QPolygon* thePoints) const
+{
+  int aLen = radius();
+  if (aLen > MIN_RADIUS) {
+    thePoints->clear();
+    QPoint aCenter = myPoints[0];
+    QPoint aStart = myPoints[1];
+    for (int i = 0; i < CIRCLE_NB_POINTS; i++) {
+      thePoints->append(aStart);
+      aStart = rotatePoint(aStart, aCenter, angle_rad);
+    }
+  }
+}
+
+int QtxCircleRubberBand::radius() const
+{
+  if (myPoints.size() < 2)
+    return -1;
+  QPoint aDist = myPoints[1] - myPoints[0];
+  return (int)std::sqrt(std::pow(aDist.x(), 2) + std::pow(aDist.y(), 2));
 }

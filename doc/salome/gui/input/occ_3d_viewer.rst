@@ -67,6 +67,20 @@ ____
 
 ____
 
+.. image:: ../../../../src/OCCViewer/resources/occ_view_rect_style.png
+	:align: center
+
+**Advanced selection by polygon** - enables advanced selection by polygon.
+
+____
+
+.. image:: ../../../../src/OCCViewer/resources/occ_view_circle_style.png
+	:align: center
+
+**Advanced selection by polygon** - enables advanced selection by circle.
+
+____
+
 .. image:: ../../../../src/OCCViewer/resources/occ_view_fitall.png
 	:align: center
 

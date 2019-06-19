@@ -313,14 +313,17 @@ OCCViewer_PolygonSketcher::OCCViewer_PolygonSketcher( OCCViewer_ViewWindow* vw, 
   myToler         ( 5, 5 ),
   //mypPoints        ( 0L ),
   myAddButton     ( 0 ),
-  myDelButton     ( 0 )
+  myDelButton     ( 0 ),
+  myMode          ( Poligone )
 {
   mySketchButton = Qt::RightButton;
   if ( vw )
-    {
-      OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
-      mypPolyRB = new QtxPolyRubberBand( avp );
-    }
+  {
+    OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+    mypPolyRB = new QtxPolyRubberBand( avp );
+    mypCircleRB = new QtxCircleRubberBand( avp );
+  }
+  mypData = new QPolygon( 0 );
 }
 
 OCCViewer_PolygonSketcher::~OCCViewer_PolygonSketcher()
@@ -332,7 +335,6 @@ OCCViewer_PolygonSketcher::~OCCViewer_PolygonSketcher()
 void OCCViewer_PolygonSketcher::onActivate()
 {
   myDbl = false;
-  mypData = new QPolygon( 0 );
   //mypPoints = new QPolygon( 0 );
 
   switch ( sketchButton() )
@@ -355,13 +357,11 @@ void OCCViewer_PolygonSketcher::onActivate()
 
 void OCCViewer_PolygonSketcher::onDeactivate()
 {
-  //delete mypPoints;
-  //mypPoints = 0;
-  delete (QPolygon*)mypData;
-  mypData = 0;
-
   if ( mypPolyRB )
     mypPolyRB->clearGeometry();  
+  if (mypCircleRB)
+    mypCircleRB->clearGeometry();
+  ((QPolygon*)mypData)->clear();
 }
 
 bool OCCViewer_PolygonSketcher::onKey( QKeyEvent* e )
@@ -471,45 +471,53 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
 
 void OCCViewer_PolygonSketcher::onSketch( SketchState state )
 {
-  //OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
-
   QPolygon* points = (QPolygon*)data();
-  /*QPainter p( avp );
-  p.setPen( Qt::white );
-  p.setCompositionMode( QPainter::CompositionMode_Xor );
-  if ( state != Debut )
-    p.drawPolyline( *mypPoints );
+  switch (myMode) {
+  case Poligone:
+    if (mypPolyRB) {
+      if (state == Fin) {
+        mypPolyRB->clearGeometry();
+        mypPolyRB->hide();
+        mypViewWindow->activateSketching(OCCViewer_ViewWindow::NoSketching);
+      }
+      else {
+        mypPolyRB->setUpdatesEnabled(false);
+        if (!mypPolyRB->isVisible())
+          mypPolyRB->show();
 
-  if ( points->count() )
-  {
-    mypPoints->resize( points->count() + 1 );
-    for ( uint i = 0; i < points->count(); i++ )
-      mypPoints->setPoint( i, points->point( i ) );
-    mypPoints->setPoint( points->count(), myCurr );
-    if ( state != Fin )
-      p.drawPolyline( *mypPoints );
-      }*/
-  if ( mypPolyRB ) {
-    if ( state == Fin ) {
-      mypPolyRB->clearGeometry();
-      mypPolyRB->hide();
-      mypViewWindow->activateSketching( OCCViewer_ViewWindow::NoSketching );
-    } else {
-      mypPolyRB->setUpdatesEnabled ( false );
-      if ( !mypPolyRB->isVisible() )
-	mypPolyRB->show();
-      //if ( state != Debut )
-      //  mypPolyRB->repaint();
-      
-      if ( state != Fin && points->count() )
-	mypPolyRB->initGeometry( QPolygon(*points) << myCurr );
-      //mypPolyRB->addNode( myCurr );
-      
-      //if ( state != Fin )
-      //  mypPolyRB->repaint();
-      mypPolyRB->setUpdatesEnabled ( true );
-      //mypPolyRB->repaint();
+        if (state != Fin && points->count())
+          mypPolyRB->initGeometry(QPolygon(*points) << myCurr);
+        mypPolyRB->setUpdatesEnabled(true);
+      }
     }
+    break;
+  case Circle:
+    if (mypCircleRB) {
+      if (state == Fin) {
+        mypCircleRB->getPoligon(points);
+        mypCircleRB->clearGeometry();
+        mypCircleRB->hide();
+        if (points->size() == CIRCLE_NB_POINTS)
+          myResult = Accept;
+        mypViewWindow->activateSketching(OCCViewer_ViewWindow::NoSketching);
+      }
+      else {
+        mypCircleRB->setUpdatesEnabled(false);
+
+        if (state != Fin) {
+          if (mypCircleRB->isCenterDefined()) {
+            mypCircleRB->setRadius(myCurr);
+            if ((mypCircleRB->radius() > MIN_RADIUS) && (!mypCircleRB->isVisible()))
+              mypCircleRB->show();
+          }
+          else {
+            mypCircleRB->initGeometry(myCurr);
+          }
+        }
+        mypCircleRB->setUpdatesEnabled(true);
+      }
+    }
+    break;
   }
 }
 
@@ -589,3 +597,7 @@ bool OCCViewer_PolygonSketcher::isIntersect( const QPoint& aStart1, const QPoint
 }
 
 
+void OCCViewer_PolygonSketcher::setSketcherMode(int theMode)
+{
+  myMode = (SketchMode)theMode;
+}

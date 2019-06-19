@@ -212,6 +212,18 @@ Pythonファイルは、文字、数字、アンダースコアが含まれて�
       <translation>遠近法</translation>
     </message>
     <message>
+        <source>PREF_POLYGON_SELECTION</source>
+        <translation>Polygon</translation>
+    </message>
+    <message>
+        <source>PREF_CIRCLE_SELECTION</source>
+        <translation>Circle</translation>
+    </message>
+    <message>
+        <source>PREF_SELECTION_STYLE</source>
+        <translation>Advanced selection</translation>
+    </message>
+    <message>
       <source>PREF_NAVIGATION</source>
       <translation>ナビゲーション スタイル</translation>
     </message>

@@ -159,6 +159,9 @@ public:
   int                             stereoType() const;
   void                            setStereoType( const int );
 
+  int                             selectionStyle() const;
+  void                            setSelectionStyle(const int);
+
   int                             anaglyphFilter() const;
   void                            setAnaglyphFilter( const int );
 
@@ -260,6 +263,7 @@ protected:
   int                             myAnaglyphFilter;
   int                             myStereographicFocusType;
   int                             myInterocularDistanceType;
+  int                             mySelectionStyle;
 
   double                          myStereographicFocusValue;
   double                          myInterocularDistanceValue;

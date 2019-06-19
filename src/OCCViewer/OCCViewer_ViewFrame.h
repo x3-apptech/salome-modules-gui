@@ -75,6 +75,9 @@ public:
   virtual int projectionType() const;
   virtual void setProjectionType( int );
 
+  virtual int selectionStyle() const;
+  virtual void setSelectionStyle(int);
+
   virtual int stereoType() const;
   virtual void setStereoType( const int );
 

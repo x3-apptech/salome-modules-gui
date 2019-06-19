@@ -236,6 +236,22 @@
         <translation>Changer le style de zoom</translation>
     </message>
     <message>
+        <source>MNU_RECTANGLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by polygon</translation>
+    </message>
+    <message>
+        <source>DSC_RECTANGLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by polygon</translation>
+    </message>
+    <message>
+        <source>MNU_CIRCLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by circle</translation>
+    </message>
+    <message>
+        <source>DSC_CIRCLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by circle</translation>
+    </message>
+    <message>
         <source>MNU_ENABLE_PRESELECTION</source>
         <translation>Activer/Désactiver préselection</translation>
     </message>

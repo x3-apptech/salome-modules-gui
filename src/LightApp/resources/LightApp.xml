@@ -125,6 +125,7 @@
     <!-- OCC viewer preferences -->
     <parameter name="projection_mode"     value="0"/>
     <parameter name="stereo_type"         value="0"/>
+    <parameter name="adv_selection_mode"  value="0"/>
     <parameter name="anaglyph_filter"     value="0"/>
     <parameter name="focus_type"          value="1"/>
     <parameter name="focus_value"         value="1.0"/>

@@ -90,4 +90,33 @@ public:
   void            setClosed( bool );
 };
 
+
+#define CIRCLE_NB_POINTS 30
+#define MIN_RADIUS 5
+
+class QTX_EXPORT QtxCircleRubberBand : public QtxAbstractRubberBand
+{
+  Q_OBJECT
+
+public:
+  QtxCircleRubberBand(QWidget*);
+  virtual ~QtxCircleRubberBand();
+
+  void            initGeometry(const QPoint&);
+
+  void            setRadius(const QPoint&);
+
+  bool            isCenterDefined() const;
+
+  virtual void    clearGeometry();
+
+  void getPoligon(QPolygon* thePoints) const;
+
+  int radius() const;
+
+protected:
+  virtual void    updateMask();
+  bool            myHasCenter;
+};
+
 #endif //QTXRUBBERBAND_H

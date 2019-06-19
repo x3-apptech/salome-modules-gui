@@ -237,6 +237,22 @@
       <translation>ズームのスタイルを変更します。</translation>
     </message>
     <message>
+        <source>MNU_RECTANGLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by polygon</translation>
+    </message>
+    <message>
+        <source>DSC_RECTANGLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by polygon</translation>
+    </message>
+    <message>
+        <source>MNU_CIRCLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by circle</translation>
+    </message>
+    <message>
+        <source>DSC_CIRCLE_SELECTION_STYLE</source>
+        <translation>Advanced selection by circle</translation>
+    </message>
+    <message>
       <source>MNU_ENABLE_PRESELECTION</source>
       <translation>予選の有効/無効にします。</translation>
     </message>

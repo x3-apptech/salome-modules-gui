@@ -355,6 +355,20 @@ void OCCViewer_ViewFrame::setProjectionType( int t)
 }
 
 //**************************************************************************************
+int OCCViewer_ViewFrame::selectionStyle() const
+{
+  return getView(MAIN_VIEW)->selectionStyle();
+}
+
+//**************************************************************************************
+void OCCViewer_ViewFrame::setSelectionStyle(int t)
+{
+  foreach(OCCViewer_ViewWindow* aView, myViews) {
+    aView->setSelectionStyle(t);
+  }
+}
+
+//**************************************************************************************
 int OCCViewer_ViewFrame::stereoType() const
 {
   return getView(MAIN_VIEW)->stereoType();

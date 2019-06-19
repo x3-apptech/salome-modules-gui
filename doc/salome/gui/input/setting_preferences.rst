@@ -152,6 +152,7 @@ OCC 3D Viewer Preferences
 
   - **Enable preselection** - switches preselection on/off.
   - **Enable selection** - switches selection on/off.
+  - **Advanced selection** - switches default advanced selection style by Polygon or by Circle.
 
 - **Clipping parameters** - specifies the default clipping plane parameters.
 

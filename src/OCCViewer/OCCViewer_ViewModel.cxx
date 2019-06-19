@@ -170,6 +170,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 
   // set projection type to orthographic
   myProjectionType = 0;
+  mySelectionStyle = 0;
   // set stereo parameters
   myStereoType = 0;
   myAnaglyphFilter = 0;
@@ -244,6 +245,7 @@ void OCCViewer_Viewer::initView( OCCViewer_ViewWindow* view )
     view->initSketchers();
     view->setInteractionStyle( interactionStyle() );
     view->setProjectionType( projectionType() );
+    view->setSelectionStyle( selectionStyle() );
     view->setStereoType( stereoType() );
     view->setAnaglyphFilter( anaglyphFilter() );
     view->setStereographicFocus( stereographicFocusType(), stereographicFocusValue() );
@@ -544,6 +546,31 @@ void OCCViewer_Viewer::setProjectionType( const int theType )
     }
   }
 }
+
+
+int OCCViewer_Viewer::selectionStyle() const
+{
+  return mySelectionStyle;
+}
+
+void OCCViewer_Viewer::setSelectionStyle(const int theMode)
+{
+  if (mySelectionStyle != theMode) {
+    mySelectionStyle = theMode;
+    if (!myViewManager)
+      return;
+
+    QVector<SUIT_ViewWindow*> wins = myViewManager->getViews();
+    for (int i = 0; i < (int)wins.count(); i++)
+    {
+      OCCViewer_ViewWindow* win = ::qobject_cast<OCCViewer_ViewWindow*>(wins.at(i));
+      if (win)
+        win->setSelectionStyle(theMode);
+    }
+  }
+}
+
+
 
 /*!
   \return stereo type

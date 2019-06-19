@@ -120,6 +120,14 @@
         <translation>occ_view_zooming_style_switch.png</translation>
     </message>
     <message>
+        <source>ICON_OCCVIEWER_RECT_STYLE</source>
+        <translation>occ_view_rect_style.png</translation>
+    </message>
+    <message>
+        <source>ICON_OCCVIEWER_CIRCLE_STYLE</source>
+        <translation>occ_view_circle_style.png</translation>
+    </message>
+    <message>
         <source>ICON_OCCVIEWER_MAXIMIZE</source>
         <translation>occ_view_maximized.png</translation>
     </message>
