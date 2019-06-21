@@ -122,6 +122,11 @@ static QEvent* l_mbPressEvent = 0;
 #undef KeyPress
 #endif
 
+#ifdef KeyRelease
+#undef KeyRelease
+#endif
+
+
 // Enable ray tracing features
 #define ENABLE_RAY_TRACING
 
