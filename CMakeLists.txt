@@ -291,6 +291,7 @@ MARK_AS_ADVANCED(SALOME_INSTALL_AMCONFIG_LOCAL SALOME_INSTALL_DOC)
 # Accumulate environment variables for GUI module
 SALOME_ACCUMULATE_ENVIRONMENT(PYTHONPATH NOCHECK ${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_BINS}
                                                  ${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_PYTHON}
+                                                 ${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_LIBS}
                                                  ${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_PYTHON_SHARED})
 SALOME_ACCUMULATE_ENVIRONMENT(LD_LIBRARY_PATH NOCHECK ${CMAKE_INSTALL_PREFIX}/${SALOME_INSTALL_LIBS}) 
                                               
