@@ -307,7 +307,7 @@ QString ToolsGUI_CatalogGeneratorDlg::getCompType()
 */
 QString ToolsGUI_CatalogGeneratorDlg::getIdlPath()
 {
-  cout << "QAD_Desktop::getCatalogue() is not implemented!!";
+  std::cout << "QAD_Desktop::getCatalogue() is not implemented!!";
   if ( true )
     return QString( "" );
 /*

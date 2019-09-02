@@ -39,6 +39,8 @@
 #include <time.h>
 #endif
 
+using namespace std;
+
 /*! Constructor.*/
 LightApp_Driver::LightApp_Driver()
 : myIsTemp( false )
