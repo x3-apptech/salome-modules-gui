@@ -77,7 +77,7 @@ ____
 .. image:: ../../../../src/OCCViewer/resources/occ_view_circle_style.png
 	:align: center
 
-**Advanced selection by cyrcle** - enables advanced selection by circle.
+**Advanced selection by circle** - enables advanced selection by circle.
 
 ____
 
