@@ -115,7 +115,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 #if OCC_VERSION_LARGE <= 0x07030000
   myIsUseLocalSelection(false),
 #endif
-  myClippingDlg (NULL)
+  myClippingDlg (NULL),
+  myFitter(0)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );

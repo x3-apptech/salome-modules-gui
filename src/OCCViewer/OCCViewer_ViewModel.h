@@ -58,6 +58,19 @@ class QtxAction;
 #pragma warning( disable:4251 )
 #endif
 
+/**
+An object wich provides alternative way to fit scene in a view
+*/
+class OCCViewer_Fitter
+{
+public:
+  /// A method which has top be reimplemented to provide alterantive implementation FitAll command
+  /// \param theView - a view which has to be fit
+  virtual void fitAll(Handle(V3d_View) theView) = 0;
+};
+
+
+
 class OCCVIEWER_EXPORT OCCViewer_Viewer: public SUIT_ViewModel
 {
   Q_OBJECT
@@ -142,6 +155,18 @@ public:
   void                            setUseLocalSelection(bool theIsUseLocalSelection);
   bool                            useLocalSelection() const;
 #endif
+
+  // Methods to access fitter
+
+  /// Returns currently installed fitter
+  OCCViewer_Fitter* fitter() const { return myFitter; }
+
+  /// Installs new fitter
+  /// \param theFitter a new fitter
+  void setFitter(OCCViewer_Fitter* theFitter) {
+    myFitter = theFitter;
+  }
+
 
 public:
   Handle(V3d_Viewer)              getViewer3d()    const { return myV3dViewer;}
@@ -298,6 +323,8 @@ protected:
 #if OCC_VERSION_LARGE <= 0x07030000
   bool                            myIsUseLocalSelection;
 #endif
+
+  OCCViewer_Fitter* myFitter;
 };
 
 #ifdef WIN32
