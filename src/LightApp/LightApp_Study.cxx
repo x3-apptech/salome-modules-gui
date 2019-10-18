@@ -77,7 +77,7 @@ bool LightApp_Study::openDocument( const QString& theFileName )
 {
   myDriver->ClearDriverContents();
   // create files for models from theFileName
-  if( !openStudyData(theFileName))
+  if( !openStudyData(theFileName, 0)) // 0 means persistence file
     return false;
 
   setRoot( new LightApp_RootObject( this ) ); // create myRoot
@@ -105,7 +105,7 @@ bool LightApp_Study::openDocument( const QString& theFileName )
 bool LightApp_Study::loadDocument( const QString& theStudyName )
 {
   myDriver->ClearDriverContents();
-  if( !openStudyData(theStudyName))
+  if( !openStudyData(theStudyName, 0)) // 0 means persistence file
     return false;
 
   setRoot( new LightApp_RootObject( this ) ); // create myRoot
@@ -155,7 +155,8 @@ bool LightApp_Study::saveDocumentAs( const QString& theFileName )
     listOfFiles.clear();
     aModel->saveAs( theFileName, this, listOfFiles );
     if ( !listOfFiles.isEmpty() )
-      saveModuleData(aModel->module()->name(), listOfFiles);
+      saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
+		     listOfFiles);
 
     // Remove files if necessary. File is removed if it was in the list of files before
     // saving and it is not contained in the list after saving. This provides correct 
@@ -186,7 +187,7 @@ bool LightApp_Study::saveDocumentAs( const QString& theFileName )
     myDriver->RemoveFiles( toRemoveList, isMultiFile );
   }
 
-  bool res = saveStudyData(theFileName);
+  bool res = saveStudyData(theFileName, 0); // 0 means persistence file
   res = res && CAM_Study::saveDocumentAs( theFileName );
   //SRN: BugID IPAL9377, removed usage of uninitialized variable <res>
   if ( res )
@@ -211,10 +212,11 @@ bool LightApp_Study::saveDocument()
 
     listOfFiles.clear();
     aModel->save( listOfFiles );
-    saveModuleData(aModel->module()->name(), listOfFiles);
+    saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
+		   listOfFiles);
   }
 
-  bool res = saveStudyData(studyName());
+  bool res = saveStudyData(studyName(), 0); // 0 means persistence file
   res = res && CAM_Study::saveDocument();
   if (res)
     emit saved( this );
@@ -324,7 +326,7 @@ void LightApp_Study::addComponent(const CAM_DataModel* dm)
 /*!
   Saves list file for module 'theModuleName'
 */
-void LightApp_Study::saveModuleData(QString theModuleName, QStringList theListOfFiles)
+void LightApp_Study::saveModuleData(QString theModuleName, int type, QStringList theListOfFiles)
 {
   int aNb = theListOfFiles.count();
   if ( aNb == 0 )
@@ -338,13 +340,13 @@ void LightApp_Study::saveModuleData(QString theModuleName, QStringList theListOf
     aListOfFiles[anIndex] = (*it).toUtf8().constData();
     anIndex++;
   }
-  myDriver->SetListOfFiles(theModuleName.toLatin1().constData(), aListOfFiles);
+  SetListOfFiles(theModuleName.toLatin1().constData(), type, aListOfFiles);
 }
 
 /*!
   Gets list of file for module 'theModuleNam'
 */
-void LightApp_Study::openModuleData(QString theModuleName, QStringList& theListOfFiles)
+void LightApp_Study::openModuleData(QString theModuleName, int /*type*/, QStringList& theListOfFiles)
 {
   std::vector<std::string> aListOfFiles =  myDriver->GetListOfFiles(theModuleName.toLatin1().constData());
   int i, aLength = aListOfFiles.size() - 1;
@@ -360,7 +362,7 @@ void LightApp_Study::openModuleData(QString theModuleName, QStringList& theListO
 /*!
   Saves data from study
 */
-bool LightApp_Study::saveStudyData( const QString& theFileName )
+bool LightApp_Study::saveStudyData( const QString& theFileName, int /*type*/ )
 {
   ModelList list; dataModels( list );
   SUIT_ResourceMgr* resMgr = application()->resourceMgr();
@@ -375,7 +377,7 @@ bool LightApp_Study::saveStudyData( const QString& theFileName )
 /*!
   Opens data for study
 */
-bool LightApp_Study::openStudyData( const QString& theFileName )
+bool LightApp_Study::openStudyData( const QString& theFileName, int /*type*/ )
 {
   SUIT_ResourceMgr* resMgr = application()->resourceMgr();
   if( !resMgr )
@@ -395,7 +397,8 @@ bool LightApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm 
     return false;
 
   QStringList listOfFiles;
-  openModuleData(dm->module()->name(), listOfFiles);
+  openModuleData(dm->module()->name(), 0, // 0 means persistence file
+		 listOfFiles);
   if (dm && dm->open(studyName, this, listOfFiles)) {
     // Something has been read -> create data model tree
     LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>( dm );
@@ -419,11 +422,9 @@ std::string LightApp_Study::GetTmpDir (const char* theURL,
   \return list of files necessary for module
   \param theModuleName - name of module
 */
-std::vector<std::string> LightApp_Study::GetListOfFiles(const char* theModuleName) const
+std::vector<std::string> LightApp_Study::GetListOfFiles(const char* theModuleName, int /*type*/) const
 {
-  std::vector<std::string> aListOfFiles;
-  aListOfFiles = myDriver->GetListOfFiles(theModuleName);
-  return aListOfFiles;
+  return myDriver->GetListOfFiles(theModuleName);
 }
 
 /*!
@@ -431,7 +432,7 @@ std::vector<std::string> LightApp_Study::GetListOfFiles(const char* theModuleNam
   \param theModuleName - name of module
   \param theListOfFiles - list of files
 */
-void LightApp_Study::SetListOfFiles (const char* theModuleName, const std::vector<std::string> theListOfFiles)
+void LightApp_Study::SetListOfFiles (const char* theModuleName, int /*type*/, const std::vector<std::string> theListOfFiles)
 {
   myDriver->SetListOfFiles(theModuleName, theListOfFiles);
 }
@@ -439,7 +440,7 @@ void LightApp_Study::SetListOfFiles (const char* theModuleName, const std::vecto
 /*!
   Removes temporary files
 */
-void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, const bool isMultiFile) const
+void LightApp_Study::RemoveTemporaryFiles (const char* theModuleName, bool isMultiFile, bool /*force*/)
 {
   if (isMultiFile)
     return;

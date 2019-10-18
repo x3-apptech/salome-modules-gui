@@ -48,7 +48,7 @@
   Constructor
 */
 SalomeApp_Engine_i::SalomeApp_Engine_i( const char* theComponentName )
-  : myComponentName( theComponentName )
+  : myKeepFiles( false ), myComponentName( theComponentName )
 {
   MESSAGE("SalomeApp_Engine_i::SalomeApp_Engine_i(): myComponentName = " <<
 	  qPrintable( myComponentName ) << ", this = " << this);
@@ -85,7 +85,8 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 
   bool manuallySaved = false;
 
-  if ( GetListOfFiles().empty() ) {
+  if ( GetListOfFiles(0).empty() ) // 0 means persistence file
+  { 
 
     // Save was probably called from outside GUI, so SetListOfFiles was not called!
     // Try to get list of files from directly from data model
@@ -94,7 +95,7 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
             qPrintable( myComponentName ) <<
             "it seems Save() was called from outside GUI" );
 
-    // - Get app rnv
+    // - Get app
     SalomeApp_Application* app = 
       dynamic_cast<SalomeApp_Application*>(SUIT_Session::session()->activeApplication());
     if ( !app )
@@ -125,7 +126,7 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
       if ( !name.isEmpty() )
         names.push_back(name.toUtf8().data());
     }
-    SetListOfFiles( names );
+    SetListOfFiles( 0, names ); // 0 means persistence file
     manuallySaved = true;
   }
 
@@ -134,26 +135,30 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
 
   // listOfFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
-  const int n = myListOfFiles.size() - 1;
+  ListOfFiles listOfFiles = GetListOfFiles( 0 ); // 0 means persistence file
+  const int n = listOfFiles.size() - 1;
   
   if (n > 0) { // there are some files, containing persistent data of the component
-    std::string aTmpDir = myListOfFiles[0];
+    std::string aTmpDir = listOfFiles[0];
     
     // Create a list to store names of created files
     ListOfFiles aSeq;
     aSeq.reserve(n);
     for (int i = 0; i < n; i++)
-      aSeq.push_back(CORBA::string_dup(myListOfFiles[i + 1].c_str()));
+      aSeq.push_back(CORBA::string_dup(listOfFiles[i + 1].c_str()));
     
     // Convert a file to the byte stream
     aStreamFile = SALOMEDS_Tool::PutFilesToStream(aTmpDir.c_str(), aSeq, isMultiFile);
     
     // Remove the files and tmp directory, created by the component storage procedure
-    if (!isMultiFile) SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
+    SalomeApp_Application* app = 
+      dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
+    SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>( app->activeStudy() );
+    study->RemoveTemporaryFiles( myComponentName.toStdString().c_str(), isMultiFile );
   }
   
   if ( manuallySaved )
-    SetListOfFiles( ListOfFiles());
+    SetListOfFiles(0, ListOfFiles()); // 0 means persistence file
 
   return aStreamFile._retn();
 }
@@ -188,19 +193,20 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
   for (int i = 1; i < n; i++)
     listOfFiles[i] = std::string(aSeq[i - 1]);
 
-  SetListOfFiles(listOfFiles);
+  SetListOfFiles(0, listOfFiles); // 0 means persistence file
+  keepFiles( true );
 
   return true;
 }
 
-SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles()
+SalomeApp_Engine_i::ListOfFiles SalomeApp_Engine_i::GetListOfFiles(int type)
 {
-  return myListOfFiles;
+  return myListOfFiles.count(type) ? myListOfFiles[type] : ListOfFiles();
 }
 
-void SalomeApp_Engine_i::SetListOfFiles (const ListOfFiles& theListOfFiles)
+void SalomeApp_Engine_i::SetListOfFiles (int type, const ListOfFiles& theListOfFiles)
 {
-  myListOfFiles = theListOfFiles;
+  myListOfFiles[type] = theListOfFiles;
 }
 
 /*! 
@@ -222,13 +228,15 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
   aStreamFile[0] = '\0';
   isValidScript = true;
 
+  ListOfFiles listOfFiles = GetListOfFiles( 1 ); // 1  means dump file
+
   // listOfFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
-  if ( myListOfFiles.size() < 2 )
+  if ( listOfFiles.size() < 2 )
     return aStreamFile._retn();
 
   // there are some files, containing persistent data of the component
-  QString aTmpPath( myListOfFiles.front().c_str() );
+  QString aTmpPath( listOfFiles.front().c_str() );
   QDir aTmpDir( aTmpPath );
   if ( !aTmpDir.exists() )
     return aStreamFile._retn();    
@@ -237,8 +245,8 @@ Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
   QStringList aFilePaths;
   QList<qint64> aFileSizes;
   qint64 aBuffSize = 0;
-  ListOfFiles::const_iterator aFIt  = myListOfFiles.begin();
-  ListOfFiles::const_iterator aFEnd = myListOfFiles.end();
+  ListOfFiles::const_iterator aFIt  = listOfFiles.begin();
+  ListOfFiles::const_iterator aFEnd = listOfFiles.end();
   aFIt++;
   for (; aFIt != aFEnd; aFIt++){
     QString aFileName( (*aFIt).c_str() );

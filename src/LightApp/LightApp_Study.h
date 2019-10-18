@@ -114,16 +114,16 @@ public:
   virtual LightApp_DataObject* findObjectByEntry( const QString& theEntry );
 
 protected:
-  virtual void        saveModuleData ( QString theModuleName, QStringList theListOfFiles );
-  virtual void        openModuleData ( QString theModuleName, QStringList& theListOfFiles );
-  virtual bool        saveStudyData  ( const QString& theFileName );
-  virtual bool        openStudyData  ( const QString& theFileName );
+  virtual void        saveModuleData ( QString theModuleName, int type, QStringList theListOfFiles );
+  virtual void        openModuleData ( QString theModuleName, int type, QStringList& theListOfFiles );
+  virtual bool        saveStudyData  ( const QString& theFileName, int type );
+  virtual bool        openStudyData  ( const QString& theFileName, int type );
 
-  virtual std::vector<std::string> GetListOfFiles ( const char* theModuleName ) const;
-  virtual void        SetListOfFiles ( const char* theModuleName,
+  virtual std::vector<std::string> GetListOfFiles ( const char* theModuleName, int type ) const;
+  virtual void        SetListOfFiles ( const char* theModuleName, int type,
                                        const std::vector<std::string> theListOfFiles );
 
-  virtual void        RemoveTemporaryFiles ( const char* theModuleName, const bool isMultiFile ) const;
+  virtual void        RemoveTemporaryFiles ( const char*, bool, bool = false );
 
 protected:
   virtual bool        openDataModel  ( const QString&, CAM_DataModel* );

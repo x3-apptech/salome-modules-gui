@@ -62,9 +62,10 @@ public:
 
 public:
   typedef std::vector<std::string> ListOfFiles;
+  typedef std::map<int, ListOfFiles> MapOfFiles;
 
-  ListOfFiles             GetListOfFiles ();
-  void                    SetListOfFiles (const ListOfFiles& theListOfFiles);
+  ListOfFiles             GetListOfFiles (int);
+  void                    SetListOfFiles (int, const ListOfFiles& theListOfFiles);
 
   static std::string         EngineIORForComponent( const char* theComponentName,
 						    bool toCreate );
@@ -90,6 +91,9 @@ public:
   CORBA::Boolean CanPaste( const char*, CORBA::Long )                                                                                                {return 0;}
   SALOMEDS::SObject_ptr PasteInto( const SALOMEDS::TMPFile&, CORBA::Long, SALOMEDS::SObject_ptr )                                                    {return 0;}
 
+  bool keepFiles() const { return myKeepFiles; }
+  void keepFiles( bool keep ) { myKeepFiles = keep; }
+
   char* getVersion();
 
 private:
@@ -97,7 +101,8 @@ private:
   static PortableServer::POA_var     poa();
   static SALOME_NamingService*       namingService();
 private:
-  ListOfFiles                        myListOfFiles;
+  MapOfFiles                         myListOfFiles;
+  bool                               myKeepFiles;
 
   QString                            myComponentName;
 };

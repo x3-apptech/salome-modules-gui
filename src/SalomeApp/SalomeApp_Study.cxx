@@ -624,7 +624,8 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
       listOfFiles.clear();
       aModel->saveAs( theFileName, this, listOfFiles );
       if ( !listOfFiles.isEmpty() )
-        saveModuleData(aModel->module()->name(), listOfFiles);
+        saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
+		       listOfFiles);
     }
   }
 
@@ -638,7 +639,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
   bool res = studyDS()->SaveAs( theFileName.toUtf8().data(), isMultiFile, isAscii )
     && CAM_Study::saveDocumentAs( theFileName );
 
-  res = res && saveStudyData(theFileName);
+  res = res && saveStudyData(theFileName, 0); // 0 means persistence file
 
   if ( res )
     emit saved( this );
@@ -667,7 +668,8 @@ bool SalomeApp_Study::saveDocument()
       listOfFiles.clear();
       aModel->save(listOfFiles);
       if ( !listOfFiles.isEmpty() )
-        saveModuleData(aModel->module()->name(), listOfFiles);
+        saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
+		       listOfFiles);
     }
   }
 
@@ -680,7 +682,7 @@ bool SalomeApp_Study::saveDocument()
   bool isAscii = resMgr->booleanValue( "Study", "ascii_file", false );
   bool res = studyDS()->Save( isMultiFile, isAscii ) && CAM_Study::saveDocument();
 
-  res = res && saveStudyData(studyName());
+  res = res && saveStudyData(studyName(), 0); // 0 means persistence file
   if ( res )
     emit saved( this );
 
@@ -761,7 +763,8 @@ bool SalomeApp_Study::dump( const QString& theFileName,
         // This call simply passes the data model's dump output to SalomeApp_Engine servant.
         // This code is shared with persistence mechanism.
         // NOTE: this should be revised if behavior of saveModuleData() changes!
-        saveModuleData(aModel->module()->name(), listOfFiles);
+        saveModuleData(aModel->module()->name(), 1, // 1 means dump file
+		       listOfFiles);
     }
   }
 
@@ -778,7 +781,7 @@ bool SalomeApp_Study::dump( const QString& theFileName,
   // Issue 21377 - Clean up light module data in SalomeApp_Engine servant
   // This code is shared with persistence mechanism.
   // NOTE: this should be revised if behavior of saveStudyData() changes!
-  saveStudyData( theFileName );
+  saveStudyData( theFileName, 1 ); // 0 means persistence file
 
   return res;
 }
@@ -821,7 +824,7 @@ bool SalomeApp_Study::isSaved() const
   \param theModuleName - name of module
   \param theListOfFiles - list of files to be saved
 */
-void SalomeApp_Study::saveModuleData( QString theModuleName, QStringList theListOfFiles )
+void SalomeApp_Study::saveModuleData( QString theModuleName, int type, QStringList theListOfFiles )
 {
   int aNb = theListOfFiles.count();
   if ( aNb == 0 )
@@ -835,7 +838,7 @@ void SalomeApp_Study::saveModuleData( QString theModuleName, QStringList theList
     aListOfFiles[anIndex] = (*it).toUtf8().data();
     anIndex++;
   }
-  SetListOfFiles(theModuleName.toStdString().c_str(), aListOfFiles);
+  SetListOfFiles(theModuleName.toStdString().c_str(), type, aListOfFiles);
 }
 
 /*!
@@ -843,9 +846,9 @@ void SalomeApp_Study::saveModuleData( QString theModuleName, QStringList theList
   \param theModuleName - name of module
   \param theListOfFiles - list of files to be loaded
 */
-void SalomeApp_Study::openModuleData( QString theModuleName, QStringList& theListOfFiles )
+void SalomeApp_Study::openModuleData( QString theModuleName, int type, QStringList& theListOfFiles )
 {
-  std::vector<std::string> aListOfFiles =  GetListOfFiles( theModuleName.toStdString().c_str() );
+  std::vector<std::string> aListOfFiles = GetListOfFiles( theModuleName.toStdString().c_str(), type );
 
   int i, aLength = aListOfFiles.size() - 1;
   if ( aLength < 0 )
@@ -862,18 +865,17 @@ void SalomeApp_Study::openModuleData( QString theModuleName, QStringList& theLis
   Re-implemented from LightApp_Study, actually does not save anything but
   simply cleans up light modules' data
 */
-bool SalomeApp_Study::saveStudyData( const QString& theFileName )
+bool SalomeApp_Study::saveStudyData( const QString& theFileName, int type )
 {
   ModelList list; dataModels( list );
   QListIterator<CAM_DataModel*> it( list );
-  std::vector<std::string> listOfFiles(0);
   while ( it.hasNext() ){
     LightApp_DataModel* aLModel = 
       dynamic_cast<LightApp_DataModel*>( it.next() );
     // It is safe to call SetListOfFiles() for any kind of module
     // because SetListOfFiles() does nothing for full modules :)
     if ( aLModel )
-      SetListOfFiles(aLModel->module()->name().toStdString().c_str(), listOfFiles);
+      SetListOfFiles(aLModel->module()->name().toStdString().c_str(), type, std::vector<std::string>());
   }
   return true;
 }
@@ -881,9 +883,9 @@ bool SalomeApp_Study::saveStudyData( const QString& theFileName )
 /*!
   Loads data for study
 */
-bool SalomeApp_Study::openStudyData( const QString& theFileName )
+bool SalomeApp_Study::openStudyData( const QString& /*theFileName*/, int /*type*/ )
 {
- return true;
+  return true;
 }
 
 /*!
@@ -1039,14 +1041,15 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
     // for a given component in the study yet
   }
   QStringList listOfFiles;
-  openModuleData(dm->module()->name(), listOfFiles);
+  openModuleData(dm->module()->name(), 0, // 0 means persistence file
+		 listOfFiles);
   if (dm && dm->open(studyName, this, listOfFiles)) {
     // Remove the files and temporary directory, created
     // for this module by LightApp_Engine_i::Load()
     bool isMultiFile = false; // TODO: decide, how to access this parameter
-    RemoveTemporaryFiles( dm->module()->name().toStdString().c_str(), isMultiFile );
-    std::vector<std::string> listOfFiles   ;
-    SetListOfFiles( dm->module()->name().toStdString().c_str(), listOfFiles );
+    RemoveTemporaryFiles( dm->module()->name().toStdString().c_str(), isMultiFile, true );
+    SetListOfFiles( dm->module()->name().toStdString().c_str(), 0, // 0 means persistence file
+		    std::vector<std::string>() );
 
     // Something has been read -> create data model tree
     LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>( dm );
@@ -1064,15 +1067,14 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
   \return list of files used by module: to be used by CORBAless modules
   \param theModuleName - name of module
 */
-std::vector<std::string> SalomeApp_Study::GetListOfFiles( const char* theModuleName  ) const
+std::vector<std::string> SalomeApp_Study::GetListOfFiles( const char* theModuleName, int type ) const
 {
   // Issue 21377 - using separate engine for each type of light module
   SalomeApp_Engine_i* aDefaultEngine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
   if (aDefaultEngine)
-    return aDefaultEngine->GetListOfFiles();
+    return aDefaultEngine->GetListOfFiles( type );
 
-  std::vector<std::string> aListOfFiles;
-  return aListOfFiles;
+  return std::vector<std::string>();
 }
 
 /*!
@@ -1083,13 +1085,13 @@ std::vector<std::string> SalomeApp_Study::GetListOfFiles( const char* theModuleN
   \param theModuleName - name of module
   \param theListOfFiles - list of files
 */
-void SalomeApp_Study::SetListOfFiles ( const char* theModuleName,
+void SalomeApp_Study::SetListOfFiles ( const char* theModuleName, int type,
                                        const std::vector<std::string> theListOfFiles )
 {
   // Issue 21377 - using separate engine for each type of light module
   SalomeApp_Engine_i* aDefaultEngine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
   if (aDefaultEngine)
-    aDefaultEngine->SetListOfFiles(theListOfFiles);
+    aDefaultEngine->SetListOfFiles(type, theListOfFiles);
 }
 
 /*!
@@ -1105,12 +1107,12 @@ std::string SalomeApp_Study::GetTmpDir ( const char* theURL, const bool  isMulti
 /*!
   Removes temporary files
 */
-void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bool isMultiFile ) const
+void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, bool isMultiFile, bool force )
 {
   if (isMultiFile)
     return;
 
-  SALOMEDS_Tool::ListOfFiles aListOfFiles = GetListOfFiles( theModuleName );
+  SALOMEDS_Tool::ListOfFiles aListOfFiles = GetListOfFiles( theModuleName, 0 );
   if (aListOfFiles.size() > 0) {
     std::string aTmpDir = aListOfFiles[0];
 
@@ -1120,7 +1122,13 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, const bo
     for (int i = 0; i < n; i++)
       aSeq.push_back(CORBA::string_dup(aListOfFiles[i + 1].c_str()));
 
-    SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
+    SalomeApp_Engine_i* engine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
+    bool toRemove = force || engine && !engine->keepFiles();
+
+    if ( toRemove ) {
+      SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
+      engine->keepFiles( false );
+    }
   }
 }
 
