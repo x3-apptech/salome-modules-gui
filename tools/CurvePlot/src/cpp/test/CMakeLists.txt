@@ -31,6 +31,11 @@ ADD_DEFINITIONS(${PYTHON_DEFINITIONS} ${QT_DEFINITIONS})
 # libraries to link to
 SET(_link_LIBRARIES ${PYTHON_LIBRARIES} ${GUI_PyInterp} ${QT_LIBRARIES} CurvePlot)
 
+IF(TARGET PyInterp)
+  SET(_link_LIBRARIES ${_link_LIBRARIES} PyInterp)
+ENDIF()
+
+
 # --- headers ---
 
 SET(_moc_HEADERS

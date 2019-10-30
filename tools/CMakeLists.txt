@@ -18,7 +18,6 @@
 #
 
 ADD_SUBDIRECTORY(dlgfactory)
-ADD_SUBDIRECTORY(CurvePlot)
 
 ##
 # Python-based packages, part 1 (generic)
@@ -32,6 +31,9 @@ IF(SALOME_USE_PYCONSOLE)
   SET(PYCONSOLE_INSTALL_RES "${SALOME_GUI_INSTALL_RES_DATA}" CACHE PATH "")
      
   ADD_SUBDIRECTORY(../tools/PyConsole) # will bring in PyInterp automatically
+
+  ADD_SUBDIRECTORY(CurvePlot)
+
 ENDIF(SALOME_USE_PYCONSOLE)
 
 IF(SALOME_USE_PYVIEWER)

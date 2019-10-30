@@ -22,6 +22,17 @@
 #ifndef SRC_CPP_CURVEPLOT_HXX_
 #define SRC_CPP_CURVEPLOT_HXX_
 
+#ifdef WIN32
+#  if defined CURVEPLOT_EXPORTS || defined CurvePlot_EXPORTS
+#    define CURVEPLOT_EXPORT __declspec(dllexport)
+#  else
+#    define CURVEPLOT_EXPORT __declspec(dllimport)
+#  endif
+#else   // WIN32
+#  define CURVEPLOT_EXPORT
+#endif  // WIN32
+
+
 #include <string>
 #include <vector>
 
@@ -32,9 +43,9 @@ namespace CURVEPLOT
   /**
    * This function should be called before doing anything in the CURVEPLOT namespace.
    */
-  void* InitializeCurvePlot();
+  CURVEPLOT_EXPORT void* InitializeCurvePlot();
 
-  class ColumnVector
+  class CURVEPLOT_EXPORT ColumnVector
   {
   public:
     friend class CurvePlot;
@@ -75,7 +86,7 @@ namespace CURVEPLOT
   /**
    * C++ wrapping of the public API exposed in the Python package curveplot. See doc there.
    */
-  class CurvePlot
+  class CURVEPLOT_EXPORT CurvePlot
   {
   public:
     static PlotID AddCurve(const ColumnVector & x, const ColumnVector & y,
