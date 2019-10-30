@@ -34,7 +34,7 @@ ADD_DEFINITIONS(${PYTHON_DEFINITIONS})
 # libraries to link to
 SET(_link_LIBRARIES ${PYTHON_LIBRARIES} ${GUI_PyInterp})
 
-IF(TARGET PyInterp)
+IF(TARGET PyInterp AND WIN32)
   SET(_link_LIBRARIES ${_link_LIBRARIES} PyInterp)
 ENDIF()
 
