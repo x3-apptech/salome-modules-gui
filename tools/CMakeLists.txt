@@ -18,6 +18,7 @@
 #
 
 ADD_SUBDIRECTORY(dlgfactory)
+ADD_SUBDIRECTORY(CurvePlot)
 
 ##
 # Python-based packages, part 1 (generic)

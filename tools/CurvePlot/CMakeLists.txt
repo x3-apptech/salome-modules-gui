@@ -66,15 +66,21 @@ IF(NOT SALOME_CURVEPLOT_STANDALONE)
       MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR or turn option SALOME_CURVEPLOT_STANDALONE to ON!")
     ENDIF( EXISTS ${KERNEL_ROOT_DIR} )
     
-    # Find SALOME GUI (needed for the C++ part - PyUtils)
     # ==============
     SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI")
-    IF(EXISTS ${GUI_ROOT_DIR})
-      LIST(APPEND CMAKE_MODULE_PATH "${GUI_ROOT_DIR}/adm_local/cmake_files")
-      FIND_PACKAGE(SalomeGUI)
-    ELSE(EXISTS ${GUI_ROOT_DIR})
-      MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR or turn option SALOME_CURVEPLOT_STANDALONE to ON!")
-    ENDIF(EXISTS ${GUI_ROOT_DIR})
+    # Are we compiled being into GUI/tools directory or have we been extracted somewhere else?
+    IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../src/Session/SALOME_Session.hxx")  # we are in GUI
+      LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../adm_local/cmake_files")
+      # Re-define GUI_INCLUDE_DIRS 
+      SET(GUI_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../PyInterp/src)
+    ELSE()      
+      IF(EXISTS ${GUI_ROOT_DIR})
+        LIST(APPEND CMAKE_MODULE_PATH "${GUI_ROOT_DIR}/adm_local/cmake_files")
+        FIND_PACKAGE(SalomeGUI)
+      ELSE()
+        MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR or turn option SALOME_CURVEPLOT_STANDALONE to ON!")
+      ENDIF()
+    ENDIF()
     
     # Platform setup
     # ==============
