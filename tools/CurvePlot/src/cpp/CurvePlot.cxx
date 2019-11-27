@@ -159,7 +159,7 @@ namespace CURVEPLOT
        if(!PyUnicode_Check(ret_py))
          throw Exception("CurvePlot::toStdString(): Unexpected returned type!");
        Py_ssize_t size;
-       char *ptr = PyUnicode_AsUTF8AndSize(ret_py, &size);
+       const char *ptr = PyUnicode_AsUTF8AndSize(ret_py, &size);
        ret_str = std::string(ptr);
     }
     return ret_str;
