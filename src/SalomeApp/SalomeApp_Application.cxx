@@ -2087,6 +2087,14 @@ void SalomeApp_Application::afterCloseDoc()
   LightApp_Application::afterCloseDoc();
 }
 
+bool SalomeApp_Application::canOpenDoc( const QString& url )
+{
+  _PTR(Study) aStudyDS = getStudy();
+  if ( aStudyDS )
+    return aStudyDS->CanOpen( url.toUtf8().data() );
+  return false;
+}
+
 /*
   Asks to close existing document.
 */

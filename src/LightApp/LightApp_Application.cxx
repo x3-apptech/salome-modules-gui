@@ -1024,7 +1024,6 @@ void LightApp_Application::onOpenDoc()
   if ( aName.isNull() ) //Cancel
     return;
   
-  closeDoc(false);
   onOpenDoc( aName );
   
   if ( !study ) // new study will be create in THIS application
@@ -1034,12 +1033,30 @@ void LightApp_Application::onOpenDoc()
   }
 }
 
+bool LightApp_Application::canOpenDoc( const QString& )
+{
+  return true;
+}
+
 /*!
   SLOT: Opens new document.
   \param aName - name of file
 */
 bool LightApp_Application::onOpenDoc( const QString& aName )
 {
+  if ( !canOpenDoc(aName)) {
+    bool showError = !property("open_study_from_command_line").isValid() ||
+      !property("open_study_from_command_line").toBool();
+
+    putInfo( tr("OPEN_DOCUMENT_PROBLEM") );
+    if ( showError )
+      SUIT_MessageBox::critical( desktop(), tr("ERR_ERROR"), tr("OPEN_DOCUMENT_PROBLEM"));
+
+    return false;
+  }
+
+  closeDoc(false);
+
   if ( !checkExistingDoc() )
     return false;
 

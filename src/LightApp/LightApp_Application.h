@@ -222,6 +222,8 @@ protected:
   virtual void                        setActiveStudy( SUIT_Study* );
   virtual void                        updateCommandsStatus();
 
+  virtual bool                        canOpenDoc( const QString& );
+
   virtual void                        beforeCloseDoc( SUIT_Study* );
   virtual void                        afterCloseDoc();
   virtual void                        moduleAdded( CAM_Module* );

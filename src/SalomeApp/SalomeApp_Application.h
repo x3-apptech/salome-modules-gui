@@ -173,6 +173,7 @@ protected:
   virtual PyConsole_Interp*           createPyInterp();
 #endif
 
+  virtual bool                        canOpenDoc( const QString& );
   virtual void                        afterCloseDoc();
 
 private slots:
