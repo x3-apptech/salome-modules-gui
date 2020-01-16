@@ -239,7 +239,7 @@ Voulez-vous le recharger ?</translation>
     </message>
     <message>
         <source>APPCLOSE_DESCRIPTION</source>
-        <translation>Voulez-vous fermer ou décharger l&apos;étude avant de la fermer ?</translation>
+        <translation>Voulez-vous sauvegarder l&apos;étude avant de quitter ?</translation>
     </message>
     <message>
         <source>PRP_DESK_PROPERTIES</source>
