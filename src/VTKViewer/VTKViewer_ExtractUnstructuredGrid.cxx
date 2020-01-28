@@ -324,8 +324,8 @@ inline int InsertCell(vtkUnstructuredGrid *theInput,
     theFaceLocations->InsertNextValue(theFaces->GetMaxId() + 1);
 
     // insert cell connectivity and faces stream
-    vtkIdType nfaces = 0;
-    vtkIdType*  face = 0;
+    vtkIdType       nfaces = 0;
+    const vtkIdType*  face = 0;
     vtkIdType realnpts;
     theInput->GetFaceStream(theCellId, nfaces, face);
     vtkUnstructuredGrid::DecomposeAPolyhedronCell(
@@ -494,7 +494,8 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
         aCellLocationsArray->SetNumberOfComponents(1);
         aCellLocationsArray->SetNumberOfTuples(newNbElems);
         aConnectivity->InitTraversal();
-        for(vtkIdType i = 0, *pts, npts; aConnectivity->GetNextCell(npts,pts); i++){
+        vtkIdType const *pts(nullptr);
+        for(vtkIdType i = 0, npts; aConnectivity->GetNextCell(npts,pts); i++){
           aCellLocationsArray->SetValue(i,aConnectivity->GetTraversalLocation(npts));
         }
 #if VTK_XVERSION > 50700
@@ -595,7 +596,8 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
       aCellLocationsArray->SetNumberOfComponents(1);
       aCellLocationsArray->SetNumberOfTuples( newNbElems );
       aConnectivity->InitTraversal();
-      for(vtkIdType i = 0, *pts, npts; aConnectivity->GetNextCell(npts,pts); i++){
+      vtkIdType const *pts(nullptr);
+      for(vtkIdType i = 0, npts; aConnectivity->GetNextCell(npts,pts); i++){
         aCellLocationsArray->SetValue(i,aConnectivity->GetTraversalLocation(npts));
       }
 #if VTK_XVERSION > 50700

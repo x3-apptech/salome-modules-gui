@@ -18,7 +18,6 @@
 #
 
 INCLUDE(UseQtExt)
-INCLUDE(${VTK_USE_FILE})
 
 # --- options ---
 
@@ -44,10 +43,13 @@ ADD_DEFINITIONS(${QT_DEFINITIONS} ${OpenCASCADE_DEFINITIONS} ${BOOST_DEFINITIONS
 SET(_link_LIBRARIES 
   ${QT_LIBRARIES}
   ${OPENGL_LIBRARIES}
-  ${VTK_LIBRARIES}
   ${OpenCASCADE_FoundationClasses_LIBRARIES} ${OpenCASCADE_Visualization_LIBRARIES}
   ${KERNEL_OpUtil}
   qtx suit ViewerTools SalomeObject SalomePrs VTKViewer OpenGLUtils
+  VTK::RenderingAnnotation
+  VTK::ImagingCore
+  VTK::CommonSystem
+  VTK::IOExportGL2PS
 )
 
 # --- headers ---

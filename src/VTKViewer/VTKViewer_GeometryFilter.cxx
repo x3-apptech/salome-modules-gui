@@ -118,10 +118,10 @@ VTKViewer_GeometryFilter
 static inline bool toShowEdge( vtkIdType id1, vtkIdType id2, vtkIdType cellId, vtkUnstructuredGrid* input )
 {
   // return true if the given cell is the 1st among cells including the edge
-  vtkCellLinks * links = input->GetCellLinks();
+  vtkCellLinks * links = static_cast<vtkCellLinks *>(input->GetCellLinks());
   if ( !links ) {
     input->BuildLinks();
-    links = input->GetCellLinks();
+    links = static_cast<vtkCellLinks *>(input->GetCellLinks());
   }
   if ( id1 < id2 )
     std::swap( id1, id2 );
@@ -134,7 +134,9 @@ static inline bool toShowEdge( vtkIdType id1, vtkIdType id2, vtkIdType cellId, v
   {
     if ( cells[iCell] == cellId )
       return true;
-    input->GetCellPoints( cells[iCell], npts, cellPts );
+    vtkIdType const *tmp(nullptr);
+    input->GetCellPoints( cells[iCell], npts, tmp );
+    std::copy(tmp, tmp+npts, cellPts);
     for ( vtkIdType i = 0; i < npts && !found; ++i )
       found = ( cellPts[i] == id2 );
     iCell += ( !found );
@@ -193,7 +195,7 @@ VTKViewer_GeometryFilter
   int i;
   int allVisible;
   vtkIdType npts = 0;
-  vtkIdType *pts = 0;
+  vtkIdType const *pts = 0;
   vtkPoints *p = input->GetPoints();
   vtkIdType numCells=input->GetNumberOfCells();
   vtkPointData *pd = input->GetPointData();
@@ -214,7 +216,7 @@ VTKViewer_GeometryFilter
 
   char *cellVis;
   vtkIdType newCellId;
-  int faceId, *faceVerts, *edgeVerts, numFacePts;
+  int faceId, numFacePts;
   double *x;
   vtkIdType PixelConvert[4];
   // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
@@ -447,7 +449,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 6; ++edgeID )
             {
-              edgeVerts = vtkTetra::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkTetra::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -473,7 +475,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 4; faceId++)
             {
               faceIds->Reset();
-              faceVerts = vtkTetra::GetFaceArray(faceId);
+              const int *faceVerts = vtkTetra::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -504,7 +506,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 12; ++edgeID )
             {
-              edgeVerts = vtkVoxel::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkVoxel::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -528,7 +530,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 6; faceId++)
             {
               faceIds->Reset();
-              faceVerts = vtkVoxel::GetFaceArray(faceId);
+              const int *faceVerts = vtkVoxel::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -562,7 +564,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 12; ++edgeID )
             {
-              edgeVerts = vtkHexahedron::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkHexahedron::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -588,7 +590,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 6; faceId++)
             {
               faceIds->Reset();
-              faceVerts = vtkHexahedron::GetFaceArray(faceId);
+              const int *faceVerts = vtkHexahedron::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -620,7 +622,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 9; ++edgeID )
             {
-              edgeVerts = vtkWedge::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkWedge::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -644,7 +646,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 5; faceId++)
             {
               faceIds->Reset();
-              faceVerts = vtkWedge::GetFaceArray(faceId);
+              const int *faceVerts = vtkWedge::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -683,7 +685,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 18; ++edgeID )
             {
-              edgeVerts = vtkHexagonalPrism::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkHexagonalPrism::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -706,7 +708,7 @@ VTKViewer_GeometryFilter
 #endif
             for (faceId = 0; faceId < 8; faceId++)
             {
-              faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
+              const int *faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
               faceIds->Reset();
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
@@ -748,7 +750,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 8; ++edgeID )
             {
-              edgeVerts = vtkPyramid::GetEdgeArray( edgeID );
+              const int *edgeVerts = vtkPyramid::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -772,7 +774,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 5; faceId++)
             {
               faceIds->Reset();
-              faceVerts = vtkPyramid::GetFaceArray(faceId);
+              const int *faceVerts = vtkPyramid::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -809,7 +811,7 @@ VTKViewer_GeometryFilter
         case VTK_POLYHEDRON:
         {
           vtkIdType nFaces = 0;
-          vtkIdType* ptIds = 0;
+          const vtkIdType* ptIds = 0;
           int idp = 0;
           input->GetFaceStream(cellId, nFaces, ptIds);
 #ifdef SHOW_COINCIDING_3D_PAL21924
@@ -891,7 +893,7 @@ VTKViewer_GeometryFilter
             if ( cell->GetCellDimension() == 1 ) {
               vtkIdType arcResult = -1;
               if(myIsBuildArc) {
-                arcResult = Build1DArc(cellId, input, output, pts, myMaxArcAngle);
+                arcResult = Build1DArc(cellId, input, output, const_cast<vtkIdType *>(pts), myMaxArcAngle);
                 newCellId = arcResult;
               }
 
@@ -993,10 +995,10 @@ VTKViewer_GeometryFilter
             switch(aCellType) {
             case VTK_QUADRATIC_EDGE:
             {
-              vtkIdType arcResult =-1;
+              vtkIdType arcResult = -1;
               if(myIsBuildArc) {
-               arcResult = Build1DArc(cellId, input, output, pts,myMaxArcAngle);
-               newCellId = arcResult;
+                arcResult = Build1DArc(cellId, input, output, const_cast<vtkIdType *>(pts), myMaxArcAngle);
+                newCellId = arcResult;
               }
               if(!myIsBuildArc || arcResult == -1) {
                 aCellType = VTK_POLY_LINE;

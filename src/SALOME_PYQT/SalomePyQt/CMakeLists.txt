@@ -19,9 +19,6 @@
 
 INCLUDE(UseQtExt)
 INCLUDE(UsePyQt)
-IF(SALOME_USE_VTKVIEWER)
-  INCLUDE(${VTK_USE_FILE})
-ENDIF()
 
 # --- options ---
 
@@ -87,7 +84,6 @@ ADD_DEFINITIONS(
 # libraries to link to
 SET(_link_LIBRARIES
   ${PYTHON_LIBRARIES}
-  ${VTK_LIBRARIES}
   ${OPENGL_LIBRARIES}
   ${QWT_LIBRARY}
   SalomePyQtGUILight

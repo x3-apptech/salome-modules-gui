@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(${VTK_USE_FILE})
-
 # --- options ---
 
 # additional include directories
@@ -49,7 +47,6 @@ SET(_link_LIBRARIES
   ${PYTHON_LIBRARIES}
   ${QT_LIBRARIES}
   ${OPENGL_LIBRARIES}
-  ${VTK_LIBRARIES}
   LightApp
 )
 

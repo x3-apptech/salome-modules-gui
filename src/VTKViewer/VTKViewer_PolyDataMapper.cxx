@@ -41,6 +41,8 @@
 #include <vtkRenderWindow.h>
 #include <vtkCommand.h>
 #include <vtkCellData.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkIdTypeArray.h>
 
 #include <Basics_Utils.hxx>
 
@@ -747,7 +749,7 @@ namespace VTK
                    vtkDataArray* theDiamArray,
                    double theBallScale )
   {
-    vtkIdType* ptIds = theCells->GetPointer();
+    vtkIdType* ptIds = theCells->GetData()->GetPointer(0);
     vtkIdType* endPtIds = ptIds + theCells->GetNumberOfConnectivityEntries();
 
     bool mapBalls = false; 

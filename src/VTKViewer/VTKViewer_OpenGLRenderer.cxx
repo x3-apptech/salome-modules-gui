@@ -20,6 +20,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+// to compile, otherwise we get:
+// #error gl.h included before glew.h
+#include <vtkglew/include/GL/glew.h>
+
 #include "VTKViewer_OpenGLRenderer.h"
 #include "VTKViewer_Texture.h"
 

@@ -17,7 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(${VTK_USE_FILE})
 INCLUDE(UseQtExt)
 
 # --- options ---
@@ -35,7 +34,21 @@ INCLUDE_DIRECTORIES(
 ADD_DEFINITIONS(${OpenCASCADE_DEFINITIONS} ${QT_DEFINITIONS})
 
 # libraries to link to
-SET(_link_LIBRARIES ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${VTK_LIBRARIES} ${OpenCASCADE_FoundationClasses_LIBRARIES} qtx suit ${KERNEL_SALOMELocalTrace})
+SET(_link_LIBRARIES
+  ${QT_LIBRARIES}
+  ${OPENGL_LIBRARIES}
+  VTK::FiltersGeometry
+  VTK::FiltersParallel
+  VTK::RenderingLOD
+  VTK::RenderingFreeType
+  VTK::RenderingOpenGL2
+  VTK::IOImage
+  VTK::IOXML
+  ${OpenCASCADE_FoundationClasses_LIBRARIES}
+  qtx
+  suit
+  ${KERNEL_SALOMELocalTrace}
+  )
 
 # --- headers ---
 

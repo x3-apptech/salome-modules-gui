@@ -148,7 +148,7 @@ private:
   int       myIsWireframeMode;
   int       myAppendCoincident3D;
 
-  double    myMaxArcAngle;   // define max angle for mesh 2D quadratic element in the degrees
+  double    myMaxArcAngle;    // define max angle for mesh 2D quadratic element in the degrees
   bool      myIsBuildArc;     // flag for representation 2D quadratic element as arked polygon
 };
 

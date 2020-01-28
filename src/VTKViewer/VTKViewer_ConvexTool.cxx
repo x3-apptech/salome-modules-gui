@@ -107,7 +107,9 @@ VTKViewer_Triangulator
   myPoints->Modified(); // the VTK bug
 
   vtkIdType aNumPts;
-  theInput->GetCellPoints(theCellId, aNumPts, myPointIds); 
+  vtkIdType const *tmp(nullptr);
+  theInput->GetCellPoints(theCellId, aNumPts, tmp);
+  std::copy(tmp,tmp+aNumPts,myPointIds);
   if ( aNumPts > 0 ) {
     double anAbsoluteCoord[3];
     myPoints->SetNumberOfPoints(aNumPts);
@@ -668,7 +670,7 @@ VTKViewer_OrderedTriangulator
   if ( theFaceId < 0 || theFaceId >= aNumCells ) 
     return NULL;
 
-  vtkIdType *aCells = myBoundaryTris->GetPointer();
+  vtkIdType *aCells = myBoundaryTris->GetData()->GetPointer(0);
 
   // Each triangle has three points plus number of points
   vtkIdType *aCellPtr = aCells + 4*theFaceId;

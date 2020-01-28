@@ -72,9 +72,6 @@ void PVViewer_Behaviors::instanciateMinimalBehaviors(QMainWindow * desk)
       // Register standard types of view-frame actions.
       pgm->addInterface(new pqStandardViewFrameActionsImplementation(pgm));
 
-      // Load plugins distributed with application.
-      pqApplicationCore::instance()->loadDistributedPlugins();
-
       new pqPipelineContextMenuBehavior(this);
       new pqDefaultViewBehavior(this);  // shows a 3D view as soon as a server connection is made
       new pqAlwaysConnectedBehavior(this);  // client always connected to a server
