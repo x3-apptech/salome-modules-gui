@@ -149,6 +149,7 @@ void LightApp_Module::contextMenuPopup( const QString& client, QMenu* menu, QStr
   popupMgr()->setSelection( sel );
   popupMgr()->setMenu( menu );
   popupMgr()->updateMenu();
+  popupMgr()->setSelection( 0 );
 }
 
 /*!Update object browser.
