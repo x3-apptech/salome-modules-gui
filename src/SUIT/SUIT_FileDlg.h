@@ -114,13 +114,14 @@ protected slots:
 
 private:
   void                polish();
+  void                updateSideBar();
 
 private:
   SUIT_FileValidator* myValidator;        //!< file validator
-  QLabel*             myQuickLab;         //!< quick dir combo box
-  QComboBox*          myQuickCombo;       //!< quick dir combo box
-  QList<QUrl>         myUrls;             //!< quick dir Sidebar Urls
-  QPushButton*        myQuickButton;      //!< quick dir add button
+  QLabel*             myQuickLab;         //!< quick dir panel: label
+  QComboBox*          myQuickCombo;       //!< quick dir panel: combo box
+  QPushButton*        myQuickButton;      //!< quick dir panel: button
+  QStringList         myUrls;             //!< sidebar urls
   bool                myCheckPermissions; //!< check permissions option
   static QString      myLastVisitedPath;  //!< last visited path
 };

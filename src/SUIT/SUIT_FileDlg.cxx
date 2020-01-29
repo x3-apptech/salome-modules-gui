@@ -92,9 +92,8 @@
 #include <QApplication>
 #include <QListView>
 #include <QLineEdit>
-// GDD
 #include <QUrl>
-#include <QDesktopServices>
+#include <QStandardPaths>
 
 /*!
   \brief Defines extension behavior.
@@ -130,11 +129,10 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
   if ( parent )
     setWindowIcon( parent->windowIcon() );
 
-  // GDD
-  myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)));
-  myUrls.insert(0,QUrl::fromLocalFile(QStandardPaths::writableLocation(QStandardPaths::HomeLocation)));
-
-  setSidebarUrls(myUrls);
+  // standard side bar URLs
+  myUrls << QStandardPaths::writableLocation( QStandardPaths::ApplicationsLocation );
+  myUrls << QStandardPaths::writableLocation( QStandardPaths::HomeLocation );
+  myUrls << qgetenv( "DATA_DIR" );
 
   // add quick directories widgets
   if ( showQuickDir ) {
@@ -155,15 +153,12 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
       if ( dirList.isEmpty() ) 
         dirList << QDir::homePath();
 
-      // GDD
       for ( int i = 0; i < dirList.count(); i++ ) {
+        // add to combo box
         myQuickCombo->addItem( dirList[i] );
-        myUrls.append(QUrl::fromLocalFile(dirList[i]));
+        // add to side bar
+        myUrls << dirList[i];
       }
-
-      // GDD
-      setSidebarUrls(myUrls);
-      
     }
     else {
       delete myQuickLab;    myQuickLab = 0;
@@ -171,6 +166,9 @@ SUIT_FileDlg::SUIT_FileDlg( QWidget* parent, bool open, bool showQuickDir, bool 
       delete myQuickButton; myQuickButton = 0;
     }
   }
+
+  // update side bar
+  updateSideBar();
 
   setAcceptMode( open ? AcceptOpen: AcceptSave );
   setWindowTitle( open ? tr( "INF_DESK_DOC_OPEN" ) : tr( "INF_DESK_DOC_SAVE" ) );
@@ -682,14 +680,18 @@ void SUIT_FileDlg::addQuickDir()
     }
 
     if ( !found ) {
-      dirList.append( dp );
+      dirList << dp;
       resMgr->setValue( "FileDlg", "QuickDirList", dirList.join( ";" ) );
-      // GDD
+
       if ( !emptyAndHome ) {
+        // add to combo box
         myQuickCombo->addItem( dp );
-        myUrls.append(QUrl::fromLocalFile( dp ));
-        setSidebarUrls(myUrls);
+        // add to side bar
+        myUrls << dp;
       }
+
+      // update side bar
+      updateSideBar();
     }
   }
 }
@@ -719,6 +721,21 @@ void SUIT_FileDlg::polish()
         it != views.end(); ++it ) {
     (*it)->setViewMode( QListView::ListMode );
   }
+}
+
+/*!
+  \brief Update side bar URLs list
+*/
+void SUIT_FileDlg::updateSideBar()
+{
+  QList<QUrl> urls;
+
+  foreach ( QString url, myUrls ) {
+    if ( !url.isEmpty() && QFileInfo( url ).exists() )
+      urls << QUrl::fromLocalFile( url );
+  }
+
+  setSidebarUrls( urls );
 }
 
 /*!

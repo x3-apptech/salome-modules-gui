@@ -25,10 +25,6 @@
     <parameter name="visibility_column_id_3" value="false" />
     <parameter name="visibility_column_id_4" value="false" />
   </section>
-  <section name="FileDlg">
-    <!-- "Open/Save File" dialog box preferences-->
-    <parameter name="QuickDirList" value="${DATA_DIR}" />
-  </section>
   <section name="Study">
     <!-- General study settings -->
     <parameter name="autoload_light_modules"     value="true" />
