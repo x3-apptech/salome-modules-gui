@@ -178,6 +178,8 @@ public:
 
   void             refresh();
 
+  QString          language( const QString& = QString() ) const;
+
 protected:
   virtual QString  defaultLanguage() const;
 

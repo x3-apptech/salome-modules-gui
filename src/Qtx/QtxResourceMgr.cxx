@@ -2686,6 +2686,35 @@ QString QtxResourceMgr::defaultLanguage() const
   return "";
 }
 
+
+/*!
+  \brief Select language to be used.
+  \param preferableLanguage preferable language name (if empty, default language is used)
+*/
+QString QtxResourceMgr::language( const QString& preferableLanguage ) const
+{
+  // first try to select preferable language probably specified via the parameter
+  QString lang = preferableLanguage;
+
+  // then try default language; selection of default language can be redefined in successors
+  if ( lang.isEmpty() )
+    lang = defaultLanguage();
+
+  // then try language as defined in the preferences files
+  if ( lang.isEmpty() )
+    value( langSection(), "language", lang );
+
+  // finally try strongly hardcoded Ennglish
+  if ( lang.isEmpty() )
+  {
+    lang = QString( "en" );
+    qWarning() << "QtxResourceMgr: Language not specified. Assumed:" << lang;
+  }
+
+  return lang;
+}
+
+
 /*!
   \brief Load translation files according to the specified language.
 
@@ -2705,28 +2734,18 @@ QString QtxResourceMgr::defaultLanguage() const
   see userFileName()). To avoid loading user settings, pass \c false as first parameter.
 
   \param pref parameter which defines translation context (for example, package name)
-  \param l language name
+  \param preferableLanguage language name
 
   \sa resSection(), langSection(), loadTranslators()
 */
-void QtxResourceMgr::loadLanguage( const QString& pref, const QString& l )
+void QtxResourceMgr::loadLanguage( const QString& pref, const QString& preferableLanguage )
 {
   initialize( true );
 
   QMap<QChar, QString> substMap;
   substMap.insert( 'A', appName() );
 
-  QString lang = l;
-  if ( lang.isEmpty() )
-    lang = defaultLanguage();
-  if ( lang.isEmpty() )
-    value( langSection(), "language", lang );
-
-  if ( lang.isEmpty() )
-  {
-    lang = QString( "en" );
-    qWarning() << "QtxResourceMgr: Language not specified. Assumed:" << lang;
-  }
+  QString lang = language( preferableLanguage );
 
   substMap.insert( 'L', lang );
 
