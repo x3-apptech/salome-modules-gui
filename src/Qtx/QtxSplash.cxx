@@ -272,9 +272,49 @@ void QtxSplash::setError( const QString& error, const QString& title, const int 
                            tr( "&OK" ) );
   }
   else {
-    printf( "QtxSplash::error: %s\n",error.toLatin1().constData() );
+    qCritical( "QtxSplash::error: %s\n", qPrintable( error ) );
   }
 }
+
+/*!
+  \brief Set fixed size of splash screen.
+
+  If size is not set explicitly, it is inherited from image being used.
+  Otherwise, image is rescaled to given size.
+
+  Width and height can be given indepdently; not given dimension
+  (zero of negative value) is ignored.
+
+  \param size fixed splash size
+  \sa fixedSize()
+*/
+void QtxSplash::setSize( const QSize& size )
+{
+  mySize = size;
+  setPixmap( pixmap() );
+}
+
+/*!
+  \brief This is an overloaded function.
+
+  \param w width
+  \param h height
+  \sa fixedSize()
+*/
+void QtxSplash::setSize( int w, int h )
+{
+  setSize( QSize( w, h ) );
+}
+
+/*!
+  \brief Get fixed splash screen's size if it was set.
+  \sa setSize()
+*/
+QSize QtxSplash::fixedSize() const
+{
+  return mySize;
+}
+
 
 /*!
   \brief Set the pixmap that will be used as the splash screen's image.
@@ -283,6 +323,9 @@ void QtxSplash::setError( const QString& error, const QString& title, const int 
 */
 void QtxSplash::setPixmap( const QPixmap& pixmap )
 {
+  if ( pixmap.isNull() )
+    return;
+
   if ( pixmap.hasAlpha() ) {
     QPixmap opaque( pixmap.size() );
     QPainter p( &opaque );
@@ -294,6 +337,18 @@ void QtxSplash::setPixmap( const QPixmap& pixmap )
   else {
     myPixmap = pixmap;
   }
+
+  int width = fixedSize().width();
+  int height = fixedSize().height();
+  if ( width > 0 || height > 0 ) {
+    QImage img = myPixmap.toImage();
+    img = img.scaled( width > 0 ? width : myPixmap.width(),
+                      height > 0 ? height : myPixmap.height(),
+                      Qt::IgnoreAspectRatio,
+                      Qt::SmoothTransformation );
+    myPixmap = QPixmap::fromImage( img );
+  }
+
   QRect r( 0, 0, myPixmap.size().width(), myPixmap.size().height() );
   resize( myPixmap.size() );
   move( QApplication::desktop()->screenGeometry().center() - r.center() );
@@ -856,7 +911,11 @@ void QtxSplash::repaint()
 void QtxSplash::readSettings( QtxResourceMgr* resMgr, const QString& section )
 {
   QString resSection = section.isEmpty() ? QString( "splash" ) : section;
-  
+
+  // size
+  setSize( resMgr->integerValue( resSection, "width", 0 ),
+           resMgr->integerValue( resSection, "height", 0 ) );
+
   // pixmap
   QString pxname;
   if ( resMgr->value( resSection, "image", pxname ) ) {

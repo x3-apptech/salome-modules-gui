@@ -64,6 +64,10 @@ public:
   static void       setStatus( const QString&, const int = -1 );
   static void       setError( const QString&, const QString& = QString(), const int = -1 );
   
+  void              setSize( const QSize& );
+  void              setSize( int, int );
+  QSize             fixedSize() const;
+
   void              setPixmap( const QPixmap& );
   QPixmap           pixmap() const;
   
@@ -152,7 +156,8 @@ private:
       
 private:
   static QtxSplash* mySplash;
-  
+
+  QSize             mySize;             //!< splash size
   QPixmap           myPixmap;           //!< splash pixmap
   QString           myInfo;             //!< constant info
   QString           myMessage;          //!< current status message
