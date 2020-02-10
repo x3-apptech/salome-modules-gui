@@ -150,9 +150,13 @@ public:
   {
   public:
     Localizer();
+    Localizer( int, const char* );
     ~Localizer();
   private:
-    QString myCurLocale;
+    void init( int, const char* );
+  private:
+    int myCategory;
+    QString myOriginalLocale;
   };
 
   class QTX_EXPORT CmdLineArgs

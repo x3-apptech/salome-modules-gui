@@ -1344,8 +1344,9 @@ void QtxResourceMgr::initialize( const bool autoLoad ) const
 
   QtxResourceMgr* that = (QtxResourceMgr*)this;
 
-  if ( !userFileName( appName() ).isEmpty() )
-    that->myResources.append( new Resources( that, userFileName( appName() ) ) );
+  QString userFile = userFileName( appName() );
+  if ( !userFile.isEmpty() )
+    that->myResources.append( new Resources( that, userFile ) );
 
   that->myHasUserValues = myResources.count() > 0;
 
@@ -2987,7 +2988,7 @@ QString QtxResourceMgr::userFileName( const QString& appName, const bool /*for_l
 {
   QString fileName;
   QString pathName = QDir::homePath();
-  QString cfgAppName = QApplication::applicationName();
+  QString cfgAppName = QApplication::organizationName();
   if ( !cfgAppName.isEmpty() )
     pathName = Qtx::addSlash( Qtx::addSlash( pathName ) + QString( ".config" ) ) + cfgAppName;
 

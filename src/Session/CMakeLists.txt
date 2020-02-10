@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+INCLUDE(UseQtExt)
+
 # --- options ---
 
 # additional include directories
@@ -81,6 +83,13 @@ SET(SalomeSession_HEADERS
   Session_Session_i.hxx
 )
 
+# --- resources ---
+
+# resource files / to be processed by lrelease
+SET(_ts_RESOURCES
+  resources/Session_msg_fr.ts
+)
+
 # --- sources ---
 
 # sources / to compile
@@ -102,3 +111,4 @@ TARGET_LINK_LIBRARIES(SALOME_Session_Server ${_link_LIBRARIES} SalomeSession)
 INSTALL(TARGETS SALOME_Session_Server EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_BINS})
 
 INSTALL(FILES ${SalomeSession_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
+QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")

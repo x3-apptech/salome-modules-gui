@@ -57,6 +57,7 @@
     <parameter name="SVTK"          value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="ToolsGUI"      value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
     <parameter name="LogWindow"     value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
+    <parameter name="Session"       value="${GUI_ROOT_DIR}/share/salome/resources/gui"/>
   </section>
   <section name="desktop" >
     <!-- Default GUI desktop state, position, size -->

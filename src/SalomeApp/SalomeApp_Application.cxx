@@ -226,9 +226,10 @@ void SalomeApp_Application::start()
     QString hdffile;
     QStringList pyfiles;
 
-    for (int i = 1; i < qApp->arguments().size(); i++) {
+    QStringList args = QApplication::arguments();
+    for (int i = 1; i < args.count(); i++) {
       QRegExp rxs ("--study-hdf=(.+)");
-      if ( rxs.indexIn( qApp->arguments()[i] ) >= 0 && rxs.capturedTexts().count() > 1 ) {
+      if ( rxs.indexIn( args[i] ) >= 0 && rxs.capturedTexts().count() > 1 ) {
         QString file = rxs.capturedTexts()[1];
         QFileInfo fi ( file );
         QString extension = fi.suffix().toLower();
@@ -237,7 +238,7 @@ void SalomeApp_Application::start()
       }
       else {
         QRegExp rxp ("--pyscript=\\[(.+)\\]");
-        if ( rxp.indexIn( qApp->arguments()[i] ) >= 0 && rxp.capturedTexts().count() > 1 ) {
+        if ( rxp.indexIn( args[i] ) >= 0 && rxp.capturedTexts().count() > 1 ) {
           // pyscript
           QStringList dictList = rxp.capturedTexts()[1].split("},", QString::SkipEmptyParts);
           for (int k = 0; k < dictList.count(); ++k) {

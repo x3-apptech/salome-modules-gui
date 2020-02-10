@@ -1739,9 +1739,14 @@ Qtx::BackgroundData Qtx::stringToBackground( const QString& str )
   
   To use the Localizer class, just create a local variable in the beginning
   of the code where you need to read / write data from textual file(s).
-  The constructor of the class forces setting "C" locale temporariy.
+  The constructor of the class forces setting "C" locale temporarily.
   The destructor switches back to the initial locale.
 
+  There are two ways to create a localizer.
+  First constructor accepts category and locale value to be forced as parameters.
+  The second constructor does not take parameters, and is just a shortcut to the
+  first one, setting LC_NUMERIC as a category and "C" as a locale to force.
+  
   \code
   Qtx::Localizer loc;
   readSomething();
@@ -1750,12 +1755,30 @@ Qtx::BackgroundData Qtx::stringToBackground( const QString& str )
 */
 
 /*!
-  \brief Constructor. Forces "C" locale to be set.
+  \brief Default constructor. Forces "C" locale to be set as LC_NUMERIC.
 */
 Qtx::Localizer::Localizer()
 {
-  myCurLocale = setlocale( LC_NUMERIC, 0 );
-  setlocale( LC_NUMERIC, "C" );
+  init( LC_NUMERIC, "C" );
+}
+
+/*!
+  \brief Default constructor. Forces "C" locale to be set as LC_NUMERIC.
+*/
+Qtx::Localizer::Localizer( int category, const char* locale )
+{
+  init( category, locale );
+}
+
+/*!
+  \brief Internal initialization
+  \internal
+*/
+void Qtx::Localizer::init( int category, const char* locale )
+{
+  myCategory = category;
+  myOriginalLocale = setlocale( category, NULL );
+  setlocale( category, locale );
 }
 
 /*!
@@ -1763,7 +1786,7 @@ Qtx::Localizer::Localizer()
 */
 Qtx::Localizer::~Localizer()
 {
-  setlocale( LC_NUMERIC, myCurLocale.toLatin1().constData() );
+  setlocale( LC_NUMERIC, myOriginalLocale.toLatin1().constData() );
 }
 
 /*!

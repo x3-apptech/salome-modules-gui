@@ -288,10 +288,12 @@ void Session_ServerCheck::run()
     }
 
     if ( i == myAttempts-1 ) {
-      setError( tr( "Unable to contact the naming service.\n" ) );
+      setError( tr( "Unable to contact the naming service." ) + "\n" );
       return;
     }
   }
+
+  QString errfmt = "\n%1";
 
   // 2. Check registry server
   for ( int i = 0; i < myAttempts ; i++ ) {
@@ -337,7 +339,7 @@ void Session_ServerCheck::run()
     }
 
     if ( i == myAttempts-1 ) {
-      setError( tr( "Registry server is not found.\n%1" ).arg ( error ) );
+      setError( tr( "Registry server is not found." ) + errfmt.arg( error ) );
       return;
     }
   }
@@ -386,7 +388,7 @@ void Session_ServerCheck::run()
     }
 
     if ( i == myAttempts-1 ) {
-      setError( tr( "Study server is not found.\n%1" ).arg ( error ) );
+      setError( tr( "Study server is not found." ) + errfmt.arg( error ) );
       return;
     }
   }
@@ -435,7 +437,7 @@ void Session_ServerCheck::run()
     }
 
     if ( i == myAttempts-1 ) {
-      setError( tr( "Module catalogue server is not found.\n%1" ).arg ( error ) );
+      setError( tr( "Module catalogue server is not found." ) + errfmt.arg( error ) );
       return;
     }
   }
@@ -484,7 +486,7 @@ void Session_ServerCheck::run()
     }
 
     if ( i == myAttempts-1 ) {
-      setError( tr( "Session server is not found.\n%1" ).arg ( error ) );
+      setError( tr( "Session server is not found." ) + errfmt.arg( error ) );
       return;
     }
   }
@@ -535,7 +537,7 @@ void Session_ServerCheck::run()
       }
       
       if ( i == myAttempts-1 ) {
-        setError( tr( "C++ container is not found.\n%1" ).arg ( error ) );
+        setError( tr( "C++ container is not found." ) + errfmt.arg( error ) );
         return;
       }
     }
@@ -587,7 +589,7 @@ void Session_ServerCheck::run()
       }
 
       if ( i == myAttempts-1 ) {
-        setError( tr( "Python container is not found.\n%1" ).arg ( error ) );
+        setError( tr( "Python container is not found." ) + errfmt.arg( error ) );
         return;
       }
     }
@@ -639,7 +641,7 @@ void Session_ServerCheck::run()
       }
     
       if ( i == myAttempts-1 ) {
-        setError( tr( "Supervision container is not found.\n%1" ).arg ( error ) );
+        setError( tr( "Supervision container is not found." ) + errfmt.arg( error ) );
         return;
       }
     }

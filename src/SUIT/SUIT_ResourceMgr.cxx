@@ -82,12 +82,11 @@ QString SUIT_ResourceMgr::userFileName( const QString& appName, const bool for_l
 {
   QString pathName;
 
-  QStringList arguments;
-  if ( SUIT_Session::session() ) arguments = SUIT_Session::session()->arguments();
   // Try config file, given in arguments
-  for (int i = 1; i < arguments.count(); i++) {
+  QStringList args = QApplication::arguments();
+  for (int i = 1; i < args.count(); i++) {
     QRegExp rx ("--resources=(.+)");
-    if ( rx.indexIn( arguments[i] ) >= 0 && rx.captureCount() > 0 ) {
+    if ( rx.indexIn( args[i] ) >= 0 && rx.captureCount() > 0 ) {
       QString file = rx.cap(1);
       QFileInfo fi (file);
       pathName = fi.absoluteFilePath();
@@ -185,15 +184,16 @@ long SUIT_ResourceMgr::userFileId( const QString& ) const
 */
 QString SUIT_ResourceMgr::defaultLanguage() const
 {
-  QStringList arguments;
   QString language;
-  if ( SUIT_Session::session() ) arguments = SUIT_Session::session()->arguments();
+
   // Try language, given in arguments
-  for (int i = 1; i < arguments.count(); i++) {
+  QStringList args = QApplication::arguments();
+  for (int i = 1; i < args.count(); i++) {
     QRegExp rx ("--language=(.+)");
-    if ( rx.indexIn( arguments[i] ) >= 0 && rx.captureCount() > 0 ) {
+    if ( rx.indexIn( args[i] ) >= 0 && rx.captureCount() > 0 ) {
       language = rx.cap(1);
     }
   }
+
   return language;
 }
