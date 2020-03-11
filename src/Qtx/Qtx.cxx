@@ -1763,7 +1763,7 @@ Qtx::Localizer::Localizer()
 }
 
 /*!
-  \brief Default constructor. Forces "C" locale to be set as LC_NUMERIC.
+  \brief Constructor. Forces \a locale to be set for \a category.
 */
 Qtx::Localizer::Localizer( int category, const char* locale )
 {
@@ -1786,7 +1786,7 @@ void Qtx::Localizer::init( int category, const char* locale )
 */
 Qtx::Localizer::~Localizer()
 {
-  setlocale( LC_NUMERIC, myOriginalLocale.toLatin1().constData() );
+  setlocale( myCategory, myOriginalLocale.toLatin1().constData() );
 }
 
 /*!
