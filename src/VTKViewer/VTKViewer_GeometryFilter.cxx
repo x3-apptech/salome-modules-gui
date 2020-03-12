@@ -449,7 +449,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 6; ++edgeID )
             {
-              const int *edgeVerts = vtkTetra::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkTetra::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -475,7 +475,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 4; faceId++)
             {
               faceIds->Reset();
-              const int *faceVerts = vtkTetra::GetFaceArray(faceId);
+              const vtkIdType *faceVerts = vtkTetra::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -506,7 +506,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 12; ++edgeID )
             {
-              const int *edgeVerts = vtkVoxel::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkVoxel::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -530,7 +530,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 6; faceId++)
             {
               faceIds->Reset();
-              const int *faceVerts = vtkVoxel::GetFaceArray(faceId);
+              const vtkIdType*faceVerts = vtkVoxel::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -564,7 +564,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 12; ++edgeID )
             {
-              const int *edgeVerts = vtkHexahedron::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkHexahedron::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -590,7 +590,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 6; faceId++)
             {
               faceIds->Reset();
-              const int *faceVerts = vtkHexahedron::GetFaceArray(faceId);
+              const vtkIdType *faceVerts = vtkHexahedron::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -622,7 +622,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 9; ++edgeID )
             {
-              const int *edgeVerts = vtkWedge::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkWedge::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -646,7 +646,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 5; faceId++)
             {
               faceIds->Reset();
-              const int *faceVerts = vtkWedge::GetFaceArray(faceId);
+              const vtkIdType *faceVerts = vtkWedge::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
@@ -685,7 +685,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 18; ++edgeID )
             {
-              const int *edgeVerts = vtkHexagonalPrism::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkHexagonalPrism::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -708,7 +708,7 @@ VTKViewer_GeometryFilter
 #endif
             for (faceId = 0; faceId < 8; faceId++)
             {
-              const int *faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
+              const vtkIdType *faceVerts = vtkHexagonalPrism::GetFaceArray(faceId);
               faceIds->Reset();
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
@@ -750,7 +750,7 @@ VTKViewer_GeometryFilter
             aCellType = VTK_LINE;
             for ( int edgeID = 0; edgeID < 8; ++edgeID )
             {
-              const int *edgeVerts = vtkPyramid::GetEdgeArray( edgeID );
+              const vtkIdType *edgeVerts = vtkPyramid::GetEdgeArray( edgeID );
               if ( toShowEdge( pts[edgeVerts[0]], pts[edgeVerts[1]], cellId, input ))
               {
                 aNewPts[0] = pts[edgeVerts[0]];
@@ -774,7 +774,7 @@ VTKViewer_GeometryFilter
             for (faceId = 0; faceId < 5; faceId++)
             {
               faceIds->Reset();
-              const int *faceVerts = vtkPyramid::GetFaceArray(faceId);
+              const vtkIdType *faceVerts = vtkPyramid::GetFaceArray(faceId);
               faceIds->InsertNextId(pts[faceVerts[0]]);
               faceIds->InsertNextId(pts[faceVerts[1]]);
               faceIds->InsertNextId(pts[faceVerts[2]]);
