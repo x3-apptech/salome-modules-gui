@@ -107,9 +107,8 @@ VTKViewer_Triangulator
   myPoints->Modified(); // the VTK bug
 
   vtkIdType aNumPts;
-  vtkIdType const *tmp(nullptr);
+  vtkIdType const *tmp(myPointIds);
   theInput->GetCellPoints(theCellId, aNumPts, tmp);
-  std::copy(tmp,tmp+aNumPts,myPointIds);
   if ( aNumPts > 0 ) {
     double anAbsoluteCoord[3];
     myPoints->SetNumberOfPoints(aNumPts);

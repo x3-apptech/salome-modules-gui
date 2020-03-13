@@ -28,7 +28,6 @@
 #include "VTKViewer_ConvexTool.h"
 #include "VTKViewer_ArcBuilder.h"
 
-#include <vtkSmartPointer.h>
 #include <vtkCellArray.h>
 #include <vtkCellData.h>
 #include <vtkGenericCell.h>
@@ -42,13 +41,15 @@
 #include <vtkPolyData.h>
 #include <vtkPolygon.h>
 #include <vtkPyramid.h>
+#include <vtkSmartPointer.h>
+#include <vtkStaticCellLinks.h>
 #include <vtkStructuredGrid.h>
 #include <vtkTetra.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkVersion.h>
 #include <vtkVoxel.h>
 #include <vtkWedge.h>
-#include <vtkVersion.h>
 
 #include <algorithm>
 #include <iterator>
@@ -118,25 +119,24 @@ VTKViewer_GeometryFilter
 static inline bool toShowEdge( vtkIdType id1, vtkIdType id2, vtkIdType cellId, vtkUnstructuredGrid* input )
 {
   // return true if the given cell is the 1st among cells including the edge
-  vtkCellLinks * links = static_cast<vtkCellLinks *>(input->GetCellLinks());
+  vtkStaticCellLinks * links = static_cast<vtkStaticCellLinks *>(input->GetCellLinks());
   if ( !links ) {
     input->BuildLinks();
-    links = static_cast<vtkCellLinks *>(input->GetCellLinks());
+    links = static_cast<vtkStaticCellLinks *>(input->GetCellLinks());
   }
   if ( id1 < id2 )
     std::swap( id1, id2 );
   vtkIdType *cells = links->GetCells( id1 );
 
   // among cells, look for a cell including the edge
-  vtkIdType *cellPts, npts, iCell = 0;
+  vtkIdType npts, iCell = 0;
+  vtkIdType const *cellPts;
   bool found = false;
   while ( !found )
   {
     if ( cells[iCell] == cellId )
       return true;
-    vtkIdType const *tmp(nullptr);
-    input->GetCellPoints( cells[iCell], npts, tmp );
-    std::copy(tmp, tmp+npts, cellPts);
+    input->GetCellPoints( cells[iCell], npts, cellPts );
     for ( vtkIdType i = 0; i < npts && !found; ++i )
       found = ( cellPts[i] == id2 );
     iCell += ( !found );
