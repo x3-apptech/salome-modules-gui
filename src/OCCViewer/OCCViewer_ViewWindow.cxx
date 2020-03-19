@@ -2973,14 +2973,16 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
         }
         Quantity_Color aColor = Quantity_Color( cR, cG, cB, Quantity_TOC_RGB );
         if( aType == V3d_DIRECTIONAL ) {
-          Handle(V3d_DirectionalLight) aLight = new V3d_DirectionalLight( myModel->getViewer3d() );
+          Handle(V3d_DirectionalLight) aLight = new V3d_DirectionalLight();
+          myModel->getViewer3d()->AddLight( aLight );
           aLight->SetDirection( aX, aY, aZ );
           aLight->SetColor( aColor );
           aLight->SetHeadlight( isHeadlight );
           myModel->getViewer3d()->SetLightOn( aLight );
         }
         else if( aType == V3d_POSITIONAL ) {
-          Handle(V3d_PositionalLight) aLight = new V3d_PositionalLight( myModel->getViewer3d(), aX, aY, aZ, aColor.Name() );
+          Handle(V3d_PositionalLight) aLight = new V3d_PositionalLight( gp_Pnt(aX, aY, aZ), aColor.Name() );
+          myModel->getViewer3d()->AddLight( aLight );
           aLight->SetHeadlight( isHeadlight );
           myModel->getViewer3d()->SetLightOn( aLight );
         }

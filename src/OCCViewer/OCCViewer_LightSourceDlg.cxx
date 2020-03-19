@@ -286,14 +286,16 @@ void OCCViewer_LightSourceDlg::initParam( bool theIsDefault )
     aLight = myModel->getViewer3d()->DefinedLight();
     if ( aLight->Type() == V3d_DIRECTIONAL ) {
       myDirLight = Handle(V3d_DirectionalLight)::DownCast( aLight );
-      myPosLight = new V3d_PositionalLight( myModel->getViewer3d(), 0, 0, 0 );
+      myPosLight = new V3d_PositionalLight( gp_Pnt(0, 0, 0) );
+      myModel->getViewer3d()->AddLight( myPosLight );
       myDirType->setChecked( true );
       myStackedLayout->setCurrentIndex(0);
       break;
     }
     if ( aLight->Type() == V3d_POSITIONAL ) {
       myPosLight = Handle(V3d_PositionalLight)::DownCast( aLight );
-      myDirLight = new V3d_DirectionalLight( myModel->getViewer3d() );
+      myDirLight = new V3d_DirectionalLight();
+      myModel->getViewer3d()->AddLight( myDirLight );
       myPosType->setChecked( true );
       myStackedLayout->setCurrentIndex(1);
       break;

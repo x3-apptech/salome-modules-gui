@@ -1142,11 +1142,14 @@ void OCCViewer_Viewer::setDefaultLights()
   double aDz = SUIT_Session::session()->resourceMgr()->doubleValue( "OCCViewer", "light_dz", -1.0 );
 
   Handle(V3d_DirectionalLight) aLight =
-    new V3d_DirectionalLight( myV3dViewer, V3d_Zneg, OCCViewer::color( aColor ).Name(), Standard_True );
+    new V3d_DirectionalLight( V3d_Zneg, OCCViewer::color( aColor ).Name(), Standard_True );
+  myV3dViewer->AddLight( aLight );
   if( !( aDx == 0 && aDy == 0 && aDz == 0 ) )
     aLight->SetDirection( aDx, aDy, aDz );
   myV3dViewer->SetLightOn( aLight );
-  myV3dViewer->SetLightOn( new V3d_AmbientLight( myV3dViewer ) );
+  Handle(V3d_AmbientLight) ambLight = new V3d_AmbientLight();
+  myV3dViewer->AddLight( ambLight );
+  myV3dViewer->SetLightOn( ambLight );
 }
 
 /*!
