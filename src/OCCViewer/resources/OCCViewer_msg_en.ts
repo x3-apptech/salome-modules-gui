@@ -238,19 +238,27 @@
     </message>
     <message>
         <source>MNU_RECTANGLE_SELECTION_STYLE</source>
-        <translation>Advanced selection by polygon</translation>
+        <translation>Selection by rectangle</translation>
     </message>
     <message>
         <source>DSC_RECTANGLE_SELECTION_STYLE</source>
-        <translation>Advanced selection by polygon</translation>
+        <translation>Selection by rectangle</translation>
+    </message>
+    <message>
+        <source>MNU_POLYGON_SELECTION_STYLE</source>
+        <translation>Selection by polygon</translation>
+    </message>
+    <message>
+        <source>DSC_POLYGON_SELECTION_STYLE</source>
+        <translation>Selection by polygon</translation>
     </message>
     <message>
         <source>MNU_CIRCLE_SELECTION_STYLE</source>
-        <translation>Advanced selection by circle</translation>
+        <translation>Selection by circle</translation>
     </message>
     <message>
         <source>DSC_CIRCLE_SELECTION_STYLE</source>
-        <translation>Advanced selection by circle</translation>
+        <translation>Selection by circle</translation>
     </message>
     <message>
         <source>MNU_ENABLE_PRESELECTION</source>

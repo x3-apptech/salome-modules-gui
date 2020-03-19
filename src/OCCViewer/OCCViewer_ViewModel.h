@@ -29,6 +29,7 @@
 
 #include "OCCViewer.h"
 #include "OCCViewer_ClipPlane.h"
+#include "OCCViewer_ViewWindow.h"
 
 #include "Qtx.h"
 #include "SUIT_ViewModel.h"
@@ -184,8 +185,8 @@ public:
   int                             stereoType() const;
   void                            setStereoType( const int );
 
-  int                             selectionStyle() const;
-  void                            setSelectionStyle(const int);
+  OCCViewer_ViewWindow::SelectionStyle selectionStyle() const;
+  void                            setSelectionStyle(OCCViewer_ViewWindow::SelectionStyle);
 
   int                             anaglyphFilter() const;
   void                            setAnaglyphFilter( const int );
@@ -288,7 +289,7 @@ protected:
   int                             myAnaglyphFilter;
   int                             myStereographicFocusType;
   int                             myInterocularDistanceType;
-  int                             mySelectionStyle;
+  OCCViewer_ViewWindow::SelectionStyle mySelectionStyle;
 
   double                          myStereographicFocusValue;
   double                          myInterocularDistanceValue;

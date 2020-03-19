@@ -234,6 +234,7 @@ void OCCViewer_RectSketcher::onDeactivate()
   delete (QRect*)mypData;
   mypData = 0;
   mypRectRB->clearGeometry();
+  mypRectRB->hide();
 }
 
 bool OCCViewer_RectSketcher::onKey( QKeyEvent* e )
@@ -316,7 +317,7 @@ OCCViewer_PolygonSketcher::OCCViewer_PolygonSketcher( OCCViewer_ViewWindow* vw, 
   myDelButton     ( 0 ),
   myMode          ( Poligone )
 {
-  mySketchButton = Qt::RightButton;
+  mySketchButton = Qt::LeftButton;
   if ( vw )
   {
     OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
@@ -357,42 +358,81 @@ void OCCViewer_PolygonSketcher::onActivate()
 
 void OCCViewer_PolygonSketcher::onDeactivate()
 {
-  if ( mypPolyRB )
-    mypPolyRB->clearGeometry();  
-  if (mypCircleRB)
+  if (mypPolyRB) {
+    mypPolyRB->clearGeometry();
+    mypPolyRB->hide();
+  }
+  if (mypCircleRB) {
     mypCircleRB->clearGeometry();
+    mypCircleRB->hide();
+  }
   ((QPolygon*)mypData)->clear();
 }
 
-bool OCCViewer_PolygonSketcher::onKey( QKeyEvent* e )
+bool OCCViewer_PolygonSketcher::onKey(QKeyEvent* e)
 {
-  if ( e->key() == Qt::Key_Escape )
+  int aKey = e->key();
+  if (aKey == Qt::Key_Escape)
   {
     myResult = Reject;
     return true;
   }
-  else if ( e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return )
+  else if (aKey == Qt::Key_Enter || aKey == Qt::Key_Return)
   {
     QPolygon* points = (QPolygon*)data();
-    if ( points->count() )
+    if (points->count())
     {
-      QPoint last = points->point( points->count() - 1 );
-      if ( last != myCurr )
+      QPoint last = points->point(points->count() - 1);
+      if (last != myCurr)
       {
-        points->resize( points->count() + 1 );
-        points->setPoint( points->count() - 1, myCurr );
+        points->resize(points->count() + 1);
+        points->setPoint(points->count() - 1, myCurr);
       }
     }
     myResult = Accept;
     return true;
   }
-  else if ( e->key() == Qt::Key_Backspace && e->type() == QEvent::KeyRelease )
+  else if (aKey == Qt::Key_Backspace && e->type() == QEvent::KeyRelease)
   {
     QPolygon* points = (QPolygon*)data();
-    if ( points->count() > 1 )
-      points->resize( points->count() - 1 );
-    onMouse( 0 );
+    if (points->count() > 1)
+      points->resize(points->count() - 1);
+    onMouse(0);
     return true;
+  }
+  else if (aKey == Qt::Key_Space && e->type() == QEvent::KeyRelease) 
+  {
+    OCCViewer_ViewPort3d* avp = mypViewWindow->getViewPort();
+    bool closed = false;
+    QPolygon* points = (QPolygon*)data();
+    bool valid = avp->rect().contains(myCurr);
+    if (!myStart.isNull())
+    {
+      QRect aRect(myStart.x() - myToler.width(), myStart.y() - myToler.height(),
+        2 * myToler.width(), 2 * myToler.height());
+      closed = aRect.contains(myCurr);
+    }
+    valid = valid && isValid(points, myCurr);
+    if (closed && !valid)
+      closed = false;
+    if (closed)
+      myResult = Accept;
+    else
+    {
+      if (myStart.isNull())
+        myStart = myCurr;
+      else
+      {
+        QPoint last = points->point(points->count() - 1);
+        if (last != myCurr && valid)
+        {
+          points->resize(points->count() + 1);
+          points->setPoint(points->count() - 1, myCurr);
+        }
+        if (valid && myDbl)
+          myResult = Accept;
+      }
+    }
   }
 
   return true;
@@ -437,27 +477,6 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
                                                    e->globalPos(), e->button(), 
                                                    e->buttons(), e->modifiers() ) );
-  }
-  else if ( e->type() == QEvent::MouseButtonRelease && ( e->button() & myAddButton ) )
-  {
-    if ( closed )
-      myResult = Accept;
-    else
-    {
-      if ( myStart.isNull() )
-        myStart = myCurr;
-      else
-      {
-        QPoint last = points->point( points->count() - 1 );
-        if ( last != myCurr && valid )
-        {
-          points->resize( points->count() + 1 );
-          points->setPoint( points->count() - 1, myCurr );
-        }
-        if ( valid && myDbl )
-          myResult = Accept;
-      }
-    }
   }
   else if ( ( e->type() == QEvent::MouseButtonRelease && ( e->button() & myDelButton ) ) ||
             ( e->type() == QEvent::MouseButtonDblClick && ( e->button() & myDelButton ) ) )

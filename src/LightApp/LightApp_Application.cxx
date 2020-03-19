@@ -1650,7 +1650,7 @@ SUIT_ViewManager* LightApp_Application::createViewManager( const QString& vmType
                                resMgr->doubleValue( "OCCViewer", "focus_value", vm->stereographicFocusValue() ));
     vm->setInterocularDistance( resMgr->integerValue( "OCCViewer", "iod_type", vm->interocularDistanceType() ),
                                 resMgr->doubleValue( "OCCViewer", "iod_value", vm->interocularDistanceValue() ));
-    vm->setSelectionStyle( resMgr->integerValue( "OCCViewer", "adv_selection_mode", vm->selectionStyle() ) );
+    vm->setSelectionStyle((OCCViewer_ViewWindow::SelectionStyle) resMgr->integerValue( "OCCViewer", "adv_selection_mode", vm->selectionStyle() ) );
 
     vm->setReverseStereo( resMgr->booleanValue( "OCCViewer", "reverse_stereo", vm->isReverseStereo() ) );
     vm->setVSync( resMgr->booleanValue( "OCCViewer", "enable_vsync", vm->isVSync() ) );
@@ -3355,7 +3355,7 @@ void LightApp_Application::preferencesChanged( const QString& sec, const QString
         continue;
 
       OCCViewer_Viewer* occVM = (OCCViewer_Viewer*)vm;
-      occVM->setSelectionStyle(mode);
+      occVM->setSelectionStyle((OCCViewer_ViewWindow::SelectionStyle)mode);
     }
   }
 #endif

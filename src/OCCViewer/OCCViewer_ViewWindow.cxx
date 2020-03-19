@@ -1012,45 +1012,57 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
          aButton == Qt::LeftButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
         myDrawRect = myEnableDrawMode;
         if ( myDrawRect ) {
-          drawRect();
-          if ( !myCursorIsHand )        {   // we are going to sketch a rectangle
-            QCursor handCursor (Qt::PointingHandCursor);
-            myCursorIsHand = true;
-            saveCursor();
-            myViewPort->setCursor( handCursor );
+          //drawRect();
+          //if ( !myCursorIsHand )        {   // we are going to sketch a rectangle
+          //  QCursor handCursor (Qt::PointingHandCursor);
+          //  myCursorIsHand = true;
+          //  saveCursor();
+          //  myViewPort->setCursor( handCursor );
+          //}
+          if (!mypSketcher) {
+            SelectionStyle aStyle = selectionStyle();
+            activateSketching(aStyle == RectStyle ? Rect : Polygon);
+          }
+          if (mypSketcher) {
+            if (l_mbPressEvent) {
+              QApplication::sendEvent(getViewPort(), l_mbPressEvent);
+              delete l_mbPressEvent;
+              l_mbPressEvent = 0;
+            }
+            QApplication::sendEvent(getViewPort(), theEvent);
           }
         }
         emit mouseMoving( this, theEvent );
       }
-      else if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
-                aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
-                ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
-                aButton == Qt::RightButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
-        OCCViewer_ViewSketcher* sketcher = 0;
-        QList<OCCViewer_ViewSketcher*>::Iterator it;
-        for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it )
-        {
-          OCCViewer_ViewSketcher* sk = (*it);
-          if( sk->isDefault() && sk->sketchButton() == aButton )
-            sketcher = sk;
-        }
-        if ( sketcher && myCurSketch == -1 )
-        {
-          activateSketching( sketcher->type() );
-          if ( mypSketcher )
-          {
-            myCurSketch = mypSketcher->sketchButton();
+      //else if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
+      //          aButton == Qt::RightButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
+      //          ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
+      //          aButton == Qt::RightButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
+      //  OCCViewer_ViewSketcher* sketcher = 0;
+      //  QList<OCCViewer_ViewSketcher*>::Iterator it;
+      //  for ( it = mySketchers.begin(); it != mySketchers.end() && !sketcher; ++it )
+      //  {
+      //    OCCViewer_ViewSketcher* sk = (*it);
+      //    if( sk->isDefault() && sk->sketchButton() == aButton )
+      //      sketcher = sk;
+      //  }
+      //  if ( sketcher && myCurSketch == -1 )
+      //  {
+      //    activateSketching( sketcher->type() );
+      //    if ( mypSketcher )
+      //    {
+      //      myCurSketch = mypSketcher->sketchButton();
 
-            if ( l_mbPressEvent )
-            {
-              QApplication::sendEvent( getViewPort(), l_mbPressEvent );
-              delete l_mbPressEvent;
-              l_mbPressEvent = 0;
-            }
-            QApplication::sendEvent( getViewPort(), theEvent );
-          }
-        }
-      }
+      //      if ( l_mbPressEvent )
+      //      {
+      //        QApplication::sendEvent( getViewPort(), l_mbPressEvent );
+      //        delete l_mbPressEvent;
+      //        l_mbPressEvent = 0;
+      //      }
+      //      QApplication::sendEvent( getViewPort(), theEvent );
+      //    }
+      //  }
+      //}
       else
         emit mouseMoving( this, theEvent );
     }
@@ -1134,8 +1146,7 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
     myViewPort->update();
   }
 
-  if ( l_mbPressEvent )
-  {
+  if ( l_mbPressEvent ) {
     delete l_mbPressEvent;
     l_mbPressEvent = 0;
   }
@@ -1178,11 +1189,7 @@ void OCCViewer_ViewWindow::drawRect()
 {
   if ( !myRectBand ) {
     myRectBand = new QtxRectRubberBand( myViewPort );
-    //QPalette palette;
-    //palette.setColor(myRectBand->foregroundRole(), Qt::white);
-    //myRectBand->setPalette(palette);
   }
-  //myRectBand->hide();
 
   myRectBand->setUpdatesEnabled ( false );
   QRect aRect = SUIT_Tools::makeRect(myStartX, myStartY, myCurrX, myCurrY);
@@ -1192,14 +1199,6 @@ void OCCViewer_ViewWindow::drawRect()
     myRectBand->show();
 
   myRectBand->setUpdatesEnabled ( true );
-  //myRectBand->repaint();
-
-  //myRectBand->setVisible( aRect.isValid() );
-  //if ( myRectBand->isVisible() )
-  //  myRectBand->repaint();
-  //else
-  //  myRectBand->show();
-  //myRectBand->repaint();
 }
 
 /*!
@@ -1207,13 +1206,10 @@ void OCCViewer_ViewWindow::drawRect()
 */
 void OCCViewer_ViewWindow::endDrawRect()
 {
-  //delete myRectBand;
-  //myRectBand = 0;
-  if ( myRectBand )
-    {
-      myRectBand->clearGeometry();
-      myRectBand->hide();
-    }
+  if ( myRectBand ) {
+    myRectBand->clearGeometry();
+    myRectBand->hide();
+  }
 }
 
 /*!
@@ -1488,6 +1484,12 @@ void OCCViewer_ViewWindow::createActions()
   aAction->setCheckable(true);
   toolMgr()->registerAction( aAction, RectangleSelectionStyleId);
 
+  aAction = new QtxAction(tr("MNU_POLYGON_SELECTION_STYLE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_POLY_STYLE" ) ),
+                          tr( "MNU_POLYGON_SELECTION_STYLE" ), 0, this);
+  aAction->setStatusTip(tr("DSC_POLYGON_SELECTION_STYLE"));
+  aAction->setCheckable(true);
+  toolMgr()->registerAction( aAction, PolygonSelectionStyleId);
+
   aAction = new QtxAction(tr("MNU_CIRCLE_SELECTION_STYLE"), aResMgr->loadPixmap( "OCCViewer", tr( "ICON_OCCVIEWER_CIRCLE_STYLE" ) ),
                           tr( "MNU_CIRCLE_SELECTION_STYLE" ), 0, this);
   aAction->setStatusTip(tr("DSC_CIRCLE_SELECTION_STYLE"));
@@ -1497,6 +1499,7 @@ void OCCViewer_ViewWindow::createActions()
   // - add exclusive action group
   QActionGroup* aSelectionGroup = new QActionGroup(this);
   aSelectionGroup->addAction(toolMgr()->action(RectangleSelectionStyleId));
+  aSelectionGroup->addAction(toolMgr()->action(PolygonSelectionStyleId));
   aSelectionGroup->addAction(toolMgr()->action(CircleSelectionStyleId));
   connect(aSelectionGroup, SIGNAL(triggered(QAction*)), this, SLOT(onSwitchSelectionStyle(QAction*)));
 
@@ -1571,8 +1574,13 @@ void OCCViewer_ViewWindow::createToolBar()
   toolMgr()->append( SwitchZoomingStyleId, tid );
   toolMgr()->append( SwitchPreselectionId, tid );
   toolMgr()->append( SwitchSelectionId, tid );
-  toolMgr()->append(RectangleSelectionStyleId, tid );
-  toolMgr()->append(CircleSelectionStyleId, tid );
+
+  QtxMultiAction* aSelectionAction = new QtxMultiAction(this);
+  aSelectionAction->insertAction(toolMgr()->action(RectangleSelectionStyleId));
+  aSelectionAction->insertAction(toolMgr()->action(PolygonSelectionStyleId));
+  aSelectionAction->insertAction(toolMgr()->action(CircleSelectionStyleId));
+  toolMgr()->append(aSelectionAction, tid );
+
   if( myModel->trihedronActivated() )
     toolMgr()->append( TrihedronShowId, tid );
 
@@ -2230,7 +2238,7 @@ void OCCViewer_ViewWindow::onSwitchSelectionStyle(QAction* theAction)
   // selection
   OCCViewer_ViewSketcher* aSkecher = getSketcher(Polygon);
   if (aSkecher) {
-    if (theAction == toolMgr()->action(RectangleSelectionStyleId)) {
+    if (theAction == toolMgr()->action(PolygonSelectionStyleId)) {
       aSkecher->setSketcherMode(OCCViewer_PolygonSketcher::Poligone);
     }
     else if (theAction == toolMgr()->action(CircleSelectionStyleId)) {
@@ -2239,28 +2247,32 @@ void OCCViewer_ViewWindow::onSwitchSelectionStyle(QAction* theAction)
   }
 }
 
-int OCCViewer_ViewWindow::selectionStyle() const
+/*!
+Returns currently selected selection style
+*/
+OCCViewer_ViewWindow::SelectionStyle OCCViewer_ViewWindow::selectionStyle() const
 {
-  OCCViewer_ViewSketcher* aSkecher = getSketcher(Polygon);
-  if (aSkecher) {
-    return aSkecher->sketcherMode();
-  }
-  return 0;
+  if (toolMgr()->action(PolygonSelectionStyleId)->isChecked())
+    return PolygonStyle;
+  if (toolMgr()->action(CircleSelectionStyleId)->isChecked())
+    return CyrcleStyle;
+  return RectStyle;
 }
 
-void OCCViewer_ViewWindow::setSelectionStyle(int theMode)
+void OCCViewer_ViewWindow::setSelectionStyle(SelectionStyle theMode)
 {
-  OCCViewer_ViewSketcher* aSkecher = getSketcher(Polygon);
-  if (aSkecher) {
-    aSkecher->setSketcherMode(theMode);
-    if (theMode == 0) {
-      toolMgr()->action(RectangleSelectionStyleId)->setChecked(true);
-      toolMgr()->action(CircleSelectionStyleId)->setChecked(false);
-    }
-    else {
-      toolMgr()->action(RectangleSelectionStyleId)->setChecked(false);
-      toolMgr()->action(CircleSelectionStyleId)->setChecked(true);
-    }
+  toolMgr()->action(RectangleSelectionStyleId)->setChecked(false);
+  toolMgr()->action(PolygonSelectionStyleId)->setChecked(false);
+  toolMgr()->action(CircleSelectionStyleId)->setChecked(false);
+  switch (theMode) {
+  case RectStyle:
+    toolMgr()->action(RectangleSelectionStyleId)->setChecked(true);
+    break;
+  case PolygonStyle:
+    toolMgr()->action(PolygonSelectionStyleId)->setChecked(true);
+    break;
+  case CyrcleStyle:
+    toolMgr()->action(CircleSelectionStyleId)->setChecked(true);
   }
 }
 
@@ -3142,7 +3154,7 @@ void OCCViewer_ViewWindow::onSketchingFinished()
   if ( mypSketcher && mypSketcher->result() == OCCViewer_ViewSketcher::Accept )
   {
     Handle(AIS_InteractiveContext) ic = myModel->getAISContext();
-    bool append = bool( mypSketcher->buttonState() && mypSketcher->isHasShift() );
+    bool append = mypSketcher->isHasShift();
     switch( mypSketcher->type() )
     {
     case Rect:
@@ -3157,9 +3169,9 @@ void OCCViewer_ViewWindow::onSketchingFinished()
 //           myRect = aRect;
 
           if( append )
-            ic->ShiftSelect( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
+            ic->ShiftSelect( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False);
           else
-            ic->Select( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False );
+            ic->Select( aLeft, aBottom, aRight, aTop, getViewPort()->getView(), Standard_False);
         }
       }
       break;
@@ -3180,9 +3192,9 @@ void OCCViewer_ViewWindow::onSketchingFinished()
           }
 
           if( append )
-            ic->ShiftSelect( anArray, getViewPort()->getView(), Standard_False );
+            ic->ShiftSelect( anArray, getViewPort()->getView(), Standard_False);
           else
-            ic->Select( anArray, getViewPort()->getView(), Standard_False );
+            ic->Select( anArray, getViewPort()->getView(), Standard_False);
         }
       }
       break;

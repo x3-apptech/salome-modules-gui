@@ -22,7 +22,6 @@
 
 #include "OCCViewer_ViewModel.h"
 #include "OCCViewer.h"
-#include "OCCViewer_ViewWindow.h"
 #include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
@@ -54,6 +53,7 @@
 #include <AIS_Axis.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <AIS_ListIteratorOfListOfInteractive.hxx>
+#include <StdSelect_ViewerSelector3d.hxx>
 
 #include <Graphic3d_Texture2Dmanual.hxx>
 #include <Graphic3d_MaterialAspect.hxx>
@@ -127,6 +127,10 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myAISContext = new AIS_InteractiveContext( myV3dViewer );
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor( Quantity_NOC_WHITE );
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_Selected)->SetColor( Quantity_NOC_WHITE );
+
+  // Set overlap detection for common behaviour of Rect selection and Polygon selection
+  // (both selects an object with partial overlap)
+  myAISContext->MainSelector()->AllowOverlapDetection(true);
   
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
@@ -171,7 +175,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 
   // set projection type to orthographic
   myProjectionType = 0;
-  mySelectionStyle = 0;
+  mySelectionStyle = OCCViewer_ViewWindow::RectStyle;
   // set stereo parameters
   myStereoType = 0;
   myAnaglyphFilter = 0;
@@ -359,17 +363,17 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
-  if (!aHasShift) {
-    myAISContext->ClearCurrents( false );
-    emit deselection();
-  }
 
   if (myStartPnt == myEndPnt)
   {
+    if (!aHasShift) {
+      myAISContext->ClearCurrents( false );
+      emit deselection();
+    }
     if ( !isPreselectionEnabled() ) {
       Handle(V3d_View) aView3d = aView->getViewPort()->getView();
       if ( !aView3d.IsNull() ) {
-	myAISContext->MoveTo( myEndPnt.x(), myEndPnt.y(), aView3d, Standard_True );
+	      myAISContext->MoveTo( myEndPnt.x(), myEndPnt.y(), aView3d, Standard_True );
       }
     }
 
@@ -378,31 +382,31 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
     else 
       myAISContext->Select( Standard_True );
   }
-  else
-  {
-    if (aHasShift && myMultiSelectionEnabled)
-      myAISContext->ShiftSelect(myStartPnt.x(), myStartPnt.y(),
-                                myEndPnt.x(), myEndPnt.y(),
-                                aView->getViewPort()->getView(), Standard_False );
-    else
-      myAISContext->Select(myStartPnt.x(), myStartPnt.y(),
-                           myEndPnt.x(), myEndPnt.y(),
-                           aView->getViewPort()->getView(), Standard_False );
+  //else
+  //{
+  //  if (aHasShift && myMultiSelectionEnabled)
+  //    myAISContext->ShiftSelect(myStartPnt.x(), myStartPnt.y(),
+  //                              myEndPnt.x(), myEndPnt.y(),
+  //                              aView->getViewPort()->getView(), Standard_False );
+  //  else
+  //    myAISContext->Select(myStartPnt.x(), myStartPnt.y(),
+  //                         myEndPnt.x(), myEndPnt.y(),
+  //                         aView->getViewPort()->getView(), Standard_False );
 
-    int Nb = myAISContext->NbSelected();
-    if( Nb>1 && !myMultiSelectionEnabled )
-    {
-        myAISContext->InitSelected();
-        Handle( SelectMgr_EntityOwner ) anOwner = myAISContext->SelectedOwner();
-        if( !anOwner.IsNull() )
-        {
-            myAISContext->ClearSelected( Standard_False );
-            myAISContext->AddOrRemoveSelected( anOwner, Standard_False );
-        }
-    }
+  //  int Nb = myAISContext->NbSelected();
+  //  if( Nb>1 && !myMultiSelectionEnabled )
+  //  {
+  //      myAISContext->InitSelected();
+  //      Handle( SelectMgr_EntityOwner ) anOwner = myAISContext->SelectedOwner();
+  //      if( !anOwner.IsNull() )
+  //      {
+  //          myAISContext->ClearSelected( Standard_False );
+  //          myAISContext->AddOrRemoveSelected( anOwner, Standard_False );
+  //      }
+  //  }
 
-    myAISContext->UpdateCurrentViewer();
-  }
+  //  myAISContext->UpdateCurrentViewer();
+  //}
   emit selectionChanged();
 }
 
@@ -549,12 +553,12 @@ void OCCViewer_Viewer::setProjectionType( const int theType )
 }
 
 
-int OCCViewer_Viewer::selectionStyle() const
+OCCViewer_ViewWindow::SelectionStyle OCCViewer_Viewer::selectionStyle() const
 {
   return mySelectionStyle;
 }
 
-void OCCViewer_Viewer::setSelectionStyle(const int theMode)
+void OCCViewer_Viewer::setSelectionStyle(OCCViewer_ViewWindow::SelectionStyle theMode)
 {
   if (mySelectionStyle != theMode) {
     mySelectionStyle = theMode;

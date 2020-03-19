@@ -355,13 +355,13 @@ void OCCViewer_ViewFrame::setProjectionType( int t)
 }
 
 //**************************************************************************************
-int OCCViewer_ViewFrame::selectionStyle() const
+OCCViewer_ViewWindow::SelectionStyle OCCViewer_ViewFrame::selectionStyle() const
 {
   return getView(MAIN_VIEW)->selectionStyle();
 }
 
 //**************************************************************************************
-void OCCViewer_ViewFrame::setSelectionStyle(int t)
+void OCCViewer_ViewFrame::setSelectionStyle(OCCViewer_ViewWindow::SelectionStyle t)
 {
   foreach(OCCViewer_ViewWindow* aView, myViews) {
     aView->setSelectionStyle(t);

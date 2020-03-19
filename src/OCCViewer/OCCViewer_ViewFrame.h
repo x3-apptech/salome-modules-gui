@@ -75,8 +75,8 @@ public:
   virtual int projectionType() const;
   virtual void setProjectionType( int );
 
-  virtual int selectionStyle() const;
-  virtual void setSelectionStyle(int);
+  virtual OCCViewer_ViewWindow::SelectionStyle selectionStyle() const;
+  virtual void setSelectionStyle(OCCViewer_ViewWindow::SelectionStyle);
 
   virtual int stereoType() const;
   virtual void setStereoType( const int );

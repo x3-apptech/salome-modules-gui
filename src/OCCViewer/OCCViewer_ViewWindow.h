@@ -152,7 +152,7 @@ public:
 	 SwitchPreselectionId, SwitchSelectionId,
 	 MaximizedId, SynchronizeId, ReturnTo3dViewId,
 	 OrthographicId, PerspectiveId, StereoId, RayTracingId, EnvTextureId, LightSourceId,
-   RectangleSelectionStyleId, CircleSelectionStyleId,
+   RectangleSelectionStyleId, PolygonSelectionStyleId, CircleSelectionStyleId,
 	 UserId };
 
   enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
@@ -163,6 +163,8 @@ public:
   enum RotationPointType{ BBCENTER, SELECTED };
 
   enum SketchingType { NoSketching, Rect, Polygon };
+
+  enum SelectionStyle { RectStyle, PolygonStyle, CyrcleStyle };
 
   enum Mode2dType { No2dMode, XYPlane, XZPlane, YZPlane };
 
@@ -220,8 +222,8 @@ public:
   virtual int                     projectionType() const;
   virtual void                    setProjectionType( int );
 
-  virtual int                     selectionStyle() const;
-  virtual void                    setSelectionStyle(int);
+  virtual SelectionStyle          selectionStyle() const;
+  virtual void                    setSelectionStyle(SelectionStyle);
 
   virtual int                     stereoType() const;
   virtual void                    setStereoType( const int );
