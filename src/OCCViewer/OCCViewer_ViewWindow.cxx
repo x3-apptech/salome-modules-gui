@@ -299,14 +299,14 @@ void OCCViewer_ViewWindow::initLayout()
   myViewPort = new OCCViewer_ViewPort3d( this, myModel->getViewer3d(), V3d_ORTHOGRAPHIC );
   myViewPort->installEventFilter(this);
   setCentralWidget(myViewPort);
-  myOperation = NOTHING;
+  myOperation = NOVIEWOP;
 
   myCurrPointType = BBCENTER;
   myPrevPointType = BBCENTER;
   mySelectedPoint = gp_Pnt(0.,0.,0.);
   myRotationPointSelection = false;
 
-  setTransformRequested ( NOTHING );
+  setTransformRequested ( NOVIEWOP );
   setTransformInProcess ( false );
 
   createActions();
@@ -346,7 +346,7 @@ OCCViewer_ViewWindow* OCCViewer_ViewWindow::getView( const int mode ) const
 OCCViewer_ViewWindow::OperationType
 OCCViewer_ViewWindow::getButtonState( QMouseEvent* theEvent, int theInteractionStyle )
 {
-  OperationType aOp = NOTHING;
+  OperationType aOp = NOVIEWOP;
   SUIT_ViewModel::InteractionStyle aStyle = (SUIT_ViewModel::InteractionStyle)theInteractionStyle;
   if( (theEvent->modifiers() == SUIT_ViewModel::myStateMap[aStyle][SUIT_ViewModel::ZOOM]) &&
       (theEvent->buttons() == SUIT_ViewModel::myButtonMap[aStyle][SUIT_ViewModel::ZOOM]) )
@@ -528,7 +528,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
     if ( interactionStyle() == SUIT_ViewModel::STANDARD )
       aState = getButtonState(theEvent, anInteractionStyle);
     else {
-      aState = OCCViewer_ViewWindow::NOTHING;
+      aState = OCCViewer_ViewWindow::NOVIEWOP;
       myIsKeyFree = true;
     }
     switch ( aState ) {
@@ -594,7 +594,7 @@ void OCCViewer_ViewWindow::vpMousePressEvent( QMouseEvent* theEvent )
 	  ic->Deactivate();
 	  ic->Activate(0);
 #endif
-          myOperation = NOTHING;
+          myOperation = NOVIEWOP;
           myViewPort->setCursor( myCursor );
           myCursorIsHand = false;
           myRotationPointSelection = false;
@@ -797,7 +797,7 @@ void OCCViewer_ViewWindow::activateSetRotationGravity()
     ic->Deactivate();
     ic->Activate(0);
 #endif
-    myOperation = NOTHING;
+    myOperation = NOVIEWOP;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
     myRotationPointSelection = false;
@@ -842,7 +842,7 @@ void OCCViewer_ViewWindow::activateSetRotationSelected( double theX, double theY
     ic->Deactivate();
     ic->Activate(0);
 #endif
-    myOperation = NOTHING;
+    myOperation = NOVIEWOP;
     myViewPort->setCursor( myCursor );
     myCursorIsHand = false;
     myRotationPointSelection = false;
@@ -939,8 +939,8 @@ void OCCViewer_ViewWindow::activateWindowFit()
 bool OCCViewer_ViewWindow::setTransformRequested( OperationType op )
 {
   bool ok = transformEnabled( op );
-  myOperation = ok ? op : NOTHING;
-  myViewPort->setMouseTracking( myOperation == NOTHING );
+  myOperation = ok ? op : NOVIEWOP;
+  myViewPort->setMouseTracking( myOperation == NOVIEWOP );
   return ok;
 }
 
@@ -1076,7 +1076,7 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
 void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
 {
   switch ( myOperation ) {
-  case NOTHING:
+  case NOVIEWOP:
     {
       int prevState = myCurSketch;
       if(theEvent->button() == Qt::RightButton)
@@ -1176,7 +1176,7 @@ void OCCViewer_ViewWindow::resetState()
     emit vpTransformationFinished (myOperation);
 
   setTransformInProcess( false );
-  setTransformRequested( NOTHING );
+  setTransformRequested( NOVIEWOP );
 
   myPanningByBtn = false;
 }
@@ -3214,7 +3214,7 @@ OCCViewer_ViewPort3d* OCCViewer_ViewWindow::getViewPort()
 
 bool OCCViewer_ViewWindow::transformRequested() const
 {
-  return ( myOperation != NOTHING );
+  return ( myOperation != NOVIEWOP );
 }
 
 bool OCCViewer_ViewWindow::transformInProcess() const
@@ -3232,7 +3232,7 @@ void OCCViewer_ViewWindow::setTransformInProcess( bool bOn )
 */
 void OCCViewer_ViewWindow::setTransformEnabled( const OperationType id, const bool on )
 {
-  if ( id != NOTHING ) myStatus.insert( id, on );
+  if ( id != NOVIEWOP ) myStatus.insert( id, on );
 }
 
 /*!

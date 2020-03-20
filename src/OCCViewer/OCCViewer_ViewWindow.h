@@ -155,7 +155,7 @@ public:
    RectangleSelectionStyleId, PolygonSelectionStyleId, CircleSelectionStyleId,
 	 UserId };
 
-  enum OperationType{ NOTHING, PANVIEW, ZOOMVIEW, ROTATE, 
+  enum OperationType{ NOVIEWOP, PANVIEW, ZOOMVIEW, ROTATE, 
                       PANGLOBAL, WINDOWFIT, FITALLVIEW, FITSELECTION, RESETVIEW,
                       FRONTVIEW, BACKVIEW, TOPVIEW, BOTTOMVIEW, LEFTVIEW, RIGHTVIEW,
 		      CLOCKWISEVIEW, ANTICLOCKWISEVIEW, PROJECTION };
