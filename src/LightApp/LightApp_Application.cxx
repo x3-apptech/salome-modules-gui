@@ -4115,10 +4115,14 @@ void LightApp_Application::updateWindows()
   for ( WinMap::ConstIterator it = myWin.begin(); it != myWin.end(); ++it )
   {
     QWidget* wid = it.value();
+    if ( !wid )
+      continue;
     if ( winMap.contains( it.key() ) )
       wid->setVisible( true );
-    else
+    else if ( !activeStudy() )
       delete wid;
+    else
+      wid->setVisible( false );
   }
 
   loadDockWindowsState();
