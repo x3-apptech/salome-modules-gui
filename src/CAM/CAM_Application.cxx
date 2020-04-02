@@ -753,6 +753,10 @@ void CAM_Application::readModuleList()
     if ( modName == "KERNEL" || modName == "GUI" )
       continue; // omit KERNEL and GUI modules
 
+    bool hasGui = resMgr->booleanValue( *it, "gui", true );
+    if ( !hasGui )
+      continue; // omit if module is explicitly declared as not having GUI
+
     QString modTitle = resMgr->stringValue( *it, "name", QString() );
     if ( modTitle.isEmpty() )
     {
@@ -787,7 +791,6 @@ void CAM_Application::readModuleList()
     else
       modLibrary = modName;
 
-    bool hasGui = resMgr->booleanValue( *it, "gui", true );
     QString version = resMgr->stringValue( *it, "version", QString() );
 
     ModuleInfo inf;
