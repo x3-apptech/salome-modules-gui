@@ -70,6 +70,21 @@
 
 #include <Basics_OCCTVersion.hxx>
 
+namespace
+{
+  void setCappingColor(const Handle(Graphic3d_ClipPlane)& plane, const QColor& color)
+  {
+    Quantity_Color qcolor( color.redF(), color.greenF(), color.blueF(), Quantity_TOC_RGB );
+#if OCC_VERSION_LARGE < 0x07040000
+    Graphic3d_MaterialAspect aspect;
+    aspect.SetColor( qcolor );
+    plane->SetCappingMaterial( aspect );
+#else
+    plane->SetCappingColor( qcolor );
+#endif
+  }
+}
+
 /*!
   Get data for supported background modes: gradient types, identifiers and supported image formats
 */
@@ -919,16 +934,9 @@ void OCCViewer_Viewer::setClippingColor( const QColor& theColor )
   if( myInternalClipPlanes.IsEmpty() )
     return;
 
-  Graphic3d_MaterialAspect aMaterialAspect = Graphic3d_MaterialAspect();
-  aMaterialAspect.SetColor( Quantity_Color( theColor.redF(), theColor.greenF(),
-                                            theColor.blueF(), Quantity_TOC_RGB ) );
-#if OCC_VERSION_LARGE <= 0x07030000
-  for( int i = 1; i <= myInternalClipPlanes.Size(); i++ )
-    myInternalClipPlanes.Value(i)->SetCappingMaterial( aMaterialAspect );
-#else
   for ( Graphic3d_SequenceOfHClipPlane::Iterator aPlaneIt ( myInternalClipPlanes ); aPlaneIt.More(); aPlaneIt.Next() )
-    aPlaneIt.Value()->SetCappingMaterial( aMaterialAspect );
-#endif
+    setCappingColor( aPlaneIt.Value(), theColor );
+
   update();
 }
 
@@ -1582,10 +1590,7 @@ Handle(Graphic3d_ClipPlane) OCCViewer_Viewer::createClipPlane(const gp_Pln& theP
   aGraphic3dPlane->SetCapping( Standard_True );
 
   // set capping color
-  Graphic3d_MaterialAspect aMaterialAspect = Graphic3d_MaterialAspect();
-  aMaterialAspect.SetColor( Quantity_Color( myClippingColor.redF(), myClippingColor.greenF(),
-                                            myClippingColor.blueF(), Quantity_TOC_RGB ) );
-  aGraphic3dPlane->SetCappingMaterial( aMaterialAspect );
+  setCappingColor( aGraphic3dPlane, myClippingColor );
 
   // set capping texture
   aGraphic3dPlane->SetCappingTexture( initClippingTexture( myDefaultTextureUsed, myClippingTexture,
