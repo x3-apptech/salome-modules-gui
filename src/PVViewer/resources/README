@@ -1,0 +1,12 @@
+README
+------
+
+The purpose of the XML files in this folder is the following:
+
+1. ParaViewFilters.xml - this file describes ParaView filters which are available in the SALOME
+2. ParaViewSources.xml - this file describes ParaView sources which are available in the SALOME
+3. ParaViewReaders.xml - deprecated
+4. ParaViewWriters.xml - deprecated
+
+Initially these files are available in the ParaView sources, they ensure proper loading of the ParaView resources such as icons and names of an actions.
+ParaViewFilters.xml and ParaViewSources.xml should be updated during migration to newer ParaView version.

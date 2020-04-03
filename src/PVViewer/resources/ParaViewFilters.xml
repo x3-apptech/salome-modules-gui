@@ -1,17 +1,18 @@
 <ParaViewFilters>
   <Category name="Common" menu_label="&amp;Common" preserve_order="1"
     show_in_toolbar="1">
-    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator24.png"/>
-    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface24.png"/>
-    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip24.png"/>
-    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice24.png"/>
-    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold24.png"/>
-    <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid24.png"/>
-    <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph24.png"/>
-    <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer24.png"/>
-    <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp24.png"/>
-    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup24.png"/>
-    <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract24.png"/>
+    <Proxy group="filters" name="Calculator" icon=":/pqWidgets/Icons/pqCalculator.svg"/>
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg"/>
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg"/>
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg"/>
+    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold.svg"/>
+    <Proxy group="filters" name="ExtractGrid" icon=":/pqWidgets/Icons/pqExtractGrid.svg"/>
+    <Proxy group="filters" name="Glyph" icon=":/pqWidgets/Icons/pqGlyph.svg"/>
+    <Proxy group="filters" name="NewGlyph" icon=":/pqWidgets/Icons/pqGlyph.svg"/>
+    <Proxy group="filters" name="StreamTracer" icon=":/pqWidgets/Icons/pqStreamTracer.svg"/>
+    <Proxy group="filters" name="WarpVector" icon=":/pqWidgets/Icons/pqWarp.svg"/>
+    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup.svg"/>
+    <Proxy group="filters" name="ExtractHierarchicalLevel" icon=":/pqWidgets/Icons/pqGroupExtract.svg"/>
   </Category>
 
   <Category name="CosmoTools" menu_label="&amp;CosmoTools" show_in_toolbar="0">
@@ -24,20 +25,20 @@
 
   <Category name="DataAnalysis" menu_label="&amp;Data Analysis" show_in_toolbar="1" hide_for_tests="1">
     <Proxy group="filters" name="Calculator"
-            icon=":/pqWidgets/Icons/pqCalculator24.png" omit_from_toolbar="1"/>
+            icon=":/pqWidgets/Icons/pqCalculator.svg" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ExtractSelection"
-            icon=":/pqWidgets/Icons/pqExtractSelection24.png" />
+            icon=":/pqWidgets/Icons/pqExtractSelection.svg" />
     <Proxy group="filters" name="ExtractSelectionOverTime"
-            icon=":/pqWidgets/Icons/pqPlotSelectionOverTime24.png" />
+            icon=":/pqWidgets/Icons/pqPlotSelectionOverTime.svg" />
     <Proxy group="filters" name="ExtractHistogram"
             icon=":/pqWidgets/Icons/pqHistogram24.png" omit_from_toolbar="1"/>
     <Proxy group="filters" name="IntegrateAttributes" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ExtractFieldDataOverTime"
-            icon=":/pqWidgets/Icons/pqPlotGlobalOverTime24.png" />
+            icon=":/pqWidgets/Icons/pqPlotGlobalOverTime.svg" />
     <Proxy group="filters" name="ProbeLine"
-            icon=":/pqWidgets/Icons/pqPlotOverLine24.png" />
+            icon=":/pqWidgets/Icons/pqPlotOverLine.svg" />
     <Proxy group="filters" name="ProbePoint"
-            icon=":/pqWidgets/Icons/pqProbeLocation24.png" />
+            icon=":/pqWidgets/Icons/pqProbeLocation.svg" />
     <Proxy group="filters" name="PlotAttributes" omit_from_toolbar="1"/>
     <Proxy group="filters" name="PlotOnSortedLines" omit_from_toolbar="1"/>
     <Proxy group="filters" name="PlotOnIntersectionCurves" omit_from_toolbar="1"/>
@@ -46,9 +47,22 @@
     <Proxy group="filters" name="TransposeTable" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ComputeQuartiles"
             icon=":/pqWidgets/Icons/pqBoxChart16.png" omit_from_toolbar="1"/>
-    <Proxy group="filters" name="ExtractBagPlots"
-            icon=":/pqWidgets/Icons/pqFunctionalBagChart16.png" omit_from_toolbar="1"/>
     <Proxy group="filters" name="ExtractLocation" omit_from_toolbar="1" />
+    <Proxy group="filters" name="PlotDataOverTime" omit_from_toolbar="1" />
+  </Category>
+
+  <Category name="Hyper Tree Grid" menu_label="&amp;Hyper Tree Grid">
+    <Proxy group="filters" name="Clip" icon=":/pqWidgets/Icons/pqClip.svg"/>
+    <Proxy group="filters" name="Cut" icon=":/pqWidgets/Icons/pqSlice.svg"/>
+    <Proxy group="filters" name="HyperTreeGridAxisReflection" />
+    <Proxy group="filters" name="HyperTreeGridCellCenters" />
+    <Proxy group="filters" name="Contour" icon=":/pqWidgets/Icons/pqIsosurface.svg"/>
+    <Proxy group="filters" name="HyperTreeGridDepthLimiter" />
+    <Proxy group="filters" name="GroupDataSets" icon=":/pqWidgets/Icons/pqGroup.svg"/>
+    <Proxy group="filters" name="HyperTreeGridGhostCellsGenerator" />
+    <Proxy group="filters" name="Threshold" icon=":/pqWidgets/Icons/pqThreshold.svg"/>
+    <Proxy group="filters" name="HyperTreeGridToDualGrid" />
+    <Proxy group="filters" name="HyperTreeGridToUnstructuredGrid" />
   </Category>
 
   <Category name="Statistics" menu_label="&amp;Statistics">
@@ -134,6 +148,13 @@
     <Proxy group="filters" name="SPHDatasetInterpolator" />
   </Category>
 
+  <Category name="Chemistry" menu_label="Chemistry">
+    <Proxy group="filters" name="AppendMolecule"/>
+    <Proxy group="filters" name="ComputeMoleculeBonds"/>
+    <Proxy group="filters" name="MoleculeToLines"/>
+    <Proxy group="filters" name="PointSetToMolecule"/>
+  </Category>
+
   <Proxy group="filters" name="AggregateDataSet" />
   <Proxy group="filters" name="AppendArcLength" />
   <Proxy group="filters" name="AddFieldArrays" />
@@ -141,6 +162,7 @@
   <Proxy group="filters" name="UniformGridPartitioner" />
   <Proxy group="filters" name="Append" />
   <Proxy group="filters" name="AppendAttributes" />
+  <Proxy group="filters" name="AppendLocationAttributes" />
   <Proxy group="filters" name="AppendPolyData" />
   <Proxy group="filters" name="AppendReductionFilter" />
   <Proxy group="filters" name="AngularPeriodicFilter" />
@@ -168,42 +190,50 @@
   <Proxy group="filters" name="DataSetSurfaceFilter" />
   <Proxy group="filters" name="DataSetRegionSurfaceFilter" />
   <Proxy group="filters" name="DataSetTriangleFilter" />
+  <Proxy group="filters" name="DateToNumeric" />
   <Proxy group="filters" name="DecimatePro" />
+  <Proxy group="filters" name="DecimatePolyline" />
   <Proxy group="filters" name="Delaunay2D" />
   <Proxy group="filters" name="Delaunay3D" />
+  <Proxy group="filters" name="DistributePoints"/>
   <Proxy group="filters" name="ElevationFilter" />
   <Proxy group="filters" name="EvenlySpacedStreamlines2D" />
   <Proxy group="filters" name="ExtractBlock" />
   <Proxy group="filters" name="ExtractComponent" />
   <Proxy group="filters" name="ExtractEdges" />
+  <Proxy group="filters" name="ExtractEnclosedPoints" />
   <Proxy group="filters" name="ExtractGeometry" />
   <Proxy group="filters" name="ExtractGrid" />
   <Proxy group="filters" name="ExtractHistogram" />
   <Proxy group="filters" name="ExtractSelection" />
   <Proxy group="filters" name="ExtractSelectionOverTime" />
+  <Proxy group="filters" name="ExtractSubsetWithSeed" />
+  <Proxy group="filters" name="PlotDataOverTime" />
   <Proxy group="filters" name="FeatureEdges" />
   <Proxy group="filters" name="FFTSelectionOverTime" />
   <Proxy group="filters" name="GaussianSplatter"/>
   <Proxy group="filters" name="GenerateIdScalars"/>
+  <Proxy group="filters" name="GenerateGlobalIds"/>
   <Proxy group="filters" name="GhostCellsGenerator" />
   <Proxy group="filters" name="Glyph" />
-  <Proxy group="filters" name="GlyphWithCustomSource" />
+  <Proxy group="filters" name="NewGlyph" />
+  <Proxy group="filters" name="GlyphWithCustomSource" icon=":/pqWidgets/Icons/pqGlyph.svg" />
   <Proxy group="filters" name="Gradient" />
   <Proxy group="filters" name="GridConnectivity" />
   <Proxy group="filters" name="GroupDataSets" />
   <Proxy group="filters" name="ImageDataToAMR" />
   <Proxy group="filters" name="ImageDataToPointSet" />
+  <Proxy group="filters" name="ImageDataToUniformGrid" />
   <Proxy group="filters" name="IntegrateAttributes" />
   <Proxy group="filters" name="IntegrateFlowThroughSurface" />
   <!--  <Proxy group="filters" name="LevelIdScalars" /> -->
   <Proxy group="filters" name="LinearExtrusionFilter" />
+  <Proxy group="filters" name="LinearCellExtrusionFilter" />
   <Proxy group="filters" name="LoopSubdivisionFilter" />
   <Proxy group="filters" name="MaskPoints" />
   <Proxy group="filters" name="Median" />
   <Proxy group="filters" name="MergeBlocks" />
   <Proxy group="filters" name="MeshQuality" />
-  <Proxy group="filters" name="OctreeDepthLimit" />
-  <Proxy group="filters" name="OctreeDepthScalars" />
   <Proxy group="filters" name="OTKernelSmoothing" />
   <Proxy group="filters" name="OTDensityMap" />
   <Proxy group="filters" name="OutlineCornerFilter" />
@@ -216,6 +246,7 @@
   <Proxy group="filters" name="PlotOnSortedLines" />
   <Proxy group="filters" name="PointDataToCellData" />
   <Proxy group="filters" name="PolyDataNormals" />
+  <Proxy group="filters" name="PolyDataTangents" />
   <Proxy group="filters" name="ProbeLine" />
   <Proxy group="filters" name="ProbePoint" />
   <Proxy group="filters" name="ProcessIdScalars" />
@@ -227,6 +258,7 @@
   <Proxy group="filters" name="QuadricClustering" />
   <Proxy group="filters" name="RectilinearGridConnectivity" />
   <Proxy group="filters" name="RectilinearGridToPointSet" />
+  <Proxy group="filters" name="RedistributeDataSet" />
   <Proxy group="filters" name="ReflectionFilter" />
   <Proxy group="filters" name="RemoveGhostInformation" />
   <Proxy group="filters" name="ResampleToImage" />
@@ -256,6 +288,7 @@
   <Proxy group="filters" name="TriangleFilter" />
   <Proxy group="filters" name="TubeFilter" />
   <Proxy group="filters" name="UnstructuredGradient" />
+  <Proxy group="filters" name="ValidateCells" />
   <Proxy group="filters" name="WarpScalar" />
   <Proxy group="filters" name="WarpVector" />
   <Proxy group="filters" name="YoungsMaterialInterface"/>
@@ -271,5 +304,6 @@
   <Proxy group="filters" name="GenericGeometryFilter" />
   <Proxy group="filters" name="SliceAlongPolyLine" />
   <Proxy group="filters" name="SliceWithPlane" />
-  <Proxy group="filters" name="RulerFilter" />
+  <Proxy group="filters" name="RulerFilter" icon=":/pqWidgets/Icons/pqRuler.png"/>
+  <Proxy group="filters" name="OMETIFFChannelCalculator" />
 </ParaViewFilters>
