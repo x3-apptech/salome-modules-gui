@@ -40,11 +40,13 @@
 #include <Quantity_Color.hxx>
 
 #include <QColor>
+#include <QRect>
 
 namespace OCCViewer
 {
   OCCVIEWER_EXPORT Quantity_Color color( const QColor& );
   OCCVIEWER_EXPORT QColor         color( const Quantity_Color& );
+  OCCVIEWER_EXPORT bool           overThreshold( const QRect& );
 };
 
 #endif //OCCVIEWER_H

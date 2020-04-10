@@ -21,7 +21,6 @@
 //
 
 #include "OCCViewer_ViewModel.h"
-#include "OCCViewer.h"
 #include "OCCViewer_ViewFrame.h"
 #include "OCCViewer_VService.h"
 #include "OCCViewer_ViewPort3d.h"
@@ -131,7 +130,8 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myIsUseLocalSelection(false),
 #endif
   myClippingDlg (NULL),
-  myFitter(0)
+  myFitter(0),
+  mySelectionDone(false)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
@@ -378,8 +378,8 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
-
-  if (myStartPnt == myEndPnt)
+  // In case of small tremor of a mouse pointer, consider it as a click
+  if ( !OCCViewer::overThreshold( QRect( myStartPnt, myEndPnt ) )  && !mySelectionDone)
   {
     if (!aHasShift) {
       myAISContext->ClearCurrents( false );
@@ -396,7 +396,10 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
       myAISContext->ShiftSelect( Standard_True );
     else 
       myAISContext->Select( Standard_True );
+    emit selectionChanged();
   }
+  mySelectionDone = false;
+
   //else
   //{
   //  if (aHasShift && myMultiSelectionEnabled)
@@ -422,7 +425,6 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
 
   //  myAISContext->UpdateCurrentViewer();
   //}
-  emit selectionChanged();
 }
 
 /*!

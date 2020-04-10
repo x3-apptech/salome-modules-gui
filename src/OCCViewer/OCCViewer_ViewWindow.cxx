@@ -3160,7 +3160,9 @@ void OCCViewer_ViewWindow::onSketchingFinished()
     case Rect:
       {
         QRect* aRect = (QRect*)mypSketcher->data();
-        if( aRect )
+        // Use rectangle selection only if the rect has a reasonable size
+        // If it is too small then it is very probably tremor of a mouse pointer
+        if ( aRect && OCCViewer::overThreshold( *aRect ) )
         {
           int aLeft = aRect->left();
           int aRight = aRect->right();
@@ -3180,21 +3182,24 @@ void OCCViewer_ViewWindow::onSketchingFinished()
         QPolygon* aPolygon = (QPolygon*)mypSketcher->data();
         if( aPolygon )
         {
-          int size = aPolygon->size();
-          TColgp_Array1OfPnt2d anArray( 1, size );
+          QRect aRect = aPolygon->boundingRect();
+          if ( OCCViewer::overThreshold( aRect ) ) {
+            int size = aPolygon->size();
+            TColgp_Array1OfPnt2d anArray(1, size);
 
-          QPolygon::Iterator it = aPolygon->begin();
-          QPolygon::Iterator itEnd = aPolygon->end();
-          for( int index = 1; it != itEnd; ++it, index++ )
-          {
-            QPoint aPoint = *it;
-            anArray.SetValue( index, gp_Pnt2d( aPoint.x(), aPoint.y() ) );
+            QPolygon::Iterator it = aPolygon->begin();
+            QPolygon::Iterator itEnd = aPolygon->end();
+            for (int index = 1; it != itEnd; ++it, index++)
+            {
+              QPoint aPoint = *it;
+              anArray.SetValue(index, gp_Pnt2d(aPoint.x(), aPoint.y()));
+            }
+
+            if (append)
+              ic->ShiftSelect(anArray, getViewPort()->getView(), Standard_False);
+            else
+              ic->Select(anArray, getViewPort()->getView(), Standard_False);
           }
-
-          if( append )
-            ic->ShiftSelect( anArray, getViewPort()->getView(), Standard_False);
-          else
-            ic->Select( anArray, getViewPort()->getView(), Standard_False);
         }
       }
       break;
@@ -3204,6 +3209,7 @@ void OCCViewer_ViewWindow::onSketchingFinished()
 
     OCCViewer_ViewManager* aViewMgr = ( OCCViewer_ViewManager* )getViewManager();
     aViewMgr->getOCCViewer()->performSelectionChanged();
+    aViewMgr->getOCCViewer()->doNotSelect();
   }
 }
 
