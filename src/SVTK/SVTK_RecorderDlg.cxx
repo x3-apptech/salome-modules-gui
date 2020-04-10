@@ -38,6 +38,7 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QDir>
 
 /*!
  * Constructor
@@ -175,7 +176,7 @@ bool SVTK_RecorderDlg::onBrowseFile()
   aFilter.append( tr( "FLT_AVI_FILES" ) );
   aFilter.append( tr( "FLT_ALL_FILES" ) );
 
-  QString aFileName = SUIT_FileDlg::getFileName( this, Qtx::getenv( "HOME" ), aFilter,
+  QString aFileName = SUIT_FileDlg::getFileName( this, QDir::homePath(), aFilter,
                                                  tr( "FILE_NAME" ), false );
 
   if( aFileName.isNull() )

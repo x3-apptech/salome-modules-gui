@@ -126,7 +126,7 @@ class MySelectVarsDialog(Ui_SelectVarsDialog, QDialog):
 
     def loadVars(self):
         filename = QFileDialog.getOpenFileName(self, self.tr("Import variables from file"),
-                                                     os.getenv("HOME"),
+                                                     os.path.expanduser("~"),
                                                      self.tr("XML Files (*.xml)"))
         if not filename:
             return
@@ -139,7 +139,7 @@ class MySelectVarsDialog(Ui_SelectVarsDialog, QDialog):
                                  self.tr("Cannot load file %s:\n%s" % (filename, e)))
 
     def saveVars(self):
-        default = os.path.join(os.getenv("HOME"), "vars.xml")
+        default = os.path.join(os.path.expanduser("~"), "vars.xml")
         filename = QFileDialog.getSaveFileName(self, self.tr("Export variables to file"),
                                                      default, self.tr("XML Files (*.xml)"))
         if not filename:

@@ -25,6 +25,7 @@
 #include <QPushButton>
 #include <QTextStream> 
 #include <QFile>
+#include <QDir>
 #include <QPrinter>
 //#include <QSimpleRichText>
 #include <QTextDocument>
@@ -115,6 +116,7 @@ SUIT_LicenseDlg::~SUIT_LicenseDlg()
 
 void SUIT_LicenseDlg::onAgree()
 {
+  /*
   QString env;
 #ifdef WIN32
   DWORD aLen=1024;
@@ -138,6 +140,11 @@ void SUIT_LicenseDlg::onAgree()
   QFile file( env + "/ReadLicense.log" ); // Read the text from a file
 
   file.open( QIODevice::WriteOnly );
+  */
+  QString env = QDir::homePath();
+  QFile file( env + "/ReadLicense.log" );
+  if (!file.open( QIODevice::WriteOnly ))
+    reject();
 
   QTextStream ts( &file );
   ts << "OK" << endl;
