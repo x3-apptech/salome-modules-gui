@@ -22,21 +22,19 @@ PROJECT(PyInterp C CXX)
 
 # Versioning
 # ===========
-# Project name, upper case
+# Project name, uppercase / lowercase
 STRING(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
+STRING(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 
-# To be changed once externalized CMake procedure:
-###################
-SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
-IF(EXISTS ${KERNEL_ROOT_DIR})
-  LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
-  INCLUDE(SalomeMacros)
-ELSE(EXISTS ${KERNEL_ROOT_DIR})
-  MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
-ENDIF(EXISTS ${KERNEL_ROOT_DIR})
-# From GUI - again to be changed once externalized:
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../adm_local/cmake_files")
-###################
+# Include common macros
+# =====================
+SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+  LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
+  INCLUDE(SalomeMacros NO_POLICY_SCOPE)
+ELSE()
+  MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
+ENDIF()
 
 # Platform setup
 # ==============
@@ -44,30 +42,44 @@ INCLUDE(SalomeSetupPlatform)
 
 # Options
 # =======
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
 
-#
-# Set list of prerequisites
-# =========================
+# Detect prerequisites
+# ====================
 
+# Python
 FIND_PACKAGE(SalomePythonInterp REQUIRED)
 FIND_PACKAGE(SalomePythonLibs REQUIRED)
 # Qt
 FIND_PACKAGE(SalomeQt5 REQUIRED)
 
-# Detection report
+# Detection summary report
 SALOME_PACKAGE_REPORT_AND_CHECK()
 
 # Directories
 #
 # Directories have to be given after prerequisites (to be able to use
 # Python version string for example).
-# ===========
-SET(PYINTERP_INSTALL_LIBS lib CACHE PATH "Install path: PyInterp libs")
-SET(PYINTERP_INSTALL_HEADERS include CACHE PATH "Install path: PyInterp headers")
+# ===================================================================
+SET(PYINTERP_INSTALL_LIBS lib CACHE PATH "Install path: libraries")
+SET(PYINTERP_INSTALL_HEADERS include CACHE PATH "Install path: headers")
+SET(PYINTERP_INSTALL_RES share/resources CACHE PATH "Install path: resources")
+SET(PYINTERP_INSTALL_CMAKE lib/cmake/${PROJECT_NAME_LC} CACHE PATH "Install path: cmake files")
 
-SET(PYINTERP_INSTALL_RES share/resources CACHE PATH "Install path: PyInterp resources")
+MARK_AS_ADVANCED(PYINTERP_INSTALL_LIBS PYINTERP_INSTALL_HEADERS
+                 PYINTERP_INSTALL_RES PYINTERP_INSTALL_CMAKE)
 
-# Sources
-# ========
+SET(PYINTERP_EXPORT_NAME ${PROJECT_NAME} CACHE STRING "Export name")
+MARK_AS_ADVANCED(PYINTERP_EXPORT_NAME)
+
+# Subdirs
+# =======
 ADD_SUBDIRECTORY(src)
 
+# Export configuration and targets
+# ================================
+IF(NOT PYINTERP_SUBPROJECT)
+  # Install the export set for use with the install-tree
+  INSTALL(EXPORT ${PYINTERP_EXPORT_NAME}TargetGroup DESTINATION ${PYINTERP_INSTALL_CMAKE}
+          FILE ${PROJECT_NAME}Targets.cmake)
+ENDIF()

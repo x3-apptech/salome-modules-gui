@@ -22,21 +22,19 @@ PROJECT(PyEditor C CXX)
 
 # Versioning
 # ===========
-# Project name, upper case
+# Project name, uppercase / lowercase
 STRING(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
+STRING(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 
-# To be changed once externalized CMake procedure:
-###################
-SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
-IF(EXISTS ${KERNEL_ROOT_DIR})
-  LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
-  INCLUDE(SalomeMacros)
-ELSE(EXISTS ${KERNEL_ROOT_DIR})
-  MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
-ENDIF(EXISTS ${KERNEL_ROOT_DIR})
-# From GUI - again to be changed once externalized:
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../adm_local/cmake_files")
-###################
+# Include common macros
+# =====================
+SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+  LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
+  INCLUDE(SalomeMacros NO_POLICY_SCOPE)
+ELSE()
+  MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
+ENDIF()
 
 # Platform setup
 # ==============
@@ -44,50 +42,58 @@ INCLUDE(SalomeSetupPlatform)
 
 # Options
 # =======
-OPTION(PYEDITOR_BUILD_SHARED_LIBS "Build shared libraries for PyEditor" ON)
-OPTION(PYEDITOR_BUILD_EXE "Build PyEditor's executable" ON)
-OPTION(PYEDITOR_BUILD_PYTHON "Build Python wrapping for PyEditor" ON)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
+OPTION(BUILD_EXECUTABLE "Build executable" ON)
+OPTION(BUILD_PYMODULE "Build Python module" ON)
 
-#
-# Set list of prerequisites
-# =========================
-
-IF(PYEDITOR_BUILD_SHARED_LIBS)
-  SET(BUILD_SHARED_LIBS TRUE)
-ELSE(PYEDITOR_BUILD_SHARED_LIBS)
-  SET(BUILD_SHARED_LIBS FALSE)
-ENDIF(PYEDITOR_BUILD_SHARED_LIBS)
+# Detect prerequisites
+# ====================
 
 # Qt
 FIND_PACKAGE(SalomeQt5 REQUIRED)
-IF(PYEDITOR_BUILD_PYTHON)
+IF(BUILD_PYMODULE)
   # Python
   FIND_PACKAGE(SalomePythonInterp REQUIRED)
   FIND_PACKAGE(SalomePythonLibs REQUIRED)
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomePythonInterp PYEDITOR_BUILD_PYTHON)
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomePythonLibs PYEDITOR_BUILD_PYTHON)
-  # Sip
-  FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python and before PyQt
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomeSIP PYEDITOR_BUILD_PYTHON)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomePythonInterp BUILD_PYMODULE)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomePythonLibs BUILD_PYMODULE)
+  # Sip (should come after Python and before PyQt)
+  FIND_PACKAGE(SalomeSIP REQUIRED)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomeSIP BUILD_PYMODULE)
   # PyQt
   FIND_PACKAGE(SalomePyQt5 REQUIRED)
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomePyQt5 PYEDITOR_BUILD_PYTHON)
-ENDIF(PYEDITOR_BUILD_PYTHON)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomePyQt5 BUILD_PYMODULE)
+ENDIF(BUILD_PYMODULE)
 
-# Detection report
+# Detection summary report
 SALOME_PACKAGE_REPORT_AND_CHECK()
 
 # Directories
 #
 # Directories have to be given after prerequisites (to be able to use
 # Python version string for example).
-# ===========
-SET(PYEDITOR_INSTALL_BINS bin CACHE PATH "Install path: PyEditor binaries")
-SET(PYEDITOR_INSTALL_LIBS lib CACHE PATH "Install path: PyEditor libraries")
-SET(PYEDITOR_INSTALL_HEADERS include CACHE PATH "Install path: PyEditor headers")
-SET(PYEDITOR_INSTALL_RES share/resources CACHE PATH "Install path: PyEditor resources")
+# ===================================================================
+SET(PYEDITOR_INSTALL_BINS bin CACHE PATH "Install path: binaries")
+SET(PYEDITOR_INSTALL_LIBS lib CACHE PATH "Install path: libraries")
+SET(PYEDITOR_INSTALL_PYTHON lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages CACHE PATH "Install path: Python module")
+SET(PYEDITOR_INSTALL_HEADERS include CACHE PATH "Install path: headers")
+SET(PYEDITOR_INSTALL_RES share/resources CACHE PATH "Install path: resources")
+SET(PYEDITOR_INSTALL_CMAKE lib/cmake/${PROJECT_NAME_LC} CACHE PATH "Install path: cmake files")
 
-# Sources
-# ========
+MARK_AS_ADVANCED(PYEDITOR_INSTALL_BINS PYEDITOR_INSTALL_LIBS PYEDITOR_INSTALL_PYTHON
+                 PYEDITOR_INSTALL_HEADERS PYEDITOR_INSTALL_RES PYEDITOR_INSTALL_CMAKE)
+
+SET(PYEDITOR_EXPORT_NAME ${PROJECT_NAME} CACHE STRING "Export name")
+MARK_AS_ADVANCED(PYEDITOR_EXPORT_NAME)
+
+# Subdirs
+# =======
 ADD_SUBDIRECTORY(src)
 
+# Export configuration and targets
+# ================================
+IF(NOT PYEDITOR_SUBPROJECT)
+  # Install the export set for use with the install-tree
+  INSTALL(EXPORT ${PYEDITOR_EXPORT_NAME}TargetGroup DESTINATION ${PYEDITOR_INSTALL_CMAKE}
+          FILE ${PROJECT_NAME}Targets.cmake)
+ENDIF()

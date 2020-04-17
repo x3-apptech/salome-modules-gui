@@ -44,7 +44,7 @@ OPTION(SALOME_BUILD_TESTS "Generate SALOME CURVEPLOT tests" ON)
 SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
 IF(EXISTS ${CONFIGURATION_ROOT_DIR})
   LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
-  INCLUDE(SalomeMacros)
+  INCLUDE(SalomeMacros NO_POLICY_SCOPE)
 ELSE()
   MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
 ENDIF()
@@ -54,7 +54,6 @@ IF(NOT SALOME_CURVEPLOT_STANDALONE)
     # ==============
     SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
     IF( EXISTS ${KERNEL_ROOT_DIR} )
-      LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
       FIND_PACKAGE(SalomeKERNEL REQUIRED)
       KERNEL_WITH_CORBA() # check whether KERNEL builded with CORBA
       ADD_DEFINITIONS(${KERNEL_DEFINITIONS} -DSALOME_KERNEL)
@@ -67,32 +66,26 @@ IF(NOT SALOME_CURVEPLOT_STANDALONE)
     SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR} CACHE PATH "Path to the Salome GUI")
     # Are we compiled being into GUI/tools directory or have we been extracted somewhere else?
     IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../src/Session/SALOME_Session.hxx")  # we are in GUI
-      LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../adm_local/cmake_files")
       # Re-define GUI_INCLUDE_DIRS 
       SET(GUI_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/../PyInterp/src)
     ELSE()      
       IF(EXISTS ${GUI_ROOT_DIR})
-        LIST(APPEND CMAKE_MODULE_PATH "${GUI_ROOT_DIR}/adm_local/cmake_files")
         FIND_PACKAGE(SalomeGUI)
       ELSE()
         MESSAGE(FATAL_ERROR "We absolutely need a Salome GUI, please define GUI_ROOT_DIR or turn option SALOME_CURVEPLOT_STANDALONE to ON!")
       ENDIF()
     ENDIF()
     
-    # Platform setup
-    # ==============
-    INCLUDE(SalomeSetupPlatform)   # From KERNEL
 ENDIF(NOT SALOME_CURVEPLOT_STANDALONE)
+
+# Platform setup
+# ==============
+INCLUDE(SalomeSetupPlatform)
 
 # Always build libraries as shared objects:
 SET(BUILD_SHARED_LIBS TRUE)
 # Local macros:
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/adm_local/cmake_files")
-
-IF(SALOME_CURVEPLOT_STANDALONE)
-    INCLUDE(SalomeMacros)
-ENDIF()
-
 
 # Prerequisites
 # =============

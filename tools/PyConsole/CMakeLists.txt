@@ -22,21 +22,19 @@ PROJECT(PyConsole C CXX)
 
 # Versioning
 # ===========
-# Project name, upper case
+# Project name, uppercase / lowercase
 STRING(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UC)
+STRING(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LC)
 
-###################
-# To be changed once externalized CMake procedure:
-SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
-IF(EXISTS ${KERNEL_ROOT_DIR})
-  LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
-  INCLUDE(SalomeMacros)
-ELSE(EXISTS ${KERNEL_ROOT_DIR})
-  MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
-ENDIF(EXISTS ${KERNEL_ROOT_DIR})
-# From GUI - again to be changed once externalized:
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../adm_local/cmake_files")
-###################
+# Include common macros
+# =====================
+SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+  LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
+  INCLUDE(SalomeMacros NO_POLICY_SCOPE)
+ELSE()
+  MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
+ENDIF()
 
 # Platform setup
 # ==============
@@ -44,50 +42,67 @@ INCLUDE(SalomeSetupPlatform)
 
 # Options
 # =======
-OPTION(PYCONSOLE_BUILD_PYTHON "Build Python wrapping for PyConsole" ON)
+OPTION(BUILD_SHARED_LIBS "Build shared libraries" ON)
+OPTION(BUILD_PYMODULE "Build Python module" ON)
 
-#
-# Set list of prerequisites
-# =========================
+# Detect prerequisites
+# ====================
 
+# Python
 FIND_PACKAGE(SalomePythonInterp REQUIRED)
 FIND_PACKAGE(SalomePythonLibs REQUIRED)
-
 # Qt
 FIND_PACKAGE(SalomeQt5 REQUIRED)
-IF(PYCONSOLE_BUILD_PYTHON)
-  # Sip
-  FIND_PACKAGE(SalomeSIP REQUIRED)  # should come after Python and before PyQt
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomeSIP PYCONSOLE_BUILD_PYTHON)
+IF(BUILD_PYMODULE)
+  # Sip (should come after Python and before PyQt)
+  FIND_PACKAGE(SalomeSIP REQUIRED)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomeSIP BUILD_PYMODULE)
   # PyQt
   FIND_PACKAGE(SalomePyQt5 REQUIRED)
-  SALOME_LOG_OPTIONAL_PACKAGE(SalomePyQt5 PYCONSOLE_BUILD_PYTHON)
-ENDIF(PYCONSOLE_BUILD_PYTHON)
+  SALOME_LOG_OPTIONAL_PACKAGE(SalomePyQt5 BUILD_PYMODULE)
+ENDIF(BUILD_PYMODULE)
 
-# Detection report
+# Detection summary report
 SALOME_PACKAGE_REPORT_AND_CHECK()
 
 # Directories
 #
 # Directories have to be given after prerequisites (to be able to use
 # Python version string for example).
-# ===========
-SET(PYCONSOLE_INSTALL_LIBS lib CACHE PATH "Install path: PyConsole libs")
-SET(PYCONSOLE_INSTALL_HEADERS include CACHE PATH "Install path: PyConsole headers")
+# ===================================================================
+SET(PYCONSOLE_INSTALL_LIBS lib CACHE PATH "Install path: libraries")
+SET(PYCONSOLE_INSTALL_PYTHON lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages CACHE PATH "Install path: Python module")
+SET(PYCONSOLE_INSTALL_HEADERS include CACHE PATH "Install path: headers")
+SET(PYCONSOLE_INSTALL_RES share/resources CACHE PATH "Install path: resources")
+SET(PYCONSOLE_INSTALL_CMAKE lib/cmake/${PROJECT_NAME_LC} CACHE PATH "Install path: cmake files")
 
-SET(PYCONSOLE_INSTALL_RES share/resources CACHE PATH "Install path: PyConsole resources")
+MARK_AS_ADVANCED(PYCONSOLE_INSTALL_LIBS PYCONSOLE_INSTALL_HEADERS
+                 PYCONSOLE_INSTALL_RES PYCONSOLE_INSTALL_CMAKE)
 
-# Tool dependencies
-# =================
-# PyConsole depends on PyInterp:
-SET(PYINTERP_INSTALL_LIBS "${PYCONSOLE_INSTALL_LIBS}"  CACHE PATH "")
+SET(PYCONSOLE_EXPORT_NAME ${PROJECT_NAME} CACHE STRING "Export name")
+MARK_AS_ADVANCED(PYCONSOLE_EXPORT_NAME)
+
+# Dependencies
+# ============
+# Force PyInterp to build as a sub-project
+SET(PYINTERP_SUBPROJECT YES CACHE INTERNAL "")
+SET(PYINTERP_EXPORT_NAME "${PROJECT_NAME}" CACHE STRING "")
+SET(PYINTERP_INSTALL_LIBS "${PYCONSOLE_INSTALL_LIBS}" CACHE PATH "")
 SET(PYINTERP_INSTALL_HEADERS "${PYCONSOLE_INSTALL_HEADERS}" CACHE PATH "")
 SET(PYINTERP_INSTALL_RES "${PYCONSOLE_INSTALL_RES}" CACHE PATH "")
+SET(PYINTERP_INSTALL_CMAKE "${PYCONSOLE_INSTALL_CMAK}" CACHE PATH "")
 
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/../PyInterp ${PROJECT_BINARY_DIR}/PyInterp)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../PyInterp/src)
 
-# Sources
-# ========
+# Subdirs
+# =======
 ADD_SUBDIRECTORY(src)
 
+# Export configuration and targets
+# ================================
+IF(NOT PYCONSOLE_SUBPROJECT)
+  # Install the export set for use with the install-tree
+  INSTALL(EXPORT ${PYCONSOLE_EXPORT_NAME}TargetGroup DESTINATION ${PYCONSOLE_INSTALL_CMAKE}
+          FILE ${PROJECT_NAME}Targets.cmake)
+ENDIF()

@@ -1,0 +1,18 @@
+1. Each sub-project must export its own configuration.
+
+2. When building as sub-projects within SALOME GUI top-level project,
+   targets file can be directly included from the GUI main configuration.
+   Or, alternatively, find_package(sub-project) must be called from
+   GUI main configuration file, similarly to other pre-requisites.
+
+3. As soon as (1) and (2) are done, refactor sub-projects to:
+   * Include other sub-projects recursively, following this approach,
+     for example, SalomeGUI -> PyConsole -> PyInterp.
+   * CurvePlot should become independent project, probably depending
+     on PyInterp. Also, it seems reasonable to avoid this direct
+     dependency as it is minimal de facto and needed features can be
+     achieved by simple copy-paste.
+   * Due to this refactoring, direct inclusion of PyInterp to PyConsole
+     via add_subdirectory() will be not needed anymore.
+
+4. Export targets for RemoteFileBrowser.
