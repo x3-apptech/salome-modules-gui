@@ -130,8 +130,7 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myIsUseLocalSelection(false),
 #endif
   myClippingDlg (NULL),
-  myFitter(0),
-  mySelectionDone(false)
+  myFitter(0)
 {
   // init CasCade viewers
   myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
@@ -143,10 +142,6 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor( Quantity_NOC_WHITE );
   myAISContext->HighlightStyle(Prs3d_TypeOfHighlight_Selected)->SetColor( Quantity_NOC_WHITE );
 
-  // Set overlap detection for common behaviour of Rect selection and Polygon selection
-  // (both selects an object with partial overlap)
-  myAISContext->MainSelector()->AllowOverlapDetection(true);
-  
   // display isoline on planar faces (box for ex.)
   myAISContext->IsoOnPlane( true );
 
@@ -378,8 +373,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   myEndPnt.setX(theEvent->x()); myEndPnt.setY(theEvent->y());
   bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
   
-  // In case of small tremor of a mouse pointer, consider it as a click
-  if ( !OCCViewer::overThreshold( QRect( myStartPnt, myEndPnt ) )  && !mySelectionDone)
+  if (myStartPnt == myEndPnt)
   {
     if (!aHasShift) {
       myAISContext->ClearCurrents( false );
@@ -398,7 +392,6 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
       myAISContext->Select( Standard_True );
     emit selectionChanged();
   }
-  mySelectionDone = false;
 
   //else
   //{

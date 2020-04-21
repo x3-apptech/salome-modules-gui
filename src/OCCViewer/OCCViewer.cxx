@@ -45,14 +45,3 @@ QColor OCCViewer::color( const Quantity_Color& c )
                   int( c.Green() * 255 ),
                   int( c.Blue()  * 255 ) );
 }
-
-/*!
-  \brief Check if size of given rectagle exceeds threshold value for mouse events.
-  \param rect Given rectangle
-  \return Result of comparison
-*/
-bool OCCViewer::overThreshold( const QRect& rect )
-{
-  const int threshold = 3;
-  return qMin( rect.height(), rect.width() ) >= threshold;
-}

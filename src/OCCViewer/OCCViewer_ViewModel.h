@@ -260,9 +260,6 @@ public:
 
   void    initView( OCCViewer_ViewWindow* view );
 
-  /// Sets a flag to ignore mouse release for selection. Used for Rectangle/Polygon selection
-  void    doNotSelect() { mySelectionDone = true; }
-
 signals:
   void selectionChanged();
   void deselection();
@@ -329,7 +326,6 @@ protected:
 #endif
 
   OCCViewer_Fitter* myFitter;
-  bool mySelectionDone;
 };
 
 #ifdef WIN32
