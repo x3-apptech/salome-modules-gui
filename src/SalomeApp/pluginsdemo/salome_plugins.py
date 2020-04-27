@@ -279,7 +279,30 @@ def runSalomeShellSession(context):
       except Exception as e:
         print("Error: ",e)
 
-
 salome_pluginsmanager.AddFunction('SALOME shell session',
                                   'Execute a SALOME shell session in an external xterm',
                                   runSalomeShellSession)
+
+# -------------------------------------------------------------------------
+# Example 4: run CODE
+def runCodeEditor(context):
+    import os,subprocess
+    import salome_version
+    import shutil
+    from PyQt5.Qt import QMessageBox
+    from SalomePyQt import SalomePyQt
+    try:
+      command = shutil.which('code')
+      if command:
+        try:
+          subprocess.check_call(command, shell = True)
+        except Exception as e:
+          print("Error: ",e)
+      else:
+        QMessageBox.critical(SalomePyQt.getDesktop(), "Error", "Visual Studio Code executable is not found")
+    except Exception as e:
+      print("Error: ",e)
+
+salome_pluginsmanager.AddFunction('Launch VS Code (debugger)',
+                                  'Execute Visual Studio Code',
+                                  runCodeEditor)
