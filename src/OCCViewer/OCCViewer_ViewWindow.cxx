@@ -3178,7 +3178,7 @@ void OCCViewer_ViewWindow::onSketchingFinished()
     case Polygon:
       {
         QPolygon* aPolygon = (QPolygon*)mypSketcher->data();
-        if( aPolygon )
+        if( aPolygon && (aPolygon->size() > 2))
         {
           int size = aPolygon->size();
           TColgp_Array1OfPnt2d anArray(1, size);

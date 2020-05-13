@@ -473,7 +473,7 @@ void OCCViewer_PolygonSketcher::onMouse( QMouseEvent* e )
 
   if ( e->type() == QEvent::MouseButtonRelease && ( e->button() & sketchButton() ) )
   {
-    myResult = closed? Accept : Reject;
+    myResult = (closed && (points->count() > 2)) ? Accept : Reject;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
                                                    e->globalPos(), e->button(), 
                                                    e->buttons(), e->modifiers() ) );
