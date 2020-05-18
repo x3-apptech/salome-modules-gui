@@ -58,8 +58,8 @@ selection requirements (specified by the dialog) under the current mouse cursor,
 it is possible to switch between them by means of mouse scroll wheel.
 The same can be also done by pressing *"N"* and *"P"* keys.
 
-There are also two additional selection mechanisms: rectangle and 
-polyline selection.
+There are also three additional selection mechanisms: rectangle, 
+polyline and circle selection.
 
 Rectangle selection
 *******************
@@ -86,10 +86,18 @@ which allows selecting an arbitrary part of the graphic area using a
 polygon frame (rubber band), instead of the usual selection with a
 rectangular frame.
 
-To produce a Polyline Selection, press and hold the right mouse button and draw
-the first side of the selection polygon, then change the direction by clicking
-the left mouse button add draw another side, etc. Click twice by left mouse 
-button to finish drawing.
+To produce a Polyline Selection in VTK Viewer, press and hold the right
+mouse button and draw the first side of the selection polygon, then change
+the direction by clicking the left mouse button add draw another side, etc.
+Click twice by left mouse button to finish drawing.
+
+To produce a Polyline Selection in OCC Viewer, press and hold the left
+mouse button and draw the first side of the selection polygon, then change
+the direction by clicking the Space keyboard button add draw another side, etc.
+You can delete last polygon point by Backspace button.
+To finish drawing use Enter (Return) key or put mouse cursor near the first
+polygon point (you mouse cursor will have '+' shape in this case)
+and click the Space or release the left mouse button.
 
 .. image:: ../images/polyselectionvtk11.png
 	:align: center
@@ -99,8 +107,23 @@ As a result, the objects within the polygon are selected.
 .. image:: ../images/polyselectionvtk21.png
 	:align: center
 
-To add an area to the existing selection it is necessary to hold down 
-*Shift* key while selecting.
+.. note:: To add an area to the existing selection it is necessary to hold down *Shift* key while selecting.
+
+Circle selection
+****************
+
+To select a circular area press the left mouse button in the viewer at the
+desired centre of the circle and hold it while you reach required circle radius.
+
+.. image:: ../images/circselectionocc1.png
+	:align: center
+
+As a result, the objects within the circle are selected.
+
+.. image:: ../images/circselectionocc2.png
+	:align: center
+
+.. note:: It is possible to add an area to the existing selection by holding down *Shift* key while selecting.
 
 .. _viewer_navigation_modes:
 
