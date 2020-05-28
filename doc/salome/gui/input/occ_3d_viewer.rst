@@ -70,14 +70,21 @@ ____
 .. image:: ../../../../src/OCCViewer/resources/occ_view_rect_style.png
 	:align: center
 
-**Advanced selection by polygon** - enables advanced selection by polygon.
+**Selection by rectangle** - enables selection by rectangle (see for details :ref:`viewer_selection` chapter).
+
+____
+
+.. image:: ../../../../src/OCCViewer/resources/occ_view_polygon_style.png
+	:align: center
+
+**Selection by polygon** - enables selection by polygon (see for details :ref:`viewer_selection` chapter).
 
 ____
 
 .. image:: ../../../../src/OCCViewer/resources/occ_view_circle_style.png
 	:align: center
 
-**Advanced selection by circle** - enables advanced selection by circle.
+**Selection by circle** - enables selection by circle (see for details :ref:`viewer_selection` chapter).
 
 ____
 

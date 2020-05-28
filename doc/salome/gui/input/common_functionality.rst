@@ -40,6 +40,7 @@ Default background for the OCC viewer is specified via the
 :ref:`occ_preferences` and for the
 VTK viewer via the :ref:`vtk_preferences`.
 
+.. _viewer_selection:
 
 Selection
 #########
