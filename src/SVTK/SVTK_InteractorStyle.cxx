@@ -1773,7 +1773,9 @@ void SVTK_InteractorStyle::endDrawPolygon()
 {
   if ( myPolygonBand ) myPolygonBand->hide();
 
-  delete myPolygonBand;
+  // RNV fix for : #19204 [CEA][Windows] VTK Viewer - Access violation while right clicking
+  //delete myPolygonBand;
+  myPolygonBand->deleteLater();
   myPolygonBand = 0;
 
   myPolygonPoints.clear();
