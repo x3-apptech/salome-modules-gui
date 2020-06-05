@@ -193,6 +193,7 @@ private slots:
 
 private:
   void                                createExtraActions();
+  void                                ensureShaperIsActivated();
 
 private:
 #ifndef DISABLE_PYCONSOLE

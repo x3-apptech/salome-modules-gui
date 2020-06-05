@@ -4956,6 +4956,34 @@ void LightApp_Application::onDesktopMessage( const QString& message )
     if ( !vtype.isEmpty() )
       getViewManager( vtype, true );
   }
+  else if ( message.toLower().startsWith("register_module_in_study" ) ) {
+    QString moduleName = message.split( sectionSeparator ).last();
+    // Check name of current activating module name in order to avoid ciclik 
+    // call because of messages
+    if (!property("activateModule").toBool()) {
+      CAM_Module* mod = module(moduleName);
+      if (!mod)
+        mod = module(moduleTitle(moduleName));
+      if (!mod) {
+        mod = loadModule(moduleName);
+        if (!mod)
+          mod = loadModule(moduleTitle(moduleName));
+        if (mod) {
+          addModule(mod);
+        }
+      }
+      if (mod) {
+        CAM_Study* anActiveStudy = dynamic_cast<CAM_Study*>(activeStudy());
+        if (anActiveStudy) {
+          mod->connectToStudy(anActiveStudy);
+          LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>(mod->dataModel());
+          if(aDM) {
+            aDM->initRootObject();
+          }
+        }
+      }
+    }
+  }
   else {
     QStringList data = message.split( sectionSeparator );
     if ( data.count() > 1 ) {
