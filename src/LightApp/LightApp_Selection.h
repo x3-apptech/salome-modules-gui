@@ -45,7 +45,7 @@ class SUIT_ViewWindow;
 class LIGHTAPP_EXPORT LightApp_Selection : public QtxPopupSelection
 {
 protected:
-  typedef enum { OI_Entry, OI_Reference, OI_User } ObjectInformation;
+  typedef enum { OI_Entry, OI_Reference, OI_RefEntry, OI_User } ObjectInformation;
 
 public:
   LightApp_Selection();

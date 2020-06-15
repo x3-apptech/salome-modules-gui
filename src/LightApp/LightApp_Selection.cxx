@@ -102,8 +102,9 @@ void LightApp_Selection::init( const QString& client, LightApp_SelectionMgr* mgr
 
         entries.insert( entry );
 
-	setObjectInfo( num, OI_Entry, entry );
-	setObjectInfo( num, OI_Reference, sowner->entry() != entry );
+        setObjectInfo( num, OI_Entry, entry );
+        setObjectInfo( num, OI_Reference, sowner->entry() != entry );
+        setObjectInfo( num, OI_RefEntry, sowner->entry() );
 
         if ( processOwner( sowner ) )
           num++;
