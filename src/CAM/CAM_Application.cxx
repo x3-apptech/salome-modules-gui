@@ -417,6 +417,7 @@ bool CAM_Application::activateModule( const QString& modName )
   bool res = false;
   if ( !modName.isEmpty() )
   {
+    setProperty("activateModule", true);
     CAM_Module* mod = module( modName );
     if ( !mod )
       mod = loadModule( modName );
@@ -424,6 +425,7 @@ bool CAM_Application::activateModule( const QString& modName )
 
     if ( mod )
       res = activateModule( mod );
+    setProperty("activateModule", QVariant());
   }
   else
     res = activateModule( 0 );

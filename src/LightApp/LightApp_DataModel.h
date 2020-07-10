@@ -70,6 +70,9 @@ public:
   int  groupId() const;
   void registerColumn( SUIT_DataBrowser*, const QString&, const int );
   void unregisterColumn( SUIT_DataBrowser*, const QString& );
+  //! For initialization of the data model and registration of SComponent when study is created
+  //! but module was not activated.
+  virtual void                        initRootObject() {};
 
 signals:
   void                                opened();

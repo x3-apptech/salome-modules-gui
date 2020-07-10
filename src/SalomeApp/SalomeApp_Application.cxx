@@ -966,6 +966,7 @@ void SalomeApp_Application::onDumpStudy( )
       bool res;
       {
         SUIT_OverrideCursor wc;
+        ensureShaperIsActivated();
         res = appStudy->dump( aFileName, toPublish, isMultiFile, toSaveGUI );
       }
       if ( !res )
@@ -2113,3 +2114,21 @@ PyConsole_Interp* SalomeApp_Application::createPyInterp()
 }
 
 #endif // DISABLE_PYCONSOLE
+
+void SalomeApp_Application::ensureShaperIsActivated()
+{
+  SalomeApp_Study* study = dynamic_cast<SalomeApp_Study*>(activeStudy());
+  _PTR(Study) studyDS = getStudy();
+  if ( study && studyDS )
+  {
+    _PTR(SObject) shaper = studyDS->FindObjectByPath("/Shaper"); // non null result if shaper data is present in the study
+    bool shaperIsActive = false;
+    QList<CAM_DataModel*> models;
+    study->dataModels( models );
+    for( int i = 0; i < models.count() && !shaperIsActive; i++ )
+      shaperIsActive = models[i]->module()->moduleName() == "Shaper";
+	
+    if (shaper && !shaperIsActive)
+      onDesktopMessage("register_module_in_study/Shaper");
+  }
+}

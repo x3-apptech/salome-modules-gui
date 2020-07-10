@@ -97,6 +97,7 @@
 #include <Image_PixMap.hxx>
 
 #include <Standard_Version.hxx>
+#include <Standard_Failure.hxx>
 
 #include "utilities.h"
 
@@ -3662,15 +3663,19 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   aProps.getPosition( aPosition[0], aPosition[1], aPosition[2] );
   aProps.getViewUp( anUpDir[0], anUpDir[1], anUpDir[2] );
   aProps.getAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
+  
+  try {
+    aDestView->SetAt( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
+    aDestView->SetEye( aPosition[0], aPosition[1], aPosition[2] );
+    aDestView->SetUp( anUpDir[0], anUpDir[1], anUpDir[2] );
+    aDestView->Camera()->SetScale( aProps.getMappingScale() );
 
-  aDestView->SetAt( aFocalPoint[0], aFocalPoint[1], aFocalPoint[2] );
-  aDestView->SetEye( aPosition[0], aPosition[1], aPosition[2] );
-  aDestView->SetUp( anUpDir[0], anUpDir[1], anUpDir[2] );
-  aDestView->Camera()->SetScale( aProps.getMappingScale() );
-
-  getViewPort()->setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
-  aDestView->SetImmediateUpdate( Standard_True );
-  aDestView->Redraw();
+    getViewPort()->setAxialScale( anAxialScale[0], anAxialScale[1], anAxialScale[2] );
+    aDestView->SetImmediateUpdate( Standard_True );
+    aDestView->Redraw();
+  } 
+  catch (Standard_Failure) {
+  }
 
   blockSignals( blocked );
 }
