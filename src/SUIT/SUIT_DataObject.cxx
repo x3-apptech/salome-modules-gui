@@ -422,9 +422,6 @@ void SUIT_DataObject::setParent( SUIT_DataObject* p )
 
 void SUIT_DataObject::assignParent( SUIT_DataObject* p )
 {
-  if ( p == myParent )
-    return;
-
   myParent = p;
 }
 

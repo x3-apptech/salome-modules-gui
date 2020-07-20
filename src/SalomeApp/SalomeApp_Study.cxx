@@ -154,7 +154,7 @@ public:
           SalomeApp_DataObject* aFatherDO = it->second;
 
           it = entry2SuitObject.find(theID);
-          if (it != entry2SuitObject.end()) { // this SOobject is already added somethere
+          if (it != entry2SuitObject.end()) { // this SOobject is already added somewhere
             suit_obj = it->second;
             SUIT_DataObject* oldFather = suit_obj->parent();
             if (oldFather) {
@@ -181,15 +181,7 @@ public:
 
           suit_obj->updateItem();
           // define position in the data tree (in aFatherDO) to insert the aSObj
-          int pos = -1;
-          //int childDataObjCount = aFatherDO->childCount();
-          _PTR(UseCaseIterator) aUseCaseIter = aUseCaseBuilder->GetUseCaseIterator(aFatherSO);
-          for (int cur = 0; aUseCaseIter->More() && pos < 0; cur++, aUseCaseIter->Next()) {
-            if (aUseCaseIter->Value()->GetID() == theID) {
-              pos = cur;
-              break;
-            }
-          }
+          int pos = aUseCaseBuilder->GetIndexInFather(aFatherSO, aSObj);
 
           aFatherDO->insertChildAtPos(suit_obj, pos);
           //aFatherDO->insertChild(suit_obj, pos);
@@ -625,7 +617,7 @@ bool SalomeApp_Study::saveDocumentAs( const QString& theFileName )
       aModel->saveAs( theFileName, this, listOfFiles );
       if ( !listOfFiles.isEmpty() )
         saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
-		       listOfFiles);
+                       listOfFiles);
     }
   }
 
@@ -669,7 +661,7 @@ bool SalomeApp_Study::saveDocument()
       aModel->save(listOfFiles);
       if ( !listOfFiles.isEmpty() )
         saveModuleData(aModel->module()->name(), 0, // 0 means persistence file
-		       listOfFiles);
+                       listOfFiles);
     }
   }
 
@@ -764,7 +756,7 @@ bool SalomeApp_Study::dump( const QString& theFileName,
         // This code is shared with persistence mechanism.
         // NOTE: this should be revised if behavior of saveModuleData() changes!
         saveModuleData(aModel->module()->name(), 1, // 1 means dump file
-		       listOfFiles);
+                       listOfFiles);
     }
   }
 
@@ -1042,14 +1034,14 @@ bool SalomeApp_Study::openDataModel( const QString& studyName, CAM_DataModel* dm
   }
   QStringList listOfFiles;
   openModuleData(dm->module()->name(), 0, // 0 means persistence file
-		 listOfFiles);
+                 listOfFiles);
   if (dm && dm->open(studyName, this, listOfFiles)) {
     // Remove the files and temporary directory, created
     // for this module by LightApp_Engine_i::Load()
     bool isMultiFile = false; // TODO: decide, how to access this parameter
     RemoveTemporaryFiles( dm->module()->name().toStdString().c_str(), isMultiFile, true );
     SetListOfFiles( dm->module()->name().toStdString().c_str(), 0, // 0 means persistence file
-		    std::vector<std::string>() );
+                    std::vector<std::string>() );
 
     // Something has been read -> create data model tree
     LightApp_DataModel* aDM = dynamic_cast<LightApp_DataModel*>( dm );
@@ -1123,7 +1115,7 @@ void SalomeApp_Study::RemoveTemporaryFiles ( const char* theModuleName, bool isM
       aSeq.push_back(CORBA::string_dup(aListOfFiles[i + 1].c_str()));
 
     SalomeApp_Engine_i* engine = SalomeApp_Engine_i::GetInstance( theModuleName, false );
-    bool toRemove = force || engine && !engine->keepFiles();
+    bool toRemove = force || ( engine && !engine->keepFiles() );
 
     if ( toRemove ) {
       SALOMEDS_Tool::RemoveTemporaryFiles(aTmpDir.c_str(), aSeq, true);
