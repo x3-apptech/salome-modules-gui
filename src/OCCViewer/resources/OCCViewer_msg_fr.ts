@@ -249,7 +249,7 @@
     </message>
     <message>
         <source>DSC_POLYGON_SELECTION_STYLE</source>
-        <translation>La sélection par polygone</translation>
+        <translation>La sélection par polygone. Utilisez la touche Espace pour commencer un nouveau segment</translation>
     </message>
     <message>
         <source>MNU_CIRCLE_SELECTION_STYLE</source>

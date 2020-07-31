@@ -250,7 +250,7 @@
     </message>
     <message>
         <source>DSC_POLYGON_SELECTION_STYLE</source>
-        <translation>Selection by polygon</translation>
+        <translation>Selection by polygon. Use Space key to start a new segment</translation>
     </message>
     <message>
         <source>MNU_CIRCLE_SELECTION_STYLE</source>
