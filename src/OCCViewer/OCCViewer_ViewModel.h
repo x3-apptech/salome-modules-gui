@@ -41,6 +41,8 @@
 #include <AIS_ListOfInteractive.hxx>
 #include <Graphic3d_SequenceOfHClipPlane.hxx>
 
+#include <Basics_OCCTVersion.hxx>
+
 class QKeyEvent;
 class QMouseEvent;
 
