@@ -64,7 +64,7 @@ SalomeApp_Engine_i::~SalomeApp_Engine_i()
 }
 
 SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theComponent,
-                                             const char* theURL,
+                                             const char* /*theURL*/,
                                              bool isMultiFile)
 {
   SALOMEDS::TMPFile_var aStreamFile = new SALOMEDS::TMPFile;
@@ -136,7 +136,7 @@ SALOMEDS::TMPFile* SalomeApp_Engine_i::Save (SALOMEDS::SComponent_ptr theCompone
   // listOfFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
   ListOfFiles listOfFiles = GetListOfFiles( 0 ); // 0 means persistence file
-  const int n = listOfFiles.size() - 1;
+  const int n = (int)listOfFiles.size() - 1; //!< TODO: conversion from size_t to int
   
   if (n > 0) { // there are some files, containing persistent data of the component
     std::string aTmpDir = listOfFiles[0];
@@ -187,7 +187,7 @@ CORBA::Boolean SalomeApp_Engine_i::Load (SALOMEDS::SComponent_ptr theComponent,
     SALOMEDS_Tool::PutStreamToFiles(theFile, aTmpDir.c_str(), isMultiFile);
 
   // Store list of file names to be used by the component loading procedure
-  const int n = aSeq.size() + 1;
+  const int n = (int)aSeq.size() + 1; //!< TODO: conversion from size_t to int
   ListOfFiles listOfFiles (n);
   listOfFiles[0] = aTmpDir;
   for (int i = 1; i < n; i++)
@@ -212,9 +212,9 @@ void SalomeApp_Engine_i::SetListOfFiles (int type, const ListOfFiles& theListOfF
 /*! 
  *  DumpPython implementation for light modules
  */
-Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean isPublished,
-						                         CORBA::Boolean isMultiFile,
-						                         CORBA::Boolean& isValidScript)
+Engines::TMPFile* SalomeApp_Engine_i::DumpPython(CORBA::Boolean /*isPublished*/,
+                                                 CORBA::Boolean /*isMultiFile*/,
+                                                 CORBA::Boolean& isValidScript)
 {
   MESSAGE("SalomeApp_Engine_i::DumpPython(): myComponentName = "<<
 	  qPrintable( myComponentName ) << ", this = " << this);

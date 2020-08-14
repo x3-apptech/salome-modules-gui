@@ -980,7 +980,7 @@ void SalomeApp_ComboBox::insertItem(const QString& theValue,
 */
 void SalomeApp_ComboBox::insertList(const QStringList& theList)
 {
-  for (unsigned i = 0; i < theList.count(); i++)
+  for (int i = 0; i < theList.count(); i++)
     insertItem(theList[i]);
 }
 
@@ -1243,7 +1243,7 @@ void SalomeApp_EntityEdit::insertList(const TColStd_ListOfInteger& theList,
 
   TColStd_ListIteratorOfListOfInteger aIter(theList);
   for (unsigned i = 0; aIter.More(); aIter.Next(), i++) {
-    if (theCurrent == i) {
+    if (theCurrent == (int)i) { //!< TODO: mismatch signed/unsigned
       setText(QString::number(aIter.Value()));
       break;
     }
@@ -1274,7 +1274,7 @@ void SalomeApp_EntityEdit::insertList(const TColStd_ListOfReal& theList,
 
   TColStd_ListIteratorOfListOfReal aIter(theList);
   for (unsigned i = 0; aIter.More(); aIter.Next(), i++) {
-    if (theCurrent == i) {
+    if (theCurrent == (int)i) { //!< TODO: mismatch signed/unsigned
       setText(QString::number(aIter.Value()));
       break;
     }

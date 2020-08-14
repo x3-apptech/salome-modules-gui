@@ -230,7 +230,7 @@ public:
   }
 };
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderer( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderer( PyObject* /*self*/, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -285,7 +285,7 @@ public:
   }
 };
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindow( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindow( PyObject* /*self*/, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -340,7 +340,7 @@ public:
   }
 };
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindowInteractor( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindowInteractor( PyObject* /*self*/, PyObject* args )
 {
   PyObject* aResult = Py_None;
   int toCreate = 0;
@@ -362,7 +362,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_getRenderWindowInteractor( PyOb
   \return nothing (Py_None)
 */
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_showTrihedron( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_showTrihedron( PyObject* /*self*/, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -373,7 +373,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_showTrihedron( PyObject* self, 
     virtual void Execute()
     {
       if( SVTK_ViewWindow* aVTKViewWindow = GetVTKViewWindow( __Find ) ) {
-        if ( aVTKViewWindow->isTrihedronDisplayed() != myShow )
+        if ( aVTKViewWindow->isTrihedronDisplayed() != (bool)myShow )
           aVTKViewWindow->onViewTrihedron(myShow);
       }
     }
@@ -397,7 +397,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_showTrihedron( PyObject* self, 
   \return nothing (Py_None)
 */
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_fitAll( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_fitAll( PyObject* /*self*/, PyObject* /*args*/ )
 {
   class TEvent: public SALOME_Event
   {
@@ -425,7 +425,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_fitAll( PyObject* self, PyObjec
   \return nothing (Py_None)
 */
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_setView( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_setView( PyObject* /*self*/, PyObject* args )
 {
   class TEvent: public SALOME_Event
   {
@@ -476,7 +476,7 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_setView( PyObject* self, PyObje
   \return nothing (Py_None)
 */
 
-extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_resetView( PyObject* self, PyObject* args )
+extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_resetView( PyObject* /*self*/, PyObject* /*args*/ )
 {
   class TEvent: public SALOME_Event
   {
@@ -496,14 +496,14 @@ extern "C" SALOMEPY_EXPORT PyObject* libSalomePy_resetView( PyObject* self, PyOb
 
 static PyMethodDef libSalomePy_methods[] = 
 {
-  { "getRenderer",               libSalomePy_getRenderer,               METH_VARARGS },
-  { "getRenderWindow",           libSalomePy_getRenderWindow,           METH_VARARGS },
-  { "getRenderWindowInteractor", libSalomePy_getRenderWindowInteractor, METH_VARARGS },
-  { "showTrihedron",             libSalomePy_showTrihedron,             METH_VARARGS },
-  { "fitAll",                    libSalomePy_fitAll,                    METH_NOARGS  },
-  { "setView",                   libSalomePy_setView,                   METH_VARARGS },
-  { "resetView",                 libSalomePy_resetView,                 METH_NOARGS  },
-  { NULL, NULL }
+  { "getRenderer",               libSalomePy_getRenderer,               METH_VARARGS, PyDoc_STR("Get renderer from current vtk view") },
+  { "getRenderWindow",           libSalomePy_getRenderWindow,           METH_VARARGS, PyDoc_STR("Get render window from current vtk view") },
+  { "getRenderWindowInteractor", libSalomePy_getRenderWindowInteractor, METH_VARARGS, PyDoc_STR("Get interactor from current vtk view") },
+  { "showTrihedron",             libSalomePy_showTrihedron,             METH_VARARGS, PyDoc_STR("Show/hide trihedron in current vtk view") },
+  { "fitAll",                    libSalomePy_fitAll,                    METH_NOARGS,  PyDoc_STR("Fit current vtk view to show all contents")  },
+  { "setView",                   libSalomePy_setView,                   METH_VARARGS, PyDoc_STR("Set side view for the current VTK viewer") },
+  { "resetView",                 libSalomePy_resetView,                 METH_NOARGS,  PyDoc_STR("Reset camera for current vtk view")  },
+  { 0, 0, 0, 0 }
 };
 
 struct module_state {

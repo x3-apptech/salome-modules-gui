@@ -42,11 +42,12 @@
 bool ToolsGUI::GetVisibility( _PTR(SObject) theObj,
                               void*         theId )
 {
+  // todo: this function seems to be not used
   _PTR(GenericAttribute) anAttr;
   if ( theObj && theObj->FindAttribute( anAttr, "AttributeGraphic" ) )
   {
     _PTR(AttributeGraphic) aGraphic (anAttr);
-    return aGraphic->GetVisibility( (unsigned long)theId );
+    return aGraphic->GetVisibility( int(reinterpret_cast<long long>(theId)) ); // todo: unsafe - converting pointer to int can give non-unique result
   }
 
   return false;
@@ -62,6 +63,7 @@ bool ToolsGUI::SetVisibility( const char* theEntry,
                               const bool  theValue,
                               void*       theId )
 {
+  // todo: this function seems to be not used
   _PTR(Study) aStudy = ClientFactory::Study(KERNEL::getStudyServant());
   _PTR(SObject) anObj ( aStudy->FindObjectID( theEntry ) );
 
@@ -71,13 +73,13 @@ bool ToolsGUI::SetVisibility( const char* theEntry,
     if ( anObj->FindAttribute( aGAttr, "AttributeGraphic" ) )
     {
       _PTR(AttributeGraphic) anAttr ( aGAttr );
-      anAttr->SetVisibility( (unsigned long)theId, theValue );
+      anAttr->SetVisibility( int(reinterpret_cast<long long>(theId)), theValue ); // todo: unsafe - converting pointer to int can give non-unique result
     }
     else if ( theValue )
     {
       _PTR(StudyBuilder) aBuilder (aStudy->NewBuilder());
       _PTR(AttributeGraphic) anAttr (aBuilder->FindOrCreateAttribute(anObj, "AttributeGraphic"));
-      anAttr->SetVisibility( (unsigned long)theId, theValue );
+      anAttr->SetVisibility( int(reinterpret_cast<long long>(theId)), theValue ); // todo: unsafe - converting pointer to int can give non-unique result
     }
     return true;
   }

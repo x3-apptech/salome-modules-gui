@@ -39,7 +39,7 @@ public:
 
 public:
   static VTKViewer_Texture *New();
-  vtkTypeMacro(VTKViewer_Texture,vtkOpenGLTexture);
+  vtkTypeMacro(VTKViewer_Texture,vtkOpenGLTexture)
 
   virtual void Load(vtkRenderer *ren);
 

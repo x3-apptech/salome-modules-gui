@@ -74,7 +74,7 @@ static int GetEdgeId(vtkPicker *thePicker, SALOME_Actor *theActor, int theObjId)
 }
 */
 
-vtkStandardNewMacro(VTKViewer_InteractorStyle);
+vtkStandardNewMacro(VTKViewer_InteractorStyle)
 
 
 /*!Constructor.*/
@@ -1197,7 +1197,7 @@ void VTKViewer_InteractorStyle::onOperation(QPoint mousePos)
     {
       if (!myCursorState)
         setCursor(VTK_INTERACTOR_STYLE_CAMERA_SELECT);
-    }
+    } // fall through!
   case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
       myOtherPoint = mousePos;
@@ -1221,7 +1221,7 @@ void VTKViewer_InteractorStyle::OnSelectionModeChanged()
 /*! called when user moves mouse inside viewer window and there is no active viewer operation \n
  * (!put necessary processing here!)
  */
-void VTKViewer_InteractorStyle::onCursorMove(QPoint mousePos) {
+void VTKViewer_InteractorStyle::onCursorMove(QPoint /*mousePos*/) {
   // processing highlighting
 //  SUIT_Study* anActiveStudy = SUIT_Application::getDesktop()->getActiveStudy();
 //  SALOME_Selection* Sel = SALOME_Selection::Selection( anActiveStudy->getSelection() );

@@ -319,6 +319,8 @@ void OCCViewer_ViewWindow::initLayout()
   case YZPlane:
     onFrontView();
     break;
+  default:
+    break;
   }
 
   // Graduated axes dialog
@@ -716,11 +718,10 @@ bool OCCViewer_ViewWindow::computeGravityCenter( double& theX, double& theY, dou
     if ( aStructure->IsEmpty() || !aStructure->IsVisible() || aStructure->CStructure()->IsForHighlight )
       continue;
 
-    Bnd_Box aBox1 = aStructure->MinMaxValues();
     const Graphic3d_BndBox3d& aBox = aStructure->CStructure()->BoundingBox();
     if (!aBox.IsValid())
       continue;
-    aXmin = /*aBox.IsVoid() ? RealFirst() :*/ aBox.CornerMin().x();
+    aXmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().x();
     aYmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().y();
     aZmin = /*aBox.IsVoid() ? RealFirst() : */aBox.CornerMin().z();
     aXmax = /*aBox.IsVoid() ? RealLast()  : */aBox.CornerMax().x();
@@ -984,7 +985,7 @@ void OCCViewer_ViewWindow::vpMouseMoveEvent( QMouseEvent* theEvent )
       int aButton = theEvent->buttons();
       int anInteractionStyle = interactionStyle();
       if ( ( anInteractionStyle == SUIT_ViewModel::STANDARD &&
-           aButton == Qt::LeftButton && ( aState == Qt::NoModifier || Qt::ShiftModifier ) ) ||
+           aButton == Qt::LeftButton && ( aState == Qt::NoModifier || aState == Qt::ShiftModifier ) ) ||
          ( anInteractionStyle == SUIT_ViewModel::KEY_FREE &&
          aButton == Qt::LeftButton && ( aState == Qt::ControlModifier || aState == ( Qt::ControlModifier|Qt::ShiftModifier ) ) ) ) {
         myDrawRect = myEnableDrawMode;
@@ -1110,6 +1111,8 @@ void OCCViewer_ViewWindow::vpMouseReleaseEvent(QMouseEvent* theEvent)
       endDrawRect();
       resetState();
     }
+    break;
+  default:
     break;
   }
 
@@ -2398,9 +2401,9 @@ QImage OCCViewer_ViewWindow::dumpView()
 #endif // USE_OLD_IMPLEMENTATION
 }
 
-bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& img,
+bool OCCViewer_ViewWindow::dumpViewToFormat( const QImage& /*img*/,
                                              const QString& fileName,
-                                             const QString& format )
+                                             const QString& /*format*/ )
 {
   bool res = false;
   QApplication::setOverrideCursor( Qt::WaitCursor );
@@ -2618,7 +2621,7 @@ QString OCCViewer_ViewWindow::getVisualParameters()
   data << QString( "size=%1" )     .arg( params.size,    0, 'f',  2 );
 
   ClipPlanesList aPlanes =  myModel->getClipPlanes();
-  for ( int i=0; i < aPlanes.size(); i++ )
+  for ( int i=0; i < (int)aPlanes.size(); i++ )
   {
     OCCViewer_ClipPlane& aPlane = aPlanes[i];
     QString ClippingPlane = QString( "ClippingPlane%1=").arg( i+1 );
@@ -2739,6 +2742,8 @@ QString OCCViewer_ViewWindow::getVisualParameters()
         Handle(V3d_DirectionalLight)::DownCast( aLight )->Direction( aX, aY, aZ );
       else if ( aLight->Type() == V3d_POSITIONAL )
         Handle(V3d_PositionalLight)::DownCast( aLight )->Position( aX, aY, aZ );
+      else
+	continue; // not supported type of light source
       LightSource += QString( "lightX~%1;" ).arg( aX );
       LightSource += QString( "lightY~%1;" ).arg( aY );
       LightSource += QString( "lightZ~%1;" ).arg( aZ );
@@ -2914,10 +2919,10 @@ void OCCViewer_ViewWindow::setVisualParameters( const QString& parameters )
 	    myModel->getViewer3d()->NextDefinedLights();
 	  }
         }
-        double aX, aY, aZ;
-        double cR, cG, cB;
-        V3d_TypeOfLight aType;
-        bool isHeadlight;
+        double aX = 0., aY = 0., aZ = 0.;
+        double cR = 0., cG = 0., cB = 0.;
+        V3d_TypeOfLight aType = (V3d_TypeOfLight)-1; // not specified
+        bool isHeadlight = false;
         QStringList lsData = paramValue.split( ';' );
         foreach( QString lsParam, lsData )
         {
@@ -3622,7 +3627,7 @@ void OCCViewer_ViewWindow::synchronize( SUIT_ViewWindow* theView )
     aDestView->SetImmediateUpdate( Standard_True );
     aDestView->Redraw();
   } 
-  catch (Standard_Failure) {
+  catch (Standard_Failure&) {
   }
 
   blockSignals( blocked );
@@ -3763,7 +3768,7 @@ void OCCViewer_ViewWindow::projAndPanToGravity(V3d_TypeOfOrientation CamOri)
   if( USE_XY )
   {
     const double EPS = 1E-6;
-    int xp = myViewPort->width()/2, yp = myViewPort->height()/2, xp1, yp1;
+    int xp = myViewPort->width()/2, yp = myViewPort->height()/2;
     aView3d->Convert( xp, yp, X, Y, Z );
 
     gp_Dir d = aView3d->Camera()->Direction();

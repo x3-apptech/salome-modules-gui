@@ -260,7 +260,7 @@ namespace
     int inputLen = input.length();
     QDataStream anInputData( &input, QIODevice::ReadOnly );
     while ( tmp < inputLen ) {
-      tmp = input.indexOf( QToolBarMarker, tmp + 1 );
+      tmp = input.indexOf( (uchar)QToolBarMarker, tmp + 1 );
       if ( tmp < 0 )
         break;
       anInputData.device()->seek( tmp );
@@ -1854,7 +1854,7 @@ void LightApp_Application::onStudySaved( SUIT_Study* s )
 }
 
 /*!Protected SLOT. On study closed.*/
-void LightApp_Application::onStudyClosed( SUIT_Study* s )
+void LightApp_Application::onStudyClosed( SUIT_Study* /*s*/ )
 {
   /*
   disconnect( this, SIGNAL( viewManagerRemoved( SUIT_ViewManager* ) ),
@@ -4937,7 +4937,7 @@ bool LightApp_Application::renameAllowed( const QString& /*entry*/) const {
   \param name new name of the object
   \brief Return \c true if rename operation finished successfully, \c false otherwise.
 */
-bool LightApp_Application::renameObject( const QString& entry, const QString& ) {
+bool LightApp_Application::renameObject( const QString& /*entry*/, const QString& /*name*/ ) {
   return false;
 }
 
@@ -5077,7 +5077,7 @@ QByteArray LightApp_Application::processState(QByteArray& input,
       return aRes;
     QDataStream anInputData(&input, QIODevice::ReadOnly);
 
-    int toolBarMarkerIndexDef;
+    int toolBarMarkerIndexDef = 0;
     if(hasDefaultState) {
       toolBarMarkerIndexDef = getToolbarMarkerIndex(defaultState, aNames);
       if(toolBarMarkerIndexDef < 0)

@@ -145,15 +145,15 @@ public slots:
   virtual void activateRotation() {}
   virtual void activatePanning() {}
   virtual void activateGlobalPanning() {}
-  virtual void onSetRotationPoint( bool on ) {}
+  virtual void onSetRotationPoint( bool /*on*/ ) {}
   virtual void onAxialScale() {}
   virtual void onAmbientToogle() {}
   virtual void onMemorizeView() {}
   virtual void onRestoreView() {}
-  virtual void onSwitchInteractionStyle( bool on ) {}
+  virtual void onSwitchInteractionStyle( bool /*on*/ ) {}
 
   virtual void activateSetRotationGravity() {}
-  virtual void activateSetRotationSelected( double theX, double theY, double theZ ) {}
+  virtual void activateSetRotationSelected( double /*theX*/, double /*theY*/, double /*theZ*/ ) {}
   virtual void activateStartPointSelection( TopAbs_ShapeEnum ) {}
   virtual void updateGravityCoords() {}
    

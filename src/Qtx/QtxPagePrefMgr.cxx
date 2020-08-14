@@ -4475,7 +4475,7 @@ void QtxPagePrefShortcutBtnsItem::retrieve()
   \param param resource file parameter associated with the preference item
 */
 QtxPagePrefShortcutTreeItem::QtxPagePrefShortcutTreeItem( const QString& title, QtxPreferenceItem* parent, const QString& sect, 
-                                                          const QString& param ): QtxPageNamedPrefItem( title, parent, sect, "" )
+                                                          const QString& /*param*/ ): QtxPageNamedPrefItem( title, parent, sect, "" )
 {
   mySection = sect;
 

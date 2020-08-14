@@ -213,7 +213,7 @@ void QtxToolBar::Watcher::hideContainer()
 */
 void QtxToolBar::Watcher::customEvent( QEvent* e )
 {
-  switch ( e->type() )
+  switch ( (int)e->type() )
   {
   case Install:
     installFilters();

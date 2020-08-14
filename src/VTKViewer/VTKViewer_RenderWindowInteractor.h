@@ -61,7 +61,7 @@ class VTKVIEWER_EXPORT VTKViewer_RenderWindowInteractor : public QObject, public
 public:
   static VTKViewer_RenderWindowInteractor *New();
 
-  vtkTypeMacro(VTKViewer_RenderWindowInteractor,vtkRenderWindowInteractor);
+  vtkTypeMacro(VTKViewer_RenderWindowInteractor,vtkRenderWindowInteractor)
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -163,16 +163,16 @@ public:
 
   void setViewWindow( VTKViewer_ViewWindow* theViewWnd );
 
-  void setCellData(const int& theIndex,
-                   VTKViewer_Actor* theMapActor,
-                   VTKViewer_Actor* theActor) {}
-  void setEdgeData(const int& theCellIndex,
-                   VTKViewer_Actor* theMapActor,
-                   const int& theEdgeIndex,
-                   VTKViewer_Actor* theActor ) {} //NB
-  void setPointData(const int& theIndex,
-                    VTKViewer_Actor* theMapActor,
-                    VTKViewer_Actor* theActor) {}
+  void setCellData(const int& /*theIndex*/,
+                   VTKViewer_Actor* /*theMapActor*/,
+                   VTKViewer_Actor* /*theActor*/) {}
+  void setEdgeData(const int& /*theCellIndex*/,
+                   VTKViewer_Actor* /*theMapActor*/,
+                   const int& /*theEdgeIndex*/,
+                   VTKViewer_Actor* /*theActor*/ ) {} //NB
+  void setPointData(const int& /*theIndex*/,
+                    VTKViewer_Actor* /*theMapActor*/,
+                    VTKViewer_Actor* /*theActor*/) {}
 
   typedef void (*TUpdateActor)(const TColStd_IndexedMapOfInteger& theMapIndex,
                                VTKViewer_Actor* theMapActor,

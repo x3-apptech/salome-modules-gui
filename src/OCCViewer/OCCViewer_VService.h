@@ -37,16 +37,8 @@
 class Standard_EXPORT OCCViewer_VService
 {
 public:
-
   static Handle(Aspect_Window) CreateWindow( const Handle(V3d_View)&, WId );
-
-  static Handle(V3d_Viewer)    CreateViewer( const Standard_ExtString,
-					     const Standard_CString = "",
-					     const Standard_CString = "",
-					     const Quantity_Length = 1000.0,
-					     const V3d_TypeOfOrientation = V3d_XposYnegZpos,
-					     const Standard_Boolean = Standard_True,
-					     const Standard_Boolean = Standard_True );
+  static Handle(V3d_Viewer)    CreateViewer();
 };
 
 #endif

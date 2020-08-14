@@ -23,7 +23,7 @@
 #include <vtkDataSetSurfaceFilter.h>
 #include <vtkObjectFactory.h>
 
-vtkStandardNewMacro(VTKViewer_DataSetMapper);
+vtkStandardNewMacro(VTKViewer_DataSetMapper)
 
 //----------------------------------------------------------------------------
 VTKViewer_DataSetMapper::VTKViewer_DataSetMapper()

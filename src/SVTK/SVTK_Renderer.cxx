@@ -55,24 +55,24 @@
 #undef max
 
 
-vtkStandardNewMacro(SVTK_Renderer);
+vtkStandardNewMacro(SVTK_Renderer)
 
 /*!
   Constructor
 */
 SVTK_Renderer
 ::SVTK_Renderer():
-  myDevice(VTKViewer_OpenGLRenderer::New()),
-  myInteractor(NULL),
   myPriority(0.0),
   myEventCallbackCommand(vtkCallbackCommand::New()),
+  myDevice(VTKViewer_OpenGLRenderer::New()),
+  myInteractor(NULL),
+  myTransform(VTKViewer_Transform::New()),
   myPointPicker(vtkPointPicker::New()),
   myCellPicker(vtkCellPicker::New()),
   myPointAreaPicker(SVTK_AreaPicker::New()),
   myCellAreaPicker(SVTK_AreaPicker::New()),
   myPreHighlightProperty(vtkProperty::New()),
   myHighlightProperty(vtkProperty::New()),
-  myTransform(VTKViewer_Transform::New()),
   myCubeAxes(SVTK_CubeAxesActor2D::New()),
   myTrihedron(SVTK_Trihedron::New()),
   myTrihedronSize(105),

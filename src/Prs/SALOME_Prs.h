@@ -307,7 +307,7 @@ public:
   //! \retval Return false.
   virtual bool isVisible( const Handle(SALOME_InteractiveObject)& ){ return false; }
   virtual void Repaint() {} //!< Null body here.
-  virtual void GetVisible( SALOME_ListIO& theList ) {}
+  virtual void GetVisible( SALOME_ListIO& /*theList*/ ) {}
 };
 
 /*!

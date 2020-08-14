@@ -39,7 +39,7 @@ class SALOME_PYQT_DataObjectLight;
 
 class SALOME_PYQT_LIGHT_EXPORT SALOME_PYQT_ModuleLight: public LightApp_Module
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SALOME_PYQT_ModuleLight();

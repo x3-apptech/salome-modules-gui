@@ -275,7 +275,7 @@ void SalomeApp_VisualState::restoreState(int savePoint)
 
   // restore modules' visual parameters
   std::vector<std::string> v = ip->getValues( "AP_MODULES_LIST" );
-  for ( int i = 0; i < v.size(); i++ )
+  for ( int i = 0; i < (int)v.size(); i++ )
   {
     myApp->activateModule( v[i].c_str() );
     if ( SalomeApp_Module* module = dynamic_cast<SalomeApp_Module*>( myApp->activeModule() ) )

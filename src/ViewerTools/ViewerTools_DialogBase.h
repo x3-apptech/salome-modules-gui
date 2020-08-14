@@ -31,7 +31,7 @@ class QtxAction;
 
 class VIEWERTOOLS_EXPORT ViewerTools_DialogBase : public QDialog
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   ViewerTools_DialogBase(QtxAction* theAction,

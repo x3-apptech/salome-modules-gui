@@ -33,7 +33,7 @@ class SVTK_EXPORT SVTK_KeyFreeInteractorStyle : public SVTK_InteractorStyle
 {
  public:
   static SVTK_KeyFreeInteractorStyle *New();
-  vtkTypeMacro(SVTK_KeyFreeInteractorStyle,SVTK_InteractorStyle);
+  vtkTypeMacro(SVTK_KeyFreeInteractorStyle,SVTK_InteractorStyle)
   
  protected:
   SVTK_KeyFreeInteractorStyle();

@@ -113,7 +113,7 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   bool IsUniqueName(const NoteBook_TableRow* theRow) const;
   QList<NoteBook_TableRow*> GetRows() const;
 
-  const bool         IsModified() const { return myIsModified; }
+  bool IsModified() const { return myIsModified; }
   const QList<int>&  GetRemovedRows() const { return myRemovedRows; }
   const VariableMap& GetVariableMap() const { return myVariableMap; }
   const VariableMap& GetVariableMapRef() const { return myVariableMapRef; }

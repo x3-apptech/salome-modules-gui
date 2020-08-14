@@ -77,7 +77,7 @@ void * glXGetProcAddressARB (const GLubyte *name)
 #endif
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
-vtkStandardNewMacro(VTKViewer_PolyDataMapper);
+vtkStandardNewMacro(VTKViewer_PolyDataMapper)
 #endif
 
 // some definitions for what the polydata has in it
@@ -103,13 +103,13 @@ typedef GLfloat TBall;
 
 
 
-void MessageCallback( GLenum source,
+void MessageCallback( GLenum /*source*/,
                       GLenum type,
-                      GLuint id,
+                      GLuint /*id*/,
                       GLenum severity,
-                      GLsizei length,
+                      GLsizei /*length*/,
                       const GLcharARB* message,
-                      const void* userParam )
+                      const void* /*userParam*/ )
 {
   fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
            ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
@@ -667,7 +667,7 @@ namespace VTK
 
     virtual
     void
-    get( TVertex& theVertex, vtkIdType thePointId, vtkIdType theCellId )
+    get( TVertex& theVertex, vtkIdType /*thePointId*/, vtkIdType /*theCellId*/ )
     {
       theVertex.r = myColor[0];
       theVertex.g = myColor[1];
@@ -715,7 +715,7 @@ namespace VTK
 
     virtual
     vtkIdType
-    GetTupleId( vtkIdType thePointId, vtkIdType theCellId )
+    GetTupleId( vtkIdType thePointId, vtkIdType /*theCellId*/ )
     {
       return thePointId;
     }
@@ -731,7 +731,7 @@ namespace VTK
 
     virtual
     vtkIdType
-    GetTupleId( vtkIdType thePointId, vtkIdType theCellId )
+    GetTupleId( vtkIdType /*thePointId*/, vtkIdType theCellId )
     {
       return theCellId;
     }
@@ -829,7 +829,6 @@ int VTKViewer_PolyDataMapper::Draw( vtkRenderer* ren, vtkActor* act )
 #else
 //-----------------------------------------------------------------------------
 void VTKViewer_PolyDataMapper::RenderPieceDraw( vtkRenderer* ren, vtkActor* act ) {
-  int noAbort = 1;
   if( (!this->MarkerEnabled || this->MarkerType == VTK::MT_NONE || !this->ImageData.GetPointer()) && !this->BallEnabled) {
     MAPPER_SUPERCLASS::RenderPieceDraw( ren, act );
     return;

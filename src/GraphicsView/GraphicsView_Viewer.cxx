@@ -50,7 +50,7 @@
 // Name    : GraphicsView_Viewer
 // Purpose : Constructor
 //=======================================================================
-GraphicsView_Viewer::GraphicsView_Viewer( const QString& title, QWidget* widget )
+GraphicsView_Viewer::GraphicsView_Viewer( const QString& /*title*/, QWidget* widget )
 : SUIT_ViewModel(),
   mySelector( 0 ),
   myTransformer( 0 ),
@@ -364,7 +364,7 @@ void GraphicsView_Viewer::handleKeyPress( QKeyEvent* e )
 // Function : handleKeyRelease
 // Purpose  : 
 //================================================================
-void GraphicsView_Viewer::handleKeyRelease( QKeyEvent* e )
+void GraphicsView_Viewer::handleKeyRelease( QKeyEvent* /*e*/ ) //!< TODO: unused variable
 {
 }
 
@@ -378,9 +378,9 @@ void GraphicsView_Viewer::handleMousePress( QGraphicsSceneMouseEvent* e )
   if ( e->modifiers() & GraphicsView_ViewTransformer::accelKey() )
   {
     Qt::MouseButton bs = e->button();
-    if ( bs == GraphicsView_ViewTransformer::zoomButton() )
+    if ( (int)bs == GraphicsView_ViewTransformer::zoomButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
       activateTransform( Zoom );
-    else if ( bs == GraphicsView_ViewTransformer::panButton() )
+    else if ( (int)bs == GraphicsView_ViewTransformer::panButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
       activateTransform( Pan );
   }
   else // checking for other operations before selection in release event
@@ -407,8 +407,8 @@ void GraphicsView_Viewer::handleMousePress( QGraphicsSceneMouseEvent* e )
       else if( e->button() == Qt::LeftButton &&
                !( aViewPort->currentBlock() & GraphicsView_ViewPort::BS_Selection ) &&
                !aViewPort->getHighlightedObject() &&
-               ( !aViewPort->isDraggingSelectedByLeftButton() ||
-                 aViewPort->isDraggingSelectedByLeftButton() && aViewPort->nbSelected() == 0 ) )
+               ( ( !aViewPort->isDraggingSelectedByLeftButton() ) ||
+                 ( aViewPort->isDraggingSelectedByLeftButton() && aViewPort->nbSelected() == 0 ) ) )
       {
         // Start rectangular selection if pulling was not started
         QPoint p = aViewPort->mapFromScene( e->scenePos() );
@@ -563,7 +563,7 @@ void GraphicsView_Viewer::handleWheel( QGraphicsSceneWheelEvent* e )
 // Function : onSketchingFinished
 // Purpose  : 
 //================================================================
-void GraphicsView_Viewer::onSketchingFinished( QPainterPath thePath )
+void GraphicsView_Viewer::onSketchingFinished( QPainterPath /*thePath*/ )
 {
   // testing ImageViewer
   //onTestCropOperatorPerform( thePath );

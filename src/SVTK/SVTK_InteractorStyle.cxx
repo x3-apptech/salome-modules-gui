@@ -78,24 +78,24 @@ namespace
 }
 
 
-vtkStandardNewMacro(SVTK_InteractorStyle);
+vtkStandardNewMacro(SVTK_InteractorStyle)
 
 
 /*!
   Constructor
 */
 SVTK_InteractorStyle::SVTK_InteractorStyle():
-  mySelectionEvent(new SVTK_SelectionEvent()),
-  myPointPicker(vtkPointPicker::New()),
   myLastHighlitedActor(NULL),
   myLastPreHighlitedActor(NULL),
   myControllerIncrement(SVTK_ControllerIncrement::New()),
   myControllerOnKeyDown(SVTK_ControllerOnKeyDown::New()),
+  mySelectionEvent(new SVTK_SelectionEvent()),
   myHighlightSelectionPointActor(SVTK_Actor::New()),
+  myPointPicker(vtkPointPicker::New()),
   myRectBand(0),
   myPolygonBand(0),
-  myIsAdvancedZoomingEnabled(false),
-  myPoligonState( Disable )
+  myPoligonState(Disable),
+  myIsAdvancedZoomingEnabled(false)
 {
   myPointPicker->Delete();
 
@@ -538,7 +538,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
           if( SALOME_Actor* anActor = SALOME_Actor::SafeDownCast( aVTKActor ) )
           {
         	Selection_Mode aSelectionMode = GetSelector()->SelectionMode();
-        	double* aCoords;
+        	double* aCoords = NULL;
         	int aVtkId;
         	bool isTrueType = false;
         	
@@ -1326,7 +1326,7 @@ void SVTK_InteractorStyle::onOperation(QPoint mousePos)
     {
       if (!myCursorState)
         setCursor(VTK_INTERACTOR_STYLE_CAMERA_SELECT);
-    }
+    } // fall through!
   case VTK_INTERACTOR_STYLE_CAMERA_FIT:
     {
       myOtherPoint = mousePos;
@@ -1343,7 +1343,7 @@ void SVTK_InteractorStyle::onOperation(QPoint mousePos)
   Called when user moves mouse inside viewer window and there is no active viewer operation 
   (!put necessary processing here!)
 */
-void SVTK_InteractorStyle::onCursorMove(QPoint mousePos) 
+void SVTK_InteractorStyle::onCursorMove(QPoint /*mousePos*/) 
 {
   if ( !GetSelector()->IsPreSelectionEnabled() ) 
     return;
@@ -1709,7 +1709,7 @@ bool isValid( const QPolygon* thePoints, const QPoint& theCurrent )
     return true;
 
   bool res = true;
-  for ( uint i = 0; i < thePoints->count() - 1 && res; i++ )
+  for ( int i = 0; i < thePoints->count() - 1 && res; i++ )
   {
     const QPoint& aStart = thePoints->point( i );
     const QPoint& anEnd  = thePoints->point( i + 1 );
@@ -2029,7 +2029,7 @@ SVTK_ControllerIncrement* SVTK_InteractorStyle::ControllerIncrement()
   return myControllerIncrement.GetPointer();
 }
 
-vtkStandardNewMacro(SVTK_ControllerIncrement);
+vtkStandardNewMacro(SVTK_ControllerIncrement)
 SVTK_ControllerIncrement::SVTK_ControllerIncrement()
 {
   myIncrement=10;
@@ -2058,7 +2058,7 @@ int SVTK_ControllerIncrement::Decrease()
   return myIncrement;
 }
 
-vtkStandardNewMacro(SVTK_GeomControllerIncrement);
+vtkStandardNewMacro(SVTK_GeomControllerIncrement)
 SVTK_GeomControllerIncrement::SVTK_GeomControllerIncrement()
 {
 }
@@ -2079,7 +2079,7 @@ int SVTK_GeomControllerIncrement::Decrease()
   return myIncrement;
 }
 
-vtkStandardNewMacro(SVTK_ControllerOnKeyDown);
+vtkStandardNewMacro(SVTK_ControllerOnKeyDown)
 
 /*!
   Constructor
@@ -2095,7 +2095,7 @@ SVTK_ControllerOnKeyDown::~SVTK_ControllerOnKeyDown()
 {
 }
 
-bool SVTK_ControllerOnKeyDown::OnKeyDown(vtkInteractorStyle* theIS)
+bool SVTK_ControllerOnKeyDown::OnKeyDown(vtkInteractorStyle* /*theIS*/)
 {
   return true;
 }

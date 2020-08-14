@@ -140,7 +140,7 @@ static Registry::Components_ptr GetRegistry( CORBA::ORB_ptr orb )
     if ( CORBA::is_nil( object ) ) throw CommException( "Unable to find the Registry service" );
     aRegistry = Registry::Components::_narrow( object );
   }
-  catch( const CORBA::Exception& ex )
+  catch( const CORBA::Exception& /*ex*/ ) //!< TODO: unused variable
   {
     MESSAGE( "Error: can't access Registry server" );
   }
@@ -279,7 +279,7 @@ ToolsGUI_RegWidget::ToolsGUI_RegWidget( CORBA::ORB_ptr orb, QWidget* parent )
 ToolsGUI_RegWidget::~ToolsGUI_RegWidget()
 {
   myRegWidgetPtr = 0;
-};
+}
 
 /*!
   \brief Get description text, containing information about the service.
@@ -351,7 +351,7 @@ void ToolsGUI_RegWidget::refresh()
 
     // update current services list
     myViews[Clients]->clear();
-    for ( int i = 0; i < myData[Clients]->length(); i++ ) {
+    for ( int i = 0; i < (int)myData[Clients]->length(); i++ ) { //!< TODO: mismatch signed/unsigned
       const Registry::Infos& c_info = (*myData[Clients])[i];
       time_t aStarted  = time_t( c_info.tc_start );
       time_t aLastPing = time_t( c_info.tc_hello );
@@ -367,7 +367,7 @@ void ToolsGUI_RegWidget::refresh()
 
     // update history
     myViews[History]->clear();
-    for ( int i = 0; i < myData[History]->length(); i++ ) {       
+    for ( int i = 0; i < (int)myData[History]->length(); i++ ) {  //!< TODO: mismatch signed/unsigned     
       const Registry::Infos& c_info = (*myData[History])[i];
       time_t aStarted  = time_t( c_info.tc_start );
       time_t aFinished = time_t( c_info.tc_end );

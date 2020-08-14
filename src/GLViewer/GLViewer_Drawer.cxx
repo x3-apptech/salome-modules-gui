@@ -77,7 +77,7 @@ void GLViewer_TexFont::clearTextBases()
   Default constructor
 */
 GLViewer_TexFont::GLViewer_TexFont()
-: myMaxRowWidth( 0 ), myFontHeight( 0 )
+: myFontHeight( 0 ), myMaxRowWidth( 0 )
 {
     myQFont = QApplication::font();//QFont::defaultFont();
     mySeparator = 2;
@@ -95,7 +95,7 @@ GLViewer_TexFont::GLViewer_TexFont()
   \param theMinMagFilter - min/mag filter, affects text sharpness
 */
 GLViewer_TexFont::GLViewer_TexFont( QFont* theFont, int theSeparator, bool theIsResizeable, GLuint theMinMagFilter )
-: myMaxRowWidth( 0 ), myFontHeight( 0 )
+: myFontHeight( 0 ), myMaxRowWidth( 0 )
 {
     myQFont = *theFont;
     mySeparator = theSeparator;
@@ -161,7 +161,7 @@ bool GLViewer_TexFont::generateTexture()
     aFindFont.myIsItal = myQFont.italic();
     aFindFont.myIsUndl = myQFont.underline();
     aFindFont.myPointSize = myQFont.pointSize();
-    aFindFont.myViewPortId = size_t(QGLContext::currentContext());
+    aFindFont.myViewPortId = (long)QGLContext::currentContext(); //!<TODO: conversion from "size_t" to "long"
         
     if( TexFontBase.contains( aFindFont ) )
     {
@@ -384,7 +384,7 @@ static GLuint displayListBase( QFont* theFont )
   if ( !ctx )
     return aList;  
   
-  aFindFont.myViewPortId = (int)ctx;
+  aFindFont.myViewPortId = (LONG_PTR)ctx;
 
   if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
     aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
@@ -394,7 +394,7 @@ static GLuint displayListBase( QFont* theFont )
     QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
     for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
-      if ( it.key().myViewPortId == (int)ctx && it.value() > listBase )
+      if ( it.key().myViewPortId == (LONG_PTR)ctx && it.value() > listBase )
         listBase = it.value();
     }
     listBase += 256;
@@ -451,7 +451,7 @@ static GLuint displayListBase( QFont* theFont )
     return aList;
   }
 
-  aFindFont.myViewPortId = size_t(aCont);
+  aFindFont.myViewPortId = (long)aCont;
 
   if ( GLViewer_TexFont::BitmapFontCache.contains( aFindFont ) )
     aList = GLViewer_TexFont::BitmapFontCache[aFindFont];
@@ -461,7 +461,7 @@ static GLuint displayListBase( QFont* theFont )
     QMap<GLViewer_TexFindId, GLuint>::iterator it = GLViewer_TexFont::BitmapFontCache.begin();
     for ( ; it != GLViewer_TexFont::BitmapFontCache.end(); ++it )
     {
-      if ( it.key().myViewPortId == size_t(aCont) && it.value() > listBase )
+      if ( it.key().myViewPortId == (long)aCont && it.value() > listBase )
         listBase = it.value();
     }
     listBase += 256;

@@ -41,8 +41,8 @@ TreeView::TreeView(QWidget * parent)
   _lastActionId = 0;
 
   // Default actions for tests
-  int displayActionId = addAction(QObject::tr("Afficher"));
-  int editActionId    = addAction(QObject::tr("Editer"));
+  /*int displayActionId = */addAction(QObject::tr("Afficher"));
+  /*int editActionId    = */addAction(QObject::tr("Editer"));
 }
 
 TreeView::~TreeView() {

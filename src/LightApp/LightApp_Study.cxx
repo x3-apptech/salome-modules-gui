@@ -167,7 +167,7 @@ bool LightApp_Study::saveDocumentAs( const QString& theFileName )
     
     std::set<std::string> aNewNames;
     std::set<std::string> toRemove;
-    int i, n;
+    size_t i, n;
     for( i = 0, n = aNewList.size(); i < n; i++ )
       aNewNames.insert( aNewList[ i ] );
     for( i = 0, n = anOldList.size(); i < n; i++ )
@@ -319,7 +319,7 @@ bool LightApp_Study::isSaved() const
 /*!
   Creates SComponent for module, necessary for SalomeApp study
 */
-void LightApp_Study::addComponent(const CAM_DataModel* dm)
+void LightApp_Study::addComponent(const CAM_DataModel* /*dm*/)
 {
 }
 
@@ -349,7 +349,7 @@ void LightApp_Study::saveModuleData(QString theModuleName, int type, QStringList
 void LightApp_Study::openModuleData(QString theModuleName, int /*type*/, QStringList& theListOfFiles)
 {
   std::vector<std::string> aListOfFiles =  myDriver->GetListOfFiles(theModuleName.toLatin1().constData());
-  int i, aLength = aListOfFiles.size() - 1;
+  int i, aLength = (int)aListOfFiles.size() - 1; //!< TODO: conversion size_t to int
   if (aLength < 0)
     return;
 

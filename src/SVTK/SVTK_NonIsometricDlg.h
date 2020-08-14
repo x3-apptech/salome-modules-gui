@@ -39,7 +39,7 @@ class QPushButton;
 
 class SVTK_NonIsometricDlg : public ViewerTools_DialogBase
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_NonIsometricDlg(QtxAction* theAction,

@@ -48,12 +48,12 @@ static QEvent* l_mbPressEvent = 0;
 /*!
     Constructor
 */
-GLViewer_Viewer::GLViewer_Viewer( const QString& title )
+GLViewer_Viewer::GLViewer_Viewer( const QString& /*title*/ )
 : SUIT_ViewModel(),
 mySelector( 0 ),
+mySelMode( NoSelection ),
 mySketcher( 0 ),
-myTransformer( 0 ),
-mySelMode( NoSelection )
+myTransformer( 0 )
 {
 }
 
@@ -333,7 +333,7 @@ bool GLViewer_Viewer::eventFilter( QObject* o, QEvent* e )
 /*!
     Called when smth is selected in this viewer. [ virtual protected slot ]
 */
-void GLViewer_Viewer::onSelectionDone( bool bAdded, SelectionChangeStatus status  )
+void GLViewer_Viewer::onSelectionDone( bool /*bAdded*/, SelectionChangeStatus status  )
 {
     emit selectionChanged( status );
 }
@@ -433,9 +433,9 @@ void GLViewer_Viewer::handleMousePress( QMouseEvent* e )
     if ( e->modifiers() & GLViewer_ViewTransformer::accelKey() )
     {
         Qt::MouseButton bs = e->button();
-        if ( bs == GLViewer_ViewTransformer::zoomButton() )
+        if ( (int)bs == GLViewer_ViewTransformer::zoomButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
             activateTransform( Zoom );
-        else if ( bs == GLViewer_ViewTransformer::panButton() )
+        else if ( (int)bs == GLViewer_ViewTransformer::panButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
             activateTransform( Pan );
     }
     else
@@ -472,7 +472,7 @@ void GLViewer_Viewer::handleMouseMove( QMouseEvent* e )
     }
     /* Try to activate default sketching
     */
-    else if ( e->button() == GLViewer_ViewSketcher::sketchButton() )
+    else if ( (int)e->button() == GLViewer_ViewSketcher::sketchButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
     {
         activateSketching( Rect );
         if ( mySketcher )
@@ -541,8 +541,8 @@ GLViewer_ViewTransformer::GLViewer_ViewTransformer( GLViewer_Viewer* v, int type
 : QObject( 0 ),
 myViewer( v ),
 myType( type ),
-myMajorBtn( Qt::NoButton ),
 myButtonState( 0 ),
+myMajorBtn( Qt::NoButton ),
 myRectBand( 0 )
 {
     if ( myType == GLViewer_Viewer::Pan ||
@@ -788,8 +788,8 @@ int GLViewer_ViewSketcher::sketchBtn = Qt::LeftButton;
 GLViewer_ViewSketcher::GLViewer_ViewSketcher( GLViewer_Viewer* viewer, int type )
 : QObject( 0 ),
 myViewer( viewer ),
-myData( 0 ),
 myType( type ),
+myData( 0 ),
 myRectBand( 0 )
 {
     if( !myViewer )

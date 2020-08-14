@@ -41,7 +41,7 @@
 #include "vtkOpenGL.h"
 #include <vtkObjectFactory.h>
 
-vtkStandardNewMacro(VTKViewer_Texture);
+vtkStandardNewMacro(VTKViewer_Texture)
 
 
 // ----------------------------------------------------------------------------

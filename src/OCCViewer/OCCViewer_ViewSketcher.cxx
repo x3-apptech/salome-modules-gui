@@ -256,7 +256,7 @@ void OCCViewer_RectSketcher::onMouse( QMouseEvent* e )
   else
     avp->setCursor( Qt::ForbiddenCursor );
 
-  if ( e->type() == QEvent::MouseButtonRelease && e->button() == sketchButton() )
+  if ( e->type() == QEvent::MouseButtonRelease && (int)e->button() == sketchButton() ) // todo Qt::MouseButton is unsigned int: comparison of int with uint
   {
     myResult = Accept;
     QApplication::postEvent( avp, new QMouseEvent( e->type(), e->pos(),
@@ -554,7 +554,7 @@ bool OCCViewer_PolygonSketcher::isValid( const QPolygon* aPoints, const QPoint& 
     return true;
 
   bool res = true;
-  for ( uint i = 0; i < aPoints->count() - 1 && res; i++ )
+  for ( int i = 0; i < aPoints->count() - 1 && res; i++ )
   {
     const QPoint& aStart = aPoints->point( i );
     const QPoint& anEnd  = aPoints->point( i + 1 );

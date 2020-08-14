@@ -21,7 +21,7 @@
 
 #include <vtkObjectFactory.h>
 
-vtkStandardNewMacro(PVViewer_OutputWindow);
+vtkStandardNewMacro(PVViewer_OutputWindow)
 
 PVViewer_OutputWindow::PVViewer_OutputWindow()
 {
@@ -31,27 +31,27 @@ PVViewer_OutputWindow::~PVViewer_OutputWindow()
 {
 }
 
-const unsigned int PVViewer_OutputWindow::getTextCount()
+unsigned int PVViewer_OutputWindow::getTextCount() const
 {
   return count(MESSAGE_TYPE_TEXT);
 }
 
-const unsigned int PVViewer_OutputWindow::getErrorCount()
+unsigned int PVViewer_OutputWindow::getErrorCount() const
 {
   return count(MESSAGE_TYPE_ERROR);
 }
 
-const unsigned int PVViewer_OutputWindow::getWarningCount()
+unsigned int PVViewer_OutputWindow::getWarningCount() const
 {
   return count(MESSAGE_TYPE_WARNING);
 }
 
-const unsigned int PVViewer_OutputWindow::getGenericWarningCount()
+unsigned int PVViewer_OutputWindow::getGenericWarningCount() const
 {
   return count(MESSAGE_TYPE_GENERIC_WARNING);
 }
 
-const unsigned int PVViewer_OutputWindow::getDebugCount()
+unsigned int PVViewer_OutputWindow::getDebugCount() const
 {
   return count(MESSAGE_TYPE_DEBUG);
 }
@@ -79,7 +79,7 @@ void PVViewer_OutputWindow::DisplayText(const char* text)
   }
 }
 
-int PVViewer_OutputWindow::count(const MessageTypes& type)
+int PVViewer_OutputWindow::count(const MessageTypes& type) const
 {
   return myCounter.value(type, 0);
 }

@@ -197,7 +197,7 @@ QVTK_RenderWindowInteractor
 */
 void
 QVTK_RenderWindowInteractor
-::paintEvent( QPaintEvent* theEvent ) 
+::paintEvent( QPaintEvent* /*theEvent*/ ) 
 {
   GetDevice()->CreateTimer(VTKI_TIMER_FIRST);
 }
@@ -208,7 +208,7 @@ QVTK_RenderWindowInteractor
 */
 void
 QVTK_RenderWindowInteractor
-::resizeEvent( QResizeEvent* theEvent )
+::resizeEvent( QResizeEvent* /*theEvent*/ )
 {
   int* aSize = getRenderWindow()->GetSize();
   int aWidth = aSize[0];
@@ -243,7 +243,7 @@ QVTK_RenderWindowInteractor
 */
 void
 QVTK_RenderWindowInteractor
-::contextMenuEvent( QContextMenuEvent* event )
+::contextMenuEvent( QContextMenuEvent* /*event*/ )
 {}
 
 /*!
@@ -321,7 +321,7 @@ QVTK_RenderWindowInteractor
 */
 void
 QVTK_RenderWindowInteractor
-::mouseDoubleClickEvent( QMouseEvent* event )
+::mouseDoubleClickEvent( QMouseEvent* /*event*/ )
 {}
 
 
@@ -378,7 +378,7 @@ QVTK_RenderWindowInteractor
 */
 void  
 QVTK_RenderWindowInteractor
-::enterEvent( QEvent* event )
+::enterEvent( QEvent* /*event*/ )
 {
   if(FOCUS_UNDER_MOUSE){
     activateWindow();

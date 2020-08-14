@@ -39,7 +39,7 @@ struct VTKVIEWER_EXPORT VTKViewer_CellLocationsArray : TCellLocationsArray
 {
   static VTKViewer_CellLocationsArray* New();
   
-  vtkTypeMacro(VTKViewer_CellLocationsArray,TCellLocationsArray);
+  vtkTypeMacro(VTKViewer_CellLocationsArray,TCellLocationsArray)
 };
 
 #undef TCellLocationsArray

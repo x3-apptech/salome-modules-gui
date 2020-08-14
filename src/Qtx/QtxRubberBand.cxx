@@ -76,7 +76,7 @@ bool QtxAbstractRubberBand::isClosed()
   return myIsClosed;
 }
 
-void QtxAbstractRubberBand::paintEvent( QPaintEvent* theEvent )
+void QtxAbstractRubberBand::paintEvent( QPaintEvent* /*theEvent*/ )
 {
   if ( !myPoints.empty() )
     {
@@ -92,57 +92,10 @@ void QtxAbstractRubberBand::paintEvent( QPaintEvent* theEvent )
       // ### workaround for borked XRENDER
       tiledPixmap = QPixmap::fromImage(tiledPixmap.toImage());
 
-
-      
       QPainter aPainter( this );
       aPainter.setRenderHint( QPainter::Antialiasing );
-      QRect r = myPoints.boundingRect();
-      //aPainter.setClipRegion( r.normalized().adjusted( -1, -1, 2, 2 ) );
       aPainter.drawTiledPixmap( 0, 0, width(), height(), tiledPixmap);
-
       aPainter.end();
-
-    /*
-
-
-
-#ifdef WIN32
-      QPixmap anImage( size() );
-#else
-      QImage anImage( size(), QImage::Format_ARGB32_Premultiplied );
-#endif
-
-      anImage.fill( Qt::transparent );
-      QPainter aImgPainter( &anImage );
-      aImgPainter.setRenderHint( QPainter::Antialiasing );
-      aImgPainter.setCompositionMode(QPainter::CompositionMode_Source);
-
-      QPen aPen( Qt::black );
-      aPen.setWidth( 2 );
-      aImgPainter.setPen( aPen );
-    
-      aImgPainter.drawPolyline( myPoints );
-      if ( myIsClosed && myPoints.last() != myPoints.first() )
-        aImgPainter.drawLine( myPoints.last(), myPoints.first() );
-
-      //aImgPainter.setPen(Qt::NoPen);
-      //aImgPainter.setBrush(QBrush( Qt::white, Qt::Dense4Pattern));
-      //aImgPainter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
-      //aImgPainter.drawRect(0, 0, width(), height());
-      aImgPainter.end();
-
-      QPainter aPainter( this );
-      aPainter.drawPolyline( myPoints );
-      if ( myIsClosed && myPoints.last() != myPoints.first() )
-        aPainter.drawLine( myPoints.last(), myPoints.first() );
-      
-#ifdef WIN32
-      aPainter.drawPixmap( 0, 0, anImage );
-#else
-      aPainter.drawImage( 0, 0, anImage );
-      #endif
-      aPainter.end();*/
-      
     }
 }
 

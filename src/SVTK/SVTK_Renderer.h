@@ -65,7 +65,7 @@ class SVTK_Selector;
 class SVTK_EXPORT SVTK_Renderer : public vtkObject
 {
  public:
-  vtkTypeMacro(SVTK_Renderer,vtkObject);
+  vtkTypeMacro(SVTK_Renderer,vtkObject)
   static SVTK_Renderer* New();
 
   //----------------------------------------------------------------------------

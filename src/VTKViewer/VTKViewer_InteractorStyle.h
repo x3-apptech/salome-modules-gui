@@ -72,7 +72,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
 {
  public:
   static VTKViewer_InteractorStyle *New();
-  vtkTypeMacro(VTKViewer_InteractorStyle, vtkInteractorStyle);
+  vtkTypeMacro(VTKViewer_InteractorStyle, vtkInteractorStyle)
 
   virtual void SetInteractor(vtkRenderWindowInteractor *theInteractor);
   void setViewWnd(VTKViewer_ViewWindow* theViewWnd);
@@ -113,7 +113,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
  protected:
   VTKViewer_InteractorStyle();
   ~VTKViewer_InteractorStyle();
-  VTKViewer_InteractorStyle(const VTKViewer_InteractorStyle&) {};
+  VTKViewer_InteractorStyle(const VTKViewer_InteractorStyle&): QObject(), vtkInteractorStyle() {};
   void operator=(const VTKViewer_InteractorStyle&) {};
 
   void RotateXY(int dx, int dy);
@@ -152,7 +152,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   void startRotate();
   void startFitArea();
   void startSpin();
-  void SetTDxStyle(vtkTDxInteractorStyle *tdxStyle) {}
+  void SetTDxStyle(vtkTDxInteractorStyle* /*tdxStyle*/) {}
   bool needsRedrawing();
 
  protected:
@@ -161,7 +161,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   virtual void onStartOperation();
   virtual void onFinishOperation();
   virtual void onOperation(QPoint mousePos);
-  virtual void onCursorMove(QPoint mousePos);
+  virtual void onCursorMove(QPoint /*mousePos*/);
   virtual void setCursor(const int operation);
 
   void drawRect();

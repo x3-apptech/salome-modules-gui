@@ -33,7 +33,7 @@
 
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(SVTK_KeyFreeInteractorStyle);
+vtkStandardNewMacro(SVTK_KeyFreeInteractorStyle)
 //----------------------------------------------------------------------------
 
 SVTK_KeyFreeInteractorStyle::SVTK_KeyFreeInteractorStyle():

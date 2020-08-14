@@ -102,7 +102,7 @@ void ViewerTools_FontWidgetBase::onColor()
 }
 
 void ViewerTools_FontWidgetBase::SetData( const QColor& theColor,
-                                          const int theFamily,
+                                          const int /*theFamily*/,
                                           const bool theBold,
                                           const bool theItalic,
                                           const bool theShadow )
@@ -115,7 +115,7 @@ void ViewerTools_FontWidgetBase::SetData( const QColor& theColor,
 }
 
 void ViewerTools_FontWidgetBase::GetData( QColor& theColor,
-                                          int& theFamily,
+                                          int& /*theFamily*/,
                                           bool& theBold,
                                           bool& theItalic,
                                           bool& theShadow ) const

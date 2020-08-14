@@ -52,7 +52,7 @@ public:
   virtual QString          getType() const { return Type(); }
 
   /*  interactive object management */
-  void highlight( const Handle(SALOME_InteractiveObject)& IObject, bool highlight, bool update = true ) {}
+  void highlight( const Handle(SALOME_InteractiveObject)& /*IObject*/, bool /*highlight*/, bool /*update*/ = true ) {}
   void unHighlightAll() {}
   void rename( const Handle(SALOME_InteractiveObject)&, const QString&, Plot2d_ViewFrame* = 0 );
   void renameAll( const Handle(SALOME_InteractiveObject)&, const QString& );

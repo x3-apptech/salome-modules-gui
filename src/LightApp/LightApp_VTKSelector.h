@@ -80,7 +80,7 @@ class LIGHTAPP_EXPORT LightApp_SVTKDataOwner : public LightApp_DataOwner
 */
 class LIGHTAPP_EXPORT LightApp_VTKSelector : public QObject, public SUIT_Selector
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   virtual ~LightApp_VTKSelector() {};

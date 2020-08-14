@@ -135,9 +135,8 @@ bool LightApp_SwitchOp::eventFilter( QObject* theObj, QEvent* theEv )
           if ( !anOp->isActive() && anOp->isAutoResumed() &&
                study() && !study()->blockingOperation( anOp ) )
             study()->resume( anOp );
+          break;
         }
-        break;
-        
         case QEvent::MouseButtonRelease:
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonDblClick:
@@ -147,9 +146,10 @@ bool LightApp_SwitchOp::eventFilter( QObject* theObj, QEvent* theEv )
         {
           if ( !anOp->isActive() )
             return true;
+          break;
         }
-        break;
-        
+        default:
+          break;
       }
     }
   }

@@ -57,9 +57,9 @@ SVTK_SetRotationPointDlg
                          theParent, 
                          theName),
   myMainWindow(theParent),
+  myRWInteractor(theParent->GetInteractor()),
   myPriority(0.0),
-  myEventCallbackCommand(vtkCallbackCommand::New()),
-  myRWInteractor(theParent->GetInteractor())
+  myEventCallbackCommand(vtkCallbackCommand::New())
 {
   setWindowTitle(tr("DLG_TITLE"));
   setSizeGripEnabled(true);

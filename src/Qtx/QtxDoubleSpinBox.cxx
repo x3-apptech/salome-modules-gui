@@ -306,7 +306,7 @@ QValidator::State QtxDoubleSpinBox::validate( QString& str, int& pos ) const
 {
   QString pref = this->prefix();
   QString suff = this->suffix();
-  uint overhead = pref.length() + suff.length();
+  int overhead = pref.length() + suff.length();
   QValidator::State state = QValidator::Invalid;
   
   QDoubleValidator v (NULL);

@@ -81,11 +81,10 @@ private:
 
 private:
     int                    myId;
-    QString                myText;
     QString                myTitle;
+    QString                myText;
     QTimer*                myTimer;
     QtxNotify*             myNotifyMgr;
-
     bool                   myIsClosePressed;
 };
 

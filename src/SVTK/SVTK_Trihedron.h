@@ -35,7 +35,7 @@ protected:
   void operator = (const SVTK_Trihedron&); // Not implemented
 
 public:
-  vtkTypeMacro(SVTK_Trihedron,VTKViewer_Trihedron);
+  vtkTypeMacro(SVTK_Trihedron,VTKViewer_Trihedron)
   static SVTK_Trihedron *New();
   
   virtual int GetVisibleActorCount(vtkRenderer* theRenderer);

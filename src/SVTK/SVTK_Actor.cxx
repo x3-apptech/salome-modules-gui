@@ -44,7 +44,7 @@
 #include "utilities.h"
 
 
-vtkStandardNewMacro(SVTK_Actor);
+vtkStandardNewMacro(SVTK_Actor)
 
 /*!
   Constructor

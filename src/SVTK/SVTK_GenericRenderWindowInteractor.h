@@ -58,11 +58,11 @@ class SVTK_EXPORT QVTK_GenericRenderWindowInteractor:
  public QObject,
  public vtkGenericRenderWindowInteractor
 {
-  Q_OBJECT;
+  Q_OBJECT
 
  public:
   static QVTK_GenericRenderWindowInteractor* New();
-  vtkTypeMacro(QVTK_GenericRenderWindowInteractor,vtkGenericRenderWindowInteractor);
+  vtkTypeMacro(QVTK_GenericRenderWindowInteractor,vtkGenericRenderWindowInteractor)
 
   //! Starts the QTimer instance on defined microseconds
   virtual
@@ -98,7 +98,7 @@ class SVTK_EXPORT SVTK_GenericRenderWindowInteractor: public QVTK_GenericRenderW
 {
  public:
   static SVTK_GenericRenderWindowInteractor* New();
-  vtkTypeMacro(SVTK_GenericRenderWindowInteractor,QVTK_GenericRenderWindowInteractor);
+  vtkTypeMacro(SVTK_GenericRenderWindowInteractor,QVTK_GenericRenderWindowInteractor)
 
   //! To get access to SVTK_Selector
   SVTK_Selector* 

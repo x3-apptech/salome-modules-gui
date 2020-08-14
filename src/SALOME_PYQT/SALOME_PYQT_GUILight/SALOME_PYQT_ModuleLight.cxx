@@ -637,7 +637,7 @@ void SALOME_PYQT_ModuleLight::getSelected( DataObjectList& ) const
   \brief Used to notify a Python light module of a modification of selection in study (propagation of a remote selection)
   \param list of study entries
 */
-void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const bool isUnused)
+void SALOME_PYQT_ModuleLight::setSelected( const QStringList& entries, const bool /*isUnused*/)
 {
   MESSAGE("setSelected");
   return myHelper->selectionUpdated(entries);

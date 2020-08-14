@@ -135,7 +135,7 @@ void SalomeApp_Module::extractContainers( const SALOME_ListIO& source, SALOME_Li
  * This method is called just before the study document is saved, so the module has a possibility
  * to store visual parameters in AttributeParameter attribut
  */
-void SalomeApp_Module::storeVisualParameters(int savePoint)
+void SalomeApp_Module::storeVisualParameters(int /*savePoint*/)
 {
 }
 
@@ -145,6 +145,6 @@ void SalomeApp_Module::storeVisualParameters(int savePoint)
  * This method is called after the study document is opened, so the module has a possibility to restore
  * visual parameters
  */
-void SalomeApp_Module::restoreVisualParameters(int savePoint)
+void SalomeApp_Module::restoreVisualParameters(int /*savePoint*/)
 {
 }

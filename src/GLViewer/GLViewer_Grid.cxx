@@ -56,11 +56,11 @@ GLViewer_Grid::GLViewer_Grid() :
   \param xPan and \param yPan     - offsets along x and y direction
   \param xScale and \param yScal  - scale factors along x and y direction
 */
-GLViewer_Grid::GLViewer_Grid( GLfloat width, GLfloat height,
-                              GLfloat winW, GLfloat winH,
-                              GLfloat xSize, GLfloat ySize,
-                              GLfloat xPan, GLfloat yPan,
-                              GLfloat xScale, GLfloat yScale ) :
+GLViewer_Grid::GLViewer_Grid( GLfloat /*width*/, GLfloat /*height*/,
+                              GLfloat /*winW*/, GLfloat /*winH*/,
+                              GLfloat /*xSize*/, GLfloat /*ySize*/,
+                              GLfloat /*xPan*/, GLfloat /*yPan*/,
+                              GLfloat /*xScale*/, GLfloat /*yScale*/ ) :
        myGridList( 0 ), myGridHeight( (GLfloat)0.0 ), myGridWidth( (GLfloat)0.0 ),
        myWinW( (GLfloat)0.0 ), myWinH( (GLfloat)0.0 ), myXSize( (GLfloat)0.0 ), myYSize( (GLfloat)0.0 ),
        myXPan( (GLfloat)0.0 ), myYPan( (GLfloat)0.0 ), myXScale( (GLfloat)1.0 ), myYScale( (GLfloat)1.0 ),

@@ -213,8 +213,8 @@ QVector<SUIT_ViewWindow*> SUIT_ViewManager::getViews() const
  */
 bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
 {
-  unsigned int aSize = myViews.size();
-  unsigned int aNbItems = myViews.count() + 1;
+  int aSize = myViews.size();
+  int aNbItems = myViews.count() + 1;
   if ( aNbItems > aSize )
   {
     myViews.resize( aNbItems );
@@ -251,7 +251,7 @@ bool SUIT_ViewManager::insertView(SUIT_ViewWindow* theView)
   connect(theView, SIGNAL(contextMenuRequested( QContextMenuEvent * )),
           this,    SLOT  (onContextMenuRequested( QContextMenuEvent * )));
 
-  for ( uint i = 0; i < aSize; i++ )
+  for ( int i = 0; i < aSize; i++ )
   {
     if ( myViews[i] == 0 )
     {
@@ -345,8 +345,8 @@ void SUIT_ViewManager::onMousePressed(SUIT_ViewWindow* theView, QMouseEvent* the
 void SUIT_ViewManager::onWindowActivated(SUIT_ViewWindow* view)
 {
   if (view) {
-    unsigned int aSize = myViews.size();
-    for (uint i = 0; i < aSize; i++) {
+    int aSize = myViews.size();
+    for (int i = 0; i < aSize; i++) {
       if (myViews[i] && myViews[i] == view) {
         myActiveView = view;
         emit activated( this );

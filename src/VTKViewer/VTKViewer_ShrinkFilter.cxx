@@ -35,7 +35,7 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 
-vtkStandardNewMacro(VTKViewer_ShrinkFilter);
+vtkStandardNewMacro(VTKViewer_ShrinkFilter)
 
 /*!Constructor. Sets store mapping to zero.*/
 VTKViewer_ShrinkFilter::VTKViewer_ShrinkFilter(): 

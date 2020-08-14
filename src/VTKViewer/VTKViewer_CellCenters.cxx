@@ -33,7 +33,7 @@
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
 
-vtkStandardNewMacro(VTKViewer_CellCenters);
+vtkStandardNewMacro(VTKViewer_CellCenters)
 
 /*!
  * Class       : VTKViewer_CellCenters

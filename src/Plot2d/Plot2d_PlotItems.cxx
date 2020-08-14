@@ -251,11 +251,12 @@ void Plot2d_QwtLegendLabel::paintEvent( QPaintEvent *e )
   QRect iconRect = cr;
   if ( !icon().isNull() )
   {
-    if ( itemMode() != QwtLegendData::ReadOnly )
+    if ( itemMode() != QwtLegendData::ReadOnly ) {
       iconRect.setX( iconRect.x() + ButtonFrame );
       iconRect.setSize( QSize( icon().size().width() + spacing() ,
                                    icon().size().height() + spacing() ) );
       iconRect.moveCenter( QPoint( iconRect.center().x(), cr.center().y() ) );
+    }
   }
 
   drawIdentifier( &painter, iconRect );
@@ -297,9 +298,9 @@ public:
     return qwtMin(myMin.size(), myMax.size());
   }
   bool values(size_t i, double &min, double &max) {
-    if(myMin.contains(i) && myMax.contains(i)) {
-      min = myMin[i];
-      max = myMax[i];
+    if(myMin.contains((int)i) && myMax.contains((int)i)) { //!< TODO: conversion from size_t to int
+      min = myMin[(int)i];
+      max = myMax[(int)i];
       return true;
     }
     return false;
@@ -315,8 +316,8 @@ private:
 */
 Plot2d_QwtPlotCurve::Plot2d_QwtPlotCurve( const QString& title,
                                           QwtPlot::Axis yAxis /*const int index*/ ) :
-  Plot2d_SelectableItem(),
   QwtPlotCurve( title ),
+  Plot2d_SelectableItem(),
   myYAxis( yAxis ),
   myYAxisIdentifierEnabled( false ),
   myDeviationData(0)
@@ -399,7 +400,7 @@ void Plot2d_QwtPlotCurve::drawSeries( QPainter *painter,
                                       int from, int to) const
 {
   if (to < 0)
-    to = dataSize() - 1;
+    to = (int)dataSize() - 1; //!< TODO: conversion from size_t to int
   QwtPlotCurve::drawSeries(painter, xMap, yMap, canvasRect, from, to);
 
   //draw deviation data
@@ -501,8 +502,8 @@ void Plot2d_QwtPlotCurve::clearDeviationData()
 */
 Plot2d_SelectableItem::Plot2d_SelectableItem():
   myIsSelected(false),
-  myLegendSymbol( new QwtSymbol() ),
-  myLegendPen( QPen() )
+  myLegendPen( QPen() ),
+  myLegendSymbol( new QwtSymbol() )
 {
 }
 
@@ -984,7 +985,7 @@ bool Plot2d_HistogramItem::isCrossItems() const
   Draws bar of histogram and on it bars of histograms with lower height.
 */
 void Plot2d_HistogramItem::drawRectAndLowers( QPainter* thePainter,
-                                              Qt::Orientation theOr,
+                                              Qt::Orientation /*theOr*/,
                                               const QRect& theRect ) const
 {
   QRect aRect = theRect;
@@ -1042,7 +1043,7 @@ int Plot2d_HistogramItem::getCrossedTop( const QRect& theRect ) const
   return aRes;
 }
 
-QwtGraphic Plot2d_HistogramItem::legendIcon( int index, const QSizeF &size ) const
+QwtGraphic Plot2d_HistogramItem::legendIcon( int /*index*/, const QSizeF &size ) const
 {   
     return defaultIcon( color(), size );
 }
@@ -1060,10 +1061,8 @@ Plot2d_QwtLegend::~Plot2d_QwtLegend()
 /*!
   Redefined method, which create a widget to be inserted into the legend.
 */
-QWidget *Plot2d_QwtLegend::createWidget( const QwtLegendData &data ) const
+QWidget *Plot2d_QwtLegend::createWidget( const QwtLegendData& /*data*/ ) const
 {
-  Q_UNUSED( data );
-
   Plot2d_QwtLegendLabel *label = new Plot2d_QwtLegendLabel();
   label->setItemMode( defaultItemMode() );
 

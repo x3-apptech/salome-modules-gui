@@ -297,7 +297,7 @@ void QtxWorkstackAction::setStatusTip( const int id, const QString& txt )
   \brief Process action activated by the user.
   \param type action ID
 */
-void QtxWorkstackAction::perform( const int type )
+void QtxWorkstackAction::perform( const int /*type*/ )
 {
   /*
   switch ( type )
@@ -853,7 +853,7 @@ void QtxSplitDlg::onComboBoxChanged( int theItem )
   }
   for( int i = 0; i < 4; i++ ) {
     if( myComboBox[i] != aSender ) {
-      ViewMode aNewMode;
+      ViewMode aNewMode = XYZ;
       if( myMapComboBoxMode[myComboBox[i]] == (ViewMode)(theItem) ) {
         for( int j = 0; j < 4; j++ )
           if( !aModeEnabledMap[(ViewMode)j] )

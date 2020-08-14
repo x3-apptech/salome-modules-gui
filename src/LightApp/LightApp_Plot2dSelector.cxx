@@ -38,9 +38,10 @@ LightApp_Plot2dSelector::LightApp_Plot2dSelector( Plot2d_Viewer* v, SUIT_Selecti
   : SUIT_Selector( mgr, v ),
     myViewer(v)
 {
-  if ( v )
+  if ( v ) {
     connect( v, SIGNAL( legendSelected( const QString& ) ), this, SLOT( onSelectionChanged( const QString& ) ) );
     connect( v, SIGNAL( clearSelected() ), this, SLOT( onClearSelected( ) ) );
+  }
 }
 
 /*!

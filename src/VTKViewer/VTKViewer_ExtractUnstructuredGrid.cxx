@@ -47,7 +47,7 @@
 
 #define VTK_XVERSION (VTK_MAJOR_VERSION*10000+VTK_MINOR_VERSION*100+VTK_BUILD_VERSION)
 
-vtkStandardNewMacro(VTKViewer_ExtractUnstructuredGrid);
+vtkStandardNewMacro(VTKViewer_ExtractUnstructuredGrid)
 
 
 VTKViewer_ExtractUnstructuredGrid::VTKViewer_ExtractUnstructuredGrid():
@@ -287,9 +287,9 @@ inline int InsertCell(vtkUnstructuredGrid *theInput,
                       vtkIdTypeArray*& theFaces,
                       vtkIdTypeArray*& theFaceLocations,
                       vtkIdType theCellId,
-                      vtkIdList *theIdList,
+                      vtkIdList* /*theIdList*/,
                       bool theStoreMapping,
-                      vtkIdType theOutId,
+                      vtkIdType /*theOutId*/,
                       VTKViewer_ExtractUnstructuredGrid::TVectorId& theOut2InId/*,
                       VTKViewer_ExtractUnstructuredGrid::TMapId& theIn2OutId*/)
 {
@@ -346,7 +346,7 @@ inline void InsertPointCell(vtkCellArray *theConnectivity,
                             vtkIdType theCellId,
                             vtkIdList *theIdList,
                             bool theStoreMapping,
-                            vtkIdType theOutId, 
+                            vtkIdType /*theOutId*/, 
                             VTKViewer_ExtractUnstructuredGrid::TVectorId& theOut2InId/*,
                             VTKViewer_ExtractUnstructuredGrid::TMapId& theIn2OutId*/)
 {

@@ -267,6 +267,7 @@ DDS_Dictionary::DDS_Dictionary()
   \brief Copy constructor (put in private section to prevent object copying).
 */
 DDS_Dictionary::DDS_Dictionary( const DDS_Dictionary& )
+: Standard_Transient()
 {
 }
 
@@ -555,7 +556,7 @@ Standard_Real DDS_Dictionary::ToSI( const Standard_Real theValue, const Standard
       OCC_CATCH_SIGNALS;
       aRetValue = UnitsAPI::AnyToSI( theValue, theUnits );
     }
-    catch( Standard_Failure ) {
+    catch( Standard_Failure& ) {
     }
   }
   else if ( theUnits && *theUnits )
@@ -580,7 +581,7 @@ Standard_Real DDS_Dictionary::FromSI( const Standard_Real theValue, const Standa
       OCC_CATCH_SIGNALS;
       aRetValue = UnitsAPI::AnyFromSI( theValue, theUnits );
     }
-    catch( Standard_Failure ) {
+    catch( Standard_Failure& ) {
     }
   }
   else if ( theUnits && *theUnits )

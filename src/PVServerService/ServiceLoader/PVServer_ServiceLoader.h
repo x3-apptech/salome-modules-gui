@@ -33,8 +33,8 @@ class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader_Exception: public std:
 {
 public:
   PVServer_ServiceLoader_Exception(const std::string & what):_what(what) {}
-  ~PVServer_ServiceLoader_Exception() throw () {}
-  virtual const char* what() const throw() { return _what.c_str(); }
+  ~PVServer_ServiceLoader_Exception() noexcept {}
+  virtual const char* what() const noexcept { return _what.c_str(); }
 private:
   std::string _what;
 };
@@ -42,7 +42,7 @@ private:
 class PVSERVERSERVICELOADER_EXPORT PVServer_ServiceLoader
 {
 public:
-  PVServer_ServiceLoader() throw(PVServer_ServiceLoader_Exception);
+  PVServer_ServiceLoader() ;
   virtual ~PVServer_ServiceLoader();
 
   //! Get the IOR of the CORBA service handling the PVServer

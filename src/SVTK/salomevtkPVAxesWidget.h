@@ -60,7 +60,7 @@ class SVTK_EXPORT vtkPVAxesWidget : public vtkInteractorObserver
 {
 public:
   static vtkPVAxesWidget* New();
-  vtkTypeMacro(vtkPVAxesWidget, vtkInteractorObserver);
+  vtkTypeMacro(vtkPVAxesWidget, vtkInteractorObserver)
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -47,7 +47,7 @@ Plot2d_Point::Plot2d_Point()
   Constructor
 */
 Plot2d_Point::Plot2d_Point( double theX, double theY, const QString& theText )
-  : x( theX ), y( theY ), text( theText ), deviationPtr(0)
+  : x( theX ), y( theY ), deviationPtr(0), text( theText )
 {
 }
 

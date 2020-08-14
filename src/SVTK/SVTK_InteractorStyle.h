@@ -55,7 +55,7 @@
 */
 class SVTK_EXPORT SVTK_ControllerIncrement : public vtkObject{
  public:
-  vtkTypeMacro(SVTK_ControllerIncrement, vtkObject);
+  vtkTypeMacro(SVTK_ControllerIncrement, vtkObject)
   static SVTK_ControllerIncrement* New();
 
   //! Set start value of increment
@@ -87,7 +87,7 @@ class SVTK_EXPORT SVTK_ControllerIncrement : public vtkObject{
 */
 class SVTK_EXPORT SVTK_GeomControllerIncrement : public SVTK_ControllerIncrement{
  public:
-  vtkTypeMacro(SVTK_GeomControllerIncrement, SVTK_ControllerIncrement);
+  vtkTypeMacro(SVTK_GeomControllerIncrement, SVTK_ControllerIncrement)
   static SVTK_GeomControllerIncrement* New();
 
   //! Increace the increment value by add 1
@@ -110,7 +110,7 @@ class SVTK_EXPORT SVTK_GeomControllerIncrement : public SVTK_ControllerIncrement
 */
 class SVTK_EXPORT SVTK_ControllerOnKeyDown : public vtkObject{
  public:
-  vtkTypeMacro(SVTK_ControllerOnKeyDown, vtkObject);
+  vtkTypeMacro(SVTK_ControllerOnKeyDown, vtkObject)
   static SVTK_ControllerOnKeyDown* New();
 
   //! Provides the action on event 
@@ -157,7 +157,7 @@ class SVTK_EXPORT SVTK_InteractorStyle: public vtkInteractorStyle
 {
  public:
   static SVTK_InteractorStyle *New();
-  vtkTypeMacro(SVTK_InteractorStyle, vtkInteractorStyle);
+  vtkTypeMacro(SVTK_InteractorStyle, vtkInteractorStyle)
 
   typedef boost::shared_ptr<SVTK_SelectionEvent> PSelectionEvent;
 

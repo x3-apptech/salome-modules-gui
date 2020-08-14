@@ -1912,7 +1912,7 @@ int QtxEvalSetMath::priority( const QString& op, bool isBin ) const
   \param v2 second argument (not valid for unary postfix operations)
   \return error code (QtxEvalExpr::Error)
 */
-QtxEvalExpr::Error QtxEvalSetMath::calculate( const QString& op, QVariant& v1, QVariant& v2 ) const
+QtxEvalExpr::Error QtxEvalSetMath::calculate( const QString& op, QVariant& /*v1*/, QVariant& v2 ) const
 {
   QtxEvalExpr::Error err = QtxEvalExpr::OK;
   double val = v2.toDouble();

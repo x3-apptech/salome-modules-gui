@@ -84,7 +84,7 @@ namespace SVTK
 //! Define a container for SALOME VTK view window
 class SVTK_EXPORT SVTK_ViewWindow : public SUIT_ViewWindow
 {
-  Q_OBJECT;
+  Q_OBJECT
 
  public:
   //! To construct #SVTK_ViewWindow instance

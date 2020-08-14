@@ -70,7 +70,7 @@ public:
   virtual bool                 isDefault() const;
   virtual bool                 eventFilter( QObject*, QEvent* );
 
-  virtual void                 setSketcherMode(int theMode) {}
+  virtual void                 setSketcherMode(int) {}
   virtual int                  sketcherMode() const { return 0; }
 
 private slots:

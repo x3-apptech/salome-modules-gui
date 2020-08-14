@@ -76,6 +76,7 @@ void GraphicsView_Scene::processRectChanged()
 //================================================================
 void GraphicsView_Scene::onSceneRectChanged( const QRectF& theRect )
 {
+  (void)theRect; // unused in debug mode
 #ifdef VIEWER_DEBUG
   mySceneRectItem->setRect( theRect );
 #endif
@@ -170,7 +171,7 @@ void GraphicsView_Scene::contextMenuEvent( QGraphicsSceneContextMenuEvent* e )
 // Function : dragEnterEvent
 // Purpose  : 
 //================================================================
-void GraphicsView_Scene::dragEnterEvent( QGraphicsSceneDragDropEvent* e )
+void GraphicsView_Scene::dragEnterEvent( QGraphicsSceneDragDropEvent* /*e*/ ) //!< TODO: unused variable
 {
   //QGraphicsScene::dragEnterEvent( e ); // don't uncomment
 }
@@ -179,7 +180,7 @@ void GraphicsView_Scene::dragEnterEvent( QGraphicsSceneDragDropEvent* e )
 // Function : dragLeaveEvent
 // Purpose  : 
 //================================================================
-void GraphicsView_Scene::dragLeaveEvent( QGraphicsSceneDragDropEvent* e )
+void GraphicsView_Scene::dragLeaveEvent( QGraphicsSceneDragDropEvent* /*e*/ ) //!< TODO: unused variable
 {
   //QGraphicsScene::dragLeaveEvent( e ); // don't uncomment
 }
@@ -188,7 +189,7 @@ void GraphicsView_Scene::dragLeaveEvent( QGraphicsSceneDragDropEvent* e )
 // Function : dragMoveEvent
 // Purpose  : 
 //================================================================
-void GraphicsView_Scene::dragMoveEvent( QGraphicsSceneDragDropEvent* e )
+void GraphicsView_Scene::dragMoveEvent( QGraphicsSceneDragDropEvent* /*e*/ ) //!< TODO: unused variable
 {
   //QGraphicsScene::dragMoveEvent( e ); // don't uncomment
 }
@@ -197,7 +198,7 @@ void GraphicsView_Scene::dragMoveEvent( QGraphicsSceneDragDropEvent* e )
 // Function : dropEvent
 // Purpose  : 
 //================================================================
-void GraphicsView_Scene::dropEvent( QGraphicsSceneDragDropEvent* e )
+void GraphicsView_Scene::dropEvent( QGraphicsSceneDragDropEvent* /*e*/ ) //!< TODO: unused variable
 {
   //QGraphicsScene::dropEvent( e ); // don't uncomment
 }

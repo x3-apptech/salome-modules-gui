@@ -73,7 +73,7 @@ void rotate_point( float& theX, float& theY, float theAngle )
 */
 GLViewer_ViewPort2d::GLViewer_ViewPort2d( QWidget* parent, GLViewer_ViewFrame* theViewFrame )
 : GLViewer_ViewPort( parent ),
-  myMargin( MARGIN ), myWidth( WIDTH ), myHeight( HEIGHT ),
+  myMargin( MARGIN ), myHeight( HEIGHT ), myWidth( WIDTH ),
   myXScale( 1.0 ), myYScale( 1.0 ), myXOldScale( 1.0 ), myYOldScale( 1.0 ),
   myXPan( 0.0 ), myYPan( 0.0 ),
   myIsMouseReleaseBlock( false ),
@@ -824,7 +824,7 @@ void GLViewer_ViewPort2d::fitSelect()
   Transform view by view borders
   \param keepScale - if it is true, zoom does not change
 */
-void GLViewer_ViewPort2d::fitAll( bool keepScale, bool withZ )
+void GLViewer_ViewPort2d::fitAll( bool keepScale, bool /*withZ*/ )
 {
     //cout << "GLViewer_ViewPort2d::fitAll" << endl;
 
@@ -1140,7 +1140,7 @@ void GLViewer_ViewPort2d::drawCompass()
 
     glEndList();
 
-    if ( aTextList != -1 )
+    if ( (int)aTextList != -1 )
         glCallList( aTextList );
 }
 

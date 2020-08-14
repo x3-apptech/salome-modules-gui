@@ -47,7 +47,7 @@ class vtkObject;
 
 class SVTK_EXPORT SVTK_ViewParameterDlg : public ViewerTools_DialogBase
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_ViewParameterDlg(QtxAction* theAction,

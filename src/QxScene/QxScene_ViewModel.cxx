@@ -84,7 +84,7 @@ SUIT_ViewWindow* QxScene_Viewer::createView(SUIT_Desktop* theDesktop)
 /*!
   Builds popup for QxScene viewer
 */
-void QxScene_Viewer::contextMenuPopup(QMenu* thePopup)
+void QxScene_Viewer::contextMenuPopup(QMenu* /*thePopup*/)
 {
   DEBTRACE("QxScene_Viewer::contextMenuPopup");
 }

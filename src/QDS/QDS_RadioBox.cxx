@@ -161,7 +161,7 @@ void QDS_RadioBox::setState( const bool on, const QList<int>& ids, const bool ap
   bool changed = false;
 
   QMap<int, int> aMap;
-  for ( uint i = 0; i < ids.count(); i++ )
+  for ( int i = 0; i < ids.count(); i++ )
     aMap.insert( ids.at( i ), 0 );
 
   for ( IdStateMap::Iterator it = myState.begin(); it != myState.end(); ++it )

@@ -47,7 +47,7 @@
 
 #include <Basics_Utils.hxx>
 
-vtkStandardNewMacro(VTKViewer_OpenGLRenderer);
+vtkStandardNewMacro(VTKViewer_OpenGLRenderer)
 
 VTKViewer_OpenGLRenderer::VTKViewer_OpenGLRenderer()
 {

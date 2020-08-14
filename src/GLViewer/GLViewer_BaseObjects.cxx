@@ -422,7 +422,7 @@ GLboolean GLViewer_MarkerSet::unhighlight()
   \param isCircle - true if sensitive area of detection is round
   \param isShift  - true if selection exec with append option
 */
-GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull,
+GLboolean GLViewer_MarkerSet::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect /*rect*/, GLboolean /*isFull*/,
                                       GLboolean isCircle, GLboolean isShift )
 {
     if( !myIsVisible )
@@ -814,11 +814,11 @@ bool GLViewer_MarkerSet::initializeFromByteCopy( QByteArray theArray )
   \param size - size of polyline
   \param toolTip - tool tip of polyline
 */
-GLViewer_Polyline::GLViewer_Polyline( int number, float size, const QString& toolTip ):
+GLViewer_Polyline::GLViewer_Polyline( int number, float /*size*/, const QString& toolTip ):
   GLViewer_Object(),
-  myNumber( 0 ),
   myXCoord( 0 ),
-  myYCoord( 0 )       
+  myYCoord( 0 ),
+  myNumber( 0 )
 {
   myHighFlag = GL_TRUE;
 
@@ -1004,7 +1004,7 @@ GLViewer_Drawer* GLViewer_Polyline::createDrawer()
   \param isCircle - true if sensitive area of detection is round
   \return true if highlight status is changed
 */
-GLboolean GLViewer_Polyline::highlight( GLfloat x, GLfloat y, GLfloat tol, GLboolean isCircle )
+GLboolean GLViewer_Polyline::highlight( GLfloat x, GLfloat y, GLfloat /*tol*/, GLboolean /*isCircle*/ )
 {
     if( !myIsVisible )
         return false;
@@ -1088,8 +1088,8 @@ GLboolean GLViewer_Polyline::unhighlight()
   \param isCircle - true if sensitive area of detection is round
   \param isShift  - true if selection exec with append option
 */
-GLboolean GLViewer_Polyline::select( GLfloat x, GLfloat y, GLfloat tol, GLViewer_Rect rect, GLboolean isFull,
-                                     GLboolean isCircle, GLboolean isShift )
+GLboolean GLViewer_Polyline::select( GLfloat x, GLfloat y, GLfloat /*tol*/, GLViewer_Rect /*rect*/, GLboolean /*isFull*/,
+                                     GLboolean /*isCircle*/, GLboolean /*isShift*/ )
 {
     if( !myIsVisible )
         return false;
@@ -1621,8 +1621,8 @@ GLboolean GLViewer_TextObject::unhighlight()
   \param isCircle - true if sensitive area of detection is round
   \param isShift  - true if selection exec with append option
 */
-GLboolean GLViewer_TextObject::select( GLfloat theX, GLfloat theY, GLfloat theTol, GLViewer_Rect rect,
-                                       GLboolean isFull, GLboolean isCircle, GLboolean isShift )
+GLboolean GLViewer_TextObject::select( GLfloat theX, GLfloat theY, GLfloat theTol, GLViewer_Rect /*rect*/,
+                                       GLboolean /*isFull*/, GLboolean isCircle, GLboolean /*isShift*/ )
 { 
     if( !myIsVisible )
         return false;

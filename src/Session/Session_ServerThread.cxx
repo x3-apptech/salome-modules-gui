@@ -206,8 +206,7 @@ void Session_ServerThread::ActivateModuleCatalog(int argc,
   }
 }
 
-void Session_ServerThread::ActivateSALOMEDS(int argc,
-                                            char ** argv)
+void Session_ServerThread::ActivateSALOMEDS(int /*argc*/, char** /*argv*/)
 {
   try {
     MESSAGE("SALOMEDS thread started");
@@ -293,8 +292,7 @@ void Session_ServerThread::ActivateRegistry(int argc,
   }
 }
 
-void Session_ServerThread::ActivateContainerManager(int argc,
-                                             char ** argv)
+void Session_ServerThread::ActivateContainerManager(int /*argc*/, char** /*argv*/)
 {
   try {
     PortableServer::POA_var root_poa=PortableServer::POA::_the_root_poa();
@@ -318,8 +316,7 @@ void Session_ServerThread::ActivateContainerManager(int argc,
   }
 }
 
-void Session_ServerThread::ActivateContainer(int argc,
-                                             char ** argv)
+void Session_ServerThread::ActivateContainer(int argc, char** argv)
 {
   try {
     MESSAGE("Container thread started");
@@ -372,7 +369,7 @@ void Session_ServerThread::ActivateContainer(int argc,
       containerName = argv[1];
     }
     
-    _container = new Engines_Container_i(_orb, _root_poa, containerName , argc , argv , true , false);
+    _container = new Engines_Container_i(_orb, _root_poa, containerName, argc, argv, true, false);
   }
   catch(CORBA::SystemException&) {
     INFOS("Caught CORBA::SystemException.");
@@ -391,8 +388,7 @@ void Session_ServerThread::ActivateContainer(int argc,
   }
 }
 
-void Session_ServerThread::ActivateSession(int argc,
-                                           char ** argv)
+void Session_ServerThread::ActivateSession(int /*argc*/, char** /*argv*/)
 {
   MESSAGE("Session_ServerThread::ActivateSession() not implemented!");
 }

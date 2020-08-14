@@ -59,7 +59,7 @@ class SVTK_EXPORT SVTK_Selector: public vtkObject
 public:
   static SVTK_Selector* New();
   
-  vtkTypeMacro(SVTK_Selector,vtkObject);
+  vtkTypeMacro(SVTK_Selector,vtkObject)
 
   //! To change current Selection_Mode (as outside effect, it invokes selectionChange signal)
   virtual

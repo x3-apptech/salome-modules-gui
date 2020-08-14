@@ -70,7 +70,7 @@ void OCCViewer_AISSelector::setHilightColor ( Quantity_NameOfColor color )
 {
   myHilightColor = color;
   if ( !myAISContext.IsNull() ) {
-    const Handle(Graphic3d_HighlightStyle)& hStyle = myAISContext->HighlightStyle();
+    const Handle(Prs3d_Drawer)& hStyle = myAISContext->HighlightStyle();
     hStyle->SetColor( myHilightColor );
   }
 }
@@ -82,7 +82,7 @@ void OCCViewer_AISSelector::setSelectColor ( Quantity_NameOfColor color )
 {
   mySelectColor = color;
   if ( !myAISContext.IsNull() ) {
-    const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
+    const Handle(Prs3d_Drawer)& sStyle = myAISContext->SelectionStyle();
     sStyle->SetColor( mySelectColor );
   }
 }
@@ -94,8 +94,8 @@ void OCCViewer_AISSelector::setAISContext ( const Handle (AIS_InteractiveContext
 {
   myAISContext = aisContext;
   if ( ! myAISContext.IsNull() ) { 
-    const Handle(Graphic3d_HighlightStyle)& hStyle = myAISContext->HighlightStyle();
-    const Handle(Graphic3d_HighlightStyle)& sStyle = myAISContext->SelectionStyle();
+    const Handle(Prs3d_Drawer)& hStyle = myAISContext->HighlightStyle();
+    const Handle(Prs3d_Drawer)& sStyle = myAISContext->SelectionStyle();
     hStyle->SetColor( myHilightColor );
     sStyle->SetColor( mySelectColor );
     myAISContext->SetSubIntensityColor( Quantity_NOC_CYAN1 );
@@ -114,7 +114,7 @@ bool OCCViewer_AISSelector::checkSelection ( AIS_StatusOfPick status,
   if ( myAISContext.IsNull() )
     return false;
 
-  myNumSelected = myAISContext->NbCurrents(); /* update after the last selection */
+  myNumSelected = myAISContext->NbCurrents(); /* update after the last selection */ // todo: NbCurrents is deprecated
   
   if ( status == AIS_SOP_NothingSelected && !hadSelection ) {
     emit selSelectionCancel( addTo );

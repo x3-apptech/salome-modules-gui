@@ -108,8 +108,9 @@ namespace
   {
   public:
     MsgHandler() {}
-    void qtMessage( QtMsgType type, const QMessageLogContext& context, const QString& message )
+    void qtMessage( QtMsgType type, const QMessageLogContext& /*context*/, const QString& message )
     {
+      (void)message; // unused in debug mode
       switch ( type )
       {
       case QtDebugMsg:
@@ -181,7 +182,7 @@ namespace
     }
 
   protected:
-    QString userFileName( const QString& appName, const bool forLoad ) const
+    QString userFileName( const QString& /*appName*/, const bool forLoad ) const
     {
       if ( version().isEmpty() ) return ""; 
       return SUIT_ResourceMgr::userFileName( myCustomAppName, forLoad );

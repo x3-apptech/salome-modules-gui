@@ -41,8 +41,8 @@ GraphicsView_ViewTransformer::GraphicsView_ViewTransformer( GraphicsView_Viewer*
 : QObject( 0 ),
   myViewer( v ),
   myType( type ),
-  myMajorBtn( Qt::NoButton ),
   myButtonState( 0 ),
+  myMajorBtn( Qt::NoButton ),
   myRectBand( 0 )
 {
   if( myType == GraphicsView_Viewer::Pan ||

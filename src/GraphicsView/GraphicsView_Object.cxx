@@ -99,7 +99,7 @@ QRectF GraphicsView_Object::getRect() const
 // Function : checkHighlight
 // Purpose  : 
 //================================================================
-bool GraphicsView_Object::checkHighlight( double theX, double theY, QCursor& theCursor ) const
+bool GraphicsView_Object::checkHighlight( double theX, double theY, QCursor& /*theCursor*/ ) const
 {
   return !getRect().isNull() && getRect().contains( theX, theY );
 }
@@ -111,7 +111,7 @@ bool GraphicsView_Object::checkHighlight( double theX, double theY, QCursor& the
 bool GraphicsView_Object::highlight( double theX, double theY )
 {
   QCursor aCursor;
-  if( myIsHighlighted = isVisible() )
+  if( (myIsHighlighted = isVisible()) )
     myIsHighlighted = checkHighlight( theX, theY, aCursor );
   return myIsHighlighted;
 }
@@ -132,7 +132,7 @@ void GraphicsView_Object::unhighlight()
 bool GraphicsView_Object::select( double theX, double theY, const QRectF& theRect )
 {
   QCursor aCursor;
-  if( myIsSelected = isVisible() )
+  if( (myIsSelected = isVisible()) )
   {
     if( !theRect.isNull() )
       myIsSelected = theRect.contains( getRect() );

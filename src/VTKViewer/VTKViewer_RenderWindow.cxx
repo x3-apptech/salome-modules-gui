@@ -62,13 +62,13 @@ VTKViewer_RenderWindow::~VTKViewer_RenderWindow()
 }
 
 /*!Call Render method for render window field.*/
-void VTKViewer_RenderWindow::paintEvent(QPaintEvent* theEvent) 
+void VTKViewer_RenderWindow::paintEvent(QPaintEvent* /*theEvent*/) 
 {
   myRW->Render();
 }
 
 /*!Resize render window.*/
-void VTKViewer_RenderWindow::resizeEvent(QResizeEvent* theEvent) 
+void VTKViewer_RenderWindow::resizeEvent(QResizeEvent* /*theEvent*/) 
 {
   int aWidth = myRW->GetSize()[0], aHeight = myRW->GetSize()[1];
   if(vtkRenderWindowInteractor* aRWI = myRW->GetInteractor())

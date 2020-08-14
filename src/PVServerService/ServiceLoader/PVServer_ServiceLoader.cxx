@@ -26,7 +26,7 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(SALOME_ContainerManager)
 
-PVServer_ServiceLoader::PVServer_ServiceLoader() throw(PVServer_ServiceLoader_Exception):
+PVServer_ServiceLoader::PVServer_ServiceLoader():
   myLcc( 0 )
 {
   try

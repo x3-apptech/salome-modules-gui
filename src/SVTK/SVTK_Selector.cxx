@@ -252,7 +252,7 @@ int
 SVTK_SelectorDef
 ::IObjectCount() const
 {
-  return myIObjects.size();
+  return (int)myIObjects.size(); //!< TODO: conversion from size_t to int
 }
 
 /*!

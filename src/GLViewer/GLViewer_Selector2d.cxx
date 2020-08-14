@@ -170,7 +170,7 @@ void GLViewer_Selector2d::unselectAll()
   Checks selection state and emits  'selSelectionDone' or 'selSelectionCancel'     
   Should be called by after non-interactive selection.
 */
-void GLViewer_Selector2d::checkSelection( int selBefore, bool append, int aStatus )
+void GLViewer_Selector2d::checkSelection( int selBefore, bool /*append*/, int aStatus )
 {
     int selAfter = numSelected();
     if ( selBefore > 0 && selAfter < 1 )     

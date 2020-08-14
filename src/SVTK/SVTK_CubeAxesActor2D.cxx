@@ -43,7 +43,7 @@
 #include <vtkProperty.h>
 #include <vtkProperty2D.h>
 
-vtkStandardNewMacro(SVTK_CubeAxesActor2D);
+vtkStandardNewMacro(SVTK_CubeAxesActor2D)
 
 // Instantiate this object.
 SVTK_CubeAxesActor2D::SVTK_CubeAxesActor2D()

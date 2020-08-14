@@ -76,7 +76,6 @@ OCCViewer_LightSourceDlg::OCCViewer_LightSourceDlg( OCCViewer_ViewWindow* view, 
 
   const double min = -RealLast();
   const double max = RealLast();
-  const int precision = 3;
 
   /**********************   Directional light   **********************/
   /* Controls for directional light:
@@ -303,7 +302,7 @@ void OCCViewer_LightSourceDlg::initParam( bool theIsDefault )
     myModel->getViewer3d()->NextDefinedLights();
   }
 
-  double aX, aY, aZ;
+  double aX=0., aY=0., aZ=0.;
   Quantity_Color aColor = aLight->Color();
   if( myDirType->isChecked() ) {
     myDirColor->setColor( OCCViewer::color( aColor ) );

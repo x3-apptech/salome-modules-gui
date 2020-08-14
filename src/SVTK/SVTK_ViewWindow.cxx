@@ -138,9 +138,9 @@ namespace SVTK
 SVTK_ViewWindow::SVTK_ViewWindow(SUIT_Desktop* theDesktop):
   SUIT_ViewWindow(theDesktop),
   myView(NULL),
-  myDumpImage(QImage()),
   myKeyFreeInteractorStyle(SVTK_KeyFreeInteractorStyle::New()),
-  myEventCallbackCommand(vtkCallbackCommand::New())
+  myEventCallbackCommand(vtkCallbackCommand::New()),
+  myDumpImage(QImage())
 {
   setWindowFlags( windowFlags() & ~Qt::Window );
   // specific of vtkSmartPointer
@@ -1233,7 +1233,7 @@ void SVTK_ViewWindow::SetTrihedronSize(const double theSize, const bool theRelat
 /*! If parameter theIsForcedUpdate is true, recalculate parameters for
  *  trihedron and cube axes, even if trihedron and cube axes is invisible.
  */
-void SVTK_ViewWindow::AdjustTrihedrons(const bool theIsForcedUpdate)
+void SVTK_ViewWindow::AdjustTrihedrons(const bool /*theIsForcedUpdate*/)
 {
   GetRenderer()->AdjustActors();
   Repaint();
@@ -1890,7 +1890,7 @@ void SVTK_ViewWindow::setVisualParameters( const QString& parameters )
 void SVTK_ViewWindow::doSetVisualParameters( const QString& parameters, bool baseParamsOnly )
 {
 
-  double pos[3], focalPnt[3], viewUp[3], parScale, scale[3];
+  double pos[3], focalPnt[3], viewUp[3], parScale = 1.0, scale[3];
 
   QXmlStreamReader aReader(parameters);
   SVTK_CubeAxesActor2D* gradAxesActor = GetCubeAxes();
@@ -2733,9 +2733,9 @@ void SVTK_ViewWindow::emitTransformed() {
   Processes events
 */
 void SVTK_ViewWindow::ProcessEvents(vtkObject* vtkNotUsed(theObject),
-                                    unsigned long theEvent,
+                                    unsigned long /*theEvent*/,
                                     void* theClientData,
-                                    void* theCallData)
+                                    void* /*theCallData*/)
 {
   SVTK_ViewWindow* self = reinterpret_cast<SVTK_ViewWindow*>(theClientData);
   if(self)

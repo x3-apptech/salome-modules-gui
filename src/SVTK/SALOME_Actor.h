@@ -74,7 +74,7 @@ class SVTK_EXPORT SALOME_Actor : public VTKViewer_Actor
  public:
   static SALOME_Actor* New();
   
-  vtkTypeMacro(SALOME_Actor,VTKViewer_Actor);
+  vtkTypeMacro(SALOME_Actor,VTKViewer_Actor)
 
   //----------------------------------------------------------------------------
   //! To check, if the #SALOME_Actor has a reference to #SALOME_InteractiveObject

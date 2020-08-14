@@ -43,7 +43,7 @@
 
 #include <vtkPassThroughFilter.h>
 
-vtkStandardNewMacro(SVTK_DeviceActor);
+vtkStandardNewMacro(SVTK_DeviceActor)
 
 /*!
   Constructor
@@ -97,7 +97,7 @@ SVTK_DeviceActor
 
   myFeatureEdges->Delete();
 
-  for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
+  for(size_t i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
     myPassFilter[i]->Delete();
 }
 
@@ -205,7 +205,7 @@ SVTK_DeviceActor
   if(myIsFeatureEdgesEnabled)
     mTime = std::max(mTime,myFeatureEdges->GetMTime());
 
-  for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
+  for(size_t i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
     std::max(mTime,myPassFilter[i]->GetMTime());
 
   return mTime;

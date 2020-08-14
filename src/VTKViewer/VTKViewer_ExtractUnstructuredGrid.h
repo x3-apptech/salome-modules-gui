@@ -45,7 +45,7 @@ class VTKVIEWER_EXPORT VTKViewer_ExtractUnstructuredGrid : public vtkUnstructure
 {
 public:
   //! VTK type macros.
-  vtkTypeMacro( VTKViewer_ExtractUnstructuredGrid, vtkUnstructuredGridAlgorithm );
+  vtkTypeMacro( VTKViewer_ExtractUnstructuredGrid, vtkUnstructuredGridAlgorithm )
 
   //! \brief Construct with all types of clipping turned off.
   static VTKViewer_ExtractUnstructuredGrid *New();

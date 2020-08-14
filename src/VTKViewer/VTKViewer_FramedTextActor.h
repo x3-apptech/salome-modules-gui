@@ -41,7 +41,7 @@ public:
   enum LayoutType { Vertical = 0, Horizontal };
 
 public:
-  vtkTypeMacro(VTKViewer_FramedTextActor,vtkActor2D);
+  vtkTypeMacro(VTKViewer_FramedTextActor,vtkActor2D)
   static VTKViewer_FramedTextActor *New();
 
   virtual int                 RenderOpaqueGeometry(vtkViewport*);

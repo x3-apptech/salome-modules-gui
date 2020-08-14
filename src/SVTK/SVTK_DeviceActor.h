@@ -56,7 +56,7 @@ class vtkAlgorithmOutput;
 class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
 {
  public:
-  vtkTypeMacro(SVTK_DeviceActor,vtkLODActor);
+  vtkTypeMacro(SVTK_DeviceActor,vtkLODActor)
 
   static
   SVTK_DeviceActor* 

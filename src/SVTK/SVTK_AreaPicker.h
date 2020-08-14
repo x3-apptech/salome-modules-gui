@@ -60,7 +60,7 @@ class SVTK_EXPORT SVTK_AreaPicker : public vtkAbstractPropPicker
   static
   SVTK_AreaPicker *New();
 
-  vtkTypeMacro(SVTK_AreaPicker,vtkAbstractPropPicker);
+  vtkTypeMacro(SVTK_AreaPicker,vtkAbstractPropPicker)
   
   /*! 
     Specify tolerance for performing pick operation. Tolerance is specified

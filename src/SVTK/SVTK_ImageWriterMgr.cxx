@@ -88,7 +88,7 @@ SVTK_ImageWriterMgr
                 //"- total = "<<mySemaphore->total()<<
                 "; available = "<<mySemaphore->available()<<endl;
   if(MYDEBUG) cout<<"SVTK_ImageWriterMgr::Stop - *mySemaphore += "<<myThreads.size()<<endl;
-  mySemaphore->acquire( myThreads.size() );
+  mySemaphore->acquire( (int)myThreads.size() ); //!< TODO: conversion from size_t to int
 
   for(size_t anId = 0, anEnd = myThreads.size(); anId < anEnd; anId++){
     SVTK_ImageWriter* anImageWriter = myThreads[anId];

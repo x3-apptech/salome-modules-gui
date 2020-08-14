@@ -54,7 +54,7 @@ class vtkObject;
 
 class SVTK_EXPORT SVTK_SetRotationPointDlg : public ViewerTools_DialogBase
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_SetRotationPointDlg(QtxAction* theAction,

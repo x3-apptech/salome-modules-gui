@@ -34,7 +34,7 @@ class PyModuleHelper;
 
 class SALOME_PYQT_EXPORT SALOME_PYQT_Module: public SalomeApp_Module
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SALOME_PYQT_Module();

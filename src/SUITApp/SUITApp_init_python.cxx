@@ -67,7 +67,7 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   script += "import sys\n";
   script += "sys.excepthook = _custom_except_hook\n";
   script += "del _custom_except_hook, sys\n";
-  int res = PyRun_SimpleString(qUtf8Printable(script));
+  PyRun_SimpleString(qUtf8Printable(script));
   // VSR (22/09/2016): end of workaround
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock - can be called many times
   // Py_InitThreads acquires the GIL

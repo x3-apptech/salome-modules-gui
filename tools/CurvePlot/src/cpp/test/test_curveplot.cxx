@@ -67,7 +67,7 @@ void TestCurvePlot::onClicked()
 //  std::string s = xx.toStdString();
 //  std::cout << "test xx: " << s << std::endl;
   std::cout << "setting X label " << CurvePlot::SetXLabel("tôtô") << std::endl;
-  PlotID crv_id = CurvePlot::AddCurve(xx, yy, ps_id, "the cérve", "th x", "the y-s", false);
+  /*PlotID crv_id = */CurvePlot::AddCurve(xx, yy, ps_id, "the cérve", "th x", "the y-s", false);
   std::cout << "setting X label " << CurvePlot::SetXLabel("tôtô") << std::endl;
 }
 

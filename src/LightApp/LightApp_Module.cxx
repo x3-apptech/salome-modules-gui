@@ -700,7 +700,7 @@ LightApp_Operation* LightApp_Module::operation( const int id ) const
 /*!
   virtual method called to manage the same operations
 */
-bool LightApp_Module::reusableOperation( const int id )
+bool LightApp_Module::reusableOperation( const int /*id*/ )
 {
  return true;
 } 

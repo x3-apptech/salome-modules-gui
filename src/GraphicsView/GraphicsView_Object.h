@@ -74,10 +74,10 @@ public:
   virtual void               move( double theDX, double theDY, bool theIsAtOnce = false );
   virtual bool               finishMove( bool theStatus );
   virtual bool               isMoving() const { return myIsMoving; }
-  virtual bool               isMovingByXAllowed( double theDX ) { return true; }
-  virtual bool               isMovingByYAllowed( double theDY ) { return true; }
+  virtual bool               isMovingByXAllowed( double /*theDX*/ ) { return true; }
+  virtual bool               isMovingByYAllowed( double /*theDY*/ ) { return true; }
 
-  virtual bool               updateScale( bool theIsScaleUp, bool theIsCtrl ) { return false; }
+  virtual bool               updateScale( bool /*theIsScaleUp*/, bool /*theIsCtrl*/ ) { return false; }
 
   virtual QRectF             getPullingRect() const { return getRect(); }
   virtual bool               portContains( const QPointF& ) { return false; }

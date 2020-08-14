@@ -29,7 +29,7 @@
 #include <vtkActorCollection.h>
 #include <vtkRenderer.h>
 
-vtkStandardNewMacro(SVTK_Trihedron);
+vtkStandardNewMacro(SVTK_Trihedron)
 
 /*!
   Constructor

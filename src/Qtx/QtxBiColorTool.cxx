@@ -61,7 +61,7 @@ public:
     }
     return mySizeHint; 
   }
-  void paintEvent( QPaintEvent* e )
+  void paintEvent( QPaintEvent* /*e*/ )
   {
     QStylePainter sp(this);
     QStyleOptionButton option;

@@ -35,7 +35,7 @@
   \brief Constructor.
   \param parent Parent widget.
 */
-PyEditor_Widget::PyEditor_Widget( QWidget* parent )
+PyEditor_Widget::PyEditor_Widget( QWidget* parent ) : QWidget( parent )
 {
   // Create editor.
   myEditor = new PyEditor_Editor( this );

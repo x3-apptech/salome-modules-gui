@@ -74,7 +74,7 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
   for (it = myMap.begin(); it != myMap.end(); ++it) {
     aModuleName[i] = const_cast<char*>(it->first.c_str());//(it->first);
     aFileBufferSize += 4;                                //Add 4 bytes: a length of the module name
-    aFileBufferSize += strlen(aModuleName[i])+1;
+    aFileBufferSize += (int)strlen(aModuleName[i])+1;		//!< TODO: conversion from size_t to int
     std::string aName(aModuleName[i]);
     PutFilesToStream(aName, aBuffer[i], aBufferSize[i], isMultiFile);
     aFileBufferSize += 8;                                //Add 8 bytes: a length of the buffer
@@ -99,7 +99,7 @@ bool LightApp_Driver::SaveDatasInFile( const char* theFileName, bool isMultiFile
 
   int aBufferNameSize = 0;
   for (i = 0; i < n; i++) {
-    aBufferNameSize = strlen(aModuleName[i])+1;
+    aBufferNameSize = (int)strlen(aModuleName[i])+1; //!< TODO: conversion from size_t to int
     //Initialize 4 bytes of the buffer by 0
     memset((aFileBuffer + aCurrentPos), 0, 4); 
     //Copy the length of the module name to the buffer
@@ -216,7 +216,7 @@ LightApp_Driver::ListOfFiles LightApp_Driver::GetListOfFiles( const char* theMod
   if (myMap.count(aName))
     aListOfFiles = myMap[aName];
 
-    return aListOfFiles;
+  return aListOfFiles;
 }
 
 /*!
@@ -238,7 +238,7 @@ void LightApp_Driver::PutFilesToStream( const std::string& theModuleName, unsign
   // aFiles must contain temporary directory name in its first item
   // and names of files (relatively the temporary directory) in the others
 
-  int i, aLength = aFiles.size() - 1;
+  int i, aLength = (int)aFiles.size() - 1; //!< TODO: conversion size_t to int
   if(aLength <= 0) {
     theBufferSize = 0;
     theBuffer = new unsigned char[theBufferSize];
@@ -273,7 +273,7 @@ void LightApp_Driver::PutFilesToStream( const std::string& theModuleName, unsign
       aFileSize[i] = aFile.tellg();
       aBufferSize += aFileSize[i];              //Add a space to store the file
     }
-    aFileNameSize[i] = strlen(aFName) + 1;
+    aFileNameSize[i] = (int)strlen(aFName) + 1;		//!< TODO: conversion from size_t to int
     aBufferSize += aFileNameSize[i];          //Add a space to store the file name
     aBufferSize += (theNamesOnly)?4:12;       //Add 4 bytes: a length of the file name,
                                               //    8 bytes: length of the file itself
@@ -409,7 +409,7 @@ LightApp_Driver::ListOfFiles LightApp_Driver::PutStreamToFiles( const unsigned c
 */
 void LightApp_Driver::RemoveFiles( const ListOfFiles& theFiles, const bool IsDirDeleted)
 {
-  int i, aLength = theFiles.size() - 1;
+  int i, aLength = (int)theFiles.size() - 1; //!< TODO: conversion size_t to int
   if(aLength <= 0) {
     return;
   }

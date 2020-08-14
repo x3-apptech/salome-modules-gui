@@ -49,7 +49,7 @@ public:
   /*! \fn vtkTypeMacro(VTKViewer_AppendFilter, vtkAppendFilter)
    *  \brief VTK type revision macros.
    */
-  vtkTypeMacro(VTKViewer_AppendFilter, vtkAppendFilter);
+  vtkTypeMacro(VTKViewer_AppendFilter, vtkAppendFilter)
 
   void SetDoMappingFlag(const bool theFlag);
 

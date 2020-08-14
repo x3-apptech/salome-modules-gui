@@ -378,6 +378,7 @@ void QtxToolButton::keyPressEvent( QKeyEvent* e )
       showMenu();
       return;
     }
+    // fall through!
   case Qt::Key_PageDown:
     move = ( e->modifiers() & Qt::ControlModifier ) ? MoveLast : MoveDown;
     break;

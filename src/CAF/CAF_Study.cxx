@@ -113,7 +113,7 @@ bool CAF_Study::createDocument( const QString& doc )
       if ( !formats.IsEmpty() )
         app->stdApp()->NewDocument( formats.First(), myStdDoc );
     }
-    catch ( Standard_Failure ) {
+    catch ( Standard_Failure& ) {
       res = false;
     }
   }
@@ -149,7 +149,7 @@ bool CAF_Study::openDocument( const QString& fname )
     OCC_CATCH_SIGNALS;
     status = app->Open( CAF_Tools::toExtString( fname ), myStdDoc ) == PCDM_RS_OK;
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     status = false;
   }
 
@@ -189,7 +189,7 @@ bool CAF_Study::saveDocumentAs( const QString& fname )
       status = app->SaveAs( stdDoc(), path ) == PCDM_SS_OK;
     }
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     status = false;
   }
 
@@ -219,7 +219,7 @@ bool CAF_Study::openTransaction()
 
     myStdDoc->OpenCommand();
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     res = false;
   }
 
@@ -241,7 +241,7 @@ bool CAF_Study::abortTransaction()
     myStdDoc->AbortCommand();
     update();
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     res = false;
   }
   return res;
@@ -268,7 +268,7 @@ bool CAF_Study::commitTransaction( const QString& name )
         d->SetName( CAF_Tools::toExtString( name ) );
     }
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     res = false;
   }
   return res;
@@ -365,7 +365,7 @@ bool CAF_Study::undo()
     myStdDoc->Undo();
     undoModified();     /* decrement modification counter */
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     SUIT_MessageBox::critical(application()->desktop(), tr( "ERR_ERROR" ),
                               tr( "ERR_DOC_UNDO" ));
     return false;
@@ -387,7 +387,7 @@ bool CAF_Study::redo()
     myStdDoc->Redo();
     doModified();      /* increment modification counter */
   }
-  catch ( Standard_Failure ) {
+  catch ( Standard_Failure& ) {
     SUIT_MessageBox::critical( application()->desktop(), tr( "ERR_ERROR" ),
                                tr( "ERR_DOC_REDO" ) );
     return false;

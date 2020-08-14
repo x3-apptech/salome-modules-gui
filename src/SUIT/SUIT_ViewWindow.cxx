@@ -334,7 +334,7 @@ bool SUIT_ViewWindow::dropDownButtons() const
 */
 int SUIT_ViewWindow::getId() const
 {
-  return int(long(this));
+  return int(reinterpret_cast<long long>(this)); // todo: unsafe - converting pointer to int can give non-unique result
 }
 
 /*!
@@ -454,7 +454,7 @@ void SUIT_ViewWindow::updateSyncViews()
 /*!
   "Synchronize View" action slot.
 */
-void SUIT_ViewWindow::onSynchronizeView( bool checked )
+void SUIT_ViewWindow::onSynchronizeView( bool /*checked*/ )
 {
   QAction* a = qobject_cast<QAction*>( sender() );
   if ( a ) {

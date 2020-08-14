@@ -116,7 +116,7 @@ void DockWidgets::setDataView(QTreeView * dataView) {
   _dwDataPanel->setWidget(_tvDataView);
 }
 
-void DockWidgets::setPropertiesView(QTreeView * propertiesView) {
+void DockWidgets::setPropertiesView(QTreeView * /*propertiesView*/) {
   // Not implemented yet
 }
 

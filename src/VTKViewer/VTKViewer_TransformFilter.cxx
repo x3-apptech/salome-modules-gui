@@ -36,7 +36,7 @@
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
 
-vtkStandardNewMacro(VTKViewer_TransformFilter);
+vtkStandardNewMacro(VTKViewer_TransformFilter)
 
 /*!Execution method. Calculate output.*/
 int VTKViewer_TransformFilter::RequestData(

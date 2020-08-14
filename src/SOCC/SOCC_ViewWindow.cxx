@@ -53,7 +53,7 @@ SOCC_ViewWindow
 ::action( const int theAction  )
 {
   const int inc = 10;
-  int cx, cy;
+  int cx = 0, cy = 0;
   if ( theAction == SUIT_Accel::ZoomIn || theAction == SUIT_Accel::ZoomOut ||
        theAction == SUIT_Accel::RotateLeft || theAction == SUIT_Accel::RotateRight ||
        theAction == SUIT_Accel::RotateUp || theAction == SUIT_Accel::RotateDown ) {

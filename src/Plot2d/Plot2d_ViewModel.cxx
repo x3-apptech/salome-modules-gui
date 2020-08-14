@@ -110,8 +110,8 @@ void Plot2d_Viewer::update()
 {
   SUIT_ViewManager* aMgr = getViewManager();
   QVector<SUIT_ViewWindow*> aViews = aMgr->getViews();
-  unsigned int aSize = aViews.size();
-  for (uint i = 0; i < aSize; i++) {
+  int aSize = aViews.size();
+  for (int i = 0; i < aSize; i++) {
     Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)aViews[i];
     if (myPrs && aView)
       aView->getViewFrame()->Display(myPrs);
@@ -127,8 +127,8 @@ void Plot2d_Viewer::clearPrs()
   QVector<SUIT_ViewWindow*> aViews;
   if ( aMgr )
     aViews = aMgr->getViews();
-  unsigned int aSize = aViews.size();
-  for (uint i = 0; i < aSize; i++) {
+  int aSize = aViews.size();
+  for (int i = 0; i < aSize; i++) {
     Plot2d_ViewWindow* aView = (Plot2d_ViewWindow*)aViews[i];
     if (myPrs && aView)
       aView->getViewFrame()->Erase(myPrs);
@@ -220,7 +220,7 @@ void Plot2d_Viewer::onCloneView( Plot2d_ViewFrame* clonedVF, Plot2d_ViewFrame* n
 /*
   SLOT: called when clicked item in the legend from Plot2d_ViewManager
  */
-void Plot2d_Viewer::onClicked(const QVariant& itemInfo, int index)
+void Plot2d_Viewer::onClicked(const QVariant& /*itemInfo*/, int /*index*/)
 {
 }
 

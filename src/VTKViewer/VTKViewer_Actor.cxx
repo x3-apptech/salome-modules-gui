@@ -54,7 +54,7 @@ int VTKViewer_POINT_SIZE = 5;
 int VTKViewer_LINE_WIDTH = 3;
 
 
-vtkStandardNewMacro(VTKViewer_Actor);
+vtkStandardNewMacro(VTKViewer_Actor)
 
 /*!
   Constructor
@@ -93,7 +93,7 @@ VTKViewer_Actor
 
   myTransformFilter->Delete();
 
-  for(int i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
+  for(size_t i = 0, iEnd = myPassFilter.size(); i < iEnd; i++)
     if(myPassFilter[i])
       myPassFilter[i]->Delete();
   
@@ -637,7 +637,7 @@ VTKViewer_Actor
 */
 void
 VTKViewer_Actor
-::SetMaterial(std::vector<vtkProperty*> theProps)
+::SetMaterial(std::vector<vtkProperty*> /*theProps*/)
 {
 }
 
@@ -770,4 +770,4 @@ vtkDataSet* VTKViewer_Actor::GetHighlightedDataSet() {
 
 
 
-vtkCxxSetObjectMacro(VTKViewer_Actor,PreviewProperty,vtkProperty);
+vtkCxxSetObjectMacro(VTKViewer_Actor,PreviewProperty,vtkProperty)

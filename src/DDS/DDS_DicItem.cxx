@@ -57,6 +57,7 @@ DDS_DicItem::DDS_DicItem()
   \brief Copy constructor (put in private section to prevent object copying).
 */
 DDS_DicItem::DDS_DicItem( const DDS_DicItem& )
+: Standard_Transient()
 {
 }
 
@@ -888,7 +889,7 @@ void DDS_DicItem::FillDataMap( TCollection_AsciiString theID, const LDOM_Element
       else if ( anUnitData.myUnits.ToCString()[0] ) // treat '%' as unit with scale 100
         anUnitData.myScale = 0.01;
     }
-          catch( Standard_Failure ) {
+    catch( Standard_Failure& ) {
       anUnitData.myUnits.Clear();
     }
 

@@ -63,7 +63,7 @@ class SVTK_Renderer;
 */
 class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
 {
-  Q_OBJECT;
+  Q_OBJECT
 
  public:
   QVTK_RenderWindowInteractor(QWidget* theParent, 
@@ -139,7 +139,7 @@ class SVTK_EXPORT QVTK_RenderWindowInteractor: public QWidget
 */
 class SVTK_EXPORT SVTK_RenderWindowInteractor: public QVTK_RenderWindowInteractor
 {
-  Q_OBJECT;
+  Q_OBJECT
 
  public:
   SVTK_RenderWindowInteractor(QWidget* theParent, 

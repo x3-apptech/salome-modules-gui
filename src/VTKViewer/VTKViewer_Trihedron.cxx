@@ -47,7 +47,7 @@
 // QT includes
 #include <QtGlobal>
 
-vtkStandardNewMacro(VTKViewer_UnScaledActor);
+vtkStandardNewMacro(VTKViewer_UnScaledActor)
 
 /*!Constructor*/
 VTKViewer_UnScaledActor::VTKViewer_UnScaledActor() 
@@ -105,14 +105,14 @@ void VTKViewer_UnScaledActor::Render(vtkRenderer *theRenderer)
   vtkFollower::Render(theRenderer);
 }
 
-vtkStandardNewMacro(VTKViewer_LineActor);
+vtkStandardNewMacro(VTKViewer_LineActor)
 
 #ifdef IPAL21440
 vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,vtkTextActor);
 #else
-vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,VTKViewer_UnScaledActor);
+vtkCxxSetObjectMacro(VTKViewer_LineActor,LabelActor,VTKViewer_UnScaledActor)
 #endif
-vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,vtkFollower);
+vtkCxxSetObjectMacro(VTKViewer_LineActor,ArrowActor,vtkFollower)
 
 /*!Adds Label and Arrow actors to \a theRenderer.*/
 void VTKViewer_LineActor::Render(vtkRenderer *theRenderer)
@@ -354,11 +354,11 @@ protected:
   VTKViewer_XAxis();
   VTKViewer_XAxis(const VTKViewer_XAxis&);
 public:
-  vtkTypeMacro(VTKViewer_XAxis,VTKViewer_Axis);
+  vtkTypeMacro(VTKViewer_XAxis,VTKViewer_Axis)
   static VTKViewer_XAxis *New();
 };
 
-vtkStandardNewMacro(VTKViewer_XAxis);
+vtkStandardNewMacro(VTKViewer_XAxis)
 
 /*!Initialize X Axis*/
 VTKViewer_XAxis::VTKViewer_XAxis(){ 
@@ -380,11 +380,11 @@ protected:
   VTKViewer_YAxis();
   VTKViewer_YAxis(const VTKViewer_YAxis&);
 public:
-  vtkTypeMacro(VTKViewer_YAxis,VTKViewer_Axis);
+  vtkTypeMacro(VTKViewer_YAxis,VTKViewer_Axis)
   static VTKViewer_YAxis *New();
 };
 
-vtkStandardNewMacro(VTKViewer_YAxis);
+vtkStandardNewMacro(VTKViewer_YAxis)
 
 /*!Initialize Y Axis*/
 VTKViewer_YAxis::VTKViewer_YAxis()
@@ -408,11 +408,11 @@ protected:
   VTKViewer_ZAxis();
   VTKViewer_ZAxis(const VTKViewer_ZAxis&);
 public:
-  vtkTypeMacro(VTKViewer_ZAxis,VTKViewer_Axis);
+  vtkTypeMacro(VTKViewer_ZAxis,VTKViewer_Axis)
   static VTKViewer_ZAxis *New();
 };
 
-vtkStandardNewMacro(VTKViewer_ZAxis);
+vtkStandardNewMacro(VTKViewer_ZAxis)
 
 /*!Initialize Z Axis*/
 VTKViewer_ZAxis::VTKViewer_ZAxis()
@@ -427,7 +427,7 @@ VTKViewer_ZAxis::VTKViewer_ZAxis()
   SetColor(0.0,0.0,1.0);
 }
 
-vtkStandardNewMacro(VTKViewer_Trihedron);
+vtkStandardNewMacro(VTKViewer_Trihedron)
 
 /*!
   Constructor

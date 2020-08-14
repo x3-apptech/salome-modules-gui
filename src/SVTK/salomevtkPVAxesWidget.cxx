@@ -54,10 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace salomevtk
 {
 
-vtkStandardNewMacro(vtkPVAxesWidget);
+vtkStandardNewMacro(vtkPVAxesWidget)
 
-vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
-vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
+vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor)
+vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer)
 
 //----------------------------------------------------------------------------
 class vtkPVAxesWidgetObserver : public vtkCommand

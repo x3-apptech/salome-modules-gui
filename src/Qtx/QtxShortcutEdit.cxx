@@ -242,7 +242,7 @@ QtxShortcutTree::~QtxShortcutTree(){}
   \param event event
   \return \c true if further event processing should be stopped
 */
-bool QtxShortcutTree::eventFilter(QObject* obj, QEvent* event) 
+bool QtxShortcutTree::eventFilter(QObject* /*obj*/, QEvent* event) 
 { 
   if ( currentItem() && currentItem()->isSelected() ) {
     
@@ -273,7 +273,7 @@ bool QtxShortcutTree::eventFilter(QObject* obj, QEvent* event)
   \param cur the current item
   \param prev the previous current item
 */
-void QtxShortcutTree::onCurrentItemChanged( QTreeWidgetItem* cur, QTreeWidgetItem* prev )
+void QtxShortcutTree::onCurrentItemChanged( QTreeWidgetItem* /*cur*/, QTreeWidgetItem* prev )
 {
   if ( prev && prev->text( 1 ).endsWith( "+" ) )
       prev->setText( 1, myPrevBindings[ prev->parent()->text( 0 ) ][ prev->text( 0 ) ] );

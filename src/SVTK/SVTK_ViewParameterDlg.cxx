@@ -54,9 +54,9 @@ SVTK_ViewParameterDlg::SVTK_ViewParameterDlg(QtxAction* theAction,
                                              const char* theName):
   ViewerTools_DialogBase(theAction, theParent, theName),
   myMainWindow(theParent),
+  myRWInteractor(theParent->GetInteractor()),
   myPriority(0.0),
-  myEventCallbackCommand(vtkCallbackCommand::New()),
-  myRWInteractor(theParent->GetInteractor())
+  myEventCallbackCommand(vtkCallbackCommand::New())
 {
   setWindowTitle(tr("DLG_TITLE"));
   setSizeGripEnabled(true);
@@ -494,7 +494,7 @@ void SVTK_ViewParameterDlg::setEnabled(QFrame* theWidget, const bool theState)
   
 }
 
-void SVTK_ViewParameterDlg::onProjectionModeChanged(int mode)
+void SVTK_ViewParameterDlg::onProjectionModeChanged(int /*mode*/)
 {
   int aBtn = myProjectionMode->checkedId();
 
@@ -516,7 +516,7 @@ void SVTK_ViewParameterDlg::onProjectionModeChanged(int mode)
   }
 }
 
-void SVTK_ViewParameterDlg::onPositionModeChanged(int mode)
+void SVTK_ViewParameterDlg::onPositionModeChanged(int /*mode*/)
 {
   setEnabled(myCameraCoords, myCameraPositionMode->checkedId() == 0);
 }

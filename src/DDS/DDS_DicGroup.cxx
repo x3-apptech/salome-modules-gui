@@ -57,6 +57,7 @@ DDS_DicGroup::DDS_DicGroup( const TCollection_AsciiString& name )
   \brief Copy constructor (put in private section to prevent object copying).
 */
 DDS_DicGroup::DDS_DicGroup( const DDS_DicGroup& )
+: Standard_Transient()
 {
 }
 

@@ -110,8 +110,8 @@ bool LightApp_DataObject::Key::isEqual( const SUIT_DataObjectKey* other ) const
 */
 LightApp_DataObject::LightApp_DataObject( SUIT_DataObject* parent )
 : CAM_DataObject( parent ),
-  myCompObject( 0 ),
-  myCompDataType( "" )
+  myCompDataType( "" ),
+  myCompObject( 0 )
 {
 }
 

@@ -68,28 +68,28 @@ namespace
 }
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(SVTK_Recorder);
+vtkStandardNewMacro(SVTK_Recorder)
 
 
 //----------------------------------------------------------------------------
 SVTK_Recorder
 ::SVTK_Recorder():
-  myRenderWindow(NULL),
   myState(SVTK_Recorder_Stop),
+  myPaused(0),
+  myErrorStatus(0),
+  myPriority(0.0),
+  myTimeStart(0.0),
+  myFrameIndex(0),
+  myNbWrittenFrames(0),
   myNbFPS(5.5),
   myQuality(100),
   myProgressiveMode(true),
   myUseSkippedFrames(true),
-  myErrorStatus(0),
+  myNameAVIMaker("jpeg2yuv"),
   myCommand(vtkCallbackCommand::New()),
-  myPriority(0.0),
-  myTimeStart(0.0),
-  myFrameIndex(0),
-  myPaused(0),
+  myRenderWindow(NULL),
   myFilter(vtkWindowToImageFilter::New()),
-  myWriterMgr(new SVTK_ImageWriterMgr),
-  myNbWrittenFrames(0),
-  myNameAVIMaker("jpeg2yuv")
+  myWriterMgr(new SVTK_ImageWriterMgr)
 {
   myCommand->SetClientData(this); 
   myCommand->SetCallback(SVTK_Recorder::ProcessEvents);
@@ -433,13 +433,14 @@ SVTK_Recorder
       aStream<<"COPY /Y "<<QString::fromStdString(anInitialName).replace("/","\\\\").toStdString()<<
 		  " "<<QString::fromStdString(anCurrentName).replace("/","\\\\").toStdString()<<" > NUL";
   #endif
-      if(anIndex + 1 < aFinishIndex)
+      if(anIndex + 1 < aFinishIndex) {
   #ifndef WIN32
         aStream<<" \\";
         aStream<<endl;
   #else
         aStream<<" & ";
   #endif
+      }
     }
     std::string aString(aStream.str());
     system(aString.c_str());
@@ -461,7 +462,7 @@ SVTK_Recorder
     //" -f "<<int(myNbFPS)<<" "<<
     " -f "<<myNbFPS<<" "<<
     " -n "<<myNbWrittenFrames<<" "<<
-    " -j \""<<myName<<"_\%06d.jpeg\" "<<
+    " -j \""<<myName<<"_%06d.jpeg\" "<<
     "| yuv2lav"<<" -o \""<<myName<<"\"";
 #ifdef WIN32
   aStream<<" -f aA";   

@@ -28,4 +28,4 @@
 
 #include <vtkObjectFactory.h>
 
-vtkStandardNewMacro(VTKViewer_CellLocationsArray);
+vtkStandardNewMacro(VTKViewer_CellLocationsArray)

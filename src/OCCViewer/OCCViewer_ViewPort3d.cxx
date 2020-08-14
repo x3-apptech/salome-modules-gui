@@ -64,8 +64,8 @@ static Standard_Boolean zRotation = Standard_False;
 */
 OCCViewer_ViewPort3d::OCCViewer_ViewPort3d( QWidget* parent, const Handle( V3d_Viewer)& viewer, V3d_TypeOfView  type )
   : OCCViewer_ViewPort( parent ),
-    myScale( 1.0 ),
     myBusy( true ),
+    myScale( 1.0 ),
     myIsAdvancedZoomingEnabled( false )
 {
   // VSR: 01/07/2010 commented to avoid SIGSEGV at SALOME exit
@@ -470,7 +470,7 @@ void OCCViewer_ViewPort3d::startRotation( int x, int y,
                             theSelectedPoint.X(),theSelectedPoint.Y(), theSelectedPoint.Z(),
                             Standard_True );
 
-      Quantity_Ratio zRotationThreshold;
+      Standard_Real zRotationThreshold;
       zRotation = Standard_False;
       zRotationThreshold = 0.45;
       if( zRotationThreshold > 0. ) {
@@ -580,7 +580,7 @@ void OCCViewer_ViewPort3d::repaintViewAfterMove( )
 /*!
   Fits all objects in view. [ virtual protected ]
 */
-void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool withZ, bool upd )
+void OCCViewer_ViewPort3d::fitAll( bool keepScale, bool /*withZ*/, bool upd )
 {
   if ( activeView().IsNull() )
     return;

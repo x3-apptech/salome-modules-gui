@@ -122,15 +122,15 @@ void OCCViewer_Viewer::stereoData( QStringList& typeList, QIntList& idList)
 */
 OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
 : SUIT_ViewModel(),
-  myBackgrounds(4, Qtx::BackgroundData( Qt::black )),
   myIsRelative(true),
-  myTopLayerId( 0 ),
+  myTopLayerId(0),
   myTrihedronSize(100),
-  myClippingDlg (NULL),
+  myBackgrounds(4, Qtx::BackgroundData(Qt::black)),
+  myClippingDlg(0),
   myFitter(0)
 {
   // init CasCade viewers
-  myV3dViewer = OCCViewer_VService::CreateViewer( TCollection_ExtendedString("Viewer3d").ToExtString() );
+  myV3dViewer = OCCViewer_VService::CreateViewer();
   //myV3dViewer->Init(); // to avoid creation of the useless perspective view (see OCCT issue 0024267)
   setDefaultLights();
 
@@ -161,9 +161,9 @@ OCCViewer_Viewer::OCCViewer_Viewer( bool DisplayTrihedron)
     Handle(Prs3d_Drawer) drawer = myTrihedron->Attributes();
     if (drawer->HasOwnDatumAspect()) {
       Handle(Prs3d_DatumAspect) daspect = drawer->DatumAspect();
-      daspect->FirstAxisAspect()->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
-      daspect->SecondAxisAspect()->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
-      daspect->ThirdAxisAspect()->SetColor(Quantity_Color(0.0, 0.0, 1.0, Quantity_TOC_RGB));
+      daspect->LineAspect(Prs3d_DP_XAxis)->SetColor(Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB));
+      daspect->LineAspect(Prs3d_DP_YAxis)->SetColor(Quantity_Color(0.0, 1.0, 0.0, Quantity_TOC_RGB));
+      daspect->LineAspect(Prs3d_DP_ZAxis)->SetColor(Quantity_Color(0.0, 0.0, 1.0, Quantity_TOC_RGB));
     }
   }
 
@@ -322,7 +322,7 @@ void OCCViewer_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
 /*!
   SLOT: called on mouse button press, stores current mouse position as start point for transformations
 */
-void OCCViewer_Viewer::onMousePress(SUIT_ViewWindow* theWindow, QMouseEvent* theEvent)
+void OCCViewer_Viewer::onMousePress(SUIT_ViewWindow* /*theWindow*/, QMouseEvent* theEvent)
 {
   myStartPnt.setX(theEvent->x()); myStartPnt.setY(theEvent->y());
 }
@@ -373,7 +373,7 @@ void OCCViewer_Viewer::onMouseRelease(SUIT_ViewWindow* theWindow, QMouseEvent* t
   if (myStartPnt == myEndPnt)
   {
     if (!aHasShift) {
-      myAISContext->ClearCurrents( false );
+      myAISContext->ClearCurrents( false ); // todo: ClearCurrents is deprecated
       emit deselection();
     }
     if ( !isPreselectionEnabled() ) {
@@ -432,7 +432,7 @@ void OCCViewer_Viewer::onKeyPress(SUIT_ViewWindow* theWindow, QKeyEvent* theEven
   switch ( theEvent->key() ) {
   case  Qt::Key_S:
     if (!aHasShift) {
-      myAISContext->ClearCurrents( false );
+      myAISContext->ClearCurrents( false ); // todo: ClearCurrents is deprecated
       emit deselection();
     }
 
@@ -1187,7 +1187,7 @@ bool OCCViewer_Viewer::unHighlightAll( bool updateviewer, bool unselect )
   \param onlyInViewer - search object only in viewer (so object must be displayed)
 */
 bool OCCViewer_Viewer::isInViewer( const Handle(AIS_InteractiveObject)& obj,
-                                   bool onlyInViewer )
+                                   bool /*onlyInViewer*/ )
 {
   AIS_ListOfInteractive List;
   myAISContext->DisplayedObjects(List);
@@ -1314,7 +1314,6 @@ void OCCViewer_Viewer::setTrihedronShown( const bool on )
                            0 /*wireframe*/,
                            -1 /* selection mode */,
                            Standard_True /* update viewer*/,
-                           Standard_False /* allow decomposition */,
                            AIS_DS_Displayed /* display status */);
     myAISContext->Deactivate( myTrihedron );
   }
@@ -1451,7 +1450,7 @@ bool OCCViewer_Viewer::computeTrihedronSize( double& theNewSize, double& theSize
 
   float aSizeInPercents = SUIT_Session::session()->resourceMgr()->doubleValue("3DViewer","trihedron_size", 100.);
 
-  static float EPS = 5.0E-3;
+  static float EPS = 5.0E-3f;
   theSize = getTrihedron()->Size();
   theNewSize = aMaxSide*aSizeInPercents / 100.0;
 
@@ -1570,7 +1569,7 @@ void OCCViewer_Viewer::setClipPlanes(ClipPlanesList theList)
     Handle(AIS_InteractiveObject) anObj = anIter.Value();
     Handle(ViewerData_AISShape) aShape = Handle(ViewerData_AISShape)::DownCast (anObj);
     if (!aShape.IsNull() && aShape->IsClippable()) {
-      aShape->SetClipPlanes(myInternalClipPlanes);
+      aShape->SetClipPlanes(new Graphic3d_SequenceOfHClipPlane(myInternalClipPlanes)); // todo: store clipping planes in a handle?
     }
   }
 }
@@ -1589,7 +1588,7 @@ void OCCViewer_Viewer::applyExistingClipPlanesToObject (const Handle(AIS_Interac
   Handle(ViewerData_AISShape) aShape = Handle(ViewerData_AISShape)::DownCast (theObject);
   if (!aShape.IsNull() && aShape->IsClippable())
   {
-    aShape->SetClipPlanes (myInternalClipPlanes);
+    aShape->SetClipPlanes (new Graphic3d_SequenceOfHClipPlane(myInternalClipPlanes)); // todo: store clipping planes in a handle?
   }
 }
 

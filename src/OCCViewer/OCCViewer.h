@@ -45,6 +45,6 @@ namespace OCCViewer
 {
   OCCVIEWER_EXPORT Quantity_Color color( const QColor& );
   OCCVIEWER_EXPORT QColor         color( const Quantity_Color& );
-};
+}
 
 #endif //OCCVIEWER_H

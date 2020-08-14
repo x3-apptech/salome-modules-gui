@@ -74,7 +74,7 @@ void OCCViewer_ToolTip::setFont( const QFont& f )
   \param txtRect - returned tooltip text rectangle
   \param rect - returned tooltip rectangle
  */
-void OCCViewer_ToolTip::onToolTip( QPoint p, QString& str, QFont& f, QRect& txtRect, QRect& rect )
+void OCCViewer_ToolTip::onToolTip( QPoint p, QString& str, QFont& /*f*/, QRect& txtRect, QRect& rect )
 {
   OCCViewer_Viewer* v = dynamic_cast<OCCViewer_Viewer*>( myWnd->getViewManager()->getViewModel() );
   Handle( AIS_InteractiveContext ) aCont = v->getAISContext();

@@ -959,7 +959,7 @@ void QtxWorkstackArea::customEvent( QEvent* e )
 {
   WidgetEvent* we = (WidgetEvent*)e;
 
-  switch ( we->type() )
+  switch ( (int)we->type() )
   {
   case ActivateWidget:
     myBar->updateActiveState();
@@ -1080,7 +1080,7 @@ void QtxWorkstackArea::onChildDestroyed( QObject* obj )
   \brief Called when child widget container is shown.
   \param c child widget container being shown
 */
-void QtxWorkstackArea::onChildShown( QtxWorkstackChild* c )
+void QtxWorkstackArea::onChildShown( QtxWorkstackChild* /*c*/ )
 {
   updateState();
 }
@@ -1089,7 +1089,7 @@ void QtxWorkstackArea::onChildShown( QtxWorkstackChild* c )
   \brief Called when child widget container is hidden.
   \param c child widget container being hidden
 */
-void QtxWorkstackArea::onChildHidden( QtxWorkstackChild* c )
+void QtxWorkstackArea::onChildHidden( QtxWorkstackChild* /*c*/ )
 {
   updateState();
 }
@@ -1469,7 +1469,7 @@ bool QtxWorkstackChild::eventFilter( QObject* o, QEvent* e )
   \brief Called when child widget is destroyed.
   \param obj child widget being destroyed
 */
-void QtxWorkstackChild::onDestroyed( QObject* obj )
+void QtxWorkstackChild::onDestroyed( QObject* /*obj*/ )
 {
   deleteLater();
 }
@@ -2287,8 +2287,6 @@ static int positionSimple (QIntList& szList, const int nb, const int splitter_si
   int new_this = szList[item_ind];
   int new_next = 0;
 
-  bool isToCheck = false;
-
   if (need_pos < splitter_pos) {
     // Set size of all previous workareas to zero <--
     if (item_ind == nb - 1) {
@@ -2320,7 +2318,6 @@ static int positionSimple (QIntList& szList, const int nb, const int splitter_si
         new_this = splitter_size - new_item_rel_pos;
       }
       // jfa to do: in this case fixed size of next widgets could prevent right resizing
-      isToCheck = true;
     }
     if (item_ind == nb - 1) {
       new_this = splitter_size - new_item_rel_pos;

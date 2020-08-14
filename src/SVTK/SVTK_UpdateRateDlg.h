@@ -46,7 +46,7 @@ class vtkObject;
 
 class SVTK_UpdateRateDlg : public ViewerTools_DialogBase
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_UpdateRateDlg(QtxAction* theAction,

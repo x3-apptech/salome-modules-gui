@@ -32,7 +32,7 @@
 
 #include <QTimer>
 
-vtkStandardNewMacro(QVTK_GenericRenderWindowInteractor);
+vtkStandardNewMacro(QVTK_GenericRenderWindowInteractor)
 
 /*!
   Constructor
@@ -104,7 +104,7 @@ QVTK_GenericRenderWindowInteractor
 }
 
 
-vtkStandardNewMacro(SVTK_GenericRenderWindowInteractor);
+vtkStandardNewMacro(SVTK_GenericRenderWindowInteractor)
 
 /*!
   Constructor

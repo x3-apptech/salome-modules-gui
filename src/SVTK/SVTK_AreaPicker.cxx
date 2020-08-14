@@ -87,6 +87,7 @@ namespace
   }
 
   //----------------------------------------------------------------------------
+  /* Unused
   void CalculatePickPosition( vtkRenderer *theRenderer, double theSelectionX,
       double theSelectionY, double theSelectionZ, double thePickPosition[3] )
   {
@@ -101,10 +102,10 @@ namespace
       }
     }
   }
+  */
 }
 
 vtkStandardNewMacro( SVTK_AreaPicker )
-;
 
 SVTK_AreaPicker::SVTK_AreaPicker()
 {
@@ -264,7 +265,7 @@ void SVTK_AreaPicker::SelectVisiblePoints( QVector< QPoint >& thePoints,
     double aDX[3];
     theRenderer->GetDisplayPoint( aDX );
 
-    bool isInSelection;
+    bool isInSelection = false;
     if ( theMode == RectangleMode ) isInSelection = aDX[0] >= mySelection[0]
         && aDX[0] <= mySelection[2] && aDX[1] >= mySelection[1]
         && aDX[1] <= mySelection[3];
@@ -372,7 +373,7 @@ void SVTK_AreaPicker::SelectVisibleCells( QVector< QPoint >& thePoints,
     double aDX[3];
     theRenderer->GetDisplayPoint( aDX );
 
-    bool isInSelection;
+    bool isInSelection = false;
     if ( theMode == RectangleMode ) isInSelection = aDX[0] >= mySelection[0]
         && aDX[0] <= mySelection[2] && aDX[1] >= mySelection[1]
         && aDX[1] <= mySelection[3];

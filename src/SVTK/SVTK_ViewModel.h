@@ -44,7 +44,7 @@ class VTKViewer_Actor;
 //! Extends two interfaces #SVTK_ViewModelBase and #SALOME_View 
 class SVTK_EXPORT SVTK_Viewer : public SVTK_ViewModelBase, public SALOME_View 
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   /*! supported gradient types */

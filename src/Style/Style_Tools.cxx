@@ -354,8 +354,9 @@ void Style_Tools::drawArrow( QStyle::PrimitiveElement type, QPainter* p, const Q
   p->translate( xc, yc );
   bool correct = false;
   switch( type ) {
-    case QStyle::PE_IndicatorArrowDown:
+    case QStyle::PE_IndicatorArrowDown: {
       correct = true;
+    } // fall through!
     case QStyle::PE_IndicatorArrowUp: {
       int widthArr2 = (int)(deltaX/3.);
       if ( correct )
@@ -374,8 +375,9 @@ void Style_Tools::drawArrow( QStyle::PrimitiveElement type, QPainter* p, const Q
       x11 = -deltaX; y11 = -deltaY; x12 = deltaX; y12 = deltaY;
       break;
     }
-    case QStyle::PE_IndicatorArrowLeft: // to change
+    case QStyle::PE_IndicatorArrowLeft: {
       correct = true;
+    } // fall through!
     case QStyle::PE_IndicatorArrowRight: {
       int widthArr2 = (int)(deltaX/3.);
       if ( correct )
@@ -392,8 +394,9 @@ void Style_Tools::drawArrow( QStyle::PrimitiveElement type, QPainter* p, const Q
       x11 = deltaX; y11 = deltaY; x12 = -deltaX; y12 = -deltaY;
       break;
     }
-    case QStyle::PE_IndicatorSpinDown:
+    case QStyle::PE_IndicatorSpinDown: {
       correct = true;
+    } // fall through!
     case QStyle::PE_IndicatorSpinUp: {
       aDelta = (int)(deltaY/2);
       if ( correct ) {
@@ -447,8 +450,9 @@ void Style_Tools::drawSign( QStyle::PrimitiveElement type, QPainter* p, const QR
   p->translate( xc, yc );
   bool correct = false;
   switch( type ) {
-    case QStyle::PE_IndicatorSpinMinus:
+    case QStyle::PE_IndicatorSpinMinus: {
       correct = true;
+    } // fall through!
     case QStyle::PE_IndicatorSpinPlus: {
       aDelta = (int)(deltaY/2);
       if ( correct ) {
@@ -694,7 +698,7 @@ void Style_Tools::drawFocus( QPainter* p, const QPainterPath& path, const QColor
 */
 void Style_Tools::drawSlider( QPainter* p, const QRect& r, const double rad,
                               SliderType type, const QColor& light, const QColor& dark,
-                              const QColor& border_top, const QColor& border_bot )
+                              const QColor& /*border_top*/, const QColor& border_bot )
 {
   p->save();
   QPainterPath path, bottomPath;

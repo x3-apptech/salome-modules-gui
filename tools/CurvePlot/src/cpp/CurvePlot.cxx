@@ -47,7 +47,7 @@ namespace
         throw CURVEPLOT::Exception(msg);
       }
   }
-};
+}
 
 namespace CURVEPLOT
 {

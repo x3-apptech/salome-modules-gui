@@ -113,30 +113,8 @@ void GLViewer_Viewer2d::onChangeBgColor()
 /*!
   Updates colors for all drawers (does not work)
 */
-void GLViewer_Viewer2d::updateColors( QColor colorH, QColor colorS )
+void GLViewer_Viewer2d::updateColors( QColor /*colorH*/, QColor /*colorS*/ )
 {
-//  cout << "GLViewer_Viewer2d::updateColors" << endl;
-
-/*
-    for ( DrawerMap::Iterator it = myDrawers.begin(); it != myDrawers.end(); ++it )
-    {
-        it.key()->setHColor( colorH );
-        it.key()->setSColor( colorS );
-    }
-*/
-    /*
-    ObjList anObjects = myGLContext->getObjects();
-    ObjList::Iterator beginIt = anObjects.begin();
-    ObjList::Iterator endIt = anObjects.end();
-    for ( ObjList::Iterator it = beginIt; it != endIt; ++it )
-    {
-        //GLViewer_Drawer* aDrawer = (*it)->getDrawer();
-        //aDrawer->setHColor( colorH );
-        //aDrawer->setSColor( colorS );
-    }
-    */
-
-
   activateAllDrawers( true );
 }
 
@@ -215,12 +193,8 @@ void GLViewer_Viewer2d::updateAll()
 /*!
    \param onlyUpdate is passed to method activateAllDrawers drawers
 */
-void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat scX, GLfloat scY )
+void GLViewer_Viewer2d::updateDrawers( GLboolean update, GLfloat /*scX*/, GLfloat /*scY*/ )
 {
-//  cout << "GLViewer_Viewer2d::updateDrawers" << endl;
-
-    //myGLContext->updateScales( scX, scY );
-    //myGLSketcher->drawContour();
     activateAllDrawers( update );
 }
 
@@ -639,7 +613,7 @@ void GLViewer_Viewer2d::onMouseEvent( SUIT_ViewWindow*, QMouseEvent* e )
 */
 bool GLViewer_Viewer2d::testRotation( QMouseEvent* e )
 {
-    if ( ( e->button() == GLViewer_View2dTransformer::rotateButton() ) &&
+  if ( ( (int)e->button() == GLViewer_View2dTransformer::rotateButton() ) && // todo Qt::MouseButton is unsigned int: comparison of int with uint
          ( e->type() == QEvent::MouseButtonPress ) &&
          ( e->modifiers() & GLViewer_ViewTransformer::accelKey() ) )
     {

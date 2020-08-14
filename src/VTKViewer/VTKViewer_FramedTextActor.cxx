@@ -63,7 +63,7 @@ namespace
 }
 
 //==================================================================
-vtkStandardNewMacro(VTKViewer_FramedTextActor);
+vtkStandardNewMacro(VTKViewer_FramedTextActor)
 
 //==================================================================
 // function : VTKViewer_FramedTextActor

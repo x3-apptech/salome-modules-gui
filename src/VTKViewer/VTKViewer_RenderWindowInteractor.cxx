@@ -462,14 +462,14 @@ void VTKViewer_RenderWindowInteractor::RightButtonReleased(const QMouseEvent *ev
 /*!Reaction on button pressed.
  *\warning Do nothing.
  */
-void VTKViewer_RenderWindowInteractor::ButtonPressed(const QMouseEvent *event) {
+void VTKViewer_RenderWindowInteractor::ButtonPressed(const QMouseEvent* /*event*/) {
   return ;
 }
 
 /*!Reaction on button released..
  *\warning Do nothing.
  */
-void VTKViewer_RenderWindowInteractor::ButtonReleased(const QMouseEvent *event) {
+void VTKViewer_RenderWindowInteractor::ButtonReleased(const QMouseEvent* /*event*/) {
   return ;
 }
 
@@ -577,7 +577,7 @@ void VTKViewer_RenderWindowInteractor::DisplayAll()
 }
 
 /*!Do nothing*/
-void VTKViewer_RenderWindowInteractor::Erase( VTKViewer_Actor* SActor, bool update)
+void VTKViewer_RenderWindowInteractor::Erase( VTKViewer_Actor* /*SActor*/, bool /*update*/)
 {
 }
 
@@ -632,7 +632,7 @@ void VTKViewer_RenderWindowInteractor::Display( VTKViewer_Actor* theActor, bool 
 /*!
   default key press event (empty implementation)
 */
-void VTKViewer_RenderWindowInteractor::KeyPressed(QKeyEvent *event)
+void VTKViewer_RenderWindowInteractor::KeyPressed(QKeyEvent* /*event*/)
 {
   /// NOT_IMPLEMENTED
 }

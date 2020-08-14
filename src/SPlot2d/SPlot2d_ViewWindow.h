@@ -32,7 +32,7 @@
 
 class SPLOT2D_EXPORT SPlot2d_ViewWindow : public Plot2d_ViewWindow
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SPlot2d_ViewWindow( SUIT_Desktop*, Plot2d_Viewer* );

@@ -455,7 +455,7 @@ bool QtxListAction::ListFrame::eventFilter( QObject* o, QEvent* e )
 {
   bool res = true;
 
-  switch( e->type() )
+  switch( (int)e->type() )
   {
   case QEvent::MouseMove:
     {

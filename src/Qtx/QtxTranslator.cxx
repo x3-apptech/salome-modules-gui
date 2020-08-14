@@ -32,7 +32,7 @@
   does not allow to process messages with global context.
 
   For the current moment global context should be specified in translation
-  (*.ts/*.qm) files as "@default" string. For example:
+  (*.ts) files as "@default" string. For example:
   \verbatim
   <!DOCTYPE TS><TS>
   <context>

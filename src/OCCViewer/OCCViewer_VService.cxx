@@ -57,27 +57,10 @@ Handle(Aspect_Window) OCCViewer_VService::CreateWindow( const Handle(V3d_View)& 
 /*!
     Creates viewer 3d [ static ]
 */
-Handle(V3d_Viewer) OCCViewer_VService::CreateViewer( const Standard_ExtString name,
-						     const Standard_CString displayName,
-						     const Standard_CString domain,
-						     const Standard_Real viewSize ,
-						     const V3d_TypeOfOrientation viewProjection,
-						     const Standard_Boolean computedMode,
-						     const Standard_Boolean defaultComputedMode )
+Handle(V3d_Viewer) OCCViewer_VService::CreateViewer()
 {
   static Handle(OpenGl_GraphicDriver) aGraphicDriver;
   if (aGraphicDriver.IsNull())
-  {
-    Handle(Aspect_DisplayConnection) aDisplayConnection;
-#if !defined WIN32 && !defined __APPLE__
-    aDisplayConnection = new Aspect_DisplayConnection( displayName );
-#else
-    aDisplayConnection = new Aspect_DisplayConnection();
-#endif
-    aGraphicDriver = new OpenGl_GraphicDriver(aDisplayConnection);
-  }
-
-  return new V3d_Viewer( aGraphicDriver, name, domain, viewSize, viewProjection,
-			 Quantity_NOC_GRAY30, V3d_ZBUFFER, V3d_GOURAUD,
-			 computedMode, defaultComputedMode );
+    aGraphicDriver = new OpenGl_GraphicDriver(new Aspect_DisplayConnection());
+  return new V3d_Viewer(aGraphicDriver);
 }

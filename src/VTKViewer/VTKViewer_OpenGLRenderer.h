@@ -43,7 +43,7 @@ public:
 
 public:
   static VTKViewer_OpenGLRenderer *New();
-  vtkTypeMacro(VTKViewer_OpenGLRenderer,vtkOpenGLRenderer);
+  vtkTypeMacro(VTKViewer_OpenGLRenderer,vtkOpenGLRenderer)
 
   virtual void SetGradientType( const int );
 

@@ -35,7 +35,7 @@
 
 class VTKViewer_Actor;
 
-DEFINE_STANDARD_HANDLE(VTKViewer_Filter, Standard_Transient);
+DEFINE_STANDARD_HANDLE(VTKViewer_Filter, Standard_Transient)
 
 /*
   Class       : VTKViewer_Filter

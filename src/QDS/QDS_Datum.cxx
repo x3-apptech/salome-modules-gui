@@ -200,10 +200,10 @@ void QDS_Datum::Wrapper::setGeometry( int x, int y, int w, int h )
 QDS_Datum::QDS_Datum( const QString& id, QWidget* parent, const int flags, const QString& comp )
 : QObject( parent ),
   myId( id ),
+  myFlags( flags ),
   myLabel( 0 ),
   myUnits( 0 ),
   myControl( 0 ),
-  myFlags( flags ),
   myInitialised( false ),
   myTr( false )
 {
@@ -1422,7 +1422,7 @@ void QDS_Datum::initialize()
 
   \param unitSystem new active units system
 */
-void QDS_Datum::unitSystemChanged( const QString& unitSystem )
+void QDS_Datum::unitSystemChanged( const QString& /*unitSystem*/ )
 {
   QString labText = label();
   QString unitText = unitsToText( units() );
@@ -1883,7 +1883,7 @@ QString QDS_Datum::removeAccel( const QString& src )
 {
   QString trg = src;
 
-  for ( uint i = 0; i < trg.length(); )
+  for ( int i = 0; i < trg.length(); )
   {
     if ( trg.mid( i, 2 ) == QString( "&&" ) )
       i += 2;

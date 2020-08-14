@@ -72,7 +72,7 @@ namespace VTK
       aHeight++;
     }
 
-    if( theMarkerTexture.size() != aWidth * aHeight )
+    if( (int)theMarkerTexture.size() != aWidth * aHeight )
       return false;
 
     theMarkerTexture.push_front( aWidth );

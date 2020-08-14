@@ -125,7 +125,7 @@ bool OCCViewer_ClipPlaneInteractor::isPerforming() const
 bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePlane )
 {
   bool isFound = Standard_False;
-  for ( int aPlaneIt = 0; aPlaneIt < myPlanes.size(); ++aPlaneIt )
+  for ( int aPlaneIt = 0; aPlaneIt < (int)myPlanes.size(); ++aPlaneIt )
   {
     if ( myPlanes[aPlaneIt] == thePlane )
     {
@@ -141,7 +141,7 @@ bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePla
 
   Handle(AIS_InteractiveContext) anAISContext = myViewer->getAISContext();
 
-  if ( anAISContext->IsSelected( Handle(AIS_InteractiveObject)::DownCast(thePlane) ) )
+  if ( anAISContext->IsSelected( thePlane ) )
   {
     return false;
   }
@@ -156,7 +156,7 @@ bool OCCViewer_ClipPlaneInteractor::isClickable( const Handle(AIS_Plane)& thePla
 bool OCCViewer_ClipPlaneInteractor::isDraggable( const Handle(AIS_Plane)& thePlane )
 {
   bool isFound = Standard_False;
-  for ( int aPlaneIt = 0; aPlaneIt < myPlanes.size(); ++aPlaneIt )
+  for ( int aPlaneIt = 0; aPlaneIt < (int)myPlanes.size(); ++aPlaneIt )
   {
     if ( myPlanes[aPlaneIt] == thePlane )
     {
@@ -172,7 +172,7 @@ bool OCCViewer_ClipPlaneInteractor::isDraggable( const Handle(AIS_Plane)& thePla
 
   Handle(AIS_InteractiveContext) anAISContext = myViewer->getAISContext();
 
-  if ( !anAISContext->IsSelected( Handle(AIS_InteractiveObject)::DownCast(thePlane) ) ) 
+  if ( !anAISContext->IsSelected( thePlane ) ) 
   {
     return false;
   }
@@ -323,10 +323,12 @@ bool OCCViewer_ClipPlaneInteractor::startDragging( const QPoint& thePickPos,
 
         myMouseDragPln = gp_Pln( aPickPoint, aMousePlnN );
 
+	/* todo: aDistance2Center, aCenterOnMousePln not used
         Standard_Real aDistance2Center = myMouseDragPln.Distance( aPlaneCenter );
         gp_Pnt aCenterOnMousePln = aMousePlnN * gp_Vec( aPickPoint, aPlaneCenter ) < 0.0
           ? aPlaneCenter.Translated( aMousePlnN *  aDistance2Center )
           : aPlaneCenter.Translated( aMousePlnN * -aDistance2Center );
+	*/
 
         myRotationAxis = gp_Ax1( myRotationCenter, aMousePlnN );
       }
@@ -336,10 +338,12 @@ bool OCCViewer_ClipPlaneInteractor::startDragging( const QPoint& thePickPos,
 
         myMouseDragPln = gp_Pln( aPickPoint, aMousePlnN );
 
+	/* todo: aDistance2Center, aCenterOnMousePln not used
         Standard_Real aDistance2Center = myMouseDragPln.Distance( aPlaneCenter );
         gp_Pnt aCenterOnMousePln = aMousePlnN * gp_Vec( aPickPoint, aPlaneCenter ) < 0.0
           ? aPlaneCenter.Translated( aMousePlnN *  aDistance2Center )
           : aPlaneCenter.Translated( aMousePlnN * -aDistance2Center );
+	*/
 
         myRotationAxis = gp_Ax1( myRotationCenter, aMousePlnN );
       }
@@ -347,6 +351,10 @@ bool OCCViewer_ClipPlaneInteractor::startDragging( const QPoint& thePickPos,
       myPlaneReferenceCS = gp_Ax3( aPlaneCenter, aPlaneN, aPlaneX );
 
       return true;
+    }
+    default:
+    {
+      break;
     }
   }
 
@@ -450,6 +458,8 @@ void OCCViewer_ClipPlaneInteractor::performDragging( const QPoint& theDragPos,
       myViewer->getAISContext()->Update( thePlane , Standard_True );
     }
     break;
+  default:
+    break;
   }
 }
 
@@ -522,7 +532,7 @@ bool OCCViewer_ClipPlaneInteractor::mousePress( QMouseEvent* theEvent,
   // process mouse click on the object
   if ( myIsClickable )
   {
-    myViewer->getAISContext()->SetSelected( Handle(AIS_InteractiveObject)::DownCast(aPlane) , Standard_True );
+    myViewer->getAISContext()->SetSelected( aPlane, Standard_True );
     emit planeClicked( aPlane );
   }
 
@@ -600,8 +610,8 @@ bool OCCViewer_ClipPlaneInteractor::mouseMove( QMouseEvent* theEvent,
   \param theEvent [in] the user event.
   \param theViewPort [in] the viewport.
 */
-bool OCCViewer_ClipPlaneInteractor::mouseRelease( QMouseEvent* theEvent,
-                                                  OCCViewer_ViewPort3d* theViewPort )
+bool OCCViewer_ClipPlaneInteractor::mouseRelease( QMouseEvent* /*theEvent*/,
+                                                  OCCViewer_ViewPort3d* /*theViewPort*/ )
 {
   if ( !isPerforming() )
   {
@@ -625,8 +635,8 @@ bool OCCViewer_ClipPlaneInteractor::mouseRelease( QMouseEvent* theEvent,
   \param theEvent [in] the user event.
   \param theViewPort [in] the viewport.
 */
-bool OCCViewer_ClipPlaneInteractor::mouseDoubleClick( QMouseEvent* theEvent,
-                                                      OCCViewer_ViewPort3d* theViewPort )
+bool OCCViewer_ClipPlaneInteractor::mouseDoubleClick( QMouseEvent* /*theEvent*/,
+                                                      OCCViewer_ViewPort3d* /*theViewPort*/ )
 {
   return isPerforming();
 }

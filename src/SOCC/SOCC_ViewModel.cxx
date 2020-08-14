@@ -103,7 +103,7 @@ bool SOCC_Viewer::highlight( const Handle(SALOME_InteractiveObject)& obj,
   \param onlyInViewer - search object only in viewer (so object must be displayed)
 */
 bool SOCC_Viewer::isInViewer( const Handle(SALOME_InteractiveObject)& obj,
-                              bool onlyInViewer )
+                              bool /*onlyInViewer*/ )
 {
   AIS_ListOfInteractive List;
   getAISContext()->DisplayedObjects(List);
@@ -363,7 +363,7 @@ void SOCC_Viewer::Display( const SALOME_OCCPrs* prs )
   \param prs - presentation
   \param forced - removes object from context
 */
-void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool forced )
+void SOCC_Viewer::Erase( const SALOME_OCCPrs* prs, const bool /*forced*/ )
 {
   // try do downcast object
   const SOCC_Prs* anOCCPrs = dynamic_cast<const SOCC_Prs*>( prs );
@@ -511,13 +511,13 @@ void SOCC_Viewer::LocalSelection( const SALOME_OCCPrs* thePrs, const std::list<i
       std::list<int>::const_iterator it;
       if ( anAIS->IsKind( STANDARD_TYPE( AIS_Shape ) ) )
       {
-        ic->Load( anAIS, -1, false );
+        ic->Load( anAIS, -1 );
         for( it = sel_modes.begin(); it != sel_modes.end(); ++it )
           ic->Activate( anAIS, AIS_Shape::SelectionMode( (TopAbs_ShapeEnum)*it ) );
       }
       else if ( anAIS->DynamicType() != STANDARD_TYPE(AIS_Trihedron) )
       {
-        ic->Load( anAIS, -1, false );
+        ic->Load( anAIS, -1 );
         for( it = sel_modes.begin(); it != sel_modes.end(); ++it )
           ic->Activate( anAIS, *it );
       }

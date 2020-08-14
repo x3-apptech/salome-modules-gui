@@ -138,9 +138,9 @@ int StandardApp_Module::createStandardAction(const QString& label,
   }
 
   // Creating the action
-  QAction * action= this->createAction( effIdentifier, label, actionIcon,
-                                        label, effToolTip, 0, getApp()->desktop(),
-                                        false, slotobject, slotmember);
+  this->createAction( effIdentifier, label, actionIcon,
+                      label, effToolTip, 0, getApp()->desktop(),
+                      false, slotobject, slotmember);
 
   return effIdentifier;
 }

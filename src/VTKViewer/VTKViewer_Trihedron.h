@@ -65,7 +65,7 @@ class VTKVIEWER_EXPORT VTKViewer_UnScaledActor: public vtkFollower
   
 public:
   
-  vtkTypeMacro(VTKViewer_UnScaledActor,vtkFollower);
+  vtkTypeMacro(VTKViewer_UnScaledActor,vtkFollower)
   
   /*!Create new instance of VTKViewer_UnScaledActor.*/
   static VTKViewer_UnScaledActor *New();
@@ -91,7 +91,7 @@ class VTKVIEWER_EXPORT VTKViewer_LineActor: public vtkFollower
   
 public:
   /*!vtk type macros.*/
-  vtkTypeMacro(VTKViewer_LineActor,vtkFollower);
+  vtkTypeMacro(VTKViewer_LineActor,vtkFollower)
   
   /*!Create new instance of VTKViewer_LineActor.*/
   static VTKViewer_LineActor *New();
@@ -155,7 +155,7 @@ protected:
 
 public:
   /*!vtk type macros.*/
-  vtkTypeMacro(VTKViewer_Trihedron,vtkObject);
+  vtkTypeMacro(VTKViewer_Trihedron,vtkObject)
   
   /*!Create new instance of VTKViewer_Trihedron.*/
   static VTKViewer_Trihedron *New();
@@ -232,7 +232,7 @@ protected:
   
 public:
   /*!vtk type macros.*/
-  vtkTypeMacro(VTKViewer_Axis,vtkObject);
+  vtkTypeMacro(VTKViewer_Axis,vtkObject)
   
   /*! Add to \a theRenderer actors: myLineActor,myLabelActor,myArrowActor
    */

@@ -105,13 +105,16 @@ static void Handler(const int theSig)
 }
 
 
-#ifdef SA_SIGINFO
 //================================================================================
 /*! Private -
  * \brief  handler for SIGSEGV signal
  */
 //================================================================================ 
+#ifdef SA_SIGINFO
 static void SegvHandler(const int, siginfo_t*, const Standard_Address)
+#else
+static void SegvHandler(const int)
+#endif
 {
   sigset_t set;
   sigemptyset(&set);
@@ -120,7 +123,6 @@ static void SegvHandler(const int, siginfo_t*, const Standard_Address)
 
   CASCatch_Failure::Raise("SIGSEGV detected");
 }
-#endif
 
 
 //================================================================================
@@ -138,32 +140,32 @@ void CASCatch_CatchSignals::Activate()
   for(; i<=MAX_HANDLER_NUMBER; i++)  
     mySigStates[i] = new struct sigaction(); //Initialize structures
 
-  int stat;
+  /*int stat;*/
   act.sa_handler =  (SIG_PFV) &Handler ;
   sigemptyset(&act.sa_mask) ;
 
-  stat = sigaction(SIGHUP,&act,(struct sigaction*)mySigStates[0]);   // ...... hangup
-  stat = sigaction(SIGFPE,&act,(struct sigaction*) mySigStates[1]);  // ...... floating point exception
-  stat = sigaction(SIGINT,&act,(struct sigaction*)mySigStates[2]);   // ...... interrupt
-  stat = sigaction(SIGQUIT,&act,(struct sigaction*)mySigStates[3]);  // ...... quit
-  stat = sigaction(SIGBUS,&act,(struct sigaction*)mySigStates[4]);   // ...... bus error
-  stat = sigaction(SIGILL,&act,(struct sigaction*)mySigStates[5]);   // ...... illegal instruction
+  /*stat = */sigaction(SIGHUP,&act,(struct sigaction*)mySigStates[0]);   // ...... hangup
+  /*stat = */sigaction(SIGFPE,&act,(struct sigaction*) mySigStates[1]);  // ...... floating point exception
+  /*stat = */sigaction(SIGINT,&act,(struct sigaction*)mySigStates[2]);   // ...... interrupt
+  /*stat = */sigaction(SIGQUIT,&act,(struct sigaction*)mySigStates[3]);  // ...... quit
+  /*stat = */sigaction(SIGBUS,&act,(struct sigaction*)mySigStates[4]);   // ...... bus error
+  /*stat = */sigaction(SIGILL,&act,(struct sigaction*)mySigStates[5]);   // ...... illegal instruction
 
 #ifdef SA_RESTART
   act.sa_flags   = SA_RESTART ;
 #else
   act.sa_flags   = 0 ;
 #endif
+#ifdef SA_SIGINFO
+  act.sa_sigaction = (void(*)(int, siginfo_t *, void*)) &SegvHandler ;
+#else
   act.sa_handler = (SIG_PFV) &SegvHandler ;
-
+# endif
 #ifdef SA_SIGINFO       // OSF,SOLARIS,IRIX
   act.sa_flags = act.sa_flags | SA_SIGINFO ;
-# ifdef SOLARIS
-  act.sa_sigaction = (void(*)(int, siginfo_t *, void*)) &SegvHandler ;
-# endif
 #endif
 
-  stat = sigaction( SIGSEGV , &act , (struct sigaction*)mySigStates[6]);    // ...... segmentation violation
+  /*stat = */sigaction( SIGSEGV , &act , (struct sigaction*)mySigStates[6]);    // ...... segmentation violation
 
   myIsActivated = Standard_True;
 }
@@ -179,15 +181,15 @@ void CASCatch_CatchSignals::Deactivate()
   if(!myIsActivated) return;
 
   struct sigaction oact;
-  int stat;
+  /*int stat;*/
 
-  stat = sigaction(SIGHUP,(struct sigaction*)mySigStates[0],&oact);   // ...... hangup
-  stat = sigaction(SIGFPE,(struct sigaction*)mySigStates[1],&oact);   // ...... floating point exception
-  stat = sigaction(SIGINT,(struct sigaction*)mySigStates[2],&oact);   // ...... interrupt
-  stat = sigaction(SIGQUIT,(struct sigaction*)mySigStates[3],&oact);  // ...... quit
-  stat = sigaction(SIGBUS,(struct sigaction*)mySigStates[4],&oact);   // ...... bus error
-  stat = sigaction(SIGILL,(struct sigaction*)mySigStates[5],&oact);   // ...... illegal instruction
-  stat = sigaction(SIGSEGV,(struct sigaction*)mySigStates[6],&oact);  // ...... segmentation violation
+  /*stat = */sigaction(SIGHUP,(struct sigaction*)mySigStates[0],&oact);   // ...... hangup
+  /*stat = */sigaction(SIGFPE,(struct sigaction*)mySigStates[1],&oact);   // ...... floating point exception
+  /*stat = */sigaction(SIGINT,(struct sigaction*)mySigStates[2],&oact);   // ...... interrupt
+  /*stat = */sigaction(SIGQUIT,(struct sigaction*)mySigStates[3],&oact);  // ...... quit
+  /*stat = */sigaction(SIGBUS,(struct sigaction*)mySigStates[4],&oact);   // ...... bus error
+  /*stat = */sigaction(SIGILL,(struct sigaction*)mySigStates[5],&oact);   // ...... illegal instruction
+  /*stat = */sigaction(SIGSEGV,(struct sigaction*)mySigStates[6],&oact);  // ...... segmentation violation
 
 
   Standard_Integer i = 0;

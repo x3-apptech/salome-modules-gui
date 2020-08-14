@@ -102,7 +102,7 @@ namespace
     }
 
   protected:
-    QString userFileName( const QString& appName, const bool forLoad ) const
+    QString userFileName( const QString& /*appName*/, const bool forLoad ) const
     {
       if ( version().isEmpty() ) return ""; 
       return SUIT_ResourceMgr::userFileName( myCustomAppName, forLoad );

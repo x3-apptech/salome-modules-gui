@@ -37,7 +37,7 @@
 #include <QApplication>
 
 OCCViewer_ViewFrame::OCCViewer_ViewFrame(SUIT_Desktop* theDesktop, OCCViewer_Viewer* theModel)
-  : OCCViewer_ViewWindow( theDesktop, theModel ), myPopupRequestedView(0), mySplitMode(-1)
+  : OCCViewer_ViewWindow( theDesktop, theModel ), mySplitMode(-1), myPopupRequestedView(0)
 {
   QFrame* centralFrame = new QFrame( this );
   setCentralWidget( centralFrame );
@@ -193,7 +193,7 @@ void OCCViewer_ViewFrame::splitSubViews()
 	if( mySplitMode == -1 )
 		return;
 
-  int aNbViews;
+  int aNbViews = 1;
   if ( mySplitMode >= 0 && mySplitMode < 2)
     aNbViews = 2;
   else if( mySplitMode >= 2 && mySplitMode < 8 )
@@ -202,7 +202,7 @@ void OCCViewer_ViewFrame::splitSubViews()
     aNbViews = 4;
 
   if( aNbViews != myViewsMode.count() )
-  	return;
+    return;
 
   int SubViews3Map[6][3][4] = {
     { {0,0,1,1}, {0,1,1,1}, {0,2,1,1} },

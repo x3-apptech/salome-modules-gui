@@ -60,7 +60,7 @@ pqPVApplicationCore * PVViewer_Core::GetPVApplication()
   \param fullSetup whether to instanciate all behaviors or just the minimal ones.
   \return \c true if ParaView has been initialized successfully, otherwise false
 */
-bool PVViewer_Core::ParaviewInitApp(QMainWindow * aDesktop)
+bool PVViewer_Core::ParaviewInitApp(QMainWindow * /*aDesktop*/)
 {
   if ( ! MyCoreApp) {
       // Obtain command-line arguments

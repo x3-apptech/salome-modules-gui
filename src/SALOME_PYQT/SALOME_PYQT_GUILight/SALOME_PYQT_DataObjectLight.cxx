@@ -113,7 +113,7 @@ QPixmap SALOME_PYQT_DataObjectLight::icon(const int index) const
 // function : SALOME_PYQT_DataObjectLight::toolTip()
 // purpose  : return toolTip of object
 //=================================================================================
-QString SALOME_PYQT_DataObjectLight::toolTip(const int index) const
+QString SALOME_PYQT_DataObjectLight::toolTip(const int /*index*/) const
 {
   return myToolTip;
 }

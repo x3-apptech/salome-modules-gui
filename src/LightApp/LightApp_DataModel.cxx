@@ -55,7 +55,7 @@ LightApp_DataModel::~LightApp_DataModel()
 /*!
   Emit opened()
 */
-bool LightApp_DataModel::open( const QString&, CAM_Study* study, QStringList )
+bool LightApp_DataModel::open( const QString&, CAM_Study*, QStringList )
 {
   emit opened(); //TODO: is it really needed? to be removed maybe...
   return true;

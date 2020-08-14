@@ -235,7 +235,7 @@ void QxScene_ViewWindow::onViewFitAll()
 /*!
     Set background of the viewport
 */
-void QxScene_ViewWindow::setBackgroundColor( const QColor& color )
+void QxScene_ViewWindow::setBackgroundColor( const QColor& /*color*/ )
 {
   DEBTRACE("QxScene_ViewWindow::setBackgroundColor");
 }
@@ -253,7 +253,7 @@ QColor QxScene_ViewWindow::backgroundColor() const
 /*!
   Custom resize event handler
 */
-void QxScene_ViewWindow::resizeEvent( QResizeEvent* theEvent )
+void QxScene_ViewWindow::resizeEvent( QResizeEvent* /*theEvent*/ )
 {
   DEBTRACE("QxScene_ViewWindow::resizeEvent");
 }

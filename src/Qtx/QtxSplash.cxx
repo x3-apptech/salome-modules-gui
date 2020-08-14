@@ -200,9 +200,9 @@ QtxSplash::QtxSplash( const QPixmap& pixmap )
   myMargin( 5 ),
   myOpacity( 1.0 ),
   myError( 0 ),
-  myShowPercent( true ),
   myShowProgress( true ),
-  myShowMessage( true )
+  myShowMessage( true ),
+  myShowPercent( true )
 {
   setAttribute( Qt::WA_DeleteOnClose, true );
   setPixmap( pixmap );

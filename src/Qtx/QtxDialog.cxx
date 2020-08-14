@@ -443,14 +443,14 @@ QSize QtxDialog::Border::minimumSizeHint() const
 QtxDialog::QtxDialog( QWidget* parent, bool modal, bool allowResize, const int f, Qt::WindowFlags wf )
 : QDialog( parent, (Qt::WindowFlags)( wf | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint | Qt::Dialog |
 #ifdef WIN32
-           ( allowResize ? 0 : Qt::FramelessWindowHint ) |
+           ( allowResize ? (Qt::WindowType)0 : Qt::FramelessWindowHint ) |
 #endif
            ( ( allowResize 
 #ifdef WIN32 
                // in qwidget_win.cpp flag WStyle_ContextHelp will be unset in WStyle_MinMax in switched ON
                && !( wf & Qt::WindowContextHelpButtonHint )
 #endif
-               ) ? Qt::WindowMaximizeButtonHint : 0 ) ) ),
+               ) ? Qt::WindowMaximizeButtonHint : (Qt::WindowType)0 ) ) ),
   myInited( false ),
   mySender( 0 ),
   myAlignment( 0 ),

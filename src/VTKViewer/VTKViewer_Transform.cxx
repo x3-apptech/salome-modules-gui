@@ -33,7 +33,7 @@
 static double EPS = 10e-4;
 
 
-vtkStandardNewMacro(VTKViewer_Transform);
+vtkStandardNewMacro(VTKViewer_Transform)
 
 /*!Sets matrix scale.*/
 void VTKViewer_Transform::SetMatrixScale(double theScaleX, double theScaleY, double theScaleZ){ 

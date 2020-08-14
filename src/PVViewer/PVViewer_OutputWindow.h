@@ -38,18 +38,18 @@ class PVVIEWER_EXPORT PVViewer_OutputWindow : public vtkOutputWindow
 {
 public:
   static PVViewer_OutputWindow* New();
-  vtkTypeMacro(PVViewer_OutputWindow, vtkOutputWindow);
+  vtkTypeMacro(PVViewer_OutputWindow, vtkOutputWindow)
 
   //! Returns the number of text messages received
-  const unsigned int getTextCount();
+  unsigned int getTextCount() const;
   //! Returns the number of error messages received
-  const unsigned int getErrorCount();
+  unsigned int getErrorCount() const;
   //! Returns the number of warning messages received
-  const unsigned int getWarningCount();
+  unsigned int getWarningCount() const;
   //! Returns the number of generic warning messages received
-  const unsigned int getGenericWarningCount();
+  unsigned int getGenericWarningCount() const;
   //! Returns the number of debug messages received
-  const unsigned int getDebugCount();
+  unsigned int getDebugCount() const;
 
 private:
   PVViewer_OutputWindow();
@@ -60,7 +60,7 @@ private:
   QMap<MessageTypes, int> myCounter;
 
   void DisplayText(const char*);
-  int count(const MessageTypes&);
+  int count(const MessageTypes&) const;
 };
 
 #endif // PVVIEWER_OUTPUTWINDOW_H

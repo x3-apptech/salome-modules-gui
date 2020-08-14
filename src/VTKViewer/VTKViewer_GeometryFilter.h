@@ -48,7 +48,7 @@ public:
   /*! \fn vtkTypeMacro(VTKViewer_GeometryFilter, vtkGeometryFilter)
    *  \brief VTK type revision macros.
    */
-  vtkTypeMacro(VTKViewer_GeometryFilter, vtkGeometryFilter);
+  vtkTypeMacro(VTKViewer_GeometryFilter, vtkGeometryFilter)
   /*! \fn void SetInside(int theShowInside)
    * \brief Sets \a myShowInside flag. \a myShowInside is changed, call this->Modified().
    * \param theShowInside - used for changing value of \a myShowInside variable.
@@ -112,7 +112,7 @@ public:
 
   static void InsertId( const vtkIdType theCellId,
                         const vtkIdType theCellType,
-                        TVectorId& theVTK2ObjIds,
+                        TVectorId& /*theVTK2ObjIds*/,
                         TMapOfVectorId& theDimension2VTK2ObjIds );
 
 protected:

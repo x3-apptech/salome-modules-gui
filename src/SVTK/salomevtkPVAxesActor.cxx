@@ -59,10 +59,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace salomevtk
 {
 
-vtkStandardNewMacro(vtkPVAxesActor);
+vtkStandardNewMacro(vtkPVAxesActor)
 
-vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
-vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedShaft, vtkPolyData );
+vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData )
+vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedShaft, vtkPolyData )
 
 //-----------------------------------------------------------------------------
 vtkPVAxesActor::vtkPVAxesActor()

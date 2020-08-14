@@ -767,12 +767,12 @@ QVector< QVector<QwtPlotCurve *> > Plot2d_ViewFrame::displayPlot2dCurveList( con
       icur2 = icur1 + groupSize -1;
 
       // For all curves in one group
-      double XgroupMin, XgroupMax;
-      double YgroupMin, YgroupMax;
+      double XgroupMin = 0., XgroupMax = 0.;
+      double YgroupMin = 0., YgroupMax = 0.;
 
       // For one curve
-      double XcurveMin, XcurveMax;
-      double YcurveMin, YcurveMax;
+      double XcurveMin = 0., XcurveMax = 0.;
+      double YcurveMin = 0., YcurveMax = 0.;
       double *Xval;
       double *Yval;
       int nbPoints;
@@ -977,7 +977,7 @@ Plot2d_Curve* Plot2d_ViewFrame::createPlot2dCurve( QString & title,
                                                    int lineWidth,
                                                    QColor & lineColor,
                                                    QwtSymbol::Style markerKind,
-                                                   Plot2d_QwtPlotPicker* picker,
+                                                   Plot2d_QwtPlotPicker* /*picker*/,
                                                    bool toDraw,
                                                    bool displayLegend)
 {
@@ -1944,8 +1944,8 @@ AnalyticalCurveList Plot2d_ViewFrame::getAnalyticalCurves() const
 Plot2d_AnalyticalCurve* Plot2d_ViewFrame::getAnalyticalCurve(QwtPlotItem * theItem) {
   AnalyticalCurveList::iterator it = myAnalyticalCurves.begin();
   for( ; it != myAnalyticalCurves.end(); it++) {
-    if((*it)->plotItem() == theItem);
-		return (*it);
+    if((*it)->plotItem() == theItem)
+      return (*it);
   }
   return 0;
 }
@@ -2850,7 +2850,7 @@ bool Plot2d_ViewFrame::hasPlotObject( Plot2d_Object* object ) const
 /*!
   Sets curve type
 */
-void Plot2d_ViewFrame::setCurveType( QwtPlotCurve* curve, int curveType )
+void Plot2d_ViewFrame::setCurveType( QwtPlotCurve* curve, int /*curveType*/ )
 {
   if ( !curve )
     return;
@@ -3176,7 +3176,7 @@ QwtPlotMarker* Plot2d_Plot2d::createMarkerAndTooltip( QwtSymbol* symbol,
 QwtPlotGrid* Plot2d_Plot2d::grid() const
 {
   return myGrid;
-};
+}
 
 QwtPlotZoomer* Plot2d_Plot2d::zoomer() const
 {
@@ -3273,7 +3273,7 @@ void Plot2d_Plot2d::displayXTicksAndLabels(
   QList<double> allTicks;
 
   double devXmin, devXmax;  // X interval of a system
-  double gapXmin, gapXmax;  // X interval between two systems
+  double gapXmin = 0., gapXmax = 0.;  // X interval between two systems
   double devLabPos;         // Label's position of a system
   double segmentPos;  // Position of the vertical segment between current system and the next
 
@@ -3838,7 +3838,7 @@ QString Plot2d_ViewFrame::getXmlVisualParameters() {
     aWriter.writeAttribute("Name",c->getName());
     aWriter.writeAttribute("IsActive", QString("").sprintf("%d",	c->isActive()));
 		aWriter.writeAttribute("Expression", c->getExpression());
-    aWriter.writeAttribute("NbIntervals", QString("").sprintf("%d",	c->getNbIntervals()));
+    aWriter.writeAttribute("NbIntervals", QString("").sprintf("%ld",	c->getNbIntervals()));
     aWriter.writeAttribute("isAuto", QString("").sprintf("%d",isAuto));
     if(!isAuto) {
       aWriter.writeAttribute("Marker", QString("").sprintf("%d",(int)c->getMarker()));
@@ -3872,7 +3872,7 @@ QString Plot2d_ViewFrame::getXmlVisualParameters() {
 */
 bool Plot2d_ViewFrame::setXmlVisualParameters(const QString& parameters) {
   QXmlStreamReader aReader(parameters);
-  double xmin, xmax, ymin, ymax, y2min, y2max;
+  double xmin = 0., xmax = 0., ymin = 0., ymax = 0., y2min = 0., y2max = 0.;
   bool leftMin,leftMax,rightMin,rightMax;
   leftMin = leftMax = rightMin = rightMax = false;
   while(!aReader.atEnd()) {

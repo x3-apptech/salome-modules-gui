@@ -32,7 +32,7 @@
 
 class SOCC_EXPORT SOCC_ViewWindow : public OCCViewer_ViewWindow
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SOCC_ViewWindow( SUIT_Desktop*, OCCViewer_Viewer* );

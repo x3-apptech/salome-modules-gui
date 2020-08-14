@@ -589,7 +589,7 @@ bool Qtx::dos2unix( const QString& absName )
     char inbuf[512], outbuf[512];
 
     /* convert buffer */
-    int nbread = ::fread( inbuf, 1, sizeof( inbuf ), src );
+    int nbread = (int)::fread( inbuf, 1, sizeof( inbuf ), src ); //!< TODO: conversion from 'size_t' to 'int'
     for ( int incnt = 0; incnt < nbread; incnt++  )
     {
       if ( waitingLF )
@@ -610,7 +610,7 @@ bool Qtx::dos2unix( const QString& absName )
     waitingLF = ( inbuf[nbread - 1] == CR );
 
     /* write converted buffer to temp file */
-    int nbwri = ::fwrite( outbuf, 1, outcnt, tgt );
+    int nbwri = (int)::fwrite( outbuf, 1, outcnt, tgt ); //!< TODO: conversion from 'size_t' to 'int'
     if ( nbwri != outcnt )
     {
       ::fclose( src );
@@ -2143,7 +2143,7 @@ QString Qtx::qtDir( const QString& context )
 
   QStringList vars = { "QT5_ROOT_DIR", "QT_ROOT_DIR", "QTDIR" };
   QString qtPath;
-  for (uint i = 0; i < vars.length() && qtPath.isEmpty(); i++ ) {
+  for (int i = 0; i < vars.length() && qtPath.isEmpty(); i++ ) {
     qtPath = getenv(vars[i]);
   }
   if ( !qtPath.isEmpty() && !context.isEmpty() )

@@ -52,10 +52,10 @@ public:
 
   
 protected:
-  virtual void preprocess(QStringList itemNameIdList) {
+  virtual void preprocess(QStringList /*itemNameIdList*/) {
       // Implement something to be executed at the begining of the process function
   };
-  virtual void postprocess(QStringList itemNameIdList) {
+  virtual void postprocess(QStringList /*itemNameIdList*/) {
       // Implement something to be executed at the end of the process function
   };
   // Implement what must be done with each DataObject during the process function

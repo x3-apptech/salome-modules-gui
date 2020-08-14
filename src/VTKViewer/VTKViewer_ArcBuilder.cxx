@@ -227,8 +227,8 @@ VTKViewer_ArcBuilder::VTKViewer_ArcBuilder(const Pnt& thePnt1,
                                            const Pnt& thePnt2,
                                            const Pnt& thePnt3,
                                            double theAngle):
-  myStatus(Arc_Error),
-  myAngle(theAngle)
+  myAngle(theAngle),
+  myStatus(Arc_Error)
 {
   Vec V1(thePnt2.GetXYZ().X()-thePnt1.GetXYZ().X(),
          thePnt2.GetXYZ().Y()-thePnt1.GetXYZ().Y(),
@@ -357,7 +357,7 @@ VTKViewer_ArcBuilder::~VTKViewer_ArcBuilder()
  */
 vtkUnstructuredGrid* VTKViewer_ArcBuilder::BuildGrid(const PntList& theList) const
 {
-  int aListsize = theList.size();  
+  int aListsize = (int)theList.size(); //!< TODO: conversion from size_t to int
   vtkUnstructuredGrid* aGrid = NULL;
   
   if(aListsize != 0) {
@@ -560,22 +560,22 @@ const std::vector<double>& VTKViewer_ArcBuilder::GetScalarValues()
 }
 
 VTKViewer_ArcBuilder::IncOrder VTKViewer_ArcBuilder::GetArcAngle( const double& P1, const double& P2, const double& P3,double* Ang){
-  IncOrder aResult;
+  IncOrder aResult = MINUS;
   if(P1 < P2 && P2 < P3){
     *Ang = P3 - P1;
-    aResult = VTKViewer_ArcBuilder::PLUS;
+    aResult = PLUS;
   }
   else if((P1 < P3 && P3 < P2) || (P2 < P1 && P1 < P3)){
     *Ang = 2*vtkMath::Pi() - P3 + P1;
-    aResult = VTKViewer_ArcBuilder::MINUS;
+    aResult = MINUS;
   }
   else if((P2 < P3 && P3 < P1) || (P3 < P1 && P1 < P2)){
     *Ang = 2*vtkMath::Pi() - P1 + P3;
-    aResult = VTKViewer_ArcBuilder::PLUS;
+    aResult = PLUS;
   }
   else if(P3 < P2 && P2 < P1){
     *Ang = P1 - P3;
-    aResult = VTKViewer_ArcBuilder::MINUS;
+    aResult = MINUS;
   }
   return aResult;
 }
@@ -597,7 +597,6 @@ vtkIdType Build1DArc(vtkIdType cellId, vtkUnstructuredGrid* input,
                      double myMaxArcAngle){
   
   vtkIdType aResult = -1;
-  vtkIdType *aNewPoints;
 
   vtkDataArray* inputScalars = input->GetPointData()->GetScalars();
   vtkDataArray* outputScalars = output->GetPointData()->GetScalars();

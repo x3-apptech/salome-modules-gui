@@ -109,7 +109,7 @@ int SVTK_SpaceMouseXCB::initialize( xcb_connection_t *connection, xcb_window_t w
 int SVTK_SpaceMouseXCB::setWindow( xcb_connection_t *connection, xcb_window_t window )
 {
   xcb_client_message_event_t xcbEvent;
-  xcb_window_t root_window;
+  xcb_window_t root_window = 0; // todo: initial value (if screen is null, see below)
   xcb_screen_t* screen;
   xcb_generic_error_t* error;
   xcb_void_cookie_t cookie;

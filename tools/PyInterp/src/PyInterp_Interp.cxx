@@ -401,7 +401,7 @@ std::string
 __join(const std::vector<std::string>& v, int begin=0, int end=-1)
 {
   if (end == -1)
-    end = v.size();
+    end = (int)v.size(); //!< TODO: conversion from size_t to int
   std::stringstream ss;
   for (int i = begin; i < end; ++i) {
     if (i != begin)

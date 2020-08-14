@@ -150,14 +150,10 @@ QString SalomeApp_DataObject::text( const int id ) const
   switch ( id )
   {
   case ValueId:
-#ifndef WIN32
-    if ( componentObject() != this )
-#else
     if ( componentObject() != (SUIT_DataObject*)this )
-#endif
       txt = value( object() );
-      if ( txt.isEmpty() )
-        txt = value( referencedObject() );
+    if ( txt.isEmpty() )
+      txt = value( referencedObject() );
     break;
   case IORId:
     txt = ior( referencedObject() );

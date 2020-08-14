@@ -102,7 +102,7 @@ void SPlot2d_Viewer::renameAll( const Handle(SALOME_InteractiveObject)& IObj, co
   {
     const QVector<SUIT_ViewWindow*>& wnds = vm->getViews();
 
-    for ( uint i = 0; i < wnds.size(); i++ )
+    for ( int i = 0; i < wnds.size(); i++ )
     {
       Plot2d_ViewWindow* pwnd = dynamic_cast<Plot2d_ViewWindow*>( wnds.at( i ) );
       rename( IObj, name, pwnd->getViewFrame() );
@@ -375,7 +375,7 @@ SUIT_ViewWindow* SPlot2d_Viewer::createView( SUIT_Desktop* theDesktop )
   SLOT: called when action "Legend Clicked" is activated.
   override "onLegendClicked" method from Plot2d_ViewModel.
 */
-void SPlot2d_Viewer::onClicked( const QVariant& itemInfo, int index )
+void SPlot2d_Viewer::onClicked( const QVariant& itemInfo, int /*index*/ )
 {
   Plot2d_ViewFrame* aViewFrame = getActiveViewFrame();
   if(aViewFrame == NULL) return;

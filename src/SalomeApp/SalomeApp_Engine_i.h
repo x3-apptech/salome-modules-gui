@@ -85,7 +85,7 @@ public:
   char* IORToLocalPersistentID( SALOMEDS::SObject_ptr, const char*, CORBA::Boolean,  CORBA::Boolean )                                                {return 0;}
   char* LocalPersistentIDToIOR( SALOMEDS::SObject_ptr, const char*, CORBA::Boolean,  CORBA::Boolean )                                                {return 0;}
   bool CanPublishInStudy( CORBA::Object_ptr )                                                                                                        {return 0;}
-  SALOMEDS::SObject_ptr PublishInStudy( SALOMEDS::SObject_ptr, CORBA::Object_ptr, const char* ) throw (SALOME::SALOME_Exception)                     {return 0;}
+  SALOMEDS::SObject_ptr PublishInStudy( SALOMEDS::SObject_ptr, CORBA::Object_ptr, const char* )					                     {return 0;}
   CORBA::Boolean CanCopy( SALOMEDS::SObject_ptr )                                                                                                    {return 0;}
   SALOMEDS::TMPFile* CopyFrom( SALOMEDS::SObject_ptr, CORBA::Long& )                                                                                 {return 0;}
   CORBA::Boolean CanPaste( const char*, CORBA::Long )                                                                                                {return 0;}

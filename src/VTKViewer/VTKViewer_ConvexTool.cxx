@@ -405,7 +405,7 @@ VTKViewer_Triangulator
             if(DEBUG_TRIA_EXECUTE) cout  << "; Added = FALSE" << endl;
           }
         }
-        int aNbPoints = aPointIds.size();
+        int aNbPoints = (int)aPointIds.size(); //!< TODO: conversion from size_t to int
         aCenter[0] /= aNbPoints;
         aCenter[1] /= aNbPoints;
         aCenter[2] /= aNbPoints;
@@ -523,7 +523,7 @@ VTKViewer_Triangulator
         }
 
         if(!aSortedPointIds.empty()){
-          int aNumFacePts = aSortedPointIds.size();
+          int aNumFacePts = (int)aSortedPointIds.size(); //!< TODO: conversion from size_t to int
           ::TConnectivities aConnectivities(aNumFacePts);
           TSortedPointIds::const_iterator anIter = aSortedPointIds.begin();
           TSortedPointIds::const_iterator anEndIter = aSortedPointIds.end();
@@ -544,7 +544,7 @@ VTKViewer_Triangulator
 
   // To check, whether the polygons give a convex polyhedron or not
   if(theIsCheckConvex){
-    int aNbPolygons = aPolygons.size();
+    int aNbPolygons = (int)aPolygons.size(); //!< TODO: conversion from size_t to int
     for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
       double* aNormal = aPolygon.myNormal;
@@ -569,7 +569,7 @@ VTKViewer_Triangulator
 
   // To pass resulting set of the polygons to the output
   {
-    int aNbPolygons = aPolygons.size();
+    int aNbPolygons = (int)aPolygons.size(); //!< TODO: conversion from size_t to int
     for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
       if(DEBUG_TRIA_EXECUTE) cout << "PoilygonId="<<aPolygonId<<" | ";
@@ -579,7 +579,7 @@ VTKViewer_Triangulator
           cout << aConnectivities[i] << ",";
         cout << endl;
       }
-      int aNbPoints = aConnectivities.size();
+      int aNbPoints = (int)aConnectivities.size(); //!< TODO: conversion from size_t to int
       vtkIdType aNewCellId = theOutput->InsertNextCell(VTK_POLYGON,aNbPoints,&aConnectivities[0]);
       if(theStoreMapping)
         VTKViewer_GeometryFilter::InsertId( theCellId, VTK_POLYGON, theVTK2ObjIds, theDimension2VTK2ObjIds );

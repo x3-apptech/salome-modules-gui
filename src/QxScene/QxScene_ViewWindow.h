@@ -82,7 +82,7 @@ class QXSCENE_EXPORT QxScene_ViewWindow : public SUIT_ViewWindow {
   void              onViewReset(); 
   
  protected:
-  void              resizeEvent( QResizeEvent* theEvent );
+  void              resizeEvent( QResizeEvent* );
 
   QGraphicsScene*   _scene;
   QGraphicsView*    _sceneView;

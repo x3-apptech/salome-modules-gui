@@ -60,7 +60,7 @@ class QColor;
  */
 class SVTK_EXPORT SVTK_SignalHandler : public QObject
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_SignalHandler(SVTK_ViewWindow* theMainWindow);
@@ -117,7 +117,7 @@ public:
  */
 class SVTK_EXPORT SVTK_View : public SVTK_SignalHandler
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public:
   SVTK_View(SVTK_ViewWindow* theMainWindow);

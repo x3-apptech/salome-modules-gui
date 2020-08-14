@@ -238,7 +238,7 @@ namespace GUI_OPENGL
 		if( count > 0 )
 		{
 		  content = ( char* )malloc( sizeof( char ) * ( count + 1 ) );
-		  count = fread( content, sizeof( char ), count, file );
+		  count = (int)fread( content, sizeof( char ), count, file ); //!< TODO: conversion from size_t to int
 		  content[ count ] = '\0';
 		}
 		fclose( file );

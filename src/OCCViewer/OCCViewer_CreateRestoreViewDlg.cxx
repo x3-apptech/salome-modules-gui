@@ -121,8 +121,6 @@ void OCCViewer_CreateRestoreViewDlg::changeImage( QListWidgetItem* curItem )
 {
   if( curItem && ( curItem->flags() & Qt::ItemIsEditable ) )
   {
-    int lowLevel  = -1;
-    int highLevel = -1;
     int index = curItem->listWidget()->row( curItem );  
     Handle(V3d_View) aView3d = myCurViewPort->getView();
     myCurrentItem = myParametersMap[ index ];

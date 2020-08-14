@@ -166,20 +166,20 @@ namespace SVTK
 }
 
 
-vtkStandardNewMacro(SALOME_Actor);
+vtkStandardNewMacro(SALOME_Actor)
 
 /*!
   Constructor
 */
 SALOME_Actor
 ::SALOME_Actor():
-  myRenderer(NULL),
   myInteractor(NULL),
+  myRenderer(NULL),
   mySelectionMode(ActorSelection),
   myPreHighlightActor(SVTK_Actor::New()),
   myHighlightActor(SVTK_Actor::New()),
-  myOutline(vtkOutlineSource::New()),
   myOutlineActor(VTKViewer_Actor::New()),
+  myOutline(vtkOutlineSource::New()),
   myIsDisplayNameActor(false),
   myNameActor(VTKViewer_FramedTextActor::New())
 {
@@ -712,7 +712,7 @@ SALOME_Actor
       TColStd_MapOfInteger anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
-        vtkIdType anEnd = aVectorIds.size();
+        vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
           int aPointId = aVectorIds[anId];
           if( aPointId >= 0 && mySelector->IsValid( this, aPointId, true ) ) {
@@ -745,7 +745,7 @@ SALOME_Actor
             aRenderer->SetWorldPoint( aBounds[ i ], aBounds[ j ], aBounds[ k ], 1.0 );
             aRenderer->WorldToDisplay();
             aRenderer->GetDisplayPoint( aPnt );
-            bool anIsPointInSelection;
+            bool anIsPointInSelection = false;
             if( theSelectionEvent->myIsRectangle )
               anIsPointInSelection =  aPnt[0] > x1 && aPnt[0] < x2 && aPnt[1] > y1 && aPnt[1] < y2;
             else if( theSelectionEvent->myIsPolygon )
@@ -788,7 +788,7 @@ SALOME_Actor
       TColStd_MapOfInteger anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
-        vtkIdType anEnd = aVectorIds.size();
+        vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
           int aCellId = aVectorIds[anId];
           if ( !mySelector->IsValid( this, aCellId ) )
@@ -826,7 +826,7 @@ SALOME_Actor
       SVTK_IndexedMapOfIds anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
-        vtkIdType anEnd = aVectorIds.size();
+        vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
           int aCellId = aVectorIds[anId];
           if ( !mySelector->IsValid( this, aCellId ) )

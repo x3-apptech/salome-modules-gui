@@ -36,14 +36,14 @@ namespace
     result[1] = first[2]*second[0] - first[0]*second[2];
     result[2] = first[0]*second[1] - first[1]*second[0];
   }
-};
+}
 
 OCCViewer_ClipPlane::OCCViewer_ClipPlane()
-: X( 0.0 ),
+: Mode( Absolute ),
+  IsOn( true ),
+  X( 0.0 ),
   Y( 0.0 ),
-  Z( 0.0 ),
-  Mode( Absolute ),
-  IsOn( true )
+  Z( 0.0 )
 {
   OrientationType = AbsoluteCustom;
   AbsoluteOrientation.Dx = 0.0;

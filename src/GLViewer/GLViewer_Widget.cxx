@@ -41,7 +41,7 @@
   A constructor
   Parameters using for QOGLWidget as is 
 */
-GLViewer_Widget::GLViewer_Widget( QWidget* parent, const char* name ):
+GLViewer_Widget::GLViewer_Widget( QWidget* parent, const char* /*name*/ ):
 QGLWidget( parent, 0/*, WRepaintNoErase | WResizeNoErase*/ )
 {
   myViewPort = ( GLViewer_ViewPort2d* )parent;
@@ -401,7 +401,7 @@ void GLViewer_Widget::mouseReleaseEvent( QMouseEvent* e )
 /*!
   Custom enter event handler
 */
-void GLViewer_Widget::enterEvent( QEvent* e )
+void GLViewer_Widget::enterEvent( QEvent* /*e*/ )
 {
   updateGL();
 }
@@ -409,7 +409,7 @@ void GLViewer_Widget::enterEvent( QEvent* e )
 /*!
   Custom leave event handler
 */
-void GLViewer_Widget::leaveEvent( QEvent* e )
+void GLViewer_Widget::leaveEvent( QEvent* /*e*/ )
 {
   updateGL();
 }
@@ -579,7 +579,7 @@ typedef unsigned int WORD;
         memcpy( dest, source, aSize/8 );
     else
     {
-        double r, g, b; WORD color;
+        double r=0, g=0, b=0; WORD color;
         for( int i=0; i<width; i++ )
         {
             color = 0;

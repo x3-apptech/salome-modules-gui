@@ -32,7 +32,7 @@
 //! To define minimal interface for #SVTK_ViewWindow initialization
 class SVTK_EXPORT SVTK_ViewModelBase: public SUIT_ViewModel
 {
-  Q_OBJECT;
+  Q_OBJECT
 
 public slots:
   //! To invoke Qt #selectionChanged signal

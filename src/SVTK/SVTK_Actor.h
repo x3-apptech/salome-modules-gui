@@ -48,7 +48,7 @@ class SVTK_EXPORT SVTK_Actor : public SVTK_DeviceActor
 public:
   static SVTK_Actor* New();
 
-  vtkTypeMacro(SVTK_Actor,SVTK_DeviceActor);
+  vtkTypeMacro(SVTK_Actor,SVTK_DeviceActor)
 
   //! Initialiaze the instance completely
   virtual void

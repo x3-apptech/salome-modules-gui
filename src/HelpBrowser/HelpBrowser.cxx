@@ -162,7 +162,6 @@ int main( int argc, char **argv )
 #if defined(WIN32) && defined(UNICODE)                   
   LPWSTR *szArglist = NULL;
   int nArgs;
-  int i;
   szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);	      
   helpfile = QString::fromWCharArray(szArglist[nArgs-1]);
   // Free memory allocated for CommandLineToArgvW arguments.

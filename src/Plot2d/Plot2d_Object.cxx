@@ -40,8 +40,8 @@ Plot2d_Object::Plot2d_Object()
   myName( "" ),
   myXAxis( QwtPlot::xBottom ),
   myYAxis( QwtPlot::yLeft ),
-  myIsSelected(false),
-  myScale ( 1.0 )
+  myScale ( 1.0 ),
+  myIsSelected(false)
 {
 }
 

@@ -1678,7 +1678,7 @@ public:
   bool mySubst;
   TResult myDefault;
   TGetStrSettingEvent( const QString& section, const QString& name, const QString& def, const bool subst ) 
-    : mySection( section ), myName( name ), myDefault( def ), mySubst( subst ) {}
+    : mySection( section ), myName( name ), mySubst( subst ), myDefault( def ) {}
   virtual void Execute() 
   {
     if ( SUIT_Session::session() ) {
@@ -2117,13 +2117,13 @@ public:
   CrTool( const QString& tBar, const QString& nBar ) 
     : myCase( 0 ), myTbTitle( tBar ), myTbName( nBar)  {}
   CrTool( const int id, const int tBar, const int idx ) 
-    : myCase( 1 ), myId( id ), myTbId( tBar ), myIndex( idx ) {}
+    : myCase( 1 ), myTbId( tBar ), myId( id ), myIndex( idx ) {}
   CrTool( const int id, const QString& tBar, const int idx )
-    : myCase( 2 ), myId( id ), myTbTitle( tBar ), myIndex( idx ) {}
+    : myCase( 2 ), myTbTitle( tBar ), myId( id ), myIndex( idx ) {}
   CrTool( QAction* action, const int tbId, const int id, const int idx )
-    : myCase( 3 ), myAction( action ), myTbId( tbId ), myId( id ), myIndex( idx ) {}
+    : myCase( 3 ), myTbId( tbId ), myAction( action ), myId( id ), myIndex( idx ) {}
   CrTool( QAction* action, const QString& tBar, const int id, const int idx )
-    : myCase( 4 ), myAction( action ), myTbTitle( tBar ), myId( id ), myIndex( idx ) {}
+    : myCase( 4 ), myTbTitle( tBar ), myAction( action ), myId( id ), myIndex( idx ) {}
 
   int execute() const
   {
@@ -2133,26 +2133,33 @@ public:
         return getActiveModule()->createTool( myTbTitle, myTbName );
       else if ( getApplication() )
         return getApplication()->createTool( myTbTitle, myTbName );
+      break;
     case 1:
       if ( getActiveModule() )
         return getActiveModule()->createTool( myId, myTbId, myIndex );
       else if ( getApplication() )
         return getApplication()->createTool( myId, myTbId, myIndex );
+      break;
     case 2:
       if ( getActiveModule() )
         return getActiveModule()->createTool( myId, myTbTitle, myIndex );
       else if ( getApplication() )
         return getApplication()->createTool( myId, myTbTitle, myIndex );
+      break;
     case 3:
       if ( getActiveModule() )
         return getActiveModule()->createTool( myAction, myTbId, myId, myIndex );
       else if ( getApplication() )
         return getApplication()->createTool( myAction, myTbId, myId, myIndex );
+      break;
     case 4:
       if ( getActiveModule() )
         return getActiveModule()->createTool( myAction, myTbTitle, myId, myIndex );
       else if ( getApplication() )
         return getApplication()->createTool( myAction, myTbTitle, myId, myIndex );
+      break;
+    default:
+      break;
     }
     return -1;
   }
@@ -2269,17 +2276,17 @@ class CrMenu
 {
 public:
   CrMenu( const QString& subMenu, const int menu, const int id, const int group, const int idx ) 
-    : myCase( 0 ), mySubMenuName( subMenu ), myMenuId( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 0 ), myMenuId( menu ), mySubMenuName( subMenu ), myGroup( group ), myId( id ), myIndex( idx ) {}
   CrMenu( const QString& subMenu, const QString& menu, const int id, const int group, const int idx ) 
-    : myCase( 1 ), mySubMenuName( subMenu ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 1 ), myMenuName( menu ), mySubMenuName( subMenu ), myGroup( group ), myId( id ), myIndex( idx ) {}
   CrMenu( const int id, const int menu, const int group, const int idx ) 
-    : myCase( 2 ), myId( id ), myMenuId( menu ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 2 ), myMenuId( menu ), myGroup( group ), myId( id ), myIndex( idx ) {}
   CrMenu( const int id, const QString& menu, const int group, const int idx ) 
-    : myCase( 3 ), myId( id ), myMenuName( menu ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 3 ), myMenuName( menu ), myGroup( group ), myId( id ), myIndex( idx ) {}
   CrMenu( QAction* action, const int menu, const int id, const int group, const int idx ) 
-    : myCase( 4 ), myAction( action ), myMenuId( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 4 ), myMenuId( menu ), myGroup( group ), myAction( action ), myId( id ), myIndex( idx ) {}
   CrMenu( QAction* action, const QString& menu, const int id, const int group, const int idx ) 
-    : myCase( 5 ), myAction( action ), myMenuName( menu ), myId( id ), myGroup( group ), myIndex( idx ) {}
+    : myCase( 5 ), myMenuName( menu ), myGroup( group ), myAction( action ), myId( id ), myIndex( idx ) {}
 
   int execute() const
   {
@@ -2289,31 +2296,39 @@ public:
         return getActiveModule()->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( mySubMenuName, myMenuId, myId, myGroup, myIndex );
+      break;
     case 1:
       if ( getActiveModule() )
         return getActiveModule()->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( mySubMenuName, myMenuName, myId, myGroup, myIndex );
+      break;
     case 2:
       if ( getActiveModule() )
         return getActiveModule()->createMenu( myId, myMenuId, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( myId, myMenuId, myGroup, myIndex );
+      break;
     case 3:
       if ( getActiveModule() )
         return getActiveModule()->createMenu( myId, myMenuName, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( myId, myMenuName, myGroup, myIndex );
+      break;
     case 4:
       if ( getActiveModule() )
         return getActiveModule()->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( myAction, myMenuId, myId, myGroup, myIndex );
+      break;
     case 5:
       if ( getActiveModule() )
         return getActiveModule()->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
       else if ( getApplication() )
         return getApplication()->createMenu( myAction, myMenuName, myId, myGroup, myIndex );
+      break;
+    default:
+      break;
     }
     return -1;
   }
@@ -3977,10 +3992,10 @@ public:
 		      const QString& icon,
 		      const QString& tooltip,
 		      const QString& parent )
-    : myName( name ),
+    : myParent( parent ),
+      myName( name ),
       myIcon( icon ),
-      myToolTip( tooltip ),
-      myParent( parent ) {}
+      myToolTip( tooltip ) {}
   virtual void Execute()
   {
     SALOME_PYQT_ModuleLight* module = dynamic_cast<SALOME_PYQT_ModuleLight*>( getActiveModule() );

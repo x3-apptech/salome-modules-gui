@@ -50,7 +50,7 @@ void LightApp_GVSelector::getSelection( SUIT_DataOwnerPtrList& theList ) const
       theList.append( new LightApp_DataOwner( aViewport->selectedObject()->getName() ) );
 }
 
-void LightApp_GVSelector::setSelection( const SUIT_DataOwnerPtrList& theList )
+void LightApp_GVSelector::setSelection( const SUIT_DataOwnerPtrList& /*theList*/ )
 {
 }
 

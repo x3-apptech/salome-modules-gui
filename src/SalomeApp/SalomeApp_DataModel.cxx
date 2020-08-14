@@ -236,7 +236,7 @@ suitPtr SalomeApp_DataModelSync::parent( const suitPtr& p ) const
   Updates SUIT object
   \param p - SUIT object
 */
-void SalomeApp_DataModelSync::updateItem( const kerPtr& obj, const suitPtr& ) const
+void SalomeApp_DataModelSync::updateItem( const kerPtr&, const suitPtr& ) const
 {
 }
 

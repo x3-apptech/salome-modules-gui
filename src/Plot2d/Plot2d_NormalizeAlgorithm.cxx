@@ -108,7 +108,7 @@ void  Plot2d_NormalizeAlgorithm::execute() {
 
     double pMin, pMax, kKoef, bKoef, yMin, yMax;
     switch( getNormalizationMode() ) {
-      case NormalizeToMin:
+    case NormalizeToMin:
       pMin = _pMin;
       for (int i = 0; i < yMaxLst.size(); ++i) {
         yMin = yMinLst.at(i);
@@ -143,6 +143,8 @@ void  Plot2d_NormalizeAlgorithm::execute() {
         aBkoefs<<bKoef;
         aKkoefs<<kKoef;
       }
+      break;
+    default:
       break;
     }
 

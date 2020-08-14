@@ -189,7 +189,6 @@ void OCCViewer_EnvTextureDlg::onTextureChanged()
   }
   else {
     myEnvTextureName->setText("");
-    Graphic3d_NameOfTextureEnv aStandardTexture;
     QList<Graphic3d_NameOfTextureEnv> aTextures;
     aTextures << Graphic3d_NOT_ENV_CLOUDS << Graphic3d_NOT_ENV_CV   << Graphic3d_NOT_ENV_MEDIT
     		  << Graphic3d_NOT_ENV_PEARL  << Graphic3d_NOT_ENV_SKY1 << Graphic3d_NOT_ENV_SKY2

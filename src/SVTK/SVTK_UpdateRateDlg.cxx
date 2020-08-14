@@ -168,10 +168,10 @@ SVTK_UpdateRateDlg
   ViewerTools_DialogBase(theAction,
                          theParent, 
                          theName),
-  myPriority(0.0),
-  myEventCallbackCommand(vtkCallbackCommand::New()),
   myRWInteractor(theParent->GetInteractor()),
-  myAction(theAction)
+  myAction(theAction),
+  myPriority(0.0),
+  myEventCallbackCommand(vtkCallbackCommand::New())
 {
   vtkRenderWindowInteractor* aRWI = myRWInteractor->GetDevice();
   bool anIsEnabledUpdateRate = false;

@@ -706,7 +706,7 @@ void QtxColorScale::hide()
   \brief Paint widget
   \param e paint event
 */
-void QtxColorScale::paintEvent( QPaintEvent* e )
+void QtxColorScale::paintEvent( QPaintEvent* /*e*/ )
 {
   QPainter p( this );
   drawFrame( &p );
@@ -784,7 +784,7 @@ void QtxColorScale::drawScale( QPainter* p, const QColor& bg, const bool transp,
   
   QString aTitle = title();
   
-  int titleWidth = 0;
+  //int titleWidth = 0; // unused
   int titleHeight = 0;
   
   if ( qGray( bg.rgb() ) < 128 )
@@ -800,7 +800,7 @@ void QtxColorScale::drawScale( QPainter* p, const QColor& bg, const bool transp,
     {
       srt->setTextWidth( W - 10 );
       titleHeight = (int)srt->size().height() + spacer;
-      titleWidth = (int)srt->size().width();
+      //titleWidth = (int)srt->size().width(); // unused
       p->save();
       p->translate( X + 5, Y );
       srt->drawContents( p );

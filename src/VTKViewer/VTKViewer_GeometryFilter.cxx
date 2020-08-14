@@ -92,7 +92,7 @@
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
-vtkStandardNewMacro(VTKViewer_GeometryFilter);
+vtkStandardNewMacro(VTKViewer_GeometryFilter)
 
 VTKViewer_GeometryFilter
 ::VTKViewer_GeometryFilter():
@@ -180,7 +180,7 @@ int
 VTKViewer_GeometryFilter
 ::UnstructuredGridExecute(vtkDataSet *dataSetInput,
                           vtkPolyData *output,
-                          vtkInformation *outInfo)
+                          vtkInformation */*outInfo*/)
 {
   vtkUnstructuredGrid *input= (vtkUnstructuredGrid *)dataSetInput;
   vtkCellArray *Connectivity = input->GetCells();
@@ -1229,7 +1229,7 @@ void
 VTKViewer_GeometryFilter
 ::InsertId( const vtkIdType theCellId,
             const vtkIdType theCellType,
-            TVectorId& theVTK2ObjIds,
+            TVectorId& /*theVTK2ObjIds*/,
             TMapOfVectorId& theDimension2VTK2ObjIds )
 {
   //theVTK2ObjIds.push_back( theCellId );

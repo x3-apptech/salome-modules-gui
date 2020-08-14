@@ -72,7 +72,7 @@ void TEST_DataModel() {
 //
 // =================================================================
 //
-int main(int argc, char * argv[ ])
+int main()
 {
   TEST_DataObject();
   //TEST_DataModel();

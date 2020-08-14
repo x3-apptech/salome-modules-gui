@@ -38,7 +38,7 @@ class SVTK_Hasher {
 public:
     static Standard_Integer HashCode(const std::vector<Standard_Integer> ids,
 				     const Standard_Integer upper) {
-        Standard_Integer seed = ids.size();
+        Standard_Integer seed = (Standard_Integer)ids.size(); //!< TODO: conversion from size_t to int
         for( Standard_Integer i = 0; i <  (Standard_Integer) ids.size(); i++ ) {
             Standard_Integer v = ids[i];
             seed ^= v + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );

@@ -71,8 +71,8 @@
 //============================================================================
 NoteBook_TableRow::NoteBook_TableRow(int index, NoteBook_Table* parentTable, QWidget* parent):
   QWidget(parent),
-  myParentTable(parentTable),
   myIndex(index),
+  myParentTable(parentTable),
   myRowHeader(new QTableWidgetItem()),
   myVariableName(new QTableWidgetItem()),
   myVariableValue(new QTableWidgetItem())
@@ -274,7 +274,7 @@ bool NoteBook_TableRow::IsIntegerValue(const QString theValue, int* theResult)
  *             The whole notebook is verified on apply
  */
 //============================================================================
-bool NoteBook_TableRow::IsValidStringValue(const QString theValue)
+bool NoteBook_TableRow::IsValidStringValue(const QString /*theValue*/)
 {
   int aNumRows = myParentTable->myRows.count();
   if( aNumRows == 0 )
@@ -404,7 +404,7 @@ void NoteBook_Table::Init()
 
   //Add all variables into the table
   std::vector<std::string> aVariables = SalomeApp_Application::getStudy()->GetVariableNames();
-  for(int iVar = 0; iVar < aVariables.size(); iVar++ ) {
+  for(int iVar = 0; iVar < (int)aVariables.size(); iVar++ ) {
     AddRow(QString(aVariables[iVar].c_str()),
            Variable2String(aVariables[iVar]));
   }
@@ -816,7 +816,7 @@ void SalomeApp_NoteBook::Init(){
  *  Purpose  : [slot]
  */
 //============================================================================
-void SalomeApp_NoteBook::onVarUpdate(QString theVarName)
+void SalomeApp_NoteBook::onVarUpdate(QString /*theVarName*/)
 {
   myTable->Init();
 }

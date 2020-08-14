@@ -119,6 +119,8 @@ OCCViewer_ViewWindow::Mode2dType OCCViewer_Utilities::setViewer2DMode
       case OCCViewer_ViewWindow::YZPlane:
         aView3d->SetProj (V3d_Xpos);
         break;
+      default:
+        break;
     }
   }
 

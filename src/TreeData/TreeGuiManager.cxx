@@ -143,7 +143,7 @@ DataModel * TreeGuiManager::getDataModel() {
  */
 
 void TreeGuiManager::processItemList(QStringList itemNameIdList,
-				     int actionId)
+				     int /*actionId*/)
 {
   // WARN: THIS IS A DEFAULT IMPLEMENTATION GIVEN FOR DEMONSTRATION
   // OF WHAT TO DO WITH THE PARAMETERS

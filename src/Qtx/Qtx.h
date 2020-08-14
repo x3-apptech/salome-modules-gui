@@ -121,6 +121,7 @@ public:
 
   //! Header view flags
   typedef enum {
+    ShowNone = 0x000,                //!< Show nothing
     ShowText = 0x001,                //!< Show only text in the header
     ShowIcon = 0x010,                //!< Show only icon in the header
     ShowAll  = ShowText | ShowIcon   //!< Show icon and text in the header

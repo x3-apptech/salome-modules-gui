@@ -76,7 +76,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
  public:
   static VTKViewer_Actor* New();
   
-  vtkTypeMacro(VTKViewer_Actor,vtkLODActor);
+  vtkTypeMacro(VTKViewer_Actor,vtkLODActor)
 
   //----------------------------------------------------------------------------
   //! Get its name
@@ -319,7 +319,7 @@ class VTKVIEWER_EXPORT VTKViewer_Actor : public vtkLODActor
   //! Is notified on enabling/disabling selection
   virtual
   void
-  EnableSelection( bool enable ) {}
+  EnableSelection( bool /*enable*/ ) {}
 
   //! Ask, if the descendant of the VTKViewer_Actor will implement its own highlight or not
   virtual

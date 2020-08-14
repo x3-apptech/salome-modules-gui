@@ -226,7 +226,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
     std::vector<int>  aMins, aHours, aDays, aMonths, aYears;
     propAttr->GetModificationsList(aUsers, aMins, aHours, aDays, aMonths, aYears, false);
     int aCnt = aUsers.size();
-    for ( int i = 0; i < aCnt; i++ ) {
+    for ( int i = 0; i < (int)aCnt; i++ ) {
       QString date;
       date.sprintf("%2.2d/%2.2d/%2d %2.2d:%2.2d",
                   aDays  [i],
@@ -243,7 +243,7 @@ void SalomeApp_StudyPropertiesDlg::initData()
   
     //Component versions
     std::vector<std::string> aComponents = propAttr->GetStoredComponents();
-    for ( int i = 0; i < aComponents.size(); i++ ) {
+    for ( int i = 0; i < (int)aComponents.size(); i++ ) {
       std::vector<int>  aMins, aHours, aDays, aMonths, aYears;
       std::vector<std::string> aVersions = propAttr->GetComponentVersions(aComponents[i]);
       QStringList aData;

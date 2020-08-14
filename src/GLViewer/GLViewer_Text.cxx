@@ -70,7 +70,7 @@ int GLViewer_Text::getWidth()
 {
     int aResult = 0;
     QFontMetrics aFM( myQFont );
-    for( uint i = 0; i < myText.length(); i++ )
+    for( int i = 0; i < myText.length(); i++ )
         aResult += aFM.width( myText.at(i) ) + mySeparator;
     return aResult;
 }

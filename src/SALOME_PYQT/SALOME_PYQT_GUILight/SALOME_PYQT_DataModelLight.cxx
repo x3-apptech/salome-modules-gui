@@ -108,7 +108,7 @@ bool SALOME_PYQT_DataModelLight::save( QStringList& theListOfFiles)
 // function : saveAs()
 // purpose  : SaveAs data model operation
 //=================================================================================
-bool SALOME_PYQT_DataModelLight::saveAs ( const QString& theURL, CAM_Study* theStudy, QStringList& theListOfFiles)
+bool SALOME_PYQT_DataModelLight::saveAs ( const QString& theURL, CAM_Study* /*theStudy*/, QStringList& theListOfFiles)
 {
   myStudyURL = theURL;
   return save(theListOfFiles);
@@ -116,7 +116,7 @@ bool SALOME_PYQT_DataModelLight::saveAs ( const QString& theURL, CAM_Study* theS
 
 
 
-bool SALOME_PYQT_DataModelLight::create( CAM_Study* study )
+bool SALOME_PYQT_DataModelLight::create( CAM_Study* /*study*/ )
 {
   return true;
 }
@@ -183,7 +183,7 @@ bool SALOME_PYQT_DataModelLight::close()
 }
 
 
-void SALOME_PYQT_DataModelLight::update ( LightApp_DataObject* theObj, LightApp_Study* theStudy )
+void SALOME_PYQT_DataModelLight::update ( LightApp_DataObject* /*theObj*/, LightApp_Study* /*theStudy*/ )
 {
   // Nothing to do here: we always keep the data tree in the up-to-date state
   // The only goal of this method is to hide default behavior from LightApp_DataModel

@@ -285,7 +285,7 @@ void GraphicsView_ViewPort::addItem( QGraphicsItem* theItem )
 //================================================================
 bool GraphicsView_ViewPort::isItemAdded( QGraphicsItem* theItem )
 {
-  if( GraphicsView_Object* anObject = dynamic_cast<GraphicsView_Object*>( theItem ) )
+  if( dynamic_cast<GraphicsView_Object*>( theItem ) )
   {
     for( GraphicsView_ObjectList::iterator anIter = myObjects.begin(); anIter != myObjects.end(); anIter++ )
       if( theItem == *anIter )
@@ -1104,7 +1104,6 @@ void GraphicsView_ViewPort::highlight( double theX, double theY )
   bool anIsHighlighted = false;
   bool anIsOnObject = false;
 
-  GraphicsView_Object* aPreviousHighlightedObject = myHighlightedObject;
   GraphicsView_Object* aHighlightedObject = 0;
 
   QCursor aCursor;
@@ -1255,7 +1254,6 @@ int GraphicsView_ViewPort::select( const QRectF& theRect, bool theIsAppend )
   {
     aStatus = GVSS_NoChanged;
 
-    bool updateAll = false;
     if( !theIsAppend )
     {
       if( !mySelectedObjects.isEmpty() )
@@ -1605,8 +1603,8 @@ void GraphicsView_ViewPort::dragObjects( QGraphicsSceneMouseEvent* e )
     else
       anObjectsToMove.append( anObject );
   }
-  else if( ( hasInteractionFlag( DraggingByMiddleButton ) && ( e->buttons() & Qt::MidButton ) ||
-             isDraggingSelectedByLeftButton() && ( e->buttons() & Qt::LeftButton ) ) &&
+  else if( ( ( hasInteractionFlag( DraggingByMiddleButton ) && ( e->buttons() & Qt::MidButton ) ) ||
+             ( isDraggingSelectedByLeftButton() && ( e->buttons() & Qt::LeftButton ) ) ) &&
            nbSelected() )
   {
     for( initSelected(); moreSelected(); nextSelected() )
@@ -1802,8 +1800,8 @@ void GraphicsView_ViewPort::onMouseEvent( QGraphicsSceneMouseEvent* e )
         if( ( getHighlightedObject() &&
               getHighlightedObject()->isMovable() &&
               !( anAccel || e->button() != Qt::LeftButton ) ) ||
-            ( ( hasInteractionFlag( DraggingByMiddleButton ) && e->button() == Qt::MidButton ||
-                isDraggingSelectedByLeftButton() && e->button() == Qt::LeftButton ) &&
+            ( ( ( hasInteractionFlag( DraggingByMiddleButton ) && e->button() == Qt::MidButton ) ||
+                ( isDraggingSelectedByLeftButton() && e->button() == Qt::LeftButton ) ) &&
               nbSelected() && !anAccel ) )
         {
           myIsDragging = true;

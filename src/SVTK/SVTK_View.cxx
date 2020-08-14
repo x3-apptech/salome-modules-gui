@@ -201,7 +201,7 @@ void
 SVTK_View
 ::highlight( const Handle(SALOME_InteractiveObject)& theIO, 
              bool theIsHighlight, 
-             bool theIsUpdate ) 
+             bool /*theIsUpdate*/ ) 
 {
   using namespace SVTK;
   VTK::ActorCollectionCopy aCopy(getRenderer()->GetActors());
