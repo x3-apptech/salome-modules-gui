@@ -1551,6 +1551,9 @@ void SVTK_InteractorStyle::OnTimer()
   // check if bounding box was changed
   if ( GetCurrentRenderer() )
   {
+#ifdef VGL_WORKAROUND
+    GetCurrentRenderer()->Render();
+#endif
     double aCurrBBCenter[3];
     if ( ComputeBBCenter(GetCurrentRenderer(),aCurrBBCenter) )
     {

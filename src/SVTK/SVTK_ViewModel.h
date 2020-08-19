@@ -220,6 +220,8 @@ protected slots:
   void onActorAdded(VTKViewer_Actor*);
   void onActorRemoved(VTKViewer_Actor*);
 
+  void onViewCreated( SUIT_ViewWindow* );
+
 private:
   void updateToolBars();
 

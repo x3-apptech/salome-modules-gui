@@ -34,6 +34,7 @@
 
 #include <QMenu>
 #include <QToolBar>
+#include <QTimer>
 #include <QEvent>
 #include <QFileInfo>
 #include <QSignalMapper>
@@ -789,8 +790,16 @@ void SVTK_ViewWindow::Repaint(bool theUpdateTrihedron)
   GetInteractor()->update();
 
   SVTK_InteractorStyle* aStyle = (SVTK_InteractorStyle*)getInteractor()->GetInteractorStyle();
-  if ( aStyle )
+  if ( aStyle ) {
+#ifdef VGL_WORKAROUND
+    if ( aStyle->GetCurrentRenderer() == nullptr ) {
+      if( GetRenderer() ) {
+        aStyle->SetCurrentRenderer(GetRenderer()->GetDevice());
+      }
+    }  
+#endif
     aStyle->OnTimer();
+  }
 }
 
 /*!
@@ -2827,4 +2836,11 @@ void SVTK_ViewWindow::synchronize( SUIT_ViewWindow* theView )
   Repaint( false );
 
   blockSignals( blocked );
+}
+
+void SVTK_ViewWindow::resizeEvent( QResizeEvent* theEvent )
+{
+#ifdef VGL_WORKAROUND
+  Repaint();
+#endif
 }

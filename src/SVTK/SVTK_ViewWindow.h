@@ -416,6 +416,9 @@ public:
   enum AnaglyphFilter { RedCyan, YellowBlue, GreenMagenta };
 
 protected:
+  
+  virtual void resizeEvent( QResizeEvent* );
+  
   virtual void Initialize(SVTK_View* theView,
                           SVTK_ViewModelBase* theModel);
 

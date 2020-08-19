@@ -23,6 +23,7 @@
 #include <QMenu>
 #include <QColorDialog>
 #include <QToolBar>
+#include <QTimer>
 
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
@@ -186,7 +187,7 @@ SUIT_ViewWindow* SVTK_Viewer::createView( SUIT_Desktop* theDesktop )
           this,  SLOT(onActorAdded(VTKViewer_Actor*)));
   connect(aViewWindow, SIGNAL( actorRemoved(VTKViewer_Actor*) ), 
           this,  SLOT(onActorRemoved(VTKViewer_Actor*)));
-
+  
   return aViewWindow;
 }
 
@@ -528,6 +529,9 @@ void SVTK_Viewer::setViewManager(SUIT_ViewManager* theViewManager)
   
   connect(theViewManager, SIGNAL(mouseRelease(SUIT_ViewWindow*, QMouseEvent*)), 
           this, SLOT(onMouseRelease(SUIT_ViewWindow*, QMouseEvent*)));
+
+  connect(theViewManager, SIGNAL(viewCreated(SUIT_ViewWindow*)), 
+	  this, SLOT(onViewCreated(SUIT_ViewWindow*)));
 }
 
 /*!
@@ -864,4 +868,11 @@ void SVTK_Viewer::onActorAdded(VTKViewer_Actor* theActor)
 void SVTK_Viewer::onActorRemoved(VTKViewer_Actor* theActor)
 {
   emit actorRemoved((SVTK_ViewWindow*)sender(), theActor);
+}
+
+void SVTK_Viewer::onViewCreated( SUIT_ViewWindow* view) {
+#ifdef VGL_WORKAROUND
+  if ( SVTK_ViewWindow* svw = dynamic_cast<SVTK_ViewWindow*>( view ) )
+    QTimer::singleShot(500, [svw] () { svw->Repaint(); } );
+#endif
 }

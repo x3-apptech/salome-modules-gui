@@ -25,6 +25,8 @@
 
 #include "VTKViewer.h"
 
+#define VGL_WORKAROUND
+
 #ifdef WIN32
 #  if defined SVTK_EXPORTS
 #    define SVTK_EXPORT __declspec(dllexport)
