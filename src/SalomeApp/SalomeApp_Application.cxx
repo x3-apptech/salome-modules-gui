@@ -813,6 +813,8 @@ void SalomeApp_Application::onOpenWith()
   Handle(SALOME_InteractiveObject) aIObj = aList.First();
   QString aModuleName(aIObj->getComponentDataType());
   QString aModuleTitle = moduleTitle(aModuleName);
+  if (aModuleTitle.isEmpty()) // no gui
+    aModuleTitle = moduleDisplayer(aModuleName);
   activateModule(aModuleTitle);
   QApplication::restoreOverrideCursor();
 }
@@ -1488,9 +1490,14 @@ void SalomeApp_Application::contextMenuPopup( const QString& type, QMenu* thePop
     if ( !entry.startsWith( tr( "SAVE_POINT_DEF_NAME" ) ) ) {
       QString aModuleName( aIObj->getComponentDataType() );
       QString aModuleTitle = moduleTitle( aModuleName );
+      if (aModuleTitle.isEmpty()) {
+        // use displayer module, if given
+        aModuleTitle = moduleDisplayer( aModuleName );
+      }
       CAM_Module* currentModule = activeModule();
-      if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() )
+      if ( ( !currentModule || currentModule->moduleName() != aModuleTitle ) && !aModuleTitle.isEmpty() ) {
         thePopup->addAction( tr( "MEN_OPENWITH" ).arg( aModuleTitle ), this, SLOT( onOpenWith() ) );
+      }
     }
   }
 
