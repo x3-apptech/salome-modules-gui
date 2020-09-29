@@ -179,6 +179,9 @@ enum Axis {
 class SalomePyQt
 {
 public:
+  static QString           getAppName();
+  static bool              isLightApp();
+
   static QWidget*          getDesktop();
   static QWidget*          getMainFrame();
   static QMenuBar*         getMainMenuBar();

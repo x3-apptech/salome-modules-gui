@@ -437,6 +437,29 @@ void SgPyQtUserDefinedContent::retrieve( QtxResourceMgr*, QtxPreferenceMgr* )
 */
 
 /*!
+  \fn QString SalomePyQt::getAppName();
+  \brief Get application name
+  \return application name
+*/
+
+QString SalomePyQt::getAppName()
+{
+  LightApp_Application* app = getApplication();
+  return app == 0 ? QString() : QString(app->metaObject()->className()).split("_").first();
+}
+
+/*!
+  \fn bool SalomePyQt::isLightApp();
+  \brief Check if SALOME GUI is running in "light" mode.
+  \return \c true if this is a "light" application; \c false otherwise
+*/
+
+bool SalomePyQt::isLightApp()
+{
+  return SalomePyQt::getAppName() != "SalomeApp";
+}
+
+/*!
   \fn QWidget* SalomePyQt::getDesktop();
   \brief Get the active application's desktop window.
   \return desktop window or 0 if there is no any

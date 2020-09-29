@@ -277,6 +277,9 @@ class SalomePyQt
 %End
 
 public:
+  static QString           getAppName() /ReleaseGIL/ ;
+  static bool              isLightApp() /ReleaseGIL/ ;
+
 /* KeepReference is necessary on method getDesktop with SIP >= 4.15.5 to avoid garbage collection of
    the Python objects added to the desktop. This causes a small memory leak (the wrapper around desktop
    object is never garbage collected) but since this object contains only references this is not
