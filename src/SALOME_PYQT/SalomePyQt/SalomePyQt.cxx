@@ -943,6 +943,28 @@ bool SalomePyQt::activateModule( const QString& modName )
 }
 
 /*!
+  \fn void SalomePyQt::registerModule( const QString& modName);
+  \brief Registers module in the study tree
+*/
+
+void SalomePyQt::registerModule( const QString& modName)
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myName;
+  public:
+    TEvent(const QString& name): myName(name) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+	anApp->desktop()->emitMessage(QString("register_module_in_study/%1").arg(myName));
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent(modName) );
+}
+
+/*!
   \brief Update an Object Browser of the study.
 */
 void SalomePyQt::updateObjBrowser()

@@ -196,6 +196,7 @@ public:
   static const QString     getActiveComponent();
   static PyObject*         getActivePythonModule();
   static bool              activateModule( const QString& );
+  static void              registerModule( const QString& );
   static void              updateObjBrowser();
 
   static void              putInfo( const QString&, const int = 0 );

@@ -307,6 +307,7 @@ public:
   static const QString     getActiveComponent() /ReleaseGIL/ ;
   static SIP_PYOBJECT      getActivePythonModule() /ReleaseGIL/ ;
   static bool              activateModule( const QString& ) /ReleaseGIL/ ;
+  static void              registerModule( const QString& ) /ReleaseGIL/ ;
   static void              updateObjBrowser() /ReleaseGIL/ ;
 
   static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
