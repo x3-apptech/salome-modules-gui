@@ -51,19 +51,21 @@ class PVSERVER_impl(object):
         # deduce dynamically PARAVIEW_ROOT_DIR from the paraview module location
         self.PARAVIEW_ROOT_DIR = None
         if sys.platform == "win32":
-          ZE_KEY_TO_FIND_PV_ROOT_DIR="Lib"
+          ZE_KEY_TO_FIND_PV_ROOT_DIR=["Lib"]
           upCount =2
         else:
-          ZE_KEY_TO_FIND_PV_ROOT_DIR="lib"
+          ZE_KEY_TO_FIND_PV_ROOT_DIR=["lib", "lib64"]
           upCount =1
         tmp = os.path.sep.join(tmp.split('/'))
         li=tmp.split(os.path.sep) ; li.reverse()
-        if ZE_KEY_TO_FIND_PV_ROOT_DIR not in li:
-            raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
-                      "PVSERVER_Impl.__init__ : error during dynamic deduction of PARAVIEW_ROOT_DIR : Loc of paraview module is \"%s\" ! \"%s\" is supposed to be the key to deduce it !"%(tmp,ZE_KEY_TO_FIND_PV_ROOT_DIR),
-                      "PVSERVER.py", 0))
-        li=li[li.index(ZE_KEY_TO_FIND_PV_ROOT_DIR)+upCount:] ; li.reverse()
-        self.PARAVIEW_ROOT_DIR = os.path.sep.join(li)
+        for key_to_find in ZE_KEY_TO_FIND_PV_ROOT_DIR:
+            if key_to_find in li:
+                li=li[li.index(key_to_find)+upCount:] ; li.reverse()
+                self.PARAVIEW_ROOT_DIR = os.path.sep.join(li)
+                return                
+        raise SALOME_Exception(ExceptionStruct(INTERNAL_ERROR,
+                                               "PVSERVER_Impl.__init__ : error during dynamic deduction of PARAVIEW_ROOT_DIR : Loc of paraview module is \"%s\" ! \"%s\" is supposed to be the key to deduce it !"%(tmp," or ".join(ZE_KEY_TO_FIND_PV_ROOT_DIR)),
+                                               "PVSERVER.py", 0))
 
     """
     Private. Identify a free port to launch the PVServer. 
