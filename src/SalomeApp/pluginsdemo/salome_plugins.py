@@ -261,23 +261,34 @@ if DEMO_IS_ACTIVATED:
 def runSalomeShellSession(context):
     import os,subprocess
     import salome_version
-    version = salome_version.getVersion(full=True)
-    kernel_appli_dir = os.environ['KERNEL_ROOT_DIR']
-    command = ""
-    if os.path.exists("/usr/bin/gnome-terminal"):
-      command = 'gnome-terminal -t "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
-    elif os.path.exists("/usr/bin/konsole"):
-      command = 'PATH="/usr/bin:/sbin:/bin" LD_LIBRARY_PATH="" konsole -e "%s/salome shell" &'%(kernel_appli_dir)
-    elif os.path.exists("/usr/bin/xterm"):
-      command = 'xterm -T "SALOME %s - Shell session" -e "%s/salome shell" &'%(version,kernel_appli_dir)
-    else:
-      print("Neither xterm nor gnome-terminal nor konsole is installed.")
+    import platform
+    from PyQt5.Qt import QMessageBox
+    from SalomePyQt import SalomePyQt
 
-    if command is not "":
+    version = salome_version.getVersion(full=True)
+    runner = 'run_salome.exe' if platform.system() == 'Windows' else 'salome'
+
+    command = ''
+    for env_var in ('PRODUCT_ROOT_DIR', 'SALOME_ROOT_DIR', 'KERNEL_ROOT_DIR'):
+      script_dir = os.getenv(env_var)
+      if script_dir and os.path.isfile(os.path.join(script_dir, runner)):
+        command = os.path.join(script_dir, runner)
+        break
+
+    if command:
+      if platform.system() == 'Windows':
+        command = 'call "%s" shell' % command
+      else:
+        if os.path.exists("/usr/bin/xterm"):
+          command = 'xterm -T "SALOME %s - Shell session" -e "%s" shell &' % (version, command)
+        else:
+          QMessageBox.critical(SalomePyQt.getDesktop(), "Error", "xterm does not seem to be installed")
+          return
+
       try:
         subprocess.check_call(command, shell = True)
       except Exception as e:
-        print("Error: ",e)
+        print("Error: ", e)
 
 salome_pluginsmanager.AddFunction('SALOME shell session',
                                   'Execute a SALOME shell session in an external xterm',
