@@ -1359,13 +1359,13 @@ QImage SVTK_ViewWindow::dumpViewContent()
 
     // draw scene
     aWindow->Render();
-
-    aFrameBuffer.unbind();
+   
+    //aFrameBuffer.unbind();
     glPopAttrib();
 
     QImage anImage( aWidth, aHeight, QImage::Format_RGB32 );
+    //aFrameBuffer.bind();
 
-    aFrameBuffer.bind();
     glReadPixels( 0, 0, aWidth, aHeight, GL_RGBA, GL_UNSIGNED_BYTE, anImage.bits() );
     aFrameBuffer.unbind();
 
