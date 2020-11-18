@@ -376,13 +376,7 @@ QtxDockWidget::~QtxDockWidget()
 */
 QSize QtxDockWidget::sizeHint() const
 {
-  QSize sz = QDockWidget::sizeHint();
-
-  // printf( "----------------> QtxDockWidget::sizeHint()\n" );
-
   return QSize( 500, 100 );
-
-  return sz;
 }
 
 /*!
@@ -391,9 +385,7 @@ QSize QtxDockWidget::sizeHint() const
 */
 QSize QtxDockWidget::minimumSizeHint() const
 {
-  QSize sz = QDockWidget::minimumSizeHint();
-
-  return sz;
+  return QDockWidget::minimumSizeHint();
 }
 
 /*!
@@ -415,6 +407,9 @@ void QtxDockWidget::setVisible( bool on )
     else
       myWatcher->hidden( this );
   }
+
+  if ( on )
+    emit( aboutToShow() );
 }
 
 /*!

@@ -56,6 +56,7 @@
 #include "QtxActionMenuMgr.h"
 #include "QtxWorkstack.h"
 #include "QtxTreeView.h"
+#include "QtxInfoPanel.h"
 #include "SALOME_Event.h"
 #include "STD_TabDesktop.h"
 #include "SUIT_DataBrowser.h"
@@ -2901,6 +2902,256 @@ void SalomePyQt::message( const QString& msg, bool addSeparator )
     }
   };
   ProcessVoidEvent( new TEvent( msg, addSeparator ) );
+}
+
+/*!
+  \brief Set the title to the Help panel.
+  \param title Title text (empty string removes title)
+*/
+void SalomePyQt::infoSetTitle( const QString& title )
+{
+  class TEvent: public SALOME_Event
+  {
+    QString myTitle;
+  public:
+    TEvent( const QString& title ) 
+      : myTitle( title ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        QtxInfoPanel* ip = anApp->infoPanel();
+        if ( ip )
+          ip->setTitle( myTitle );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( title ) );
+}
+
+/*!
+  \fn int SalomePyQt::infoAddLabel( const QString& text, const int groupId )
+  \brief Insert left-aligned text label into the Help panel
+  \param text Label text
+  \param groupId Parent group's identifier (defaults to -1 for top-level group)
+  \return Label's identifier
+*/
+
+class TInfoAddLabel2paramEvent: public SALOME_Event
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString myText;
+  int     myGroupId;
+  TInfoAddLabel2paramEvent( const QString& text, const int groupId )
+    : myText( text ), myGroupId( groupId ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      QtxInfoPanel* ip = anApp->infoPanel();
+      if ( ip )
+        myResult = ip->addLabel( myText, myGroupId );
+    }
+  }
+};
+int SalomePyQt::infoAddLabel( const QString& text, const int groupId )
+{
+  return ProcessEvent( new TInfoAddLabel2paramEvent( text, groupId ) );
+}
+
+/*!
+  \fn int SalomePyQt::infoAddLabel( const QString& text, Qt::Alignment alignment, const int groupId )
+  \brief Insert text label into the Help panel
+  \param text Label text
+  \param alignment Alignment flag for text label
+  \param groupId Parent group's identifier (defaults to -1 for top-level group)
+  \return Label's identifier
+*/
+
+class TInfoAddLabel3paramEvent: public SALOME_Event
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString myText;
+  Qt::Alignment myAlignment;
+  int     myGroupId;
+  TInfoAddLabel3paramEvent( const QString& text, Qt::Alignment alignment, const int groupId )
+    : myText( text ), myAlignment( alignment ), myGroupId( groupId ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      QtxInfoPanel* ip = anApp->infoPanel();
+      if ( ip )
+        myResult = ip->addLabel( myText, myAlignment, myGroupId );
+    }
+  }
+};
+int SalomePyQt::infoAddLabel( const QString& text, Qt::Alignment alignment, const int groupId )
+{
+  return ProcessEvent( new TInfoAddLabel3paramEvent( text, alignment, groupId ) );
+}
+
+/*!
+  \fn int SalomePyQt::infoAddAction( QAction* action, const int groupId )
+  \brief Insert action button into the Help panel
+  \param action Action being added
+  \param groupId Parent group's identifier (defaults to -1 for top-level group)
+  \return Action's identifier
+*/
+
+class TInfoAddActionEvent: public SALOME_Event
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QAction* myAction;
+  int     myGroupId;
+  TInfoAddActionEvent( QAction* action, const int groupId )
+    : myAction( action ), myGroupId( groupId ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      QtxInfoPanel* ip = anApp->infoPanel();
+      if ( ip )
+        myResult = ip->addAction( myAction, myGroupId );
+    }
+  }
+};
+int SalomePyQt::infoAddAction( QAction* action, const int groupId )
+{
+  return ProcessEvent( new TInfoAddActionEvent( action, groupId ) );
+}
+
+/*!
+  \fn int SalomePyQt::infoAddGroup( const QString& text, const int groupId )
+  \brief Create a (sub-)group in the Help panel
+  \param text Group title
+  \param groupId Parent group's identifier (defaults to -1 for top-level group)
+  \return Group's identifier
+*/
+
+class TInfoAddGroupEvent: public SALOME_Event
+{
+public:
+  typedef int TResult;
+  TResult myResult;
+  QString myText;
+  int     myGroupId;
+  TInfoAddGroupEvent( const QString& text, const int groupId )
+    : myText( text ), myGroupId( groupId ) {}
+  virtual void Execute()
+  {
+    if ( LightApp_Application* anApp = getApplication() ) {
+      QtxInfoPanel* ip = anApp->infoPanel();
+      if ( ip )
+        myResult = ip->addGroup( myText, myGroupId );
+    }
+  }
+};
+int SalomePyQt::infoAddGroup( const QString& text, const int groupId )
+{
+  return ProcessEvent( new TInfoAddGroupEvent( text, groupId ) );
+}
+
+/*!
+  \brief Remove item from the Help panel
+  \param id Item's (label's, action's, group's, ...) identifier
+*/
+void SalomePyQt::infoRemove( const int id )
+{
+  class TEvent: public SALOME_Event
+  {
+    int myId;
+  public:
+    TEvent( const int id ) 
+      : myId( id ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        QtxInfoPanel* ip = anApp->infoPanel();
+        if ( ip )
+          ip->remove( myId );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( id ) );
+}
+
+/*!
+  \brief Clear Help panel's contents
+  \param groupId Group's identifier (default is -1, to clear whole panel)
+*/
+void SalomePyQt::infoClear( const int groupId )
+{
+  class TEvent: public SALOME_Event
+  {
+    int myGroupId;
+  public:
+    TEvent( const int groupId ) 
+      : myGroupId( groupId ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        QtxInfoPanel* ip = anApp->infoPanel();
+        if ( ip )
+          ip->clear( myGroupId );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( groupId ) );
+}
+
+/*!
+  \brief Set item's visibility in the Help panel
+  \param id Item's (label's, action's, group's, ...) identifier
+  \param visible Visibility flag
+*/
+void SalomePyQt::infoSetVisible( const int id, bool visible )
+{
+  class TEvent: public SALOME_Event
+  {
+    int myId;
+    bool myVisible;
+  public:
+    TEvent( const int id, bool visible ) 
+      : myId( id ), myVisible( visible ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        QtxInfoPanel* ip = anApp->infoPanel();
+        if ( ip )
+          ip->setVisible( myId, myVisible );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( id, visible ) );
+}
+
+/*!
+  \brief Enable/disable item in the Help panel
+  \param id Item's (label's, action's, group's, ...) identifier
+  \param enabled Enabled state
+*/
+void SalomePyQt::infoSetEnabled( const int id, bool enabled )
+{
+  class TEvent: public SALOME_Event
+  {
+    int myId;
+    bool myEnabled;
+  public:
+    TEvent( const int id, bool enabled ) 
+      : myId( id ), myEnabled( enabled ) {}
+    virtual void Execute()
+    {
+      if ( LightApp_Application* anApp = getApplication() ) {
+        QtxInfoPanel* ip = anApp->infoPanel();
+        if ( ip )
+          ip->setEnabled( myId, myEnabled );
+      }
+    }
+  };
+  ProcessVoidEvent( new TEvent( id, enabled ) );
 }
 
 /*!

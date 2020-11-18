@@ -272,6 +272,15 @@ LightApp_ModuleAction::~LightApp_ModuleAction()
 }
 
 /*!
+  \brief Get number of registered modules.
+  \return modules count
+*/
+int LightApp_ModuleAction::count() const
+{
+  return modules().count();
+}
+
+/*!
   \brief Get list of modules.
   \return modules names list
 */
@@ -312,6 +321,15 @@ void LightApp_ModuleAction::setModuleIcon( const QString& name, const QIcon& ico
 
   a->setIcon( ico );
   update();
+}
+
+/*!
+  \brief Get module action.
+  \param name module name
+*/
+QAction* LightApp_ModuleAction::moduleAction( const QString& name ) const
+{
+  return mySet->moduleAction( name );
 }
 
 /*!

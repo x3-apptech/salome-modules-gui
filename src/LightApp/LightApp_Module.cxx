@@ -316,6 +316,11 @@ void LightApp_Module::MenuItem()
 }
 
 /*!NOT IMPLEMENTED*/
+void LightApp_Module::updateInfoPanel()
+{
+}
+
+/*!NOT IMPLEMENTED*/
 void LightApp_Module::createPreferences()
 {
 }

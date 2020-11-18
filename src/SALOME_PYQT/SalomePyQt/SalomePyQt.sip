@@ -79,6 +79,7 @@ enum WindowType {
   WT_ObjectBrowser,
   WT_PyConsole,
   WT_LogWindow,
+  WT_InfoPanel,
 %If (ENABLE_CORBA)
   WT_NoteBook,
 %End
@@ -309,6 +310,18 @@ public:
   static bool              activateModule( const QString& ) /ReleaseGIL/ ;
   static void              registerModule( const QString& ) /ReleaseGIL/ ;
   static void              updateObjBrowser() /ReleaseGIL/ ;
+
+  static void              infoSetTitle( const QString& ) /ReleaseGIL/ ;
+  static int               infoAddLabel( const QString&, const int = -1 ) /ReleaseGIL/ ;
+  static int               infoAddLabel( const QString&, Qt::Alignment, const int = -1 ) /ReleaseGIL/ ;
+  static int               infoAddAction( QAction*, const int = -1 ) /ReleaseGIL/ ;
+  static int               infoAddGroup( const QString&, const int = -1 ) /ReleaseGIL/ ;
+
+  static void              infoRemove( const int ) /ReleaseGIL/ ;
+  static void              infoClear( const int = -1 ) /ReleaseGIL/ ;
+
+  static void              infoSetVisible( const int, bool ) /ReleaseGIL/ ;
+  static void              infoSetEnabled( const int, bool ) /ReleaseGIL/ ;
 
   static void              putInfo( const QString&, const int = 0 ) /ReleaseGIL/ ;
   static int               showNotification( const QString&, const QString&, const int = -1 ) /ReleaseGIL/ ;

@@ -33,7 +33,7 @@ SET(_link_LIBRARIES ${QT_LIBRARIES} ${OPENGL_LIBRARIES})
 # --- headers ---
 
 # header files / to be processed by moc
-SET(_moc_HEADERS   
+SET(_moc_HEADERS
   QtxAction.h
   QtxActionGroup.h
   QtxActionMenuMgr.h
@@ -53,6 +53,7 @@ SET(_moc_HEADERS
   QtxFontEdit.h
   QtxGridBox.h
   QtxGroupBox.h
+  QtxInfoPanel.h
   QtxIntSpinBox.h
   QtxIntSpinSlider.h
   QtxListAction.h
@@ -146,6 +147,7 @@ SET(_other_SOURCES
   QtxFontEdit.cxx
   QtxGridBox.cxx
   QtxGroupBox.cxx
+  QtxInfoPanel.cxx
   QtxIntSpinBox.cxx
   QtxIntSpinSlider.cxx
   QtxListAction.cxx

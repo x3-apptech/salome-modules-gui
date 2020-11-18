@@ -640,7 +640,7 @@ QString CAM_Application::moduleTitle( const QString& name )
 
 /*!
   \brief Get module icon name.
-  \param name module name
+  \param name module name or title
   \return module icon or null QString if module is not found
 */
 QString CAM_Application::moduleIcon( const QString& name )
@@ -648,24 +648,40 @@ QString CAM_Application::moduleIcon( const QString& name )
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isNull(); ++it )
   {
-    if ( (*it).name == name )
+    if ( (*it).name == name || (*it).title == name )
       res = (*it).icon;
   }
   return res;
 }
 
 /*!
+  \brief Get module description.
+  \param name module name or title
+  \return module description or null QString if description is not provided in config file.
+*/
+QString CAM_Application::moduleDescription( const QString& name )
+{
+  QString res;
+  for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isNull(); ++it )
+  {
+    if ( (*it).name == name || (*it).title == name )
+      res = tr((*it).description.toUtf8());
+  }
+  return res;
+}
+
+/*!
   \brief Get module library name by its title (user name).
-  \param title module title (user name)
+  \param title module name or title
   \param full if \c true, return full library name, otherwise return its internal name
   \return module library name or null QString if module is not found
  */
-QString CAM_Application::moduleLibrary( const QString& title, const bool full )
+QString CAM_Application::moduleLibrary( const QString& name, const bool full )
 {
   QString res;
   for ( ModuleInfoList::const_iterator it = myInfoList.begin(); it != myInfoList.end() && res.isEmpty(); ++it )
   {
-    if ( (*it).title == title )
+    if ( (*it).name == name || (*it).title == name )
       res = (*it).library;
   }
   if ( !res.isEmpty() && full )
@@ -771,6 +787,8 @@ void CAM_Application::readModuleList()
 
     QString modIcon = resMgr->stringValue( *it, "icon", QString() );
 
+    QString modDescription = resMgr->stringValue( *it, "description", QString() );
+
     QString modLibrary = resMgr->stringValue( *it, "library", QString() ).trimmed();
     if ( !modLibrary.isEmpty() )
     {
@@ -801,6 +819,7 @@ void CAM_Application::readModuleList()
     inf.status = hasGui ? stUnknown : stNoGui;
     if ( hasGui ) inf.library = modLibrary;
     inf.icon = modIcon;
+    inf.description = modDescription;
     inf.version = version;
     myInfoList.append( inf );
   }

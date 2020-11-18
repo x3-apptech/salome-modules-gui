@@ -89,6 +89,7 @@ enum {
   WT_ObjectBrowser = LightApp_Application::WT_ObjectBrowser,
   WT_PyConsole     = LightApp_Application::WT_PyConsole,
   WT_LogWindow     = LightApp_Application::WT_LogWindow,
+  WT_InfoPanel     = LightApp_Application::WT_InfoPanel,
 #ifndef GUI_DISABLE_CORBA
   WT_NoteBook      = SalomeApp_Application::WT_NoteBook,
   WT_User          = SalomeApp_Application::WT_User
@@ -198,6 +199,18 @@ public:
   static bool              activateModule( const QString& );
   static void              registerModule( const QString& );
   static void              updateObjBrowser();
+
+  static void              infoSetTitle( const QString& );
+  static int               infoAddLabel( const QString&, const int = -1 );
+  static int               infoAddLabel( const QString&, Qt::Alignment, const int = -1 );
+  static int               infoAddAction( QAction*, const int = -1 );
+  static int               infoAddGroup( const QString&, const int = -1 );
+
+  static void              infoRemove( const int );
+  static void              infoClear( const int = -1 );
+
+  static void              infoSetVisible( const int, bool );
+  static void              infoSetEnabled( const int, bool );
 
   static void              putInfo( const QString&, const int = 0 );
   static int               showNotification( const QString&, const QString&, const int = -1 );
