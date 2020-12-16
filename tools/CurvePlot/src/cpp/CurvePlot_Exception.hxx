@@ -28,9 +28,9 @@ namespace CURVEPLOT
   {
   public:
     Exception(const std::string & what) : _what(what) {}
-    const char* what() const throw() { return _what.c_str(); }
+    const char* what() const noexcept { return _what.c_str(); }
 
-    ~Exception() throw () {}
+    ~Exception() noexcept {}
   private:
     const std::string _what;
   };
