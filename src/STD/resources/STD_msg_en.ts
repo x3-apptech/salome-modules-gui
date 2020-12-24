@@ -144,11 +144,11 @@ Directory with this name exist on disc. Try to use another name</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_NEW</source>
-        <translation>Creates a new document</translation>
+        <translation>Create a new document</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_MRU</source>
-        <translation>Opens a document</translation>
+        <translation>Open a document</translation>
     </message>
     <message>
         <source>MEN_DESK_FILE_NEW</source>
@@ -376,7 +376,7 @@ Do you want to overwrite it?</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_OPEN</source>
-        <translation>Opens an existing document</translation>
+        <translation>Open an existing document</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_REOPEN</source>
@@ -384,7 +384,7 @@ Do you want to overwrite it?</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_SAVE</source>
-        <translation>Saves the active document</translation>
+        <translation>Save the active document</translation>
     </message>
     <message>
         <source>PRP_DESK_WINDOW_HTILE</source>

@@ -117,6 +117,8 @@ public slots:
 
   void                                MenuItem();
 
+  virtual void                        updateInfoPanel();
+
 protected slots:
   virtual void                        onModelSaved();
   virtual void                        onModelOpened();

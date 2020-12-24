@@ -50,10 +50,13 @@ public:
   LightApp_ModuleAction( const QString&, const QIcon&, QObject* = 0 );
   virtual ~LightApp_ModuleAction();
 
+  int              count() const;
   QStringList      modules() const;
 
   QIcon            moduleIcon( const QString& ) const;
   void             setModuleIcon( const QString&, const QIcon& );
+
+  QAction*         moduleAction( const QString& ) const;
 
   void             insertModule( const QString&, const QIcon&, const int = -1 );
   void             removeModule( const QString& );

@@ -20,49 +20,53 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:      QtxDockWidget.h
-// Author:    Sergey TELKOV
-//
-#ifndef QTXDOCKWIDGET_H
-#define QTXDOCKWIDGET_H
+#ifndef QTXINFOPANEL_H
+#define QTXINFOPANEL_H
 
 #include "Qtx.h"
 
-#include <QDockWidget>
+#include <QWidget>
 
-class QTX_EXPORT QtxDockWidget : public QDockWidget
+#ifdef WIN32
+#pragma warning( disable:4251 )
+#endif
+
+class QAction;
+
+class QTX_EXPORT QtxInfoPanel : public QWidget
 {
   Q_OBJECT
 
-  class Watcher;
+  class Container;
+  class Title;
 
 public:
-  QtxDockWidget( const QString&, QWidget* = 0, Qt::WindowFlags = 0 );
-  QtxDockWidget( const bool, QWidget* = 0, Qt::WindowFlags = 0 );
-  QtxDockWidget( QWidget*, Qt::WindowFlags = 0 );
-  virtual ~QtxDockWidget();
+  QtxInfoPanel( QWidget* = 0 );
+  ~QtxInfoPanel();
 
-  virtual QSize   sizeHint() const;
-  virtual QSize   minimumSizeHint() const;
+  void                setTitle( const QString& );
+  int                 addLabel( const QString&, const int = -1 );
+  int                 addLabel( const QString&, Qt::Alignment, const int = -1 );
+  int                 addAction( QAction*, const int = -1 );
+  int                 addGroup( const QString&, const int = -1 );
 
-  Qt::Orientation orientation() const;
+  void                remove( const int );
+  void                clear( const int = -1 );
 
-signals:
-  void            orientationChanged( Qt::Orientation );
-  void            aboutToShow();
-
-public slots:
-  virtual void    setVisible( bool );
-
-protected:
-  virtual void    resizeEvent( QResizeEvent* );
+  void                setVisible( const int, bool );
+  void                setEnabled( const int, bool );
 
 private:
-  void            updateState();
+  int                 generateId() const;
+  QWidget*            find( const int ) const;
 
 private:
-  Watcher*        myWatcher;       //!< watcher object
-  Qt::Orientation myOrientation;   //!< dockable window orientation
+  Title*              title;
+  Container*          container;
 };
 
-#endif // QTXDOCKWIDGET_H
+#ifdef WIN32
+#pragma warning( default:4251 )
+#endif
+
+#endif // QTXINFOPANEL_H

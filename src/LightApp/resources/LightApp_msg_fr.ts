@@ -59,6 +59,18 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
         <translation type="unfinished">Video Tutorials</translation>
     </message>
     <message>
+        <source>PRP_SALOME_VIDEO_TUTORIALS</source>
+        <translation type="unfinished">Visit YouTube channel with some videos</translation>
+    </message>
+    <message>
+        <source>SALOME_TUTORIALS</source>
+        <translation type="unfinished">Tutorials</translation>
+    </message>
+    <message>
+        <source>PRP_SALOME_TUTORIALS</source>
+        <translation type="unfinished">Try tutorials from SALOME site</translation>
+    </message>
+    <message>
         <source>ENTRY_COLUMN</source>
         <translation>Entrée</translation>
     </message>
@@ -167,6 +179,10 @@ Les modifications seront appliquées à la prochaine session.</translation>
     <message>
         <source>OBJECT_BROWSER</source>
         <translation>Arbre d&apos;étude</translation>
+    </message>
+    <message>
+        <source>INFO_PANEL</source>
+        <translation type="unfinished">Help panel</translation>
     </message>
     <message>
         <source>PRP_DESK_PREFERENCES</source>
@@ -1120,6 +1136,18 @@ Le fichier n&apos;existe pas</translation>
     <message>
         <source>PREF_PY_NUM_COLUMNS</source>
         <translation>Nombre de colonnes:</translation>
+    </message>
+    <message>
+      <source>INFO_WELCOME_TO_SALOME</source>
+      <translation type="unfinished">Welcome to SALOME</translation>
+    </message>
+    <message>
+      <source>INFO_GETTING_STARTED</source>
+      <translation type="unfinished">Getting started</translation>
+    </message>
+    <message>
+      <source>INFO_AVAILABLE_MODULES</source>
+      <translation type="unfinished">Available modules</translation>
     </message>
 </context>
 <context>

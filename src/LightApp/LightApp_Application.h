@@ -40,6 +40,7 @@
 #include <QStringList>
 
 class LogWindow;
+class QtxInfoPanel;
 #ifndef DISABLE_PYCONSOLE
 class PyConsole_Console;
 class PyConsole_Interp;
@@ -75,6 +76,7 @@ class LIGHTAPP_EXPORT LightApp_Application : public CAM_Application, public SUIT
 
 public:
   typedef enum { WT_ObjectBrowser,
+		 WT_InfoPanel,
 #ifndef DISABLE_PYCONSOLE
                  WT_PyConsole,
 #endif
@@ -89,6 +91,7 @@ public:
          PreferencesId, MRUId, ModulesListId,
          NewGLViewId, NewPlot2dId, NewOCCViewId, NewVTKViewId,
          NewQxSceneViewId, NewGraphicsViewId, NewPVViewId, NewPyViewerId, StyleId, FullScreenId,
+         WebSiteId, ForumId, VideosId, TutorialsId,
          UserID };
 
 protected:
@@ -110,6 +113,7 @@ public:
 
   LogWindow*                          logWindow();
   SUIT_DataBrowser*                   objectBrowser();
+  QtxInfoPanel*                       infoPanel();
 #ifndef DISABLE_PYCONSOLE
   PyConsole_Console*                  pythonConsole(const bool force = false);
 #endif
@@ -265,6 +269,8 @@ protected slots:
   void                                onFullScreen();
 
   virtual void                        onDesktopMessage( const QString& );
+
+  virtual void                        onInfoPanelShown();
 
 private slots:
   void                                onSelection();
