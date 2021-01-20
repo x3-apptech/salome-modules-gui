@@ -1220,12 +1220,17 @@ protected:
   {
     if ( !myBrowser.isEmpty() && !myUrl.isEmpty() )
     {
+      QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 #ifdef WIN32
       QString cmdLine = QString( "\"%1\" %2 \"%3\"" ).arg( myBrowser, myParameters, myUrl );
 #else
       QString cmdLine = QString( "%1 %2 \"%3\"" ).arg( myBrowser, myParameters, myUrl );
+      // remove LD_LIBRARY_PATH from the environement before starting launcher to avoid bad interactions.
+      // (especially in the case of universal binaries) 
+      env.remove("LD_LIBRARY_PATH");
 #endif
       QProcess* proc = new QProcess();
+      proc->setProcessEnvironment(env);
       proc->start( cmdLine );
       if ( !proc->waitForStarted() )
       {
