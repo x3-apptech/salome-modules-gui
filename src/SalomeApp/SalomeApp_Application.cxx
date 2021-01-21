@@ -1000,7 +1000,7 @@ void SalomeApp_Application::onLoadScript( )
   if ( !aFile.isEmpty() )
   {
 
-    QString command = QString("exec(open(\"%1\", \"rb\").read())").arg(aFile);
+    QString command = QString("exec(compile(open('%1', 'rb').read(), '%1', 'exec'))").arg(aFile);
 
 #ifndef DISABLE_PYCONSOLE
     PyConsole_Console* pyConsole = pythonConsole();
