@@ -62,3 +62,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 # TODO: check if PYTHON_ADD_MODULE() macro can be used to build this target
+
+# --- tests ---
+
+ADD_TEST(NAME GUI_libSalomePy COMMAND ${PYTHON_EXECUTABLE} -B ${CMAKE_CURRENT_SOURCE_DIR}/test_vtk_rendering_module.py)

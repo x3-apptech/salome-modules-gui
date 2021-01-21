@@ -118,7 +118,7 @@ static PyTypeObject* GetPyClass( const char* theClassName )
   static PyObject* aVTKModule = 0;
   PyObject* aPyClass = 0;
   if( !aVTKModule ) {
-    aVTKModule = PyImport_ImportModule( "vtk.vtkRenderingCorePython" ); 
+    aVTKModule = PyImport_ImportModule( "vtk.vtkRenderingCore" ); 
     if( PyErr_Occurred() ) {
       PyErr_Print();
     }
@@ -221,11 +221,7 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderer* aVTKObject = aVTKViewWindow->getRenderer();
-#if VTK_XVERSION < 50700
-      myResult = PyVTKObject_New( aPyClass, aVTKObject );
-#else
       myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
-#endif
     }
   }
 };
@@ -276,11 +272,7 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindow* aVTKObject = aVTKViewWindow->getRenderWindow();
-#if VTK_XVERSION < 50700
-      myResult = PyVTKObject_New( aPyClass, aVTKObject );
-#else
       myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
-#endif
     }
   }
 };
@@ -331,11 +323,7 @@ public:
       ::GetVTKViewWindow( myCreate ? __Create : __FindOrCreate, myKeepDetached );
     if( aVTKViewWindow && aPyClass ) {
       vtkRenderWindowInteractor* aVTKObject = aVTKViewWindow->getInteractor();
-#if VTK_XVERSION < 50700
-      myResult = PyVTKObject_New( aPyClass, aVTKObject );
-#else
       myResult = PyVTKObject_FromPointer( aPyClass, NULL, aVTKObject );
-#endif
     }
   }
 };
