@@ -78,10 +78,17 @@ PyStdOut_flush(PyStdOut * /*self*/, PyObject * /*args*/)
   return Py_None;
 }
 
+static PyObject*
+PyStdOut_isatty(PyStdOut * /*self*/, PyObject */*args*/)
+{
+  return Py_False;
+}
+
 static PyMethodDef PyStdOut_methods[] = {
   {"write",  (PyCFunction)PyStdOut_write,  METH_VARARGS, PyDoc_STR("write(string) -> None")},
   {"flush",  (PyCFunction)PyStdOut_flush,  METH_NOARGS,  PyDoc_STR("flush() -> None")},
-  {NULL, (PyCFunction)NULL, 0, NULL}   /* sentinel */
+  {"isatty", (PyCFunction)PyStdOut_isatty, METH_NOARGS,  PyDoc_STR("isatty() -> bool")},
+  {NULL,     (PyCFunction)NULL,            0,            NULL}   /* sentinel */
 };
 
 static PyMemberDef PyStdOut_memberlist[] = {
