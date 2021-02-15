@@ -112,16 +112,12 @@ SALOME_PYQT_Module::~SALOME_PYQT_Module()
 */
 QString SALOME_PYQT_Module::engineIOR() const
 {
-  // call helper to get IOR from Python module
-  static QString ior;
+  // first call helper to get IOR from Python module
+  QString ior = myHelper->engineIOR();
 
+  // if IOR is still not specified, try default implementation
+  // which loads engine to the default FactoryServer container.
   if ( ior.isEmpty() ) {
-    // first call helper to get IOR from Python module
-    ior = myHelper->engineIOR();
-  }
-  if ( ior.isEmpty() ) {
-    // if IOR is still not specified, try default implementation
-    // which loads engine to the default FactoryServer container.
     Engines::EngineComponent_var comp;
     // temporary solution
     try {
