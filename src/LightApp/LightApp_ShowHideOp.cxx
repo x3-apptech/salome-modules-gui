@@ -88,7 +88,7 @@ void LightApp_ShowHideOp::startOperation()
     QStringList::const_iterator anIt = comps.begin(), aLast = comps.end();
     for( ; anIt!=aLast; anIt++ )
     {
-      LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( app->moduleTitle( *anIt ), false );
+      LightApp_Displayer* disp = LightApp_Displayer::FindDisplayer( *anIt, false );
       if( disp )
         disp->EraseAll( false, false, 0 );
     }
@@ -105,11 +105,11 @@ void LightApp_ShowHideOp::startOperation()
   QString mod_name;
   if( sel->count()>0 )
   {
-    QString aStr =  sel->parameter( 0, "displayer" ).toString();
-    mod_name = app->moduleTitle( aStr );
+    QString aStr = sel->parameter( 0, "displayer" ).toString();
+    mod_name = aStr;
   }
   else if( app->activeModule() )
-    mod_name = app->moduleTitle( app->activeModule()->name() );
+    mod_name = app->activeModule()->name();
 
   LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mod_name, true );
   if( !d )

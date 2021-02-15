@@ -418,7 +418,7 @@ void SALOMEGUI_Swig::Display( const char* theEntry )
       LightApp_Application* anApp  = getApplication();
       LightApp_Study*       aStudy = getActiveStudy();
       if ( anApp && aStudy ) {
-	QString mname = anApp->moduleTitle( aStudy->componentDataType( myEntry ) );
+	QString mname = aStudy->componentDataType( myEntry );
 	LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mname, true );
 	if ( d ) {
 	  QStringList entries;
@@ -459,11 +459,11 @@ void SALOMEGUI_Swig::DisplayOnly( const char* theEntry )
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( comp, false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
 
-	QString mname = anApp->moduleTitle( aStudy->componentDataType( myEntry ) );
+	QString mname = aStudy->componentDataType( myEntry );
 	LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mname, true );
 	if ( d ) {
 	  QStringList entries;
@@ -500,7 +500,7 @@ void SALOMEGUI_Swig::Erase( const char* theEntry )
       LightApp_Application* anApp  = getApplication();
       LightApp_Study*       aStudy = getActiveStudy();
       if ( anApp && aStudy ) {
-	QString mname = anApp->moduleTitle( aStudy->componentDataType( myEntry ) );
+	QString mname = aStudy->componentDataType( myEntry );
 	LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( mname, true );
 	if ( d ) {
 	  QStringList entries;
@@ -538,7 +538,7 @@ void SALOMEGUI_Swig::DisplayAll()
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), true );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( comp, true );
 	  if ( d ) {
 	    QStringList entries;
 	    aStudy->children( aStudy->centry( comp ), entries );
@@ -569,7 +569,7 @@ void SALOMEGUI_Swig::EraseAll()
 	QStringList comps;
 	aStudy->components( comps );
 	foreach( QString comp, comps ) {
-	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( anApp->moduleTitle( comp ), false );
+	  LightApp_Displayer* d = LightApp_Displayer::FindDisplayer( comp, false );
 	  if ( d ) d->EraseAll( false, false, 0 );
 	}
       }

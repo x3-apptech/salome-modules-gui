@@ -76,6 +76,7 @@ public:
   static QString      moduleIcon( const QString& );
   static QString      moduleDescription( const QString& );
   static QString      moduleLibrary( const QString&, const bool = true );
+  static QString      moduleDisplayer( const QString& );
 
   virtual void        createEmptyStudy();
 
@@ -101,7 +102,7 @@ private:
 private:
   enum { stUnknown = 0, stNoGui, stInaccessible, stReady };
   typedef struct { 
-    QString name, title, icon, library, version, description;
+    QString name, title, icon, library, version, description, displayer;
     int status;
   } ModuleInfo;
   typedef QList<ModuleInfo> ModuleInfoList;

@@ -465,7 +465,7 @@ void LightApp_Application::closeApplication()
 #ifndef DISABLE_QTXWEBBROWSER
   QProcess::startDetached( "HelpBrowser",
                            QStringList() << QString( "--remove=%1" ).arg( QApplication::instance()->applicationPid() ) );
-#endif  
+#endif
   CAM_Application::closeApplication();
 }
 
@@ -543,7 +543,7 @@ bool LightApp_Application::activateModule( const QString& modName )
   updateViewManagers();
 
   if ( activeStudy() && activeStudy()->root() && objectBrowser() ) {
-    if ( objectBrowser()->root() != activeStudy()->root() ) 
+    if ( objectBrowser()->root() != activeStudy()->root() )
       objectBrowser()->setRoot( activeStudy()->root() );
     updateObjectBrowser( true );
   }
@@ -598,7 +598,7 @@ void LightApp_Application::createActions()
   // Help menu
 
   int helpMenu = createMenu( tr( "MEN_DESK_HELP" ), -1, -1, 1000 );
-  
+
   int id = LightApp_Application::UserID + FIRST_HELP_ID;
 
   // a) Link to web site
@@ -719,7 +719,7 @@ void LightApp_Application::createActions()
     IMapConstIterator<QString, QString > fileIt;
     for ( fileIt = helpData.begin(); fileIt != helpData.end(); fileIt++ ) {
       QString helpItemPath = fileIt.key();
-      // remove all '//' occurances 
+      // remove all '//' occurances
       while ( helpItemPath.contains( "//" ) )
         helpItemPath.replace( "//", "" );
       // obtain submenus hierarchy if given
@@ -733,7 +733,7 @@ void LightApp_Application::createActions()
 	if ( total.count() == 1 && smenus.count() > 0 )
 	  helpItemPath = smenus.takeLast();
       }
-      QPixmap helpIcon = fileIt.value().startsWith( "http", Qt::CaseInsensitive ) ? 
+      QPixmap helpIcon = fileIt.value().startsWith( "http", Qt::CaseInsensitive ) ?
         resMgr->loadPixmap( "STD", tr( "ICON_WWW" ), false ) : resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false );
       QAction* a = createAction( id, helpItemPath, helpIcon, helpItemPath, helpItemPath,
                                  0, desk, false, this, SLOT( onHelpContentsModule() ) );
@@ -759,9 +759,9 @@ void LightApp_Application::createActions()
     QString valueStr = resMgr->stringValue( "add_help", paramName );
     if ( !valueStr.isEmpty() ) {
       QStringList valueItems = valueStr.split( ";;", QString::SkipEmptyParts );
-      foreach( QString item, valueItems ) { 
+      foreach( QString item, valueItems ) {
         if ( item.startsWith( "http", Qt::CaseInsensitive ) || QFile::exists( item ) ) {
-          QPixmap helpIcon = item.startsWith( "http", Qt::CaseInsensitive ) ? 
+          QPixmap helpIcon = item.startsWith( "http", Qt::CaseInsensitive ) ?
             resMgr->loadPixmap( "STD", tr( "ICON_WWW" ), false ) : resMgr->loadPixmap( "STD", tr( "ICON_HELP" ), false );
           QAction* a = createAction( id++, paramName, helpIcon, paramName, paramName,
                                      0, desk, false, this, SLOT( onHelpContentsModule() ) );
@@ -1020,7 +1020,7 @@ void LightApp_Application::onNewDoc()
 
   //asl: fix for 0020515
   saveDockWindowsState();
-  
+
   CAM_Application::onNewDoc();
 }
 
@@ -1078,7 +1078,7 @@ bool LightApp_Application::onOpenDoc( const QString& aName )
 
   // We should take mru action first because this application instance can be deleted later.
   QtxMRUAction* mru = ::qobject_cast<QtxMRUAction*>( action( MRUId ) );
-  
+
   bool res = CAM_Application::onOpenDoc( aName );
 
   if ( mru )
@@ -1255,7 +1255,7 @@ void LightApp_Application::showHelp( const QString& path )
 
 #if DISABLE_QTXWEBBROWSER
   bool useExternalBrowser = true;
-#else  
+#else
   bool useExternalBrowser = resMgr->booleanValue("ExternalBrowser", "use_external_browser", false );
 #endif
 
@@ -1267,7 +1267,7 @@ void LightApp_Application::showHelp( const QString& path )
     QString browser = resMgr->stringValue( "ExternalBrowser", "application" );
 #endif
     QString parameters = resMgr->stringValue("ExternalBrowser", "parameters");
-  
+
     if ( !browser.isEmpty() )
     {
       RunBrowser::execute( this, browser, parameters, path );
@@ -1488,7 +1488,7 @@ LogWindow* LightApp_Application::logWindow()
   when you request the python console, this function could return
   null. Then the optional parameter force (default to false) can be
   set to force the creation of the python console if it is not done
-  already. 
+  already.
   \param force - if true, the pythonConsole is created if it does not exist yet
   \return Python Console
 */
@@ -2388,7 +2388,7 @@ void LightApp_Application::createPreferences( LightApp_Preferences* pref )
   pref->addPreference( tr( "PREF_SHOW_SPLASH" ), lookGroup, LightApp_Preferences::Bool, "launch", "splash" );
   // .... -> opaque resize
   pref->addPreference( tr( "PREF_OPAQUE_RESIZE" ), lookGroup, LightApp_Preferences::Bool, "desktop", "opaque_resize" );
-  // .... -> drop-down buttons 
+  // .... -> drop-down buttons
   pref->addPreference( tr( "PREF_DROP_DOWN_BUTTONS" ), lookGroup, LightApp_Preferences::Bool, "viewers", "drop_down_buttons" );
   // .... -> Notification timeout
   int delay = pref->addPreference( tr( "PREF_NOTIFY_TIMEOUT" ), lookGroup, LightApp_Preferences::IntSpin, "notification", "timeout" );
@@ -5258,7 +5258,7 @@ void LightApp_Application::emitOperationFinished( const QString& theModuleName,
   Update visibility state of given objects
 */
 void LightApp_Application::updateVisibilityState( DataObjectList& theList,
-                                                  SUIT_ViewModel*  theViewModel )
+                                                  SUIT_ViewModel* theViewModel )
 {
   if ( !theViewModel || theList.isEmpty() ) return;
 
@@ -5273,18 +5273,66 @@ void LightApp_Application::updateVisibilityState( DataObjectList& theList,
     if ( !obj || aStudy->isComponent( obj->entry() ) )
       continue;
 
-    LightApp_Module* anObjModule = dynamic_cast<LightApp_Module*>(obj->module());
-    if ( anObjModule ) {
-      LightApp_Displayer* aDisplayer = anObjModule->displayer();
-      if ( aDisplayer ) {
-        Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
-        if ( aDisplayer->canBeDisplayed( obj->entry(), theViewModel->getType() ) ) {
-          if ( aView && aDisplayer->IsDisplayed( obj->entry(), aView ) )
-            anObjState = Qtx::ShownState;
-          else
-            anObjState = Qtx::HiddenState;
+    QString mname = aStudy->componentDataType(obj->entry());
+    LightApp_Displayer* aDisplayer = LightApp_Displayer::FindDisplayer(mname, false);
+    if ( aDisplayer ) {
+      Qtx::VisibilityState anObjState = Qtx::UnpresentableState;
+      if ( aDisplayer->canBeDisplayed( obj->entry(), theViewModel->getType() ) ) {
+        if ( aView && aDisplayer->IsDisplayed( obj->entry(), aView ) )
+          anObjState = Qtx::ShownState;
+        else
+          anObjState = Qtx::HiddenState;
+      }
+      aStudy->setVisibilityState( obj->entry(), anObjState );
+    }
+  }
+}
+
+/*!
+  Update presentations of all displayed objects of theComponent in specified viewers
+*/
+void LightApp_Application::updatePresentations( const QString& theComponent,
+                                                const QStringList& theViewManagerTypes )
+{
+  LightApp_Displayer* aDisplayer = LightApp_Displayer::FindDisplayer(theComponent, false);
+  if ( aDisplayer ) {
+    LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(activeStudy());
+    DataObjectList aComps;
+    bool isFound = false;
+    aStudy->root()->children( aComps );
+    DataObjectList::const_iterator aCompsIt = aComps.begin();
+    for ( ; aCompsIt != aComps.end() && !isFound; aCompsIt++ ) {
+      LightApp_DataObject* aComp = dynamic_cast<LightApp_DataObject*>( *aCompsIt );
+      if ( aComp && aComp->componentDataType() ==  theComponent) {
+        isFound = true;
+        DataObjectList anObjs;
+        aComp->children(anObjs, true);
+
+        QList<SUIT_ViewManager*> aViewMgrs;
+        QStringList::const_iterator itVMTypes = theViewManagerTypes.begin();
+        for ( ; itVMTypes != theViewManagerTypes.end(); ++itVMTypes )
+          viewManagers( *itVMTypes, aViewMgrs );
+
+        DataObjectList::const_iterator itObjs = anObjs.begin();
+        for ( ; itObjs != anObjs.end(); itObjs++ ) {
+          LightApp_DataObject* anObj = dynamic_cast<LightApp_DataObject*>( *itObjs );
+          QString anEntry = anObj->entry();
+
+          QListIterator<SUIT_ViewManager*> itViewMgrs( aViewMgrs );
+          while ( itViewMgrs.hasNext()) {
+            SUIT_ViewModel* aVM = itViewMgrs.next()->getViewModel();
+            if ( aVM ) {
+              SALOME_View* aView = dynamic_cast<SALOME_View*>(aVM);
+              if ( aView ) {
+                bool isDisp = aDisplayer->IsDisplayed( anEntry, aView );
+                aDisplayer->Erase( anEntry, true, false, aView );
+                if ( isDisp ) {
+                  aDisplayer->Display( anEntry, false, aView );
+                }
+              }
+            }
+          }
         }
-        aStudy->setVisibilityState( obj->entry(), anObjState );
       }
     }
   }

@@ -182,7 +182,10 @@ public:
   void                                emitOperationFinished( const QString&, const QString&, const QStringList& );
 
   void                                updateVisibilityState( DataObjectList& theList,
-                                                             SUIT_ViewModel* theViewModel );  
+                                                             SUIT_ViewModel* theViewModel );
+
+  void                                updatePresentations( const QString& theComponent,
+                                                           const QStringList& theViewManagerTypes );
 
   virtual bool                        checkExistingDoc( bool = true );
 
@@ -320,8 +323,8 @@ protected:
 private:
   void                                emptyPreferences( const QString& );
   QList<QToolBar*>                    findToolBars( const QStringList& names = QStringList() );
-  
-  QByteArray                          processState(QByteArray& input, 
+
+  QByteArray                          processState(QByteArray& input,
 						   const bool processWin,
 						   const bool processTb,
 						   const bool isRestoring,
