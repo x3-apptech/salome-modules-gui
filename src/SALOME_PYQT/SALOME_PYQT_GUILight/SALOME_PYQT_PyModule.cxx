@@ -1716,15 +1716,11 @@ QString PyModuleHelper::engineIOR() const
     QString&        myIOR;
   };
 
-  static QString anIOR;
-
-  if ( anIOR.isEmpty() ) {
-    // post request
-    PyInterp_Dispatcher::Get()->Exec( new EngineIORReq( myInterp, 
-                                      const_cast<PyModuleHelper*>( this ),
-                                      anIOR ) );
-  }
-
+  QString anIOR;
+  // post request
+  PyInterp_Dispatcher::Get()->Exec( new EngineIORReq( myInterp, 
+						      const_cast<PyModuleHelper*>( this ),
+						      anIOR ) );
   return anIOR;
 }
 
