@@ -366,10 +366,9 @@ PortableServer::POA_var SalomeApp_Engine_i::poa()
 /*!
   \return 
 */
-SALOME_NamingService* SalomeApp_Engine_i::namingService()
+SALOME_NamingService_Abstract* SalomeApp_Engine_i::namingService()
 {
-  static SALOME_NamingService _ns(orb());
-  return &_ns;
+  return SalomeApp_Application::namingService();
 }
 
 /*!

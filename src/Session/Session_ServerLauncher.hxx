@@ -48,12 +48,14 @@ inline ServArg::ServArg(int servType, int firstArg, int lastArg):
   _servType(servType),_firstArg(firstArg),_lastArg(lastArg)
 {}
 
+template <class MY_NS>
 class Session_ServerThread;
 
 class QMutex;
 class QWaitCondition;
 
-class SESSION_EXPORT Session_ServerLauncher: public QThread
+template<class MY_NS>
+class SESSION_EXPORT Session_ServerLauncher : public QThread
 {
 public:
   Session_ServerLauncher();
@@ -85,7 +87,7 @@ private:
   QWaitCondition*                  _SessionStarted;
   std::list<ServArg>               _argServToLaunch;
   std::vector<std::string>         _argCopy;
-  std::list<Session_ServerThread*> _serverThreads;
+  std::list< Session_ServerThread<MY_NS>* > _serverThreads;
 };
 
 #endif

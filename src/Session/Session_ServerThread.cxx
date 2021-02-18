@@ -25,11 +25,11 @@
 //  Author : Paul RASCLE, EDF
 
 #include "Session_ServerThread.hxx"
+#include "Session_Promises.hxx"
 
 #include <SALOME_NamingService.hxx>
 #include <SALOME_Container_i.hxx>
 #include <SALOME_Launcher.hxx>
-#include <SALOMEDSClient_ClientFactory.hxx>
 #include <SALOME_ModuleCatalog_impl.hxx>
 #include <RegistryService.hxx>
 
@@ -48,18 +48,22 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-const int Session_ServerThread::NB_SRV_TYP = 6;
-const char* Session_ServerThread::_serverTypes[NB_SRV_TYP] = {"Container",
-                                                              "ModuleCatalog",
-                                                              "Registry",
-                                                              "SALOMEDS",
-                                                              "Session",
-                                                              "ContainerManager"};
+template<class MY_NS>
+const int Session_ServerThread<MY_NS>::NB_SRV_TYP = 6;
+
+template<class MY_NS>
+const char* Session_ServerThread<MY_NS>::_serverTypes[NB_SRV_TYP] = {"Container",
+                                                                      "ModuleCatalog",
+                                                                      "Registry",
+                                                                      "SALOMEDS",
+                                                                      "Session",
+                                                                      "ContainerManager"};
 
 /*! 
   default constructor not for use
 */
-Session_ServerThread::Session_ServerThread()
+template<class MY_NS>
+Session_ServerThread<MY_NS>::Session_ServerThread()
 {
   ASSERT(0); // must not be called
 }
@@ -67,7 +71,8 @@ Session_ServerThread::Session_ServerThread()
 /*! 
   constructor
 */
-Session_ServerThread::Session_ServerThread(int argc,
+template<class MY_NS>
+Session_ServerThread<MY_NS>::Session_ServerThread(int argc,
                                            char ** argv, 
                                            CORBA::ORB_ptr orb, 
                                            PortableServer::POA_ptr poa)
@@ -82,18 +87,17 @@ Session_ServerThread::Session_ServerThread(int argc,
   _orb = CORBA::ORB::_duplicate(orb);
   _root_poa = PortableServer::POA::_duplicate(poa);
   _servType =-1;
-  _NS = new SALOME_NamingService(_orb); // one instance per server to limit
-                                        // multi thread coherence problems
-  _container = 0;                       // embedded container
+  _NS.reset( new MY_NS(_orb) ); // one instance per server to limit
+                                               // multi thread coherence problems
+  _container = nullptr;                        // embedded container
 }
 
 /*! 
   destructor 
 */
-Session_ServerThread::~Session_ServerThread()
+template<class MY_NS>
+Session_ServerThread<MY_NS>::~Session_ServerThread()
 {
-  //MESSAGE("~Session_ServerThread "<< _argv[0]);
-  delete _NS;
   for (int i = 0; i <_argc ; i++ )
     free( _argv[i] );
   delete[] _argv;
@@ -103,7 +107,8 @@ Session_ServerThread::~Session_ServerThread()
   run the thread : activate one servant, the servant type is given by
   argument _argv[0]
 */
-void Session_ServerThread::Init()
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::Init()
 {
   MESSAGE("Session_ServerThread::Init "<< _argv[0]); 
 
@@ -117,42 +122,42 @@ void Session_ServerThread::Init()
       switch (_servType) {
       case 0:  // Container
         {
-          NamingService_WaitForServerReadiness(_NS,"/Registry");
-          NamingService_WaitForServerReadiness(_NS,"/ContainerManager");
+          NamingService_WaitForServerReadiness(this->getNS(),"/Registry");
+          NamingService_WaitForServerReadiness(this->getNS(),"/ContainerManager");
           ActivateContainer(_argc, _argv);
           break;
         }
       case 1:  // ModuleCatalog
         {
-          NamingService_WaitForServerReadiness(_NS,"/Registry");
+          NamingService_WaitForServerReadiness(this->getNS(),"/Registry");
           ActivateModuleCatalog(_argc, _argv);
           break;
         }
       case 2:  // Registry
         {
-          NamingService_WaitForServerReadiness(_NS,"");
+          NamingService_WaitForServerReadiness(this->getNS(),"");
           ActivateRegistry(_argc, _argv);
           break;
         }
       case 3:  // SALOMEDS
         {
-          NamingService_WaitForServerReadiness(_NS,"/Kernel/ModulCatalog");
+          NamingService_WaitForServerReadiness(this->getNS(),"/Kernel/ModulCatalog");
           ActivateSALOMEDS(_argc, _argv);
           break;
         }
       case 4:  // Session
         {
-          NamingService_WaitForServerReadiness(_NS,"/Study");
+          NamingService_WaitForServerReadiness(this->getNS(),"/Study");
           std::string containerName = "/Containers/";
           containerName = containerName + Kernel_Utils::GetHostname();
           containerName = containerName + "/FactoryServer";
-          NamingService_WaitForServerReadiness(_NS,containerName);
+          NamingService_WaitForServerReadiness(this->getNS(),containerName);
           ActivateSession(_argc, _argv);
           break;
         }
       case 5: // Container Manager
         {
-          NamingService_WaitForServerReadiness(_NS,"");
+          NamingService_WaitForServerReadiness(this->getNS(),"");
           ActivateContainerManager(_argc, _argv);
           break;
         }
@@ -166,13 +171,14 @@ void Session_ServerThread::Init()
   }
 }
 
-void Session_ServerThread::Shutdown()
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::Shutdown()
 {
   if ( _container ) _container->Shutdown();
 }
 
-void Session_ServerThread::ActivateModuleCatalog(int argc,
-                                                 char ** argv)
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateModuleCatalog(int argc, char ** argv)
 {
   try {
     MESSAGE("ModuleCatalog thread started");
@@ -206,35 +212,14 @@ void Session_ServerThread::ActivateModuleCatalog(int argc,
   }
 }
 
-void Session_ServerThread::ActivateSALOMEDS(int /*argc*/, char** /*argv*/)
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateSALOMEDS(int /*argc*/, char** /*argv*/)
 {
-  try {
-    MESSAGE("SALOMEDS thread started");
-    // We allocate the objects on the heap.  Since these are reference
-    // counted objects, they will be deleted by the POA when they are no
-    // longer needed.    
-    
-    ClientFactory::createStudy(_orb,_root_poa);
-  }
-  catch(CORBA::SystemException&) {
-    INFOS( "Caught CORBA::SystemException." );
-  }
-  catch(CORBA::Exception&) {
-    INFOS( "Caught CORBA::Exception." );
-  }
-  catch(omniORB::fatalException& fe) {
-    INFOS( "Caught omniORB::fatalException:" );
-    INFOS( "  file: " << fe.file() );
-    INFOS( "  line: " << fe.line() );
-    INFOS( "  mesg: " << fe.errmsg() );
-  }
-  catch(...) {
-    INFOS( "Caught unknown exception." );
-  }
+  this->_NS->activateSALOMEDS(this->_orb,this->_root_poa);
 }
 
-void Session_ServerThread::ActivateRegistry(int argc,
-                                            char ** argv)
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateRegistry(int argc, char ** argv)
 {
   MESSAGE("Registry thread started");
   SCRUTE(argc); 
@@ -292,153 +277,59 @@ void Session_ServerThread::ActivateRegistry(int argc,
   }
 }
 
-void Session_ServerThread::ActivateContainerManager(int /*argc*/, char** /*argv*/)
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateContainerManager(int /*argc*/, char** /*argv*/)
 {
-  try {
-    PortableServer::POA_var root_poa=PortableServer::POA::_the_root_poa();
-    std::cout << "Activate SalomeLauncher ......!!!! " << std::endl;
-    new SALOME_Launcher(_orb,root_poa);
-  }
-  catch(CORBA::SystemException&) {
-    INFOS("Caught CORBA::SystemException.");
-  }
-  catch(PortableServer::POA::WrongPolicy&) {
-    INFOS("Caught CORBA::WrongPolicyException.");
-  }
-  catch(PortableServer::POA::ServantAlreadyActive&) {
-    INFOS("Caught CORBA::ServantAlreadyActiveException");
-  }
-  catch(CORBA::Exception&) {
-    INFOS("Caught CORBA::Exception.");
-  }
-  catch(...) {
-    INFOS("Caught unknown exception.");
-  }
+  this->_NS->activateContainerManager(this->_orb);
 }
 
-void Session_ServerThread::ActivateContainer(int argc, char** argv)
+template<class MY_NS>
+typename MY_NS::RealNS *Session_ServerThread<MY_NS>::getNS()
 {
-  try {
-    MESSAGE("Container thread started");
-    
-    // get or create the child POA
-    
-    PortableServer::POA_var factory_poa;
-    try {
-      factory_poa = _root_poa->find_POA("factory_poa",0);
-      // 0 = no activation (already done if exists)
-    }
-    catch (PortableServer::POA::AdapterNonExistent&) {
-      MESSAGE("factory_poa does not exists, create...");
-      // define policy objects     
-      PortableServer::ImplicitActivationPolicy_var implicitActivation =
-        _root_poa->create_implicit_activation_policy(PortableServer::NO_IMPLICIT_ACTIVATION);
-      // default = NO_IMPLICIT_ACTIVATION
-      PortableServer::ThreadPolicy_var threadPolicy =
-        _root_poa->create_thread_policy(PortableServer::ORB_CTRL_MODEL);
-      // default = ORB_CTRL_MODEL, other choice SINGLE_THREAD_MODEL
-      
-      // create policy list
-      CORBA::PolicyList policyList;
-      policyList.length(2);
-      policyList[0] = PortableServer::ImplicitActivationPolicy::
-        _duplicate(implicitActivation);
-      policyList[1] = PortableServer::ThreadPolicy::
-        _duplicate(threadPolicy);
-      
-      PortableServer::POAManager_var nil_mgr
-        = PortableServer::POAManager::_nil();
-      factory_poa = _root_poa->create_POA("factory_poa",
-                                          nil_mgr,
-                                          policyList);
-      //with nil_mgr instead of pman,
-      //a new POA manager is created with the new POA
-      
-      // destroy policy objects
-      implicitActivation->destroy();
-      threadPolicy->destroy();
-      
-      // obtain the factory poa manager
-      PortableServer::POAManager_var pmanfac = factory_poa->the_POAManager();
-      pmanfac->activate();
-      MESSAGE("pmanfac->activate()");
-    }
-    
-    char *containerName = (char*)"";
-    if (argc >1) {
-      containerName = argv[1];
-    }
-    
-    _container = new Engines_Container_i(_orb, _root_poa, containerName, argc, argv, true, false);
-  }
-  catch(CORBA::SystemException&) {
-    INFOS("Caught CORBA::SystemException.");
-  }
-  catch(PortableServer::POA::WrongPolicy&) {
-    INFOS("Caught CORBA::WrongPolicyException.");
-  }
-  catch(PortableServer::POA::ServantAlreadyActive&) {
-    INFOS("Caught CORBA::ServantAlreadyActiveException");
-  }
-  catch(CORBA::Exception&) {
-    INFOS("Caught CORBA::Exception.");
-  }
-  catch(...) {
-    INFOS("Caught unknown exception.");
-  }
+  MY_NS *pt(_NS.get());
+  if(!pt)
+     THROW_SALOME_EXCEPTION("Session_ServerThread<MY_NS>::getNS : null pointer !");
+  return pt->getNS();
 }
 
-void Session_ServerThread::ActivateSession(int /*argc*/, char** /*argv*/)
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateContainer(int argc, char** argv)
+{
+  _container = this->_NS->activateContainer(this->_orb,this->_root_poa,argc,argv);
+}
+
+template<class MY_NS>
+void Session_ServerThread<MY_NS>::ActivateSession(int /*argc*/, char** /*argv*/)
 {
   MESSAGE("Session_ServerThread::ActivateSession() not implemented!");
 }
 
-/*! 
-  constructor 
-*/
-Session_SessionThread::Session_SessionThread(int argc,
+template<class MY_NS>
+Session_SessionThread<MY_NS>::Session_SessionThread(int argc,
                                              char** argv, 
                                              CORBA::ORB_ptr orb, 
                                              PortableServer::POA_ptr poa,
                                              QMutex* GUIMutex,
                                              QWaitCondition* GUILauncher)
-: Session_ServerThread(argc, argv, orb, poa),
+: Session_ServerThread<MY_NS>(argc, argv, orb, poa),
   _GUIMutex( GUIMutex ),
   _GUILauncher( GUILauncher )
 {
 }
 
-/*! 
-  destructor 
-*/
-Session_SessionThread::~Session_SessionThread()
+template<class MY_NS>
+Session_SessionThread<MY_NS>::~Session_SessionThread()
 {
 }
 
-void Session_SessionThread::ActivateSession(int argc,
-                                            char ** argv)
+template<class MY_NS>
+void Session_SessionThread<MY_NS>::ActivateSession(int argc, char ** argv)
 {
-  try {
-    MESSAGE("Session thread started");
-    SALOME_Session_i * mySALOME_Session
-      = new SALOME_Session_i(argc, argv, _orb, _root_poa, _GUIMutex, _GUILauncher) ;
-    PortableServer::ObjectId_var mySALOME_Sessionid
-      = _root_poa->activate_object(mySALOME_Session);
-    MESSAGE("poa->activate_object(mySALOME_Session)");
-    
-    CORBA::Object_var obj = mySALOME_Session->_this();
-    CORBA::String_var sior(_orb->object_to_string(obj));
-    mySALOME_Session->_remove_ref();
-    
-    mySALOME_Session->NSregister();
-  }
-  catch (CORBA::SystemException&) {
-    INFOS("Caught CORBA::SystemException.");
-  }
-  catch (CORBA::Exception&) {
-    INFOS("Caught CORBA::Exception.");
-  }
-  catch (...) {
-    INFOS("Caught unknown exception.");
-  }
+  this->_NS->activateSession(this->_orb,this->_root_poa,_GUIMutex,_GUILauncher,argc,argv);
 }
+
+template class Session_ServerThread<OldStyleNS>;
+template class Session_SessionThread<OldStyleNS>;
+
+template class Session_ServerThread<NewStyleNS>;
+template class Session_SessionThread<NewStyleNS>;

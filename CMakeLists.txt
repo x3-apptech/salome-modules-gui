@@ -407,7 +407,7 @@ ENDIF(SALOME_USE_PYCONSOLE)
 # CORBA specific targets:
 IF(NOT SALOME_LIGHT_ONLY)
   LIST(APPEND _${PROJECT_NAME}_exposed_targets
-       SalomeIDLGUI SalomeSession SalomeApp SalomeGuiHelpers SalomeTreeData ToolsGUI)
+       SalomeIDLGUI SalomeSession SalomeApp SalomeAppSL SalomeAppImpl SalomeGuiHelpers SalomeTreeData ToolsGUI)
 ENDIF(NOT SALOME_LIGHT_ONLY)
 
 # Add all targets to the build-tree export set

@@ -31,21 +31,18 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Component)
 #include CORBA_SERVER_HEADER(SALOME_Session)
-class SALOME_NamingService;
+
+#include <memory>
 
 class QMutex;
 class QWaitCondition;
+class SALOME_NamingService_Abstract;
 
-class SESSION_EXPORT SALOME_Session_i:  public virtual POA_SALOME::Session,
-                         public virtual PortableServer::ServantBase
+class SESSION_EXPORT SALOME_Session_i :  public virtual POA_SALOME::Session, public virtual PortableServer::ServantBase
 {
 public:
-  SALOME_Session_i(int argc, 
-                   char ** argv, 
-                   CORBA::ORB_ptr orb, 
-                   PortableServer::POA_ptr poa, 
-                   QMutex* GUIMutex,
-                   QWaitCondition* GUILauncher);
+  SALOME_Session_i(int argc, char ** argv, CORBA::ORB_ptr orb, PortableServer::POA_ptr poa, QMutex* GUIMutex, QWaitCondition* GUILauncher);
+  SALOME_Session_i(int argc, char ** argv, CORBA::ORB_ptr orb, PortableServer::POA_ptr poa, QMutex* GUIMutex, QWaitCondition* GUILauncher, SALOME_NamingService_Abstract *NS);
   ~SALOME_Session_i();
 
   //! Launch Graphical User Interface
@@ -85,7 +82,7 @@ public:
 protected:
 
   //! Naming service interface
-  SALOME_NamingService *_NS;
+  std::unique_ptr<SALOME_NamingService_Abstract> _NS;
 
   int _argc ;
   char **_argv;

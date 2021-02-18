@@ -33,6 +33,7 @@
 
 class QWaitCondition;
 
+template<class MY_NS>
 class SESSION_EXPORT Session_ServerCheck : public QThread
 {
   class Locker;

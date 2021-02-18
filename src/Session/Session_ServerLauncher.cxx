@@ -36,7 +36,8 @@
 /*! 
    default constructor not for use
  */
-Session_ServerLauncher::Session_ServerLauncher()
+template<class MY_NS>
+Session_ServerLauncher<MY_NS>::Session_ServerLauncher()
 {
   ASSERT(0); // must not be called
 }
@@ -44,14 +45,15 @@ Session_ServerLauncher::Session_ServerLauncher()
 /*! 
   constructor
 */
-Session_ServerLauncher::Session_ServerLauncher(int argc,
-                                               char ** argv, 
-                                               CORBA::ORB_ptr orb, 
-                                               PortableServer::POA_ptr poa,
-                                               QMutex *GUIMutex,
-                                               QWaitCondition *ServerLaunch,
-                                               QMutex *SessionMutex,
-                                               QWaitCondition *SessionStarted)
+template<class MY_NS>
+Session_ServerLauncher<MY_NS>::Session_ServerLauncher(int argc,
+                                                      char ** argv, 
+                                                      CORBA::ORB_ptr orb, 
+                                                      PortableServer::POA_ptr poa,
+                                                      QMutex *GUIMutex,
+                                                      QWaitCondition *ServerLaunch,
+                                                      QMutex *SessionMutex,
+                                                      QWaitCondition *SessionStarted)
 {
   _argc = argc;
   _argv = argv;
@@ -61,7 +63,7 @@ Session_ServerLauncher::Session_ServerLauncher(int argc,
   _ServerLaunch = ServerLaunch;
   _SessionMutex = SessionMutex;
   _SessionStarted = SessionStarted;
-
+  MY_NS::defineDefaultSALOMEKERNELNamingService();
   // start thread
   start();
 }
@@ -69,14 +71,16 @@ Session_ServerLauncher::Session_ServerLauncher(int argc,
 /*! 
   destructor
 */
-Session_ServerLauncher::~Session_ServerLauncher()
+template<class MY_NS>
+Session_ServerLauncher<MY_NS>::~Session_ServerLauncher()
 {
 }
 
 /*! 
   Check args and activate servers
 */
-void Session_ServerLauncher::run()
+template<class MY_NS>
+void Session_ServerLauncher<MY_NS>::run()
 {
   // wait until main thread is ready
   _GUIMutex->lock();          // ... lock mutex (it is unlocked my calling thread 
@@ -104,7 +108,8 @@ void Session_ServerLauncher::run()
 /*! 
   controls and dispatchs arguments given with command
 */
-void Session_ServerLauncher::CheckArgs()
+template<class MY_NS>
+void Session_ServerLauncher<MY_NS>::CheckArgs()
 {
   int argState = 0;
   ServArg aServArg(0,0,0);
@@ -135,8 +140,8 @@ void Session_ServerLauncher::CheckArgs()
             }
             // Temporary solution
 
-            for (int i=0; i<Session_ServerThread::NB_SRV_TYP; i++)
-                if (strcmp(_argv[iarg],Session_ServerThread::_serverTypes[i])==0)
+            for (int i=0; i<Session_ServerThread<MY_NS>::NB_SRV_TYP; i++)
+                if (strcmp(_argv[iarg],Session_ServerThread<MY_NS>::_serverTypes[i])==0)
                   {
                     aServArg._servType = i;
                     argState = 2;
@@ -166,7 +171,7 @@ void Session_ServerLauncher::CheckArgs()
             if (strcmp(_argv[iarg],")")==0)   // end of arguments = ')'
               {
                 aServArg._lastArg=iarg-1;     // arg before ')'
-                MESSAGE("server : "<< Session_ServerThread::_serverTypes[aServArg._servType]);
+                MESSAGE("server : "<< Session_ServerThread<MY_NS>::_serverTypes[aServArg._servType]);
                 for (int i=aServArg._firstArg; i<=aServArg._lastArg; i++)
                   MESSAGE("  arg : " << _argCopy[i]);
                 _argServToLaunch.push_back(aServArg);
@@ -189,7 +194,8 @@ void Session_ServerLauncher::CheckArgs()
     throw SALOME_Exception(LOCALIZED("Error in command arguments, missing parenthesis ')'"));
 }
 
-void Session_ServerLauncher::ActivateAll()
+template<class MY_NS>
+void Session_ServerLauncher<MY_NS>::ActivateAll()
 {
   std::list<ServArg>::iterator itServ;
   for (itServ = _argServToLaunch.begin(); itServ !=_argServToLaunch.end(); itServ++)
@@ -198,7 +204,7 @@ void Session_ServerLauncher::ActivateAll()
     char** argv = new char*[argc+1];
     argv[argc]=0; // for Engines_Container_i constructor...
     int servType = (*itServ)._servType;
-    argv[0]=strdup(Session_ServerThread::_serverTypes[servType]);
+    argv[0]=strdup(Session_ServerThread<MY_NS>::_serverTypes[servType]);
     if (argc>1)
     {
       for (int i=0; i<argc-1; i++)
@@ -208,8 +214,7 @@ void Session_ServerLauncher::ActivateAll()
 
     MESSAGE("*** activating [" << argc << "] : " << argv[0]);
 
-    Session_ServerThread* aServerThread
-      = new Session_ServerThread(argc, argv, _orb,_root_poa);
+    Session_ServerThread<MY_NS>* aServerThread = new Session_ServerThread<MY_NS>(argc, argv, _orb,_root_poa);
     _serverThreads.push_front(aServerThread);
     
     aServerThread->Init();
@@ -223,17 +228,19 @@ void Session_ServerLauncher::ActivateAll()
   int argc=1;
   char** argv = new char*[argc];
   argv[0] = (char*)"Session";
-  Session_SessionThread* aServerThread
-    = new Session_SessionThread(argc, argv, _orb,_root_poa,_SessionMutex,_SessionStarted);
+  Session_SessionThread<MY_NS>* aServerThread
+    = new Session_SessionThread<MY_NS>(argc, argv, _orb,_root_poa,_SessionMutex,_SessionStarted);
   _serverThreads.push_front(aServerThread);
   aServerThread->Init();
   delete[] argv;
 }
 
-void Session_ServerLauncher::ShutdownAll()
+template <class MY_NS>
+void Session_ServerLauncher<MY_NS>::ShutdownAll()
 {
   MESSAGE("Session_ServerLauncher::ShutdownAll()");
-  std::list<Session_ServerThread*>::reverse_iterator itServ;
+  using Session_ServerThreadT = Session_ServerThread<MY_NS>;
+  typename std::list<Session_ServerThreadT*>::reverse_iterator itServ;
   for (itServ = _serverThreads.rbegin(); itServ !=_serverThreads.rend(); itServ++)
   {
     (*itServ)->Shutdown();
@@ -243,12 +250,20 @@ void Session_ServerLauncher::ShutdownAll()
 /*! 
   Destruction des classes serveur dans l'ordre inverse de creation
 */
-void Session_ServerLauncher::KillAll()
+template <class MY_NS>
+void Session_ServerLauncher<MY_NS>::KillAll()
 {
   MESSAGE("Session_ServerLauncher::KillAll()");
-  std::list<Session_ServerThread*>::reverse_iterator itServ;
+  using Session_ServerThreadT = Session_ServerThread<MY_NS>;
+  typename std::list<Session_ServerThreadT*>::reverse_iterator itServ;
   for (itServ = _serverThreads.rbegin(); itServ !=_serverThreads.rend(); itServ++)
   {
     delete (*itServ);
   }
 }
+
+#include "Session_NS_wrapper.hxx" 
+
+template class Session_ServerLauncher<OldStyleNS>;
+
+template class Session_ServerLauncher<NewStyleNS>;

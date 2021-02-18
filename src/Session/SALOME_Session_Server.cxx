@@ -21,7 +21,7 @@
 //
 
 #include <Container_init_python.hxx> // this include must be the first one as it includes Python.h
-#include <Basics_Utils.hxx> 
+#include <Basics_Utils.hxx>
 #include <ConnectionManager_i.hxx>
 #include <OpUtil.hxx>
 #include <RegistryService.hxx>
@@ -37,6 +37,8 @@
 #include "Session_Session_i.hxx"
 #include "Session_ServerCheck.hxx"
 #include "Session_ServerLauncher.hxx"
+#include "Session_Promises.hxx"
+#include "Session_NS_wrapper.hxx"
 
 #include "GUI_version.h"
 #include "Qtx.h"
@@ -64,6 +66,7 @@
 #include <shellapi.h>
 #endif
 #include <time.h>
+#include <memory>
 
 #include <QApplication>
 #include <QDir>
@@ -93,7 +96,7 @@
 
 namespace
 {
-  std::string handleCorbaException( const CORBA::Exception& e )
+  std::string handleCorbaException(const CORBA::Exception &e)
   {
     std::string message;
     CORBA::Any tmp;
@@ -104,32 +107,32 @@ namespace
   }
 
   //! Custom handler to manage Qt messages
-  class MsgHandler: public QtxMsgHandlerCallback
+  class MsgHandler : public QtxMsgHandlerCallback
   {
   public:
     MsgHandler() {}
-    void qtMessage( QtMsgType type, const QMessageLogContext& /*context*/, const QString& message )
+    void qtMessage(QtMsgType type, const QMessageLogContext & /*context*/, const QString &message)
     {
       (void)message; // unused in debug mode
-      switch ( type )
+      switch (type)
       {
       case QtDebugMsg:
 #ifdef QT_DEBUG_MESSAGE
-        MESSAGE( "Debug: " << qPrintable( message ) );
+        MESSAGE("Debug: " << qPrintable(message));
 #endif
         break;
       case QtWarningMsg:
-        MESSAGE( "Warning: " << qPrintable( message ) );
+        MESSAGE("Warning: " << qPrintable(message));
         break;
       case QtCriticalMsg:
-        MESSAGE( "Critical: " << qPrintable( message ) );
+        MESSAGE("Critical: " << qPrintable(message));
         break;
       case QtFatalMsg:
-        MESSAGE( "Fatal: " << qPrintable( message ) );
+        MESSAGE("Fatal: " << qPrintable(message));
         break;
       case QtInfoMsg:
       default:
-        MESSAGE( "Information: " << qPrintable( message ) );
+        MESSAGE("Information: " << qPrintable(message));
         break;
       }
     }
@@ -146,11 +149,11 @@ namespace
   class ResourceMgr : public SUIT_ResourceMgr
   {
   public:
-    ResourceMgr( const QString& appName = "SalomeApp" ) : SUIT_ResourceMgr( appName, "%1Config" )
+    ResourceMgr(const QString &appName = "SalomeApp") : SUIT_ResourceMgr(appName, "%1Config")
     {
       customize(); // activate customization
-      setCurrentFormat( "xml" );
-      setOption( "translators", QString( "%P_msg_%L.qm|%P_icons.qm|%P_images.qm" ) );
+      setCurrentFormat("xml");
+      setOption("translators", QString("%P_msg_%L.qm|%P_icons.qm|%P_images.qm"));
     }
 
     QString customName() const { return myCustomAppName; }
@@ -162,33 +165,35 @@ namespace
       // Try to retrieve actual application name and version from translation files.
       // We create temporary resource manager and load LightApp and SalomeApp translations.
       // This procedure is supposed to be done only once, at first call.
-      if ( myCustomAppName.isNull() ) {
-        SUIT_ResourceMgr mgr( "SalomeApp", "%1Config" );
-        mgr.setCurrentFormat( "xml" );
-        mgr.setWorkingMode( IgnoreUserValues ); // prevent reading data from user's file
-        mgr.loadLanguage( "LightApp",  "en" );
-        mgr.loadLanguage( "SalomeApp", "en" );
+      if (myCustomAppName.isNull())
+      {
+        SUIT_ResourceMgr mgr("SalomeApp", "%1Config");
+        mgr.setCurrentFormat("xml");
+        mgr.setWorkingMode(IgnoreUserValues); // prevent reading data from user's file
+        mgr.loadLanguage("LightApp", "en");
+        mgr.loadLanguage("SalomeApp", "en");
 
         // actual application name can be customized via APP_NAME resource key
-        myCustomAppName = QObject::tr( "APP_NAME" ).trimmed();
-        if ( myCustomAppName == "APP_NAME" || myCustomAppName.toLower() == "salome" ) 
+        myCustomAppName = QObject::tr("APP_NAME").trimmed();
+        if (myCustomAppName == "APP_NAME" || myCustomAppName.toLower() == "salome")
           myCustomAppName = "SalomeApp"; // fallback name
 
         // actual application name can be customized via APP_VERSION resource key
-        myCustomAppVersion = QObject::tr( "APP_VERSION" ).trimmed();
-        if ( myCustomAppVersion == "APP_VERSION" )
+        myCustomAppVersion = QObject::tr("APP_VERSION").trimmed();
+        if (myCustomAppVersion == "APP_VERSION")
           myCustomAppVersion = myCustomAppName == "SalomeApp" ? salomeVersion() : ""; // fallback version
       }
     }
 
   protected:
-    QString userFileName( const QString& /*appName*/, const bool forLoad ) const
+    QString userFileName(const QString & /*appName*/, const bool forLoad) const
     {
-      if ( version().isEmpty() ) return ""; 
-      return SUIT_ResourceMgr::userFileName( myCustomAppName, forLoad );
+      if (version().isEmpty())
+        return "";
+      return SUIT_ResourceMgr::userFileName(myCustomAppName, forLoad);
     }
 
-    virtual long userFileId( const QString& _fname ) const
+    virtual long userFileId(const QString &_fname) const
     {
       //////////////////////////////////////////////////////////////////////////////////////////////
       // In SALOME and SALOME-based applications the user preferences file is named as
@@ -205,7 +210,7 @@ namespace
       // directory. For backward compatibility, when user preferences from nearest
       // version of application is searched, user home directory is also looked through,
       // with lower priority.
-      // 
+      //
       // Since version 6.6.0 of SALOME, user file name on Linux is no more prefixed by dot
       // symbol since it is stored in the hidden ~/.config/salome directory. However, dot-prefixed
       // files are also taken into account (with lower priority) for backward compatibility.
@@ -228,13 +233,14 @@ namespace
       //////////////////////////////////////////////////////////////////////////////////////////////
 
       long id = -1;
-      if ( !myCustomAppName.isEmpty() ) {
+      if (!myCustomAppName.isEmpty())
+      {
 #ifdef WIN32
         // On Windows, user file name is something like SalomeApp.xml.6.5.0 where
         // - SalomeApp is an application name (can be customized)
         // - xml is a file format (xml or ini)
         // - 6.5.0 is an application version, can include alfa/beta/rc marks, e.g. 6.5.0a3, 6.5.0rc1
-        QRegExp exp( QString( "%1\\.%2\\.([a-zA-Z0-9.]+)" ).arg( myCustomAppName ).arg( currentFormat() ) );
+        QRegExp exp(QString("%1\\.%2\\.([a-zA-Z0-9.]+)").arg(myCustomAppName).arg(currentFormat()));
 #else
         // On Linux, user file name is something like SalomeApprc.6.5.0 where
         // - SalomeApp is an application name (can be customized)
@@ -243,12 +249,14 @@ namespace
         // VSR 24/09/2012: issue 0021781: since version 6.6.0 user filename is not prepended with "."
         // when it is stored in the ~/.config/<appname> directory;
         // for backward compatibility we also check files prepended with "." with lower priority
-        QRegExp exp( QString( "\\.?%1rc\\.([a-zA-Z0-9.]+)" ).arg( myCustomAppName ) );
+        QRegExp exp(QString("\\.?%1rc\\.([a-zA-Z0-9.]+)").arg(myCustomAppName));
 #endif
-        QString fname = QFileInfo( _fname ).fileName();
-        if ( exp.exactMatch( fname ) ) {
-          long fid = Qtx::versionToId( exp.cap( 1 ) );
-          if ( fid > 0 ) id = fid;
+        QString fname = QFileInfo(_fname).fileName();
+        if (exp.exactMatch(fname))
+        {
+          long fid = Qtx::versionToId(exp.cap(1));
+          if (fid > 0)
+            id = fid;
         }
       }
       return id;
@@ -265,9 +273,9 @@ namespace
   class Session : public SUIT_Session
   {
   public:
-    virtual SUIT_ResourceMgr* createResourceMgr( const QString& appName ) const
+    virtual SUIT_ResourceMgr *createResourceMgr(const QString &appName) const
     {
-      return new ResourceMgr( appName );
+      return new ResourceMgr(appName);
     }
   };
 
@@ -276,40 +284,46 @@ namespace
   class Application : public QApplication
   {
   public:
-    Application( int& argc, char** argv )
-      : QApplication( argc, argv ), 
-        myHandler ( 0 )
+    Application(int &argc, char **argv)
+        : QApplication(argc, argv),
+          myHandler(0)
     {
-      myDebug = !Qtx::getenv( "SALOME_DEBUG_EXCEPTIONS" ).isEmpty();
+      myDebug = !Qtx::getenv("SALOME_DEBUG_EXCEPTIONS").isEmpty();
     }
 
-    virtual bool notify( QObject* receiver, QEvent* e )
+    virtual bool notify(QObject *receiver, QEvent *e)
     {
-      if ( myDebug || !myHandler ) {
-        return QApplication::notify( receiver, e );
+      if (myDebug || !myHandler)
+      {
+        return QApplication::notify(receiver, e);
       }
-      else {
-        try {
-          return myHandler->handle( receiver, e );
+      else
+      {
+        try
+        {
+          return myHandler->handle(receiver, e);
         }
-        catch ( std::exception& e ) {
+        catch (std::exception &e)
+        {
           std::cerr << "notify(): Caught exception : " << e.what() << std::endl;
         }
-        catch ( CORBA::Exception& e ) {
-          std::cerr << "notify(): Caught CORBA exception : " << handleCorbaException( e ) << std::endl;
+        catch (CORBA::Exception &e)
+        {
+          std::cerr << "notify(): Caught CORBA exception : " << handleCorbaException(e) << std::endl;
         }
-        catch (...) {
+        catch (...)
+        {
           std::cerr << "notify(): Caught unknown exception : there's probably a bug in SALOME platform" << std::endl;
         }
-        return false;  // return false when exception is caught
+        return false; // return false when exception is caught
       }
     }
 
-    SUIT_ExceptionHandler* handler() const { return myHandler; }
-    void setHandler( SUIT_ExceptionHandler* h ) { myHandler = h; }
+    SUIT_ExceptionHandler *handler() const { return myHandler; }
+    void setHandler(SUIT_ExceptionHandler *h) { myHandler = h; }
 
   private:
-    SUIT_ExceptionHandler* myHandler;
+    SUIT_ExceptionHandler *myHandler;
     bool myDebug;
   };
 
@@ -318,7 +332,7 @@ namespace
   class GetInterfaceThread : public QThread
   {
   public:
-    GetInterfaceThread( SALOME::Session_var s ) : session ( s )
+    GetInterfaceThread(SALOME::Session_var s) : session(s)
     {
       start();
     }
@@ -326,7 +340,7 @@ namespace
   protected:
     virtual void run()
     {
-      if ( !CORBA::is_nil( session ) )
+      if (!CORBA::is_nil(session))
         session->GetInterface();
       else
         std::cerr << "FATAL ERROR: SALOME::Session object is nil! Cannot display GUI" << std::endl;
@@ -340,111 +354,181 @@ namespace
   //  Option that results to \c true is specified via \a trueOption parameter.
   //  Option that results to \c false is specified via \a falseOption parameter (empty for default).
   //  Default value for the result (returned if both \a trueOption \a falseOption are not given) is specified via \c defValue parameter.
-  bool boolCmdOption( const QString trueOption, const QString falseOption = QString(), bool defValue = false )
+  bool boolCmdOption(const QString trueOption, const QString falseOption = QString(), bool defValue = false)
   {
     bool value = defValue;
 
     QStringList args = QApplication::arguments();
-    foreach ( QString arg, args )
+    foreach (QString arg, args)
     {
-      if ( arg == trueOption )
+      if (arg == trueOption)
         value = true;
-      else if ( arg == falseOption )
+      else if (arg == falseOption)
         value = false;
     }
     return value;
   }
 
-  // Kill omniNames process
-  void killOmniNames()
-  {
-    SALOME_LifeCycleCORBA::killOmniNames();
-  }
-
   // Shutdown standalone servers
-  void shutdownServers( SALOME_NamingService* theNS, bool remoteLauncher )
+  void shutdownServers(SALOME_NamingService *theNS, bool remoteLauncher)
   {
-    SALOME_LifeCycleCORBA lcc( theNS );
-    lcc.shutdownServers( !remoteLauncher );
+    SALOME_LifeCycleCORBA lcc(theNS);
+    lcc.shutdownServers(!remoteLauncher);
   }
 } // end of anonymous namespace
 
-// ---------------------------- MAIN -----------------------
-int main( int argc, char **argv )
+template<class GUI_APP_STYLE>
+int AbstractGUIAppMain(int argc, char **argv);
+
+class GUIAppOldStyle
 {
+public:
+  using NamingServiceImplementation = OldStyleNS;
+  void connectToNSIfNeeded(CORBA::ORB_ptr orb) { _NS.reset(new SALOME_NamingService(orb)); }
+  void shutdownCORBAStufIfNeeded(bool shutdownAll, CORBA::ORB_ptr orb);
+  void killOtherServersIfNeeded() { SALOME_LifeCycleCORBA::killOmniNames(); }
+  SALOME::Session_var getSession();
+  void shutdownRemoteServersIfNeeded(bool remoteLauncher);
+private:
+  std::unique_ptr<SALOME_NamingService> _NS;
+};
+
+class GUIAppNewStyle
+{
+public:
+  using NamingServiceImplementation = NewStyleNS;
+  void connectToNSIfNeeded(CORBA::ORB_ptr orb) { /*! nothing */ }
+  void shutdownCORBAStufIfNeeded(bool shutdownAll, CORBA::ORB_ptr orb) { /*! nothing */ }
+  void killOtherServersIfNeeded() { /*! nothing */ }
+  SALOME::Session_var getSession();
+  void shutdownRemoteServersIfNeeded(bool remoteLauncher) { /*! nothing */ }
+};
+
+void GUIAppOldStyle::shutdownCORBAStufIfNeeded(bool shutdownAll, CORBA::ORB_ptr orb)
+{
+  try
+  {
+    orb->shutdown(0);
+  }
+  catch (...)
+  {
+    //////////////////////////////////////////////////////////////
+    // VSR: silently skip exception:
+    // CORBA.BAD_INV_ORDER.BAD_INV_ORDER_ORBHasShutdown
+    // exception is raised when orb->destroy() is called and
+    // cpp continer is launched in the embedded mode
+    //////////////////////////////////////////////////////////////
+    if (shutdownAll)
+      SALOME_LifeCycleCORBA::killOmniNames();
+    abort(); //abort program to avoid deadlock in destructors or atexit when shutdown has been interrupted
+  }
+  // Destroy ORB
+  sleep(2);
+  ORB_INIT *init = SINGLETON_<ORB_INIT>::Instance();
+  if (init)
+    init->explicit_destroy();
+}
+
+SALOME::Session_var GUIAppOldStyle::getSession()
+{
+  CORBA::Object_var obj = _NS->Resolve("/Kernel/Session");
+  SALOME::Session_var session = SALOME::Session::_narrow(obj);
+  return session;
+}
+void GUIAppOldStyle::shutdownRemoteServersIfNeeded(bool remoteLauncher)
+{
+  shutdownServers(_NS.get(), remoteLauncher);
+}
+
+SALOME::Session_var GUIAppNewStyle::getSession()
+{
+  SALOME::Session_var session = GetSessionRefSingleton()->get_future().get();
+  return session;
+}
+
+// ---------------------------- MAIN -----------------------
+template<class GUI_APP_STYLE>
+int AbstractGUIAppMain(int argc, char **argv)
+{
+  using NamingServiceImplementation = typename GUI_APP_STYLE::NamingServiceImplementation;
+  GUI_APP_STYLE self;
   // Set-up application settings configuration (as for QSettings)
   // Note: these are default settings which can be customized (see below)
-  QApplication::setOrganizationName( "salome" );
-  QApplication::setApplicationName( "salome" );
-  QApplication::setApplicationVersion( salomeVersion() );
+  QApplication::setOrganizationName("salome");
+  QApplication::setApplicationName("salome");
+  QApplication::setApplicationVersion(salomeVersion());
 
   // Install Qt debug messages handler
   MsgHandler msgHandler;
-  qInstallMessageHandler( QtxMsgHandler );
+  qInstallMessageHandler(QtxMsgHandler);
 
   // Add <qtdir>/plugins dir to the pluins search path for image plugins
-  QString qtdir = Qtx::qtDir( "plugins" );
-  if ( !qtdir.isEmpty() )
-    QApplication::addLibraryPath( qtdir );
+  QString qtdir = Qtx::qtDir("plugins");
+  if (!qtdir.isEmpty())
+    QApplication::addLibraryPath(qtdir);
 
   // Add application library path (to search style plugin etc...)
-  QString path = SUIT_Tools::addSlash( Qtx::getenv( "GUI_ROOT_DIR" ) ) + "bin/salome";
-  QApplication::addLibraryPath( QDir::toNativeSeparators( path ) );
+  QString path = SUIT_Tools::addSlash(Qtx::getenv("GUI_ROOT_DIR")) + "bin/salome";
+  QApplication::addLibraryPath(QDir::toNativeSeparators(path));
 
-  // QSurfaceFormat should be set before creation of QApplication,  
+  // QSurfaceFormat should be set before creation of QApplication,
   // so to avoid conflicts beetween SALOME and ParaView QSurfaceFormats we should merge theirs formats
   // (see void Qtx::initDefaultSurfaceFormat()) and set the resultant format here.
-  Qtx::initDefaultSurfaceFormat(); 
+  Qtx::initDefaultSurfaceFormat();
 
   // Create Qt application instance: this should be done as early as possible!
   // Note: QApplication forces setting locale LC_ALL to system one: setlocale(LC_ALL, "").
-  Application app( argc, argv );
+  Application app(argc, argv);
 
   // Initialize Python (only once)
   // Note: Python forces setting locale LC_CTYPE to system one: setlocale(LC_CTYPE, "").
-  char* py_argv[] = {(char*)""};
-  KERNEL_PYTHON::init_python( 1, py_argv );
+  char *py_argv[] = {(char *)""};
+  KERNEL_PYTHON::init_python(1, py_argv);
 
   // Create auxiliary resource manager to access application settings
   ResourceMgr resMgr;
-  resMgr.setWorkingMode( ResourceMgr::IgnoreUserValues );
-  resMgr.loadLanguage( "LightApp", "en" );
-  resMgr.loadLanguage( "SalomeApp", "en" );
-  resMgr.loadLanguage( "Session" );
+  resMgr.setWorkingMode(ResourceMgr::IgnoreUserValues);
+  resMgr.loadLanguage("LightApp", "en");
+  resMgr.loadLanguage("SalomeApp", "en");
+  resMgr.loadLanguage("Session");
 
   // Set-up application settings configuration possible customized via resources
-  if ( resMgr.customName() != "SalomeApp" ) {
-    QApplication::setApplicationName( resMgr.customName() );
-    QApplication::setApplicationVersion( resMgr.version() );
+  if (resMgr.customName() != "SalomeApp")
+  {
+    QApplication::setApplicationName(resMgr.customName());
+    QApplication::setApplicationVersion(resMgr.version());
   }
 
   // Force default "C" locale if requested via user's preferences
   // Note: this does not change whole application locale (changed via setlocale() function),
   // but only affects GUI behavior
-  resMgr.setWorkingMode( ResourceMgr::AllowUserValues ); // we must take into account user preferences
-  if ( resMgr.booleanValue( "language", "locale", true ) )
-    QLocale::setDefault( QLocale::c() );
-  resMgr.setWorkingMode( ResourceMgr::IgnoreUserValues );
+  resMgr.setWorkingMode(ResourceMgr::AllowUserValues); // we must take into account user preferences
+  if (resMgr.booleanValue("language", "locale", true))
+    QLocale::setDefault(QLocale::c());
+  resMgr.setWorkingMode(ResourceMgr::IgnoreUserValues);
 
-  bool isGUI    = boolCmdOption( "--show-desktop", "--hide-desktop", true ); // true by default
-  bool isSplash = boolCmdOption( "--show-splash", "--hide-splash", true ); // true by default
+  bool isGUI = boolCmdOption("--show-desktop", "--hide-desktop", true);  // true by default
+  bool isSplash = boolCmdOption("--show-splash", "--hide-splash", true); // true by default
 
   // Show splash screen (only if both the "GUI" and "SPLASH" options are true)
-  QtxSplash* splash = 0;
-  if ( isGUI && isSplash ) {
-    splash = QtxSplash::splash( QPixmap() );
-    splash->readSettings( &resMgr );
-    if ( splash->pixmap().isNull() )
-      splash->setPixmap( resMgr.loadPixmap( "LightApp", QObject::tr( "ABOUT_SPLASH" ) ) );
-    if ( splash->pixmap().isNull() ) {
+  QtxSplash *splash = 0;
+  if (isGUI && isSplash)
+  {
+    splash = QtxSplash::splash(QPixmap());
+    splash->readSettings(&resMgr);
+    if (splash->pixmap().isNull())
+      splash->setPixmap(resMgr.loadPixmap("LightApp", QObject::tr("ABOUT_SPLASH")));
+    if (splash->pixmap().isNull())
+    {
       delete splash;
       splash = 0;
     }
-    else {
-      splash->setOption( "%A", QObject::tr( "APP_NAME" ) );
-      splash->setOption( "%V", QObject::tr( "ABOUT_VERSION" ).arg( resMgr.version() ) );
-      splash->setOption( "%L", QObject::tr( "ABOUT_LICENSE" ) );
-      splash->setOption( "%C", QObject::tr( "ABOUT_COPYRIGHT" ) );
+    else
+    {
+      splash->setOption("%A", QObject::tr("APP_NAME"));
+      splash->setOption("%V", QObject::tr("ABOUT_VERSION").arg(resMgr.version()));
+      splash->setOption("%L", QObject::tr("ABOUT_LICENSE"));
+      splash->setOption("%C", QObject::tr("ABOUT_COPYRIGHT"));
       splash->show();
       QApplication::instance()->processEvents();
     }
@@ -456,53 +540,59 @@ int main( int argc, char **argv )
   CORBA::ORB_var orb;
   PortableServer::POA_var poa;
 
-  SUIT_Session* aGUISession = 0;
-  SALOME_NamingService* _NS = 0;
-  GetInterfaceThread* guiThread = 0;
-  Session_ServerLauncher* myServerLauncher = 0;
+  SUIT_Session *aGUISession = 0;
+  GetInterfaceThread *guiThread = 0;
+  Session_ServerLauncher<NamingServiceImplementation> *myServerLauncher = nullptr;
 
 #if defined(WIN32) && defined(UNICODE)
-  char** new_argv = NULL;
+  char **new_argv = NULL;
 #endif
 
   bool remoteLauncher = false;
 
-  try {
+  try
+  {
     // ...create ORB, get RootPOA object, NamingService, etc.
     ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance();
-    ASSERT( SINGLETON_<ORB_INIT>::IsAlreadyExisting() );
+    ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting());
     int orbArgc = 1;
-    if( std::string(argv[1]).find("-ORBInitRef") != std::string::npos ){
+    if (std::string(argv[1]).find("-ORBInitRef") != std::string::npos)
+    {
       orbArgc = 3;
       remoteLauncher = true;
     }
-    orb = init( orbArgc, argv );
+    orb = init(orbArgc, argv);
 
-    CORBA::Object_var obj = orb->resolve_initial_references( "RootPOA" );
-    poa = PortableServer::POA::_narrow( obj );
+    CORBA::Object_var obj = orb->resolve_initial_references("RootPOA");
+    poa = PortableServer::POA::_narrow(obj);
 
     PortableServer::POAManager_var pman = poa->the_POAManager();
-    pman->activate() ;
-    MESSAGE( "POA manager activated" );
+    pman->activate();
+    MESSAGE("POA manager activated");
 
-    _NS = new SALOME_NamingService( orb );
+    self.connectToNSIfNeeded(orb);
 
     result = 0;
   }
-  catch ( SALOME_Exception& e ) {
-    INFOS( "run(): Caught SALOME_Exception : " << e.what() );
+  catch (SALOME_Exception &e)
+  {
+    INFOS("run(): Caught SALOME_Exception : " << e.what());
   }
-  catch ( CORBA::SystemException& e ) {
-    INFOS( "run(): Caught CORBA::SystemException : " << handleCorbaException( e ) );
+  catch (CORBA::SystemException &e)
+  {
+    INFOS("run(): Caught CORBA::SystemException : " << handleCorbaException(e));
   }
-  catch ( CORBA::Exception& e ) {
-    INFOS( "run(): Caught CORBA::Exception : " << handleCorbaException( e ) );
+  catch (CORBA::Exception &e)
+  {
+    INFOS("run(): Caught CORBA::Exception : " << handleCorbaException(e));
   }
-  catch ( std::exception& e ) {
-    INFOS( "run(): Caught exception : " << e.what() );
+  catch (std::exception &e)
+  {
+    INFOS("run(): Caught exception : " << e.what());
   }
-  catch (...) {
-    INFOS( "run(): Caught unknown exception" );
+  catch (...)
+  {
+    INFOS("run(): Caught unknown exception");
   }
 
   QMutex _GUIMutex, _SessionMutex, _SplashMutex;
@@ -512,91 +602,98 @@ int main( int argc, char **argv )
   // until all initialization is done
   _SessionMutex.lock();
 
-  if ( !result ) {
+  if (!result)
+  {
     // Start embedded servers launcher (Registry, SALOMEDS, etc.)
     // ...lock mutex to block embedded servers launching thread until wait( mutex )
-    _GUIMutex.lock();  
+    _GUIMutex.lock();
     // ...create launcher
 #if defined(WIN32) && defined(UNICODE)
-	LPWSTR *szArglist = NULL;
-	int nArgs;
-	int i;
-	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);	
-	new_argv = new char*[nArgs];
-	for (i = 0; i < nArgs; i++) {
-		new_argv[i] = (char*) Kernel_Utils::utf8_encode(szArglist[i]);
-	}
-	// Free memory allocated for CommandLineToArgvW arguments.
-	LocalFree(szArglist);
-	myServerLauncher = new Session_ServerLauncher(nArgs, new_argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted);	
+    LPWSTR *szArglist = NULL;
+    int nArgs;
+    int i;
+    szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+    new_argv = new char *[nArgs];
+    for (i = 0; i < nArgs; i++)
+    {
+      new_argv[i] = (char *)Kernel_Utils::utf8_encode(szArglist[i]);
+    }
+    // Free memory allocated for CommandLineToArgvW arguments.
+    LocalFree(szArglist);
+    myServerLauncher = new Session_ServerLauncher<NamingServiceImplementation>(nArgs, new_argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted);
 #else
-    myServerLauncher = new Session_ServerLauncher( argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted );
+    myServerLauncher = new Session_ServerLauncher<NamingServiceImplementation>(argc, argv, orb, poa, &_GUIMutex, &_ServerLaunch, &_SessionMutex, &_SessionStarted);
 #endif
     // ...block this thread until launcher is ready
-    _ServerLaunch.wait( &_GUIMutex );
+    _ServerLaunch.wait(&_GUIMutex);
 
     // Start servers check thread (splash)
-    if ( splash ) {
+    if (splash)
+    {
       // ...lock mutex to block splash thread until wait( mutex )
       _SplashMutex.lock();
       // ...create servers checking thread
-      Session_ServerCheck sc( &_SplashMutex, &_SplashStarted );
+      Session_ServerCheck<NamingServiceImplementation> sc(&_SplashMutex, &_SplashStarted);
       // ... set initial progress
-      splash->setProgress( 0, sc.totalSteps() );
-      // start check loop 
-      while ( true ) {
-        int step    = sc.currentStep();
-        int total   = sc.totalSteps();
+      splash->setProgress(0, sc.totalSteps());
+      // start check loop
+      while (true)
+      {
+        int step = sc.currentStep();
+        int total = sc.totalSteps();
         QString msg = sc.currentMessage();
         QString err = sc.error();
-        if ( !err.isEmpty() ) {
-          QtxSplash::setError( err );
+        if (!err.isEmpty())
+        {
+          QtxSplash::setError(err);
           QApplication::instance()->processEvents();
           result = -1;
           break;
         }
-        QtxSplash::setStatus( msg, step );
+        QtxSplash::setStatus(msg, step);
         QApplication::instance()->processEvents();
-        if ( step >= total )
+        if (step >= total)
           break;
         // ...block this thread until servers checking is finished
-        _SplashStarted.wait( &_SplashMutex );
+        _SplashStarted.wait(&_SplashMutex);
       }
       // ...unlock mutex 'cause it is no more needed
       _SplashMutex.unlock();
     }
 
-    // Finalize embedded servers launcher 
+    // Finalize embedded servers launcher
     // ...block this thread until launcher is finished
-    _ServerLaunch.wait( &_GUIMutex );
+    _ServerLaunch.wait(&_GUIMutex);
     // ...unlock mutex 'cause it is no more needed
     _GUIMutex.unlock();
   }
 
   // Obtain Session interface reference
-  CORBA::Object_var obj = _NS->Resolve( "/Kernel/Session" );
-  SALOME::Session_var session = SALOME::Session::_narrow( obj ) ;
+  SALOME::Session_var session = self.getSession();
 
   bool shutdownAll = false;
   bool shutdownSession = false;
-  bool debugExceptions = boolCmdOption( "--no-exception-handler" ) ||
-    resMgr.booleanValue( "launch", "noexcepthandler", false );
+  bool debugExceptions = boolCmdOption("--no-exception-handler") ||
+                         resMgr.booleanValue("launch", "noexcepthandler", false);
 
-  if ( !result ) {
+  if (!result)
+  {
     // Launch GUI activator
-    if ( isGUI ) {
-      if ( splash )
-        splash->setStatus( QObject::tr( "Activating desktop..." ) );
+    if (isGUI)
+    {
+      if (splash)
+        splash->setStatus(QObject::tr("Activating desktop..."));
       // ...create GUI launcher
-      MESSAGE( "Session activated, Launch IAPP..." );
-      guiThread = new GetInterfaceThread( session );
+      MESSAGE("Session activated, Launch IAPP...");
+      guiThread = new GetInterfaceThread(session);
     }
 
     // GUI activation
     // Allow multiple activation/deactivation of GUI
-    while ( true ) {
-      MESSAGE( "waiting wakeAll()" );
-      _SessionStarted.wait( &_SessionMutex ); // to be reseased by Launch server thread when ready:
+    while (true)
+    {
+      MESSAGE("waiting wakeAll()");
+      _SessionStarted.wait(&_SessionMutex); // to be reseased by Launch server thread when ready:
       // atomic operation lock - unlock on mutex
       // unlock mutex: serverThread runs, calls _ServerLaunch->wakeAll()
       // this thread wakes up, and lock mutex
@@ -606,7 +703,8 @@ int main( int argc, char **argv )
       // Session might be shutdowning here, check status
       SALOME::StatSession stat = session->GetStatSession();
       shutdownSession = stat.state == SALOME::shutdown;
-      if ( shutdownSession ) {
+      if (shutdownSession)
+      {
         _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
         break;
       }
@@ -615,37 +713,39 @@ int main( int argc, char **argv )
       aGUISession = new Session();
 
       // Load SalomeApp dynamic library
-      MESSAGE( "creation SUIT_Application" );
-      SUIT_Application* aGUIApp = aGUISession->startApplication( "SalomeApp", 0, 0 );
-      if ( aGUIApp )
+      MESSAGE("creation SUIT_Application");
+      SUIT_Application *aGUIApp = aGUISession->startApplication(NamingServiceImplementation::LibName, 0, 0);
+      if (aGUIApp)
       {
 #ifdef USE_SALOME_STYLE
-        Style_Salome::initialize( aGUIApp->resourceMgr() );
-        if ( aGUIApp->resourceMgr()->booleanValue( "Style", "use_salome_style", true ) )
+        Style_Salome::initialize(aGUIApp->resourceMgr());
+        if (aGUIApp->resourceMgr()->booleanValue("Style", "use_salome_style", true))
           Style_Salome::apply();
 #endif // USE_SALOME_STYLE
 
-        if ( !debugExceptions )
-          app.setHandler( aGUISession->handler() ); // after loading SalomeApp application
-                                                    // aGUISession contains SalomeApp_ExceptionHandler
+        if (!debugExceptions)
+          app.setHandler(aGUISession->handler()); // after loading SalomeApp application
+                                                  // aGUISession contains SalomeApp_ExceptionHandler
 
         // Run GUI loop
-        MESSAGE( "run(): starting the main event loop" );
+        MESSAGE("run(): starting the main event loop");
 
-        if ( splash )
-          splash->finish( aGUIApp->desktop() );
+        if (splash)
+          splash->finish(aGUIApp->desktop());
 
         result = app.exec();
 
         splash = 0;
 
-        if ( result == SUIT_Session::NORMAL ) {
+        if (result == SUIT_Session::NORMAL)
+        {
           // desktop is explicitly closed by user from GUI
           // exit flags says if it's necessary to shutdown all servers
           // all session server only
           shutdownAll = aGUISession->exitFlags();
         }
-        else {
+        else
+        {
           // desktop might be closed from:
           // - StopSesion() (temporarily) or
           // - Shutdown() (permanently)
@@ -657,7 +757,8 @@ int main( int argc, char **argv )
           // asking to kill servers also
           shutdownAll = aGUISession->exitFlags();
         }
-        if ( shutdownAll || shutdownSession ) {
+        if (shutdownAll || shutdownSession)
+        {
           _SessionMutex.lock(); // lock mutex before leaving loop - it will be unlocked later
           break;
         }
@@ -675,65 +776,40 @@ int main( int argc, char **argv )
   _SessionMutex.unlock();
 
   // Shutdown embedded servers
-  if ( myServerLauncher )
+  if (myServerLauncher)
     myServerLauncher->ShutdownAll();
 
   // Shutdown standalone servers
-  if ( shutdownAll )
-    shutdownServers( _NS, remoteLauncher );
+  if (shutdownAll)
+    self.shutdownRemoteServersIfNeeded(remoteLauncher);
 
   // Kill embedded servers
-  if ( myServerLauncher )
+  if (myServerLauncher)
     myServerLauncher->KillAll();
 
   // Unregister session server
-  SALOME_Session_i* sessionServant = 
-    dynamic_cast<SALOME_Session_i*>( poa->reference_to_servant( session.in() ) );
-  if ( sessionServant )
+  SALOME_Session_i *sessionServant =
+      dynamic_cast<SALOME_Session_i *>(poa->reference_to_servant(session.in()));
+  if (sessionServant)
     sessionServant->NSunregister();
 
   delete aGUISession;
   delete guiThread;
   delete myServerLauncher;
-  delete _NS;
 #if defined(WIN32) && defined(UNICODE)
   delete[] new_argv;
 #endif
-
-  try {
-    orb->shutdown(0);
-  }
-  catch (...) {
-    //////////////////////////////////////////////////////////////
-    // VSR: silently skip exception:
-    // CORBA.BAD_INV_ORDER.BAD_INV_ORDER_ORBHasShutdown 
-    // exception is raised when orb->destroy() is called and
-    // cpp continer is launched in the embedded mode
-    //////////////////////////////////////////////////////////////
-    if ( shutdownAll )
-      killOmniNames();
-    abort(); //abort program to avoid deadlock in destructors or atexit when shutdown has been interrupted
-  }
-
-  // Destroy ORB
-  sleep(2);
-  ORB_INIT* init = SINGLETON_<ORB_INIT>::Instance();
-  if ( init )
-    init->explicit_destroy();
-
+  self.shutdownCORBAStufIfNeeded(shutdownAll,orb);
   // Finalize Python
-  if ( Py_IsInitialized() )
+  if (Py_IsInitialized())
   {
     PyGILState_Ensure();
     Py_Finalize();
   }
-
   // Kill omniNames process
-  if ( shutdownAll )
-  {
-    killOmniNames();
-  }
+  if (shutdownAll)
+    self.killOtherServersIfNeeded();
 
-  MESSAGE( "Salome_Session_Server:endofserver" );
+  MESSAGE("Salome_Session_Server:endofserver");
   return result;
 }
