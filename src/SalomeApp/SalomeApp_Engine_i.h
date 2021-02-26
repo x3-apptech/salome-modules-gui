@@ -38,7 +38,7 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SalomeApp_Engine)
 
-class SALOME_NamingService;
+class SALOME_NamingService_Abstract;
 
 class SALOMEAPP_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
 					   public Engines_Component_i
@@ -99,7 +99,7 @@ public:
 private:
   static CORBA::ORB_var              orb();
   static PortableServer::POA_var     poa();
-  static SALOME_NamingService*       namingService();
+  static SALOME_NamingService_Abstract*       namingService();
 private:
   MapOfFiles                         myListOfFiles;
   bool                               myKeepFiles;

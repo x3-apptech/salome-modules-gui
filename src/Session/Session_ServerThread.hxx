@@ -27,18 +27,23 @@
 #ifndef _SESSION_SERVERTHREAD_HXX_
 #define _SESSION_SERVERTHREAD_HXX_
 
+#include "Session_NS_wrapper.hxx"
 #include "SALOME_Session.hxx"
 
 #include <omniORB4/CORBA.h> 
 #include <string>
+#include <memory>
 
 void WaitForServerReadiness(std::string serverName);
 
 class SALOME_NamingService;
 class Engines_Container_i;
 
+template<class MY_NS>
 class SESSION_EXPORT Session_ServerThread
 {
+public:
+  using RealNS = typename MY_NS::RealNS;
 public:
   static const int NB_SRV_TYP;
   static const char* _serverTypes[];
@@ -59,20 +64,22 @@ protected:
   virtual void ActivateSession         ( int argc, char ** argv );
   void         ActivateEngine          ( int argc, char ** argv );
   void         ActivateContainerManager( int argc, char ** argv );
+  RealNS *getNS();
 protected:
   int                     _argc;
   char **                 _argv;
   int                     _servType;
   CORBA::ORB_var          _orb;
   PortableServer::POA_var _root_poa;
-  SALOME_NamingService *  _NS;
+  std::unique_ptr<MY_NS>  _NS;
   Engines_Container_i*    _container;
 };
 
 class QMutex;
 class QWaitCondition;
 
-class SESSION_EXPORT Session_SessionThread : public Session_ServerThread
+template<class MY_NS>
+class SESSION_EXPORT Session_SessionThread : public Session_ServerThread<MY_NS>
 {
 public:
   Session_SessionThread() {}
@@ -85,11 +92,10 @@ public:
   virtual ~Session_SessionThread();  
 
 protected:
-  virtual void ActivateSession       ( int argc, char ** argv );
+  void ActivateSession       ( int argc, char ** argv ) override;
 private:
   QMutex*                 _GUIMutex;
   QWaitCondition*         _GUILauncher;
 };
 
 #endif
-

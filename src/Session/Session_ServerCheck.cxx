@@ -87,7 +87,8 @@ const int __DEFAULT__DELAY__ = 50000;
   \internal
 */
 
-class Session_ServerCheck::Locker
+template<class MY_CLS>
+class Session_ServerCheck<MY_CLS>::Locker
 {
 public:
   /*!
@@ -135,7 +136,8 @@ private:
   \param mutex a mutex used to serialize progress operations (splash)
   \param wc a wait condition used in combination with \a mutex
 */
-Session_ServerCheck::Session_ServerCheck( QMutex* mutex, QWaitCondition* wc )
+template<class MY_NS>
+Session_ServerCheck<MY_NS>::Session_ServerCheck( QMutex* mutex, QWaitCondition* wc )
 : QThread(),
   myMutex( mutex ),
   myWC( wc ),
@@ -169,7 +171,8 @@ Session_ServerCheck::Session_ServerCheck( QMutex* mutex, QWaitCondition* wc )
 /*!
   \brief Destructor
 */
-Session_ServerCheck::~Session_ServerCheck()
+template<class MY_NS>
+Session_ServerCheck<MY_NS>::~Session_ServerCheck()
 {
   terminate();
   while( isRunning() );
@@ -179,7 +182,8 @@ Session_ServerCheck::~Session_ServerCheck()
   \brief Get current information message.
   \return current message
 */
-QString Session_ServerCheck::currentMessage()
+template<class MY_NS>
+QString Session_ServerCheck<MY_NS>::currentMessage()
 {
   static QStringList messages;
   if ( messages.isEmpty() ) {
@@ -204,7 +208,8 @@ QString Session_ServerCheck::currentMessage()
   \brief Get error message.
   \return error message or null string of there was no any error
 */
-QString Session_ServerCheck::error()
+template<class MY_NS>
+QString Session_ServerCheck<MY_NS>::error()
 {
   QMutexLocker locker( &myDataMutex );
   return myError;
@@ -214,7 +219,8 @@ QString Session_ServerCheck::error()
   \brief Get current step.
   \return current step
 */
-int Session_ServerCheck::currentStep()
+template<class MY_NS>
+int Session_ServerCheck<MY_NS>::currentStep()
 {
   QMutexLocker locker( &myDataMutex );
   return myCurrentStep;
@@ -224,7 +230,8 @@ int Session_ServerCheck::currentStep()
   \brief Get total number of check steps.
   \return total number of steps
 */
-int Session_ServerCheck::totalSteps()
+template<class MY_NS>
+int Session_ServerCheck<MY_NS>::totalSteps()
 {
   QMutexLocker locker( &myDataMutex );
   int cnt = 5;                       // base servers
@@ -238,7 +245,8 @@ int Session_ServerCheck::totalSteps()
   \brief Modify current step.
   \param step new current step value
 */
-void Session_ServerCheck::setStep( const int step )
+template<class MY_NS>
+void Session_ServerCheck<MY_NS>::setStep( const int step )
 {
   QMutexLocker locker( &myDataMutex );
   myCurrentStep = step;
@@ -248,7 +256,8 @@ void Session_ServerCheck::setStep( const int step )
   \brief Set error message.
   \param msg error message
 */
-void Session_ServerCheck::setError( const QString& msg )
+template<class MY_NS>
+void Session_ServerCheck<MY_NS>::setError( const QString& msg )
 {
   QMutexLocker locker( &myDataMutex );
   myError = msg;
@@ -257,7 +266,8 @@ void Session_ServerCheck::setError( const QString& msg )
 /*!
   \brief Thread loop function. Performs SALOME servers check.
 */
-void Session_ServerCheck::run()
+template<class MY_NS>
+void Session_ServerCheck<MY_NS>::run()
 {
   // start check servers
   int current = 0;
@@ -271,11 +281,9 @@ void Session_ServerCheck::run()
     setStep( current * myAttempts + i );
 
     try {
-      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( args.argc(), args.argv() );
-      CORBA::Object_var obj = orb->resolve_initial_references( "NameService" );
-      CosNaming::NamingContext_var _root_context = CosNaming::NamingContext::_narrow( obj );
-      if ( !CORBA::is_nil( _root_context ) ) {
+      bool forceOK = false;
+      CosNaming::NamingContext_var _root_context = MY_NS::checkTrueNamingServiceIfExpected(args.argc(), args.argv(),forceOK);
+      if ( forceOK ||  !CORBA::is_nil( _root_context ) ) {
         setStep( ++current * myAttempts );
         break;
       }
@@ -302,12 +310,7 @@ void Session_ServerCheck::run()
     setStep( current * myAttempts + i );
 
     try {
-      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( args.argc(), args.argv() );
-      SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-      ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-      NS.init_orb( orb );
-      CORBA::Object_var obj = NS.Resolve( "/Registry" );
+      CORBA::Object_var obj = MY_NS::forServerChecker("/Registry", args.argc(), args.argv());
       Registry::Components_var registry = Registry::Components::_narrow( obj );
       if ( !CORBA::is_nil( registry ) ) {
         MESSAGE( "/Registry is found" );
@@ -351,12 +354,7 @@ void Session_ServerCheck::run()
     setStep( current * myAttempts + i );
 
     try {
-      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( args.argc(), args.argv() );
-      SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-      ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-      NS.init_orb( orb );
-      CORBA::Object_var obj = NS.Resolve( "/Study" );
+      CORBA::Object_var obj = MY_NS::forServerChecker("/Study", args.argc(), args.argv());
       SALOMEDS::Study_var study = SALOMEDS::Study::_narrow( obj );
       if ( !CORBA::is_nil( study ) ) {
         MESSAGE( "/Study is found" );
@@ -400,12 +398,7 @@ void Session_ServerCheck::run()
     setStep( current * myAttempts + i );
 
     try {
-      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( args.argc(), args.argv() );
-      SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-      ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-      NS.init_orb( orb );
-      CORBA::Object_var obj = NS.Resolve( "/Kernel/ModulCatalog" );
+      CORBA::Object_var obj = MY_NS::forServerChecker("/Kernel/ModulCatalog", args.argc(), args.argv());
       SALOME_ModuleCatalog::ModuleCatalog_var catalog = SALOME_ModuleCatalog::ModuleCatalog::_narrow( obj );
       if ( !CORBA::is_nil( catalog ) ){
         MESSAGE( "/Kernel/ModulCatalog is found" );
@@ -449,12 +442,7 @@ void Session_ServerCheck::run()
     setStep( current * myAttempts + i );
 
     try {
-      ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-      CORBA::ORB_var orb = init( args.argc(), args.argv() );
-      SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-      ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-      NS.init_orb( orb );
-      CORBA::Object_var obj = NS.Resolve( "/Kernel/Session" );
+      CORBA::Object_var obj = MY_NS::forServerChecker("/Kernel/Session", args.argc(), args.argv());
       SALOME::Session_var session = SALOME::Session::_narrow( obj );
       if ( !CORBA::is_nil( session ) ) {
         MESSAGE( "/Kernel/Session is found" );
@@ -499,13 +487,8 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-        CORBA::ORB_var orb = init( args.argc(), args.argv() );
-        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-        NS.init_orb( orb );
         QString containerName = QString( "/Containers/%1/FactoryServer" ).arg( Kernel_Utils::GetHostname().c_str() );
-        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        CORBA::Object_var obj = MY_NS::forServerChecker(containerName.toLatin1(), args.argc(), args.argv());
         Engines::Container_var FScontainer = Engines::Container::_narrow( obj );
         if ( !CORBA::is_nil( FScontainer ) ) {
           MESSAGE( containerName.toLatin1().constData() << " is found" );
@@ -551,13 +534,8 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-        CORBA::ORB_var orb = init( args.argc(), args.argv() );
-        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-        NS.init_orb( orb );
         QString containerName = QString( "/Containers/%1/FactoryServerPy" ).arg( Kernel_Utils::GetHostname().c_str() );
-        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        CORBA::Object_var obj = MY_NS::forServerChecker(containerName.toLatin1(), args.argc(), args.argv());
         Engines::Container_var FSPcontainer = Engines::Container::_narrow( obj );
         if ( !CORBA::is_nil( FSPcontainer ) ) {
           MESSAGE( containerName.toLatin1().constData() << " is found" );
@@ -603,13 +581,8 @@ void Session_ServerCheck::run()
       setStep( current * myAttempts + i );
 
       try {
-        ORB_INIT& init = *SINGLETON_<ORB_INIT>::Instance();
-        CORBA::ORB_var orb = init( args.argc(), args.argv() );
-        SALOME_NamingService &NS = *SINGLETON_<SALOME_NamingService>::Instance();
-        ASSERT( SINGLETON_<SALOME_NamingService>::IsAlreadyExisting() );
-        NS.init_orb( orb );
         QString containerName = QString( "/Containers/%1/SuperVisionContainer" ).arg( Kernel_Utils::GetHostname().c_str() );
-        CORBA::Object_var obj = NS.Resolve( containerName.toLatin1() );
+        CORBA::Object_var obj = MY_NS::forServerChecker(containerName.toLatin1(), args.argc(), args.argv());
         Engines::Container_var SVcontainer = Engines::Container::_narrow( obj );
         if ( !CORBA::is_nil( SVcontainer ) ) {
           MESSAGE( containerName.toLatin1().constData() << " is found" );
@@ -647,3 +620,8 @@ void Session_ServerCheck::run()
     }
   }
 }
+
+#include "Session_NS_wrapper.hxx"
+
+template class Session_ServerCheck<OldStyleNS>;
+template class Session_ServerCheck<NewStyleNS>;

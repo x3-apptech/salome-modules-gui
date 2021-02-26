@@ -52,26 +52,18 @@
 #include <unistd.h>
 #endif
 
-/*!
-  constructor
-*/
-SALOME_Session_i::SALOME_Session_i(int argc,
-                                   char ** argv,
-                                   CORBA::ORB_ptr orb,
-                                   PortableServer::POA_ptr poa,
-                                   QMutex* GUIMutex,
-                                   QWaitCondition* GUILauncher)
+SALOME_Session_i::SALOME_Session_i(int argc, char ** argv, CORBA::ORB_ptr orb, PortableServer::POA_ptr poa, QMutex* GUIMutex, QWaitCondition* GUILauncher):
+_argc(argc),_argv(argv),_isGUI(false),_GUIMutex(GUIMutex),_GUILauncher(GUILauncher),
+_orb(CORBA::ORB::_duplicate(orb)),_poa(PortableServer::POA::_duplicate(poa)),_isShuttingDown(false)
 {
-  _argc = argc ;
-  _argv = argv ;
-  _isGUI = false ;
-  _orb = CORBA::ORB::_duplicate(orb) ;
-  _poa = PortableServer::POA::_duplicate(poa) ;
-  _GUIMutex = GUIMutex;
-  _GUILauncher = GUILauncher;
-  _NS = new SALOME_NamingService(_orb);
-  _isShuttingDown = false;
-  //MESSAGE("constructor end");
+  _NS.reset(new SALOME_NamingService(_orb));
+}
+
+SALOME_Session_i::SALOME_Session_i(int argc, char ** argv, CORBA::ORB_ptr orb, PortableServer::POA_ptr poa, QMutex* GUIMutex, QWaitCondition* GUILauncher, SALOME_NamingService_Abstract *NS):
+_argc(argc),_argv(argv),_isGUI(false),_GUIMutex(GUIMutex),_GUILauncher(GUILauncher),
+_orb(CORBA::ORB::_duplicate(orb)),_poa(PortableServer::POA::_duplicate(poa)),_isShuttingDown(false)
+{
+  _NS.reset(NS);
 }
 
 /*!
@@ -79,13 +71,14 @@ SALOME_Session_i::SALOME_Session_i(int argc,
 */
 Engines::EngineComponent_ptr SALOME_Session_i::GetComponent(const char* theLibraryName)
 {
-  typedef Engines::EngineComponent_ptr TGetImpl(CORBA::ORB_ptr,
-                                                PortableServer::POA_ptr,
-                                                SALOME_NamingService*,QMutex*);
+  using TGetImpl = Engines::EngineComponent_ptr (*)(CORBA::ORB_ptr, PortableServer::POA_ptr, SALOME_NamingService*,QMutex*);
   OSD_SharedLibrary aSharedLibrary(const_cast<char*>(theLibraryName));
   if (aSharedLibrary.DlOpen(OSD_RTLD_LAZY)) {
     if (OSD_Function anOSDFun = aSharedLibrary.DlSymb("GetImpl"))
-      return ((TGetImpl (*)) anOSDFun)(_orb,_poa,_NS,_GUIMutex);
+    {
+      Engines::EngineComponent_ptr ret = ((TGetImpl) anOSDFun)(_orb,_poa,dynamic_cast<SALOME_NamingService*>(_NS.get()),_GUIMutex);
+      return ret;
+    }
   }
   CORBA::Object_var obj = SalomeApp_Engine_i::EngineForComponent(theLibraryName, true);
   if (!CORBA::is_nil(obj)){
@@ -100,7 +93,6 @@ Engines::EngineComponent_ptr SALOME_Session_i::GetComponent(const char* theLibra
 */
 SALOME_Session_i::~SALOME_Session_i()
 {
-  delete _NS;
   //MESSAGE("destructor end");
 }
 

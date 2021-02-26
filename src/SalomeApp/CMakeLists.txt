@@ -124,7 +124,8 @@ ENDIF()
 # --- headers ---
 
 # header files / to be processed by moc
-SET(_moc_HEADERS   
+SET(_moc_HEADERS
+  SalomeApp_Application_SL.h
   SalomeApp_Application.h
   SalomeApp_CheckFileDlg.h
   SalomeApp_DataModel.h
@@ -184,6 +185,7 @@ QT_WRAP_MOC(_moc_SOURCES ${_moc_HEADERS})
 
 # sources / static
 SET(_other_SOURCES
+  SalomeApp_Application_SL.cxx
   SalomeApp_Application.cxx
   SalomeApp_CheckFileDlg.cxx
   SalomeApp_DataModel.cxx
@@ -226,14 +228,22 @@ SET(_py_SCRIPTS
 
 # --- rules ---
 
-ADD_LIBRARY(SalomeApp ${SalomeApp_SOURCES})
-TARGET_LINK_LIBRARIES(SalomeApp ${_link_LIBRARIES})
-INSTALL(TARGETS SalomeApp EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
+ADD_LIBRARY(SalomeAppImpl ${SalomeApp_SOURCES})
+TARGET_LINK_LIBRARIES(SalomeAppImpl ${_link_LIBRARIES})
+
+ADD_LIBRARY(SalomeApp SalomeApp_Application_Entry.cxx)
+TARGET_LINK_LIBRARIES(SalomeApp SalomeAppImpl)
+
+ADD_LIBRARY(SalomeAppSL SalomeApp_Application_SL_Entry.cxx)
+TARGET_LINK_LIBRARIES(SalomeAppSL SalomeAppImpl)
+
+INSTALL(TARGETS SalomeAppImpl SalomeApp SalomeAppSL EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})
 
 INSTALL(FILES ${SalomeApp_HEADERS} DESTINATION ${SALOME_INSTALL_HEADERS})
 QT_INSTALL_TS_RESOURCES("${_ts_RESOURCES}" "${SALOME_GUI_INSTALL_RES_DATA}")
 
 INSTALL(FILES ${_other_RESOURCES} DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
+install(FILES ${_other_RESOURCES} RENAME SalomeAppSL.xml DESTINATION ${SALOME_GUI_INSTALL_RES_DATA})
 
 SALOME_INSTALL_SCRIPTS("${_py_SCRIPTS}"  ${SALOME_INSTALL_PYTHON})
 SALOME_INSTALL_SCRIPTS("${_bin_SCRIPTS}" ${SALOME_INSTALL_SCRIPT_PYTHON})

@@ -110,6 +110,8 @@
 
 #include <SALOMEDS_Tool.hxx>
 
+std::unique_ptr<SALOME_NamingService_Abstract> SalomeApp_Application::_ns;
+
 /*!Internal class that updates object browser item properties */
 // temporary commented
 /*class SalomeApp_Updater : public OB_Updater
@@ -173,18 +175,13 @@ namespace
   };
 }
 
-/*!Create new instance of SalomeApp_Application.*/
-extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
-{
-  return new SalomeApp_Application();
-}
-
 /*!Constructor.*/
-SalomeApp_Application::SalomeApp_Application()
-  : LightApp_Application(),
-    myIsCloseFromExit( false ),
-    myToIgnoreMessages( false )
+SalomeApp_Application::SalomeApp_Application(SALOME_NamingService_Abstract *ns):myIsCloseFromExit( false ),myToIgnoreMessages( false )
 {
+  if(!ns)
+    _ns.reset(new SALOME_NamingService(orb()));
+  else
+    _ns.reset(ns);
 }
 
 /*!Destructor.
@@ -1370,10 +1367,9 @@ _PTR(Study) SalomeApp_Application::getStudy()
 }
 
 /*!Create and return SALOME_NamingService.*/
-SALOME_NamingService* SalomeApp_Application::namingService()
+SALOME_NamingService_Abstract *SalomeApp_Application::namingService()
 {
-  static SALOME_NamingService _ns(orb());
-  return &_ns;
+  return _ns.get();
 }
 
 /*!Create and return SALOME_LifeCycleCORBA.*/
