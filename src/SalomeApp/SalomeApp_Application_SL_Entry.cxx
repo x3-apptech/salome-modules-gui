@@ -20,7 +20,7 @@
 #include "SalomeApp_Application_SL.h"
 
 /*!Create new instance of SalomeApp_Application.*/
-extern "C" SALOMEAPP_EXPORT SUIT_Application* createApplication()
+extern "C" SALOMEAPPSL_EXPORT SUIT_Application* createApplication()
 {
   return new SalomeApp_Application_SL;
 }

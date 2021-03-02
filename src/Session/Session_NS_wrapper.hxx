@@ -20,6 +20,7 @@
 #pragma once
 
 #include "SALOME_NamingService.hxx"
+#include "SALOME_Session.hxx"
 
 #include "omniORB4/CORBA.h"
 
@@ -28,7 +29,7 @@ class QWaitCondition;
 
 class Engines_Container_i;
 
-class OldStyleNS
+class SESSION_EXPORT OldStyleNS
 {
 public:
   using RealNS = SALOME_NamingService;
@@ -51,7 +52,7 @@ private:
 
 #include "SALOME_Fake_NamingService.hxx"
 
-class NewStyleNS
+class SESSION_EXPORT NewStyleNS
 {
 public:
   using RealNS = SALOME_Fake_NamingService;

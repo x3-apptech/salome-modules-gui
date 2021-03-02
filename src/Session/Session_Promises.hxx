@@ -21,7 +21,8 @@
 
 #include "SALOMEconfig.h"
 #include CORBA_SERVER_HEADER(SALOME_Session)
+#include "SALOME_Session.hxx"
 
 #include <future>
 
-std::promise<SALOME::Session_var> *GetSessionRefSingleton();
+SESSION_EXPORT std::promise<SALOME::Session_var> *GetSessionRefSingleton();

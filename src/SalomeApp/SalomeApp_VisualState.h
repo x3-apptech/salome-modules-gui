@@ -33,7 +33,7 @@
 
 class SalomeApp_Application;
 
-class SALOMEAPP_EXPORT SalomeApp_VisualState: public QObject
+class SALOMEAPPIMPL_EXPORT SalomeApp_VisualState: public QObject
 {
 public:
   SalomeApp_VisualState( SalomeApp_Application* );

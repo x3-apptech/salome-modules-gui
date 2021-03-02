@@ -64,7 +64,7 @@ class SALOME_LifeCycleCORBA;
   \brief Application containing SalomeApp module or LightApp module
 */
 
-class SALOMEAPP_EXPORT SalomeApp_Application : public LightApp_Application
+class SALOMEAPPIMPL_EXPORT SalomeApp_Application : public LightApp_Application
 {
   Q_OBJECT
 

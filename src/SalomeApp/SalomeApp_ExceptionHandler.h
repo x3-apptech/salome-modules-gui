@@ -27,7 +27,7 @@
 
 #include <SUIT_ExceptionHandler.h>
 
-class SALOMEAPP_EXPORT SalomeApp_ExceptionHandler : public SUIT_ExceptionHandler
+class SALOMEAPPIMPL_EXPORT SalomeApp_ExceptionHandler : public SUIT_ExceptionHandler
 {
 public:
   SalomeApp_ExceptionHandler( const bool );

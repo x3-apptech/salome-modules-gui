@@ -32,7 +32,7 @@
 
 class SalomeApp_Study;
 
-class SALOMEAPP_EXPORT SalomeApp_DataObject : public virtual LightApp_DataObject
+class SALOMEAPPIMPL_EXPORT SalomeApp_DataObject : public virtual LightApp_DataObject
 {
 
 public:
@@ -85,7 +85,7 @@ private:
   _PTR(SObject)          myObject;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_ModuleObject : public SalomeApp_DataObject,
+class SALOMEAPPIMPL_EXPORT SalomeApp_ModuleObject : public SalomeApp_DataObject,
                                                 public CAM_ModuleObject
 {
 public:
@@ -99,7 +99,7 @@ public:
   QString                toolTip( const int = NameId ) const;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_RootObject : public SalomeApp_DataObject,
+class SALOMEAPPIMPL_EXPORT SalomeApp_RootObject : public SalomeApp_DataObject,
                                               public LightApp_RootObject
 {
 public:
@@ -118,7 +118,7 @@ protected:
   bool _toSynchronize;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_SavePointObject : public virtual LightApp_DataObject
+class SALOMEAPPIMPL_EXPORT SalomeApp_SavePointObject : public virtual LightApp_DataObject
 {
 public:
   SalomeApp_SavePointObject( SUIT_DataObject*, const int, SalomeApp_Study* );
@@ -137,7 +137,7 @@ private:
   SalomeApp_Study*       myStudy;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_SavePointRootObject : public SUIT_DataObject
+class SALOMEAPPIMPL_EXPORT SalomeApp_SavePointRootObject : public SUIT_DataObject
 {
 public:
   SalomeApp_SavePointRootObject( SUIT_DataObject* );

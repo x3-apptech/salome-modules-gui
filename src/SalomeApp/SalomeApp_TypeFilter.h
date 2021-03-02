@@ -30,7 +30,7 @@
 /*!
   Class which provide data owner validation.
 */
-class SALOMEAPP_EXPORT SalomeApp_TypeFilter: public SalomeApp_Filter
+class SALOMEAPPIMPL_EXPORT SalomeApp_TypeFilter: public SalomeApp_Filter
 {
 public:
   SalomeApp_TypeFilter( SalomeApp_Study* study, const QString& kind );

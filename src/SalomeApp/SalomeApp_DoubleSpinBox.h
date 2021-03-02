@@ -29,7 +29,7 @@
 
 #include <QValidator>
 
-class SALOMEAPP_EXPORT SalomeApp_DoubleSpinBox : public QtxDoubleSpinBox
+class SALOMEAPPIMPL_EXPORT SalomeApp_DoubleSpinBox : public QtxDoubleSpinBox
 {
   Q_OBJECT
 

@@ -38,8 +38,22 @@
 #define SALOMEAPP_EXPORT __declspec(dllimport)
 #endif
 
+#if defined SALOMEAPPIMPL_EXPORTS || defined SalomeAppImpl_EXPORTS
+#define SALOMEAPPIMPL_EXPORT __declspec(dllexport)
+#else
+#define SALOMEAPPIMPL_EXPORT __declspec(dllimport)
+#endif
+
+#if defined SALOMEAPPSL_EXPORTS || defined SalomeAppSL_EXPORTS
+#define SALOMEAPPSL_EXPORT __declspec(dllexport)
+#else
+#define SALOMEAPPSL_EXPORT __declspec(dllimport)
+#endif
+
 #else
 #define SALOMEAPP_EXPORT
+#define SALOMEAPPIMPL_EXPORT
+#define SALOMEAPPSL_EXPORT
 #endif               //WIN32
 
 #define APP_VERSION "0.1"

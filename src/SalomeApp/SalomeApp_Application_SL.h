@@ -21,7 +21,7 @@
 
 #include "SalomeApp_Application.h"
 
-class SALOMEAPP_EXPORT SalomeApp_Application_SL : public SalomeApp_Application
+class SALOMEAPPIMPL_EXPORT SalomeApp_Application_SL : public SalomeApp_Application
 {
 public:
   SalomeApp_Application_SL();

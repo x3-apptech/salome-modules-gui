@@ -38,7 +38,7 @@ class Quantity_Color;
 /*! 
   Class which provide color converter and exception message box.
 */
-class SALOMEAPP_EXPORT SalomeApp_Tools : public SUIT_Tools
+class SALOMEAPPIMPL_EXPORT SalomeApp_Tools : public SUIT_Tools
 {
 public:
   static Quantity_Color  color( const QColor& );

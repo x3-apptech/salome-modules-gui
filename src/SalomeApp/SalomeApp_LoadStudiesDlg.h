@@ -28,7 +28,7 @@ class QListWidget;
 class QPushButton;
 class QStringList;
 
-class SALOMEAPP_EXPORT SalomeApp_LoadStudiesDlg : public QDialog
+class SALOMEAPPIMPL_EXPORT SalomeApp_LoadStudiesDlg : public QDialog
 { 
   Q_OBJECT
 

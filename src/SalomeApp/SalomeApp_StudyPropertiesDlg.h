@@ -44,7 +44,7 @@ class QTextEdit;
 class QTreeWidget;
 class QPushButton;
 
-class SALOMEAPP_EXPORT SalomeApp_StudyPropertiesDlg : public QDialog
+class SALOMEAPPIMPL_EXPORT SalomeApp_StudyPropertiesDlg : public QDialog
 { 
   Q_OBJECT
 public:

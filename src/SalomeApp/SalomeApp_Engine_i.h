@@ -40,7 +40,7 @@
 
 class SALOME_NamingService_Abstract;
 
-class SALOMEAPP_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
+class SALOMEAPPIMPL_EXPORT SalomeApp_Engine_i: public POA_SalomeApp::Engine,
 					   public Engines_Component_i
 {
 public:

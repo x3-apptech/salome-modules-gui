@@ -43,7 +43,7 @@ class LightApp_DataObject;
 
 //   Class       : SalomeApp_DataModel
 ///  Description : Base class of data model
-class SALOMEAPP_EXPORT SalomeApp_DataModel : public LightApp_DataModel
+class SALOMEAPPIMPL_EXPORT SalomeApp_DataModel : public LightApp_DataModel
 {
   Q_OBJECT
 

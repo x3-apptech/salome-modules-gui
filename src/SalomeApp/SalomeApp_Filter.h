@@ -28,7 +28,7 @@
 
 class SalomeApp_Study;
 
-class SALOMEAPP_EXPORT SalomeApp_Filter: public SUIT_SelectionFilter
+class SALOMEAPPIMPL_EXPORT SalomeApp_Filter: public SUIT_SelectionFilter
 {
 public:
   SalomeApp_Filter(SalomeApp_Study* study);

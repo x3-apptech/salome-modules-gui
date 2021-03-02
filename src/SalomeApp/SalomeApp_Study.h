@@ -33,7 +33,7 @@
 
 #include "SALOMEDSClient.hxx"
 
-class SALOMEAPP_EXPORT SalomeApp_Study : public LightApp_Study
+class SALOMEAPPIMPL_EXPORT SalomeApp_Study : public LightApp_Study
 {
   Q_OBJECT
 

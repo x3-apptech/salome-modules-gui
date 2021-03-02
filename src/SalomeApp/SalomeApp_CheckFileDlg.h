@@ -29,7 +29,7 @@
 
 class QCheckBox;
 
-class SALOMEAPP_EXPORT SalomeApp_CheckFileDlg : public SUIT_FileDlg
+class SALOMEAPPIMPL_EXPORT SalomeApp_CheckFileDlg : public SUIT_FileDlg
 {
   Q_OBJECT
     

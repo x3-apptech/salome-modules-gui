@@ -52,7 +52,7 @@ struct NoteBoox_Variable
 
 typedef QMap< int, NoteBoox_Variable > VariableMap;
 
-class SALOMEAPP_EXPORT NoteBook_TableRow : public QWidget
+class SALOMEAPPIMPL_EXPORT NoteBook_TableRow : public QWidget
 {
  public:
   NoteBook_TableRow(int, NoteBook_Table* parentTable, QWidget* parent=0 );
@@ -88,7 +88,7 @@ class SALOMEAPP_EXPORT NoteBook_TableRow : public QWidget
   QTableWidgetItem* myVariableValue;
 };
 
-class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
+class SALOMEAPPIMPL_EXPORT NoteBook_Table : public QTableWidget
 {
   Q_OBJECT
  public:
@@ -138,7 +138,7 @@ class SALOMEAPP_EXPORT NoteBook_Table : public QTableWidget
   VariableMap myVariableMap;
 };
 
-class SALOMEAPP_EXPORT SalomeApp_NoteBook : public QWidget 
+class SALOMEAPPIMPL_EXPORT SalomeApp_NoteBook : public QWidget 
 {
   Q_OBJECT
  public:

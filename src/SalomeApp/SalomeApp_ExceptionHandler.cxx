@@ -98,7 +98,7 @@ bool SalomeApp_ExceptionHandler::handle( QObject* o, QEvent* e )
 }
 
 /*!Create new SUIT_ExceptionHandler*/
-extern "C" SALOMEAPP_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
+extern "C" SALOMEAPPIMPL_EXPORT SUIT_ExceptionHandler* getExceptionHandler()
 {
   // MSV 2006-04-26: work around PAL12004 "VTK window => SIGFPE Arithmetic Exception Detected"
   // We disable FPE signal as it was in earlier versions of SALOME. It is enabled
