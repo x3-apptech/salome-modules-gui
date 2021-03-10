@@ -23,6 +23,7 @@
 #include "GraphicsView.h"
 
 #include <SUIT_ViewWindow.h>
+#include <QPainterPath>
 
 class QGraphicsSceneContextMenuEvent;
 class QGraphicsSceneMouseEvent;

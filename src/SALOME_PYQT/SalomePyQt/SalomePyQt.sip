@@ -130,9 +130,9 @@ class QtxAction : QWidgetAction
 
 %ConvertToSubClassCode
     if ( qobject_cast<QtxAction*>( sipCpp ) )
-      sipClass = sipClass_QtxAction;
+      sipType = sipType_QtxAction;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:
@@ -153,9 +153,9 @@ class QtxActionSet : QtxAction
 
 %ConvertToSubClassCode
     if ( qobject_cast<QtxActionSet*>( sipCpp ) )
-      sipClass = sipClass_QtxActionSet;
+      sipType = sipType_QtxActionSet;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:
@@ -192,9 +192,9 @@ class QtxActionGroup : QtxActionSet
 
 %ConvertToSubClassCode
     if ( qobject_cast<QtxActionGroup*>( sipCpp ) )
-      sipClass = sipClass_QtxActionGroup;
+      sipType = sipType_QtxActionGroup;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:
@@ -226,9 +226,9 @@ class QtxTreeView : public QTreeView
 
 %ConvertToSubClassCode
     if ( qobject_cast<QtxTreeView*>( sipCpp ) )
-      sipClass = sipClass_QtxTreeView;
+      sipType = sipType_QtxTreeView;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:
@@ -252,9 +252,9 @@ class UserDefinedContent : public QWidget
 
 %ConvertToSubClassCode
     if ( qobject_cast<UserDefinedContent*>( sipCpp ) )
-      sipClass = sipClass_UserDefinedContent;
+      sipType = sipType_UserDefinedContent;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:

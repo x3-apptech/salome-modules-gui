@@ -55,9 +55,9 @@ class Plot2d_Curve
 
 %ConvertToSubClassCode
     if ( dynamic_cast<Plot2d_Curve*>( sipCpp ) )
-      sipClass = sipClass_Plot2d_Curve;
+      sipType = sipType_Plot2d_Curve;
     else
-      sipClass = NULL;
+      sipType = NULL;
 %End
 
 public:

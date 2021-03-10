@@ -25,6 +25,7 @@
 #include "GraphicsView_Defs.h"
 
 #include <QGraphicsView>
+#include <QPainterPath>
 
 class QGridLayout;
 class QRubberBand;

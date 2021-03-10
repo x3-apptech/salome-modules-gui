@@ -143,7 +143,7 @@ void PVViewer_GUIElements::buildPVWidgets()
     // Catalyst Menu
     if (!catalystMenu) {
       catalystMenu = new QMenu(0);
-#if PARAVIEW_VERSION_MAJOR==5 && PARAVIEW_VERSION_MINOR>=6
+#if PARAVIEW_VERSION_MAJOR==5 && PARAVIEW_VERSION_MINOR<9
       pqParaViewMenuBuilders::buildCatalystMenu(*catalystMenu, myDesktop);
 #else
       pqParaViewMenuBuilders::buildCatalystMenu(*catalystMenu);
