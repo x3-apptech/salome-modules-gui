@@ -268,8 +268,8 @@ SVTK_DeviceActor
     myPassFilter[ 0 ]->Update();
     if ( vtkDataSet* aDataSet = myPassFilter[ 0 ]->GetOutput() )
     {
-      int numCells=aDataSet->GetNumberOfCells();
-      int numPts = aDataSet->GetNumberOfPoints();
+      vtkIdType numCells=aDataSet->GetNumberOfCells();
+      vtkIdType numPts = aDataSet->GetNumberOfPoints();
       //It's impossible to use to apply "shrink" for "empty" dataset
       if (numCells < 1 || numPts < 1)
         return;
@@ -576,9 +576,9 @@ SVTK_DeviceActor
 /*!
   Maps VTK index of a node to corresponding object index
 */
-int
+vtkIdType
 SVTK_DeviceActor
-::GetNodeObjId(int theVtkID)
+::GetNodeObjId(vtkIdType theVtkID)
 {
   return theVtkID;
 }
@@ -588,7 +588,7 @@ SVTK_DeviceActor
 */
 double* 
 SVTK_DeviceActor
-::GetNodeCoord(int theObjID)
+::GetNodeCoord(vtkIdType theObjID)
 {
   return GetInput()->GetPoint(theObjID);
 }
@@ -599,7 +599,7 @@ SVTK_DeviceActor
 */
 vtkCell* 
 SVTK_DeviceActor
-::GetElemCell(int theObjID)
+::GetElemCell(vtkIdType theObjID)
 {
   return GetInput()->GetCell(theObjID);
 }
@@ -607,9 +607,9 @@ SVTK_DeviceActor
 /*!
   Maps VTK index of a cell to corresponding object index
 */
-int
+vtkIdType
 SVTK_DeviceActor
-::GetElemObjId(int theVtkID) 
+::GetElemObjId(vtkIdType theVtkID) 
 { 
   return theVtkID;
 }

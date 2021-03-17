@@ -24,7 +24,7 @@
 // Author:  Alexey PETROV
 
 #include "VTKViewer_ExtractUnstructuredGrid.h"
-#include "VTKViewer_CellLocationsArray.h"
+//#include "VTKViewer_CellLocationsArray.h"
 
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnstructuredGrid.h>
@@ -81,12 +81,12 @@ void VTKViewer_ExtractUnstructuredGrid::SetStoreMapping(int theStoreMapping)
   }
 }
 
-vtkIdType VTKViewer_ExtractUnstructuredGrid::GetInputId(int theOutId) const
+vtkIdType VTKViewer_ExtractUnstructuredGrid::GetInputId(vtkIdType theOutId) const
 {
   if ( myPassAll || ( myCellIds.empty() && myCellTypes.empty() ))
     return theOutId;
 
-  if ( theOutId<0 || theOutId >= (int)myOut2InId.size() )
+  if ( theOutId < 0 || theOutId >= (vtkIdType) myOut2InId.size() )
     return -1;
   return myOut2InId[theOutId];
 }
@@ -281,7 +281,7 @@ void VTKViewer_ExtractUnstructuredGrid::BuildOut2InMap()
 // }
 
 
-inline int InsertCell(vtkUnstructuredGrid *theInput,
+inline vtkIdType InsertCell(vtkUnstructuredGrid *theInput,
                       vtkCellArray *theConnectivity,
                       vtkUnsignedCharArray* theCellTypesArray,
                       vtkIdTypeArray*& theFaces,
@@ -490,7 +490,7 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
         }
       }
       if ( vtkIdType newNbElems = aConnectivity->GetNumberOfCells() ) {
-        VTKViewer_CellLocationsArray* aCellLocationsArray = VTKViewer_CellLocationsArray::New();
+        vtkIdTypeArray* aCellLocationsArray = vtkIdTypeArray::New();
         aCellLocationsArray->SetNumberOfComponents(1);
         aCellLocationsArray->SetNumberOfTuples(newNbElems);
         aConnectivity->InitTraversal();
@@ -592,7 +592,7 @@ int VTKViewer_ExtractUnstructuredGrid::RequestData(vtkInformation *vtkNotUsed(re
       }
     }
     if (vtkIdType newNbElems = aConnectivity->GetNumberOfCells() ) {
-      VTKViewer_CellLocationsArray* aCellLocationsArray = VTKViewer_CellLocationsArray::New();
+      vtkIdTypeArray* aCellLocationsArray = vtkIdTypeArray::New();
       aCellLocationsArray->SetNumberOfComponents(1);
       aCellLocationsArray->SetNumberOfTuples( newNbElems );
       aConnectivity->InitTraversal();

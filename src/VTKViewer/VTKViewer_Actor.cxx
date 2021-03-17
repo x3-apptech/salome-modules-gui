@@ -433,9 +433,9 @@ VTKViewer_Actor
 /*!
   Maps VTK index of a node to corresponding object index
 */
-int 
+vtkIdType 
 VTKViewer_Actor
-::GetNodeObjId(int theVtkID)
+::GetNodeObjId(vtkIdType theVtkID)
 { 
   return theVtkID;
 }
@@ -445,7 +445,7 @@ VTKViewer_Actor
 */
 double* 
 VTKViewer_Actor
-::GetNodeCoord(int theObjID)
+::GetNodeCoord(vtkIdType theObjID)
 {
   return GetInput()->GetPoint(theObjID);
 }
@@ -453,9 +453,9 @@ VTKViewer_Actor
 /*!
  Maps object index of a node to corresponding VTK index
 */
-int
+vtkIdType
 VTKViewer_Actor
-::GetNodeVtkId( int theObjID )
+::GetNodeVtkId( vtkIdType theObjID )
 {
   return theObjID;
 }
@@ -466,7 +466,7 @@ VTKViewer_Actor
 */
 vtkCell* 
 VTKViewer_Actor
-::GetElemCell(int theObjID)
+::GetElemCell(vtkIdType theObjID)
 {
   return GetInput()->GetCell(theObjID);
 }
@@ -474,9 +474,9 @@ VTKViewer_Actor
 /*!
   Maps VTK index of a cell to corresponding object index
 */
-int
+vtkIdType
 VTKViewer_Actor
-::GetElemObjId(int theVtkID) 
+::GetElemObjId(vtkIdType theVtkID) 
 { 
   return theVtkID;
 }
@@ -487,7 +487,7 @@ VTKViewer_Actor
 */
 int
 VTKViewer_Actor
-::GetObjDimension( const int theObjId )
+::GetObjDimension( const vtkIdType theObjId )
 {
   if ( vtkCell* aCell = GetElemCell(theObjId) )
     return aCell->GetCellDimension();

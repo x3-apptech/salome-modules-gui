@@ -31,7 +31,7 @@
 #  include <vtkIdTypeArray.h>
 #  define TCellLocationsArray vtkIdTypeArray
 #else
-#  include <vtkIntArray.h>
+#  include <vtkLongLongArray.h>
 #  define TCellLocationsArray vtkIntArray
 #endif
 

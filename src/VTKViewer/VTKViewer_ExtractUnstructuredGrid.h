@@ -95,7 +95,7 @@ public:
   //! Computes a map out IDs to in IDs. Call it before GetInputId()!!!
   void BuildOut2InMap();
   //! Gets the input id by output id. Call BuildOut2InMap() before
-  vtkIdType GetInputId(int theOutId) const;
+  vtkIdType GetInputId(vtkIdType theOutId) const;
   //! Gets the output id by input id.
   //vtkIdType GetOutputId(int theInId) const;
 

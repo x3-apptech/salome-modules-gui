@@ -149,7 +149,7 @@ namespace
   {
     theInputID = theInputDataSetID = -1;
 
-    vtkIdType aNbInputs = (int)theRanges.size(); //!< TODO: conversion from size_t to int
+    vtkIdType aNbInputs = (vtkIdType)theRanges.size(); //!< TODO: conversion from size_t to vtkIdType
     if(theInputDataSetID < 0 || theInputDataSetID >= aNbInputs)
       return -1;
     
@@ -201,7 +201,7 @@ namespace
       return;
 
     vtkIdType aStartId = 0;
-    vtkIdType aNbInputs = (int)theRanges.size(); //!< TODO: conversion from size_t to int
+    vtkIdType aNbInputs = (vtkIdType)theRanges.size(); //!< TODO: conversion from size_t to vtkIdType
     for(vtkIdType aDataSetId = 0; aDataSetId < aNbInputs; ++aDataSetId){
       vtkIdType aRange = theRanges[aDataSetId];
       if(aRange > theOutputID){

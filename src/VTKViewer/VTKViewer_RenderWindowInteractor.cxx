@@ -679,7 +679,7 @@ bool VTKViewer_RenderWindowInteractor::unHighlightAll(){
  * else sets visibility to false.
  * \li Emit render window modified, if flag \a update - true.
  */
-bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteger& theMapIndex,
+bool VTKViewer_RenderWindowInteractor::highlight(const TIndexedMapOfVtkId& theMapIndex,
                                                  VTKViewer_Actor* theMapActor, VTKViewer_Actor* theActor,
                                                  TUpdateActor theFun, bool hilight, bool update)
 {
@@ -702,7 +702,7 @@ bool VTKViewer_RenderWindowInteractor::highlight(const TColStd_IndexedMapOfInteg
 }
 
 /*!Sets actors data.*/
-void VTKViewer_RenderWindowInteractor::setActorData(const TColStd_IndexedMapOfInteger& theMapIndex,
+void VTKViewer_RenderWindowInteractor::setActorData(const TIndexedMapOfVtkId& theMapIndex,
                                                     VTKViewer_Actor * theMapActor,
                                                     VTKViewer_Actor * theActor,
                                                     TUpdateActor theFun)

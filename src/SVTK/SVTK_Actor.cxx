@@ -96,7 +96,7 @@ SVTK_Actor
 {
 }
 
-const TColStd_IndexedMapOfInteger&
+const SVTK_TIndexedMapOfVtkId&
 SVTK_Actor
 ::GetMapIndex() const
 {
@@ -104,7 +104,7 @@ SVTK_Actor
 }
 
 
-const SVTK_IndexedMapOfIds&
+const SVTK_IndexedMapOfVtkIds&
 SVTK_Actor
 ::GetMapCompositeIndex() const 
 {
@@ -114,7 +114,7 @@ SVTK_Actor
 void
 SVTK_Actor
 ::MapCells(SALOME_Actor* theMapActor,
-           const TColStd_IndexedMapOfInteger& theMapIndex)
+           const SVTK_TIndexedMapOfVtkId& theMapIndex)
 {
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
@@ -156,7 +156,7 @@ SVTK_Actor
 void 
 SVTK_Actor
 ::MapPoints(SALOME_Actor* theMapActor,
-            const TColStd_IndexedMapOfInteger& theMapIndex)
+            const SVTK_TIndexedMapOfVtkId& theMapIndex)
 {
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
@@ -165,7 +165,7 @@ SVTK_Actor
     vtkPoints *aPoints = vtkPoints::New();
     aPoints->SetNumberOfPoints(aNbOfParts);
     for(vtkIdType i = 0; i < aNbOfParts; i++){
-      int aPartId = theMapIndex( i+1 );
+	  vtkIdType aPartId = theMapIndex( i+1 );
       if(double* aCoord = theMapActor->GetNodeCoord(aPartId)){
         aPoints->SetPoint(i,aCoord);
         // Change the type from int to vtkIdType in order to avoid compilation errors while using VTK
@@ -185,7 +185,7 @@ SVTK_Actor
 void
 SVTK_Actor
 ::MapEdge(SALOME_Actor* theMapActor,
-          const TColStd_IndexedMapOfInteger& theMapIndex)
+          const SVTK_TIndexedMapOfVtkId& theMapIndex)
 {
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
@@ -224,16 +224,16 @@ SVTK_Actor
 void
 SVTK_Actor
 ::MapEdge( SALOME_Actor* theMapActor, 
-           const SVTK_IndexedMapOfIds& theMapCompositeIndex) {
+           const SVTK_IndexedMapOfVtkIds& theMapCompositeIndex) {
   myUnstructuredGrid->Initialize();
   myUnstructuredGrid->Allocate();
 
   vtkUnstructuredGrid * aSourceGrid = ( vtkUnstructuredGrid * )theMapActor->GetInput();
   GetSource()->SetPoints( aSourceGrid->GetPoints() );
 
-  int aNbOfParts = theMapCompositeIndex.Extent();
-  for(int ind = 1; ind <= aNbOfParts; ind++){
-      std::vector<int> aNodesIds = theMapCompositeIndex( ind );
+  vtkIdType aNbOfParts = theMapCompositeIndex.Extent();
+  for(vtkIdType ind = 1; ind <= aNbOfParts; ind++){
+      std::vector<vtkIdType> aNodesIds = theMapCompositeIndex( ind );
       vtkSmartPointer<vtkIdList> ids = vtkSmartPointer<vtkIdList>::New();
       ids->InsertNextId(theMapActor->GetNodeVtkId( aNodesIds[0] ) );
       ids->InsertNextId(theMapActor->GetNodeVtkId( aNodesIds[1] ) );

@@ -101,7 +101,7 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
   bool                     IsFilterPresent( const int );
   void                     RemoveFilter( const int );
   bool                     IsValid( VTKViewer_Actor* theActor,
-                                    const int     theId,
+                                    const vtkIdType  theId,
                                     const bool    theIsNode = false );
 
   void                     IncrementalPan   ( const int incrX, const int incrY );
@@ -140,9 +140,9 @@ class VTKVIEWER_EXPORT VTKViewer_InteractorStyle : public QObject, public vtkInt
 
   VTKViewer_Actor *myPreViewActor, *myPreSelectionActor, *mySelectedActor;
 
-  int myElemId;
+  vtkIdType myElemId;
   int myEdgeId;
-  int myNodeId;
+  vtkIdType myNodeId;
 
  public:
   bool eventFilter(QObject* object, QEvent* event);

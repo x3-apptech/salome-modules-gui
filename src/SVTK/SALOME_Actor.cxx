@@ -86,9 +86,9 @@ namespace
   int
   GetEdgeAndNodesId(SALOME_Actor* theActor,
                     vtkPicker* thePicker,
-                    int theObjId,
-                    int& theFirstNodeId,
-                    int& theSecondNodeId)
+                    vtkIdType theObjId,
+                    vtkIdType& theFirstNodeId,
+                    vtkIdType& theSecondNodeId)
   {
     int anEdgeId = 0;
     if (vtkCell* aPickedCell = theActor->GetElemCell(theObjId)) {
@@ -449,7 +449,7 @@ SALOME_Actor
 
   if(mySelector.GetPointer()){
     if(mySelectionMode != ActorSelection){
-      TColStd_IndexedMapOfInteger aMapIndex;
+      SVTK_TIndexedMapOfVtkId aMapIndex;
       mySelector->GetIndex( getIO(), aMapIndex );
       switch( mySelectionMode ) {
       case NodeSelection:
@@ -466,7 +466,7 @@ SALOME_Actor
         myHighlightActor->MapCells( this, aMapIndex );
         break;
       case EdgeOfCellSelection:
-	SVTK_IndexedMapOfIds aMapCompositeIndex;
+	SVTK_IndexedMapOfVtkIds aMapCompositeIndex;
 	mySelector->GetCompositeIndex( getIO(), aMapCompositeIndex );
         myHighlightActor->GetProperty()->SetRepresentationToWireframe();
 	myHighlightActor->MapEdge( this, aMapCompositeIndex );
@@ -542,16 +542,16 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myPointPicker, this );
       myPointPicker->Pick( x, y, z, aRenderer );
       
-      int aVtkId = myPointPicker->GetPointId();
+      vtkIdType aVtkId = myPointPicker->GetPointId();
       if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId, true ) ) {
-        int anObjId = GetNodeObjId( aVtkId );
+        vtkIdType anObjId = GetNodeObjId( aVtkId );
         myIsPreselected = (anObjId >= 0);
         if(myIsPreselected){
-          const TColStd_IndexedMapOfInteger& aMapIndex = myPreHighlightActor->GetMapIndex();
-          int anExtent = aMapIndex.Extent();
+          const SVTK_TIndexedMapOfVtkId& aMapIndex = myPreHighlightActor->GetMapIndex();
+          vtkIdType anExtent = aMapIndex.Extent();
           anIsChanged |= (anExtent == 0 || (anExtent > 0 && anObjId != aMapIndex(1)));
           if(anIsChanged){
-            TColStd_IndexedMapOfInteger aMapIndex;
+            SVTK_TIndexedMapOfVtkId aMapIndex;
             aMapIndex.Add( anObjId );
             
             myPreHighlightActor->GetProperty()->SetRepresentationToPoints();
@@ -572,17 +572,17 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
       myCellPicker->Pick( x, y, z, aRenderer );
       
-      int aVtkId = myCellPicker->GetCellId();
+      vtkIdType aVtkId = myCellPicker->GetCellId();
       if ( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) && hasIO() ) {
-        int anObjId = GetElemObjId (aVtkId );
+        vtkIdType anObjId = GetElemObjId (aVtkId );
         if ( anObjId >= 0 ) {
           myIsPreselected = CheckDimensionId(aSelectionMode,this,anObjId);
           if(myIsPreselected){
-            const TColStd_IndexedMapOfInteger& aMapIndex = myPreHighlightActor->GetMapIndex();
-            int anExtent = aMapIndex.Extent();
+            const SVTK_TIndexedMapOfVtkId& aMapIndex = myPreHighlightActor->GetMapIndex();
+            vtkIdType anExtent = aMapIndex.Extent();
             anIsChanged |= (anExtent == 0 || (anExtent > 0 && anObjId != aMapIndex(1)));
             if(anIsChanged){
-              TColStd_IndexedMapOfInteger aMapIndex;
+              SVTK_TIndexedMapOfVtkId aMapIndex;
               aMapIndex.Add( anObjId );
               
               myPreHighlightActor->GetProperty()->SetRepresentationToSurface();
@@ -599,23 +599,23 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
       myCellPicker->Pick( x, y, z, aRenderer );
       
-      int aVtkId = myCellPicker->GetCellId();
+      vtkIdType aVtkId = myCellPicker->GetCellId();
       if ( aVtkId >= 0 && mySelector->IsValid( this, aVtkId )) {
-        int anObjId = GetElemObjId( aVtkId );
+        vtkIdType anObjId = GetElemObjId( aVtkId );
         if ( anObjId >= 0 ) {
-          int aFNId, aSNId;
+          vtkIdType aFNId, aSNId;
           int anEdgeId = GetEdgeAndNodesId(this,myCellPicker.GetPointer(),anObjId,aFNId,aSNId);
           myIsPreselected = anEdgeId < 0;
           if(myIsPreselected){
-	    int aFNObjId = GetNodeObjId( aFNId );
-	    int aSNObjId = GetNodeObjId( aSNId );
-            const SVTK_IndexedMapOfIds& aMapIds = myPreHighlightActor->GetMapCompositeIndex();
-            int anExtent = aMapIds.Extent();
+	    vtkIdType aFNObjId = GetNodeObjId( aFNId );
+	    vtkIdType aSNObjId = GetNodeObjId( aSNId );
+            const SVTK_IndexedMapOfVtkIds& aMapIds = myPreHighlightActor->GetMapCompositeIndex();
+            vtkIdType anExtent = aMapIds.Extent();
             anIsChanged |= (anExtent == 0 || (anExtent > 0 && aMapIds(1).size() == 2 && 
 					     (aFNObjId != aMapIds(1)[0] || aSNObjId != aMapIds(1)[1] ) ) );
             if( anIsChanged ) {
-	      SVTK_IndexedMapOfIds aMapIds;
-	      SVTK_ListOfInteger aCompositeID;
+	      SVTK_IndexedMapOfVtkIds aMapIds;
+	      SVTK_ListOfVtk aCompositeID;
               aCompositeID.push_back( aFNObjId );
               aCompositeID.push_back( aSNObjId );
 	      aMapIds.Add( aCompositeID );
@@ -709,14 +709,14 @@ SALOME_Actor
 
       const SVTK_AreaPicker::TVectorIdsMap& aVectorIdsMap = myPointAreaPicker->GetPointIdsMap();
       SVTK_AreaPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
-      TColStd_MapOfInteger anIndexes;
+      SVTK_TVtkIDsMap anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
         vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
-          int aPointId = aVectorIds[anId];
+          vtkIdType aPointId = aVectorIds[anId];
           if( aPointId >= 0 && mySelector->IsValid( this, aPointId, true ) ) {
-            int anObjId = GetNodeObjId( aPointId );
+            vtkIdType anObjId = GetNodeObjId( aPointId );
             anIndexes.Add( anObjId );
           }
         }
@@ -785,16 +785,16 @@ SALOME_Actor
 
       const SVTK_AreaPicker::TVectorIdsMap& aVectorIdsMap = myCellAreaPicker->GetCellIdsMap();
       SVTK_AreaPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
-      TColStd_MapOfInteger anIndexes;
+      SVTK_TVtkIDsMap anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
         vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
-          int aCellId = aVectorIds[anId];
+          vtkIdType aCellId = aVectorIds[anId];
           if ( !mySelector->IsValid( this, aCellId ) )
             continue;
 
-          int anObjId = GetElemObjId( aCellId );
+          vtkIdType anObjId = GetElemObjId( aCellId );
           if( anObjId != -1 )
             if ( CheckDimensionId(aSelectionMode,this,anObjId) ) {
               anIndexes.Add(anObjId);
@@ -823,21 +823,21 @@ SALOME_Actor
 
       const SVTK_AreaPicker::TVectorIdsMap& aVectorIdsMap = myCellAreaPicker->GetCellIdsMap();
       SVTK_AreaPicker::TVectorIdsMap::const_iterator aMapIter = aVectorIdsMap.find(this);
-      SVTK_IndexedMapOfIds anIndexes;
+      SVTK_IndexedMapOfVtkIds anIndexes;
       if(aMapIter != aVectorIdsMap.end()){
         const SVTK_AreaPicker::TVectorIds& aVectorIds = aMapIter->second;
         vtkIdType anEnd = (int)aVectorIds.size(); //!< TODO: conversion from size_t to int
         for(vtkIdType anId = 0; anId < anEnd; anId++ ) {
-          int aCellId = aVectorIds[anId];
+          vtkIdType aCellId = aVectorIds[anId];
           if ( !mySelector->IsValid( this, aCellId ) )
             continue;
 
-          int anObjId = GetElemObjId( aCellId );
+          vtkIdType anObjId = GetElemObjId( aCellId );
           if( anObjId != -1 ) {
-            int aFNId, aSNId;
+            vtkIdType aFNId, aSNId;
             int anEdgeId = GetEdgeAndNodesId(this,myCellPicker.GetPointer(),anObjId,aFNId,aSNId);
             if( anEdgeId < 0 ) {
-	      SVTK_ListOfInteger aCompositeID;
+	      SVTK_ListOfVtk aCompositeID;
               aCompositeID.push_back( GetNodeObjId( aFNId ) );
               aCompositeID.push_back( GetNodeObjId( aSNId ) );
 	      anIndexes.Add( aCompositeID );
@@ -866,9 +866,9 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myPointPicker, this );
       myPointPicker->Pick( x, y, 0.0, aRenderer );
 
-      int aVtkId = myPointPicker->GetPointId();
+      vtkIdType aVtkId = myPointPicker->GetPointId();
       if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId, true ) ) {
-        int anObjId = GetNodeObjId( aVtkId );
+        vtkIdType anObjId = GetNodeObjId( aVtkId );
         if( hasIO() && anObjId >= 0 ) {
           mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
           mySelector->AddIObject( this );
@@ -886,9 +886,9 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
       myCellPicker->Pick( x, y, 0.0, aRenderer );
 
-      int aVtkId = myCellPicker->GetCellId();
+      vtkIdType aVtkId = myCellPicker->GetCellId();
       if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
-        int anObjId = GetElemObjId( aVtkId );
+        vtkIdType anObjId = GetElemObjId( aVtkId );
         if( anObjId >= 0 ) {
           if ( hasIO() && CheckDimensionId(aSelectionMode,this,anObjId) ) {
             mySelector->AddOrRemoveIndex( myIO, anObjId, anIsShift );
@@ -903,14 +903,14 @@ SALOME_Actor
       SVTK::TPickLimiter aPickLimiter( myCellPicker, this );
       myCellPicker->Pick( x, y, 0.0, aRenderer );
 
-      int aVtkId = myCellPicker->GetCellId();
+      vtkIdType aVtkId = myCellPicker->GetCellId();
       if( aVtkId >= 0 && mySelector->IsValid( this, aVtkId ) ) {
-        int anObjId = GetElemObjId( aVtkId );
+        vtkIdType anObjId = GetElemObjId( aVtkId );
         if( anObjId >= 0 ) {
-          int aFNId, aSNId;
+          vtkIdType aFNId, aSNId;
           int anEdgeId = GetEdgeAndNodesId(this,myCellPicker.GetPointer(),anObjId,aFNId,aSNId);
           if( hasIO() && anEdgeId < 0 ) {
-	    SVTK_ListOfInteger aCompositeID;
+	    SVTK_ListOfVtk aCompositeID;
 	    aCompositeID.push_back( GetNodeObjId( aFNId ) );
 	    aCompositeID.push_back( GetNodeObjId( aSNId ) );
 	    mySelector->AddOrRemoveCompositeIndex( myIO, aCompositeID, anIsShift );

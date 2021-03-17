@@ -29,29 +29,71 @@
 
 #include <vector>
 #include <NCollection_IndexedMap.hxx>
+#include <NCollection_Map.hxx>
 #include <Standard_Integer.hxx>
+#include <vtkType.h>
+#include <limits>
 
 typedef std::vector<Standard_Integer> SVTK_ListOfInteger;
+typedef std::vector<vtkIdType> SVTK_ListOfVtk;
 
 class SVTK_Hasher {
 
 public:
-    static Standard_Integer HashCode(const std::vector<Standard_Integer> ids,
-				     const Standard_Integer upper) {
-        Standard_Integer seed = (Standard_Integer)ids.size(); //!< TODO: conversion from size_t to int
-        for( Standard_Integer i = 0; i <  (Standard_Integer) ids.size(); i++ ) {
-            Standard_Integer v = ids[i];
-            seed ^= v + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
-        }
-        return ::HashCode(seed,upper);
-    }
+  static Standard_Integer HashCode(const std::vector<Standard_Integer> ids,
+                                   const Standard_Integer              upper)
+  {
+    Standard_Integer seed = (Standard_Integer)ids.size();
+    for ( Standard_Integer v : ids )
+      seed ^= v + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
 
-    static Standard_Boolean IsEqual(const SVTK_ListOfInteger& theKey1,
-                                    const SVTK_ListOfInteger& theKey2) {
-        return theKey1 == theKey2;
-    }
+    return ::HashCode(seed,upper);
+  }
+
+  static Standard_Boolean IsEqual(const SVTK_ListOfInteger& theKey1,
+                                  const SVTK_ListOfInteger& theKey2)
+  {
+    return theKey1 == theKey2;
+  }
+};
+
+class SVTK_vtkHasher {
+
+public:
+  static vtkIdType HashCode(const std::vector<vtkIdType> ids,
+                            const Standard_Integer       upper)
+  {
+    vtkIdType seed = (vtkIdType)ids.size();
+    for ( vtkIdType v : ids )
+      seed ^= v + 0x9e3779b97f4a7c15 + ( seed << 6 ) + ( seed >> 2 );
+
+    return ::HashCode((Standard_Integer) seed, upper);
+  }
+
+  static vtkIdType IsEqual(const SVTK_ListOfVtk& theKey1,
+                           const SVTK_ListOfVtk& theKey2)
+  {
+    return theKey1 == theKey2;
+  }
+};
+
+struct svtkIdHasher
+{
+  static int HashCode(const vtkIdType theValue,  const int theUpperBound)
+  {
+    return static_cast<int> ((theValue & (std::numeric_limits<vtkIdType>::max)()) % theUpperBound + 1);
+  }
+
+  static bool IsEqual( const vtkIdType& id1, const vtkIdType& id2 )
+  {
+    return id1 == id2;
+  }
 };
 
 typedef NCollection_IndexedMap<SVTK_ListOfInteger,SVTK_Hasher> SVTK_IndexedMapOfIds;
+typedef NCollection_IndexedMap<SVTK_ListOfVtk, SVTK_vtkHasher> SVTK_IndexedMapOfVtkIds;
+typedef NCollection_Map< vtkIdType, svtkIdHasher > SVTK_TVtkIDsMap;
+typedef NCollection_Map< vtkIdType, svtkIdHasher >::Iterator SVTK_TVtkIDsMapIterator;
+typedef NCollection_IndexedMap<vtkIdType,svtkIdHasher> SVTK_TIndexedMapOfVtkId;
 
 #endif // SVTK_HASH_H

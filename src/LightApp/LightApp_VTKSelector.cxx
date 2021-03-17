@@ -77,7 +77,7 @@ LightApp_SVTKDataOwner
 /*!
   Gets dataowners ids list.
 */
-const TColStd_IndexedMapOfInteger& 
+const SVTK_TIndexedMapOfVtkId& 
 LightApp_SVTKDataOwner
 ::GetIds() const
 {

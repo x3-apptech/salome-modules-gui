@@ -1485,7 +1485,7 @@ void  VTKViewer_InteractorStyle::RemoveFilter( const int theId )
  *\param theIsNode - boolean flag, if \c true - node, else - cell.
  */
 bool VTKViewer_InteractorStyle::IsValid( VTKViewer_Actor* theActor,
-                                               const int     theId,
+                                               const vtkIdType theId,
                                                const bool    theIsNode )
 {
   std::map<int, Handle(VTKViewer_Filter)>::const_iterator anIter;

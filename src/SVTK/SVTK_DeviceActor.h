@@ -90,20 +90,20 @@ class SVTK_EXPORT SVTK_DeviceActor: public vtkLODActor
   /** @name For selection mapping purpose */
   //@{
   virtual
-  int
-  GetNodeObjId(int theVtkID);
+  vtkIdType
+  GetNodeObjId(vtkIdType theVtkID);
 
   virtual
   double* 
-  GetNodeCoord(int theObjID);
+  GetNodeCoord(vtkIdType theObjID);
 
   virtual
-  int
-  GetElemObjId(int theVtkID);
+  vtkIdType
+  GetElemObjId(vtkIdType theVtkID);
 
   virtual
   vtkCell* 
-  GetElemCell(int theObjID);
+  GetElemCell(vtkIdType theObjID);
 
   //! To provide VTK to Object and backward mapping
   virtual 

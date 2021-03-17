@@ -93,12 +93,12 @@ public:
    * \brief Return input value theVtkID
    * \retval theVtkID
    */
-  virtual vtkIdType GetNodeObjId(int theVtkID) { return theVtkID;}
+  virtual vtkIdType GetNodeObjId(vtkIdType theVtkID) { return theVtkID;}
   /*! \fn virtual vtkIdType GetElemObjId(int theVtkID);
    * \brief Return object ID by VTK ID cell 
    * \retval myVTK2ObjIds[theVtkID]
    */
-  virtual vtkIdType GetElemObjId(int theVtkID);
+  virtual vtkIdType GetElemObjId(vtkIdType theVtkID);
 
   virtual void SetQuadraticArcMode(bool theFlag);
   virtual bool GetQuadraticArcMode() const;

@@ -106,17 +106,17 @@ public:
   virtual
   void 
   GetIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-            TColStd_IndexedMapOfInteger& theIndex );
+            SVTK_TIndexedMapOfVtkId& theIndex );
         
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-                    const TColStd_IndexedMapOfInteger& theIndices, 
+                    const SVTK_TIndexedMapOfVtkId& theIndices, 
                     bool theIsModeShift);
   virtual
   bool 
   AddOrRemoveIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-                    const TColStd_MapOfInteger& theIndices, 
+                    const SVTK_TVtkIDsMap& theIndices, 
                     bool theIsModeShift);
   virtual
   bool
@@ -144,28 +144,28 @@ public:
   virtual
   void 
   GetCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-		     SVTK_IndexedMapOfIds& theIds );        
+		     SVTK_IndexedMapOfVtkIds& theIds );        
   virtual
   bool 
   AddOrRemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-			     const SVTK_IndexedMapOfIds& theIds,
+			     const SVTK_IndexedMapOfVtkIds& theIds,
 			     bool theIsModeShift);
 
   virtual
   bool
   AddOrRemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-			     SVTK_ListOfInteger theIds,
+			     SVTK_ListOfVtk theIds,
 			     bool theIsModeShift);
 
   virtual
   void 
   RemoveCompositeIndex( const Handle(SALOME_InteractiveObject)& theIO, 
-			SVTK_ListOfInteger theIds );
+			SVTK_ListOfVtk theIds );
 
   virtual
   bool 
   IsCompositeIndexSelected(const Handle(SALOME_InteractiveObject)& theIO, 
-			   SVTK_ListOfInteger theIds ) const;
+			   SVTK_ListOfVtk theIds ) const;
 
   virtual
   void 
@@ -255,7 +255,7 @@ private:
 
   struct TIndexedMapOfInteger
   {
-    TColStd_IndexedMapOfInteger myMap;
+    SVTK_TIndexedMapOfVtkId myMap;
     TIndexedMapOfInteger()
     {}
     TIndexedMapOfInteger(const TIndexedMapOfInteger& theIndexedMapOfInteger)
@@ -280,7 +280,7 @@ private:
   TMapIOSubIndex myMapIOSubIndex;
 
   typedef std::map<Handle(SALOME_InteractiveObject),
-                   SVTK_IndexedMapOfIds,
+                   SVTK_IndexedMapOfVtkIds,
                    TIOLessThan> TMapIOSubCompositeIndex;
   TMapIOSubCompositeIndex myMapIOSubCompositeIndex;
 

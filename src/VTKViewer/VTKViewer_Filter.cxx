@@ -51,7 +51,7 @@ VTKViewer_Filter::~VTKViewer_Filter()
  * \param theCellId - cell id.
  * \retval \c true - if cell id is valid, else \c false.
  */
-bool VTKViewer_Filter::IsValid( VTKViewer_Actor* theActor, const int theCellId )
+bool VTKViewer_Filter::IsValid( VTKViewer_Actor* theActor, const vtkIdType theCellId )
 {
   SetActor( theActor );
   return IsValid( theCellId );

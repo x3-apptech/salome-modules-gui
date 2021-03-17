@@ -539,7 +539,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
           {
         	Selection_Mode aSelectionMode = GetSelector()->SelectionMode();
         	double* aCoords = NULL;
-        	int aVtkId;
+        	vtkIdType aVtkId;
         	bool isTrueType = false;
         	
         	if( myCurrFocalPointType == SVTK::StartFocalPointSelection ||
@@ -553,7 +553,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
               aVtkId = myPointPicker->GetPointId();
               if ( aVtkId >= 0 )
               {
-                int anObjId = anActor->GetNodeObjId( aVtkId );
+                vtkIdType anObjId = anActor->GetNodeObjId( aVtkId );
                 aCoords = anActor->GetNodeCoord(anObjId);
                 isTrueType = true;
               }
@@ -569,7 +569,7 @@ void SVTK_InteractorStyle::OnLeftButtonDown(int ctrl, int shift,
                                  0.0,
                                  GetCurrentRenderer() );
               aVtkId = aCellPicker->GetCellId();
-              int aCellId = anActor->GetElemObjId( aVtkId );
+              vtkIdType aCellId = anActor->GetElemObjId( aVtkId );
 
               if( aSelectionMode == EdgeSelection )
             	isTrueType = anActor->GetObjDimension( aCellId ) == 1;
@@ -1370,11 +1370,11 @@ void SVTK_InteractorStyle::onCursorMove(QPoint /*mousePos*/)
         {
           SVTK::TPickLimiter aPickLimiter( myPointPicker, anActor );
           myPointPicker->Pick( aSelectionEvent->myX, aSelectionEvent->myY, 0.0, GetCurrentRenderer() );
-          int aVtkId = myPointPicker->GetPointId();
+          vtkIdType aVtkId = myPointPicker->GetPointId();
           if ( aVtkId >= 0 ) {
-            int anObjId = anActor->GetNodeObjId( aVtkId );
+            vtkIdType anObjId = anActor->GetNodeObjId( aVtkId );
 
-            TColStd_IndexedMapOfInteger aMapIndex;
+            SVTK_TIndexedMapOfVtkId aMapIndex;
             aMapIndex.Add( anObjId );
             myHighlightSelectionPointActor->MapPoints( anActor, aMapIndex );
 

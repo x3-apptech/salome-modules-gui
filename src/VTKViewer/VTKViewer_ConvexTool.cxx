@@ -114,7 +114,7 @@ VTKViewer_Triangulator
     double anAbsoluteCoord[3];
     myPoints->SetNumberOfPoints(aNumPts);
     vtkPoints *anInputPoints = theInput->GetPoints();
-    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
+    for (auto aPntId = 0; aPntId < aNumPts; aPntId++) {
       anInputPoints->GetPoint(myPointIds[aPntId], anAbsoluteCoord);
       myPoints->SetPoint(aPntId, anAbsoluteCoord);
     }
@@ -216,7 +216,7 @@ VTKViewer_Triangulator
   double aCellCenter[3] = {0.0, 0.0, 0.0};
   {
     double aPntCoord[3];
-    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
+    for (auto aPntId = 0; aPntId < aNumPts; aPntId++) {
       aPoints->GetPoint(GetPointId(aPntId),aPntCoord);
       if(DEBUG_TRIA_EXECUTE) cout<<"\taPntId = "<<GetPointId(aPntId)<<" {"<<aPntCoord[0]<<", "<<aPntCoord[1]<<", "<<aPntCoord[2]<<"}\n";
       aCellCenter[0] += aPntCoord[0];
@@ -229,7 +229,7 @@ VTKViewer_Triangulator
   }
 
   double aCellLength = GetCellLength();
-  int aNumFaces = GetNumFaces();
+  vtkIdType aNumFaces = GetNumFaces();
 
   static double EPS = 1.0E-2;
   double aDistEps = aCellLength/3.0 * EPS;
@@ -248,7 +248,7 @@ VTKViewer_Triangulator
   typedef std::set<TPointIds> TFace2PointIds;
   TFace2PointIds aFace2PointIds;
 
-  for (int aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
+  for (auto aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
     vtkCell* aFace = GetFace(aFaceId);
     
     GetCellNeighbors(theInput, theCellId, aFace, myCellIds);
@@ -270,7 +270,7 @@ VTKViewer_Triangulator
 
   ::TPolygons aPolygons;
 
-  for (int aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
+  for (auto aFaceId = 0; aFaceId < aNumFaces; aFaceId++) {
     if(aFace2Visibility.find(aFaceId) == aFace2Visibility.end())
       continue;
 
@@ -405,7 +405,7 @@ VTKViewer_Triangulator
             if(DEBUG_TRIA_EXECUTE) cout  << "; Added = FALSE" << endl;
           }
         }
-        int aNbPoints = (int)aPointIds.size(); //!< TODO: conversion from size_t to int
+        size_t aNbPoints = aPointIds.size();
         aCenter[0] /= aNbPoints;
         aCenter[1] /= aNbPoints;
         aCenter[2] /= aNbPoints;
@@ -523,7 +523,7 @@ VTKViewer_Triangulator
         }
 
         if(!aSortedPointIds.empty()){
-          int aNumFacePts = (int)aSortedPointIds.size(); //!< TODO: conversion from size_t to int
+          size_t aNumFacePts = aSortedPointIds.size();
           ::TConnectivities aConnectivities(aNumFacePts);
           TSortedPointIds::const_iterator anIter = aSortedPointIds.begin();
           TSortedPointIds::const_iterator anEndIter = aSortedPointIds.end();
@@ -544,8 +544,8 @@ VTKViewer_Triangulator
 
   // To check, whether the polygons give a convex polyhedron or not
   if(theIsCheckConvex){
-    int aNbPolygons = (int)aPolygons.size(); //!< TODO: conversion from size_t to int
-    for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
+    size_t aNbPolygons = aPolygons.size();
+    for (size_t aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
       double* aNormal = aPolygon.myNormal;
       double* anOrigin = aPolygon.myOrigin;
@@ -569,8 +569,8 @@ VTKViewer_Triangulator
 
   // To pass resulting set of the polygons to the output
   {
-    int aNbPolygons = (int)aPolygons.size(); //!< TODO: conversion from size_t to int
-    for (int aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
+    size_t aNbPolygons = aPolygons.size();
+    for (size_t aPolygonId = 0; aPolygonId < aNbPolygons; aPolygonId++) {
       ::TPolygon& aPolygon = aPolygons[aPolygonId];
       if(DEBUG_TRIA_EXECUTE) cout << "PoilygonId="<<aPolygonId<<" | ";
       TConnectivities& aConnectivities = aPolygon.myConnectivities;
@@ -579,7 +579,7 @@ VTKViewer_Triangulator
           cout << aConnectivities[i] << ",";
         cout << endl;
       }
-      int aNbPoints = (int)aConnectivities.size(); //!< TODO: conversion from size_t to int
+      int aNbPoints = (int)aConnectivities.size();
       vtkIdType aNewCellId = theOutput->InsertNextCell(VTK_POLYGON,aNbPoints,&aConnectivities[0]);
       if(theStoreMapping)
         VTKViewer_GeometryFilter::InsertId( theCellId, VTK_POLYGON, theVTK2ObjIds, theDimension2VTK2ObjIds );
@@ -636,7 +636,7 @@ VTKViewer_OrderedTriangulator
     zSize = aBounds[5] - aBounds[4];
     double anAbsoluteCoord[3];
     double aParamentrucCoord[3];
-    for (int aPntId = 0; aPntId < aNumPts; aPntId++) {
+    for (auto aPntId = 0; aPntId < aNumPts; aPntId++) {
       myPoints->GetPoint(aPntId, anAbsoluteCoord);
       aParamentrucCoord[0] = xSize==0. ? 0. : ((anAbsoluteCoord[0] - aBounds[0]) / xSize);
       aParamentrucCoord[1] = ySize==0. ? 0. : ((anAbsoluteCoord[1] - aBounds[2]) / ySize);

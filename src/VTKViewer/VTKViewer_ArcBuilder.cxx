@@ -640,7 +640,7 @@ vtkIdType Build1DArc(vtkIdType cellId, vtkUnstructuredGrid* input,
 vtkIdType MergevtkPoints(const std::vector< vtkSmartPointer< vtkPoints > >& theCollection,
                          const std::vector< std::vector<double> >& theScalarCollection,
                          vtkPoints* thePoints,
-                         std::map<int, double>& thePntId2ScalarValue,
+                         std::map<vtkIdType, double>& thePntId2ScalarValue,
                          vtkIdType* &theIds){
   vtkIdType aNbPoints = 0;
   vtkIdType anIdCounter = 0;

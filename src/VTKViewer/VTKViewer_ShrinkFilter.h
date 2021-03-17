@@ -47,9 +47,9 @@ public:
   /*!Gets store mapping flag.*/
   int GetStoreMapping(){ return myStoreMapping;}
 
-  virtual vtkIdType GetNodeObjId(int theVtkID);
+  virtual vtkIdType GetNodeObjId(vtkIdType theVtkID);
   /*!Return element id by vtk id.*/
-  virtual vtkIdType GetElemObjId(int theVtkID) { return theVtkID;}
+  virtual vtkIdType GetElemObjId(vtkIdType theVtkID) { return theVtkID;}
 
 protected:
   VTKViewer_ShrinkFilter();
