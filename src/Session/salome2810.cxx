@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     modulesPaths << QDir::fromNativeSeparators( QString("%1/share/salome/resources/%2").arg( pe.value(elt_root_dir) ).arg( QString(elt).toLower() ) );
   }
   // fill LightAppConfig env var
-  QString appconfig_val( modulesPaths.join(":"));
+  QString appconfig_val( modulesPaths.join(QDir::listSeparator()));
   pe.insert(APPCONFIG,appconfig_val);
   //tells shutup to salome.salome_init invoked at shaper engine ignition
   pe.insert(NO_SERVER_ENV_VAR,"1");
