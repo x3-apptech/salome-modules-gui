@@ -27,6 +27,8 @@
 #include "QtxActionToolMgr.h"
 #include "QtxMultiAction.h"
 
+#include <Basics_OCCTVersion.hxx>
+
 // OCC includes
 #include <V3d_View.hxx>
 #include <Graphic3d_MapIteratorOfMapOfStructure.hxx>
@@ -44,8 +46,12 @@ Handle(Image_PixMap) OCCViewer_Utilities::imageToPixmap( const QImage& anImage )
     aPixmap->SetTopDown( Standard_True );
 
     const uchar* aImageBytes = anImage.bits();
-      
+
+#if OCC_VERSION_LARGE < 0x07050000
     for ( int aLine = anImage.height() - 1; aLine >= 0; --aLine ) {
+#else
+    for ( int aLine = 0; aLine < anImage.height(); ++aLine ) {
+#endif
       // convert pixels from ARGB to renderer-compatible RGBA
       for ( int aByte = 0; aByte < anImage.width(); ++aByte ) {
 	    Image_ColorBGRA& aPixmapBytes = aPixmap->ChangeValue<Image_ColorBGRA>(aLine, aByte);
