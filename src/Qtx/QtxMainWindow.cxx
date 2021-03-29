@@ -621,7 +621,7 @@ bool QtxMainWindow::event( QEvent* e )
 	  break;
 	}
       if ( status ) {
-	myResizer = new Resizer( me->globalPos(), o, this );
+	//myResizer = new Resizer( me->globalPos(), o, this ); // doesn't work with QT 5.12
 	myMouseMove = new QMouseEvent( me->type(), me->pos(), me->globalPos(),
 				       me->button(), me->buttons(), me->modifiers() );
       }
