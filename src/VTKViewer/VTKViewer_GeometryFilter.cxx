@@ -144,6 +144,18 @@ static inline bool toShowEdge( vtkIdType id1, vtkIdType id2, vtkIdType cellId, v
   return ( cells[iCell] == cellId );
 }
 
+//------------------------------------------------------------------------------
+// Excluded faces are defined here.
+struct vtkExcludedFaces
+{
+  vtkStaticCellLinksTemplate<vtkIdType>* Links;
+  vtkExcludedFaces()
+    : Links(nullptr)
+  {
+  }
+  ~vtkExcludedFaces() { delete this->Links; }
+};
+
 int
 VTKViewer_GeometryFilter
 ::RequestData(
@@ -151,29 +163,96 @@ VTKViewer_GeometryFilter
   vtkInformationVector **inputVector,
   vtkInformationVector *outputVector)
 {
+
   // get the info objects
-  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *inInfo  = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut
   vtkDataSet *input = vtkDataSet::SafeDownCast(
-    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkIdType numCells=input->GetNumberOfCells();
+  vtkIdType numPts = input->GetNumberOfPoints();
 
-  if (numCells == 0)
+  if (numPts == 0 || numCells == 0)
     {
-      return 0;
+     return 0;
     }
 
-  if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID){
-    return this->UnstructuredGridExecute(input, output, outInfo);
-  }else
-    return Superclass::RequestData(request,inputVector,outputVector);
+  if (delegateToVtk)
+    {
 
-  return 1;
+     // get the info objects excluded faces
+     vtkInformation* excInfo = inputVector[1]->GetInformationObject(0);
+
+     vtkExcludedFaces exc; // Will delete exc->Links when goes out of scope
+     if (excInfo)
+       {
+        vtkPolyData* excFaces = vtkPolyData::SafeDownCast(excInfo->Get(vtkDataObject::DATA_OBJECT()));
+        vtkCellArray* excPolys = excFaces->GetPolys();
+        if (excPolys->GetNumberOfCells() > 0)
+          {
+           exc.Links = new vtkStaticCellLinksTemplate<vtkIdType>;
+           exc.Links->ThreadedBuildLinks(numPts, excPolys->GetNumberOfCells(), excPolys);
+          }
+       }
+
+     switch (input->GetDataObjectType())
+     {
+       case VTK_POLY_DATA:
+          return this->vtkGeometryFilter::PolyDataExecute(input, output, &exc);
+       case VTK_UNSTRUCTURED_GRID:
+         {
+          vtkUnstructuredGrid* inputUnstrctured = static_cast<vtkUnstructuredGrid*>(input);
+          bool NotFitForDelegation = false;
+          if ( vtkUnsignedCharArray* types = inputUnstrctured->GetCellTypesArray() )
+            {
+             std::set<vtkIdType> ElementsNotFitToDelegate;
+
+             //  All quadratic, biquadratic, and triquadratic elements not fit for delegation
+             //  as SMESH has special display with curves mode for  meshes  containing  these
+             //  elements hence such meshes are not handled  by  "vtkGeometryFilter"  instead
+             //  the native  VTKViewer_GeometryFilter::UnstructuredGridExecute is used.
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_EDGE );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_TRIANGLE );
+             ElementsNotFitToDelegate.insert( VTK_BIQUADRATIC_TRIANGLE );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_QUAD );
+             ElementsNotFitToDelegate.insert( VTK_BIQUADRATIC_QUAD );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_POLYGON );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_TETRA );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_HEXAHEDRON );
+             ElementsNotFitToDelegate.insert( VTK_TRIQUADRATIC_HEXAHEDRON );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_WEDGE );
+             ElementsNotFitToDelegate.insert( VTK_BIQUADRATIC_QUADRATIC_WEDGE );
+             ElementsNotFitToDelegate.insert( VTK_QUADRATIC_PYRAMID );
+
+             // Some openMP tests reveal that  meshes with  polyhedrons  can  sometimes cause
+             // problems as such we avoide delegation = ElementsNotFitToDelegate. It would be
+             // nice to investigate and resolve the problem with multi-therding in future.   
+             ElementsNotFitToDelegate.insert( VTK_POLYHEDRON );
+
+             for ( int i = 0; i < types->GetNumberOfTuples() && !NotFitForDelegation; ++i )
+                NotFitForDelegation = ElementsNotFitToDelegate.count( types->GetValue(i) );
+            }
+         if ( NotFitForDelegation )
+            return this->UnstructuredGridExecute(input, output, outInfo);
+         else
+            return this->vtkGeometryFilter::UnstructuredGridExecute(input, output, nullptr, &exc);
+         }
+     }
+
+     return this->vtkGeometryFilter::DataSetExecute(input, output, &exc);
+    }  
+    else // !delegateToVtk
+    {
+     if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID){
+       return this->UnstructuredGridExecute(input, output, outInfo);
+     }else
+       return Superclass::RequestData(request,inputVector,outputVector);
+    }
 }
 
 int
