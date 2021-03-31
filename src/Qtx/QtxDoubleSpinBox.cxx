@@ -75,11 +75,14 @@ QtxDoubleSpinBox::QtxDoubleSpinBox( QWidget* parent )
 : QDoubleSpinBox( parent ),
   myCleared( false )
 {
+#if !defined(GLOBAL_DOUBLE_CONVERSION)
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // see issue 14540 (old id 21219)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
+#endif
 
   // Use precision equal to default Qt decimals
   myPrecision = decimals();
@@ -104,11 +107,14 @@ QtxDoubleSpinBox::QtxDoubleSpinBox( double min, double max, double step, QWidget
 : QDoubleSpinBox( parent ),
   myCleared( false )
 {
+#if !defined(GLOBAL_DOUBLE_CONVERSION)
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // see issue 14540 (old id 21219)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
+#endif
 
   // Use precision equal to default Qt decimals
   myPrecision = decimals();
@@ -141,11 +147,14 @@ QtxDoubleSpinBox::QtxDoubleSpinBox( double min, double max, double step, int pre
   myCleared( false ),
   myPrecision( prec )
 {
+#if !defined(GLOBAL_DOUBLE_CONVERSION)
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // see issue 14540 (old id 21219)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
+#endif
 
   setDecimals( dec );
   setMinimum( min );

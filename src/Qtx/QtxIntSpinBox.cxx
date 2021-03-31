@@ -61,11 +61,14 @@ QtxIntSpinBox::QtxIntSpinBox( QWidget* parent )
 : QSpinBox( parent ),
   myCleared( false )
 {
+#if !defined(GLOBAL_DOUBLE_CONVERSION)
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // see issue 14540 (old id 21219)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
+#endif
 
   setCorrectionMode( QSpinBox::CorrectToNearestValue );
   connect( lineEdit(), SIGNAL( textChanged( const QString& ) ), 
@@ -87,11 +90,14 @@ QtxIntSpinBox::QtxIntSpinBox( int min, int max, int step, QWidget* parent )
 : QSpinBox( parent ),
   myCleared( false )
 {
+#if !defined(GLOBAL_DOUBLE_CONVERSION)
   // VSR 01/07/2010: Disable thousands separator for spin box
   // (to avoid incosistency of double-2-string and string-2-double conversion)
+  // see issue 14540 (old id 21219)
   QLocale loc;
   loc.setNumberOptions(loc.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
   setLocale(loc);
+#endif
 
   setMinimum( min );
   setMaximum( max );

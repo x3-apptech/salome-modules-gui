@@ -507,6 +507,15 @@ int AbstractGUIAppMain(int argc, char **argv)
     QLocale::setDefault(QLocale::c());
   resMgr.setWorkingMode(ResourceMgr::IgnoreUserValues);
 
+#if defined(GLOBAL_DOUBLE_CONVERSION)
+  // VSR 30/03/2021: moved here from QtxDoubleSpinBox/QtxIntSpinBox because of crash on Qt 5.12.
+  // Disable thousands separator for spin box
+  // see issue 14540 (old id 21219)
+  QLocale locale;
+  locale.setNumberOptions(locale.numberOptions() | QLocale::OmitGroupSeparator | QLocale::RejectGroupSeparator);
+  QLocale::setDefault(locale);
+#endif
+
   bool isGUI = boolCmdOption("--show-desktop", "--hide-desktop", true);  // true by default
   bool isSplash = boolCmdOption("--show-splash", "--hide-splash", true); // true by default
 
