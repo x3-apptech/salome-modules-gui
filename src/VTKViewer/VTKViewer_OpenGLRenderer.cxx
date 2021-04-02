@@ -112,7 +112,7 @@ void VTKViewer_OpenGLRenderer::Clear(void)
     glClearColor( static_cast<GLclampf>(this->Background[0]),
                   static_cast<GLclampf>(this->Background[1]),
                   static_cast<GLclampf>(this->Background[2]),
-                  static_cast<GLclampf>(0.0));
+                  static_cast<GLclampf>(1.0));
     clear_mask |= GL_COLOR_BUFFER_BIT;
   }
 
