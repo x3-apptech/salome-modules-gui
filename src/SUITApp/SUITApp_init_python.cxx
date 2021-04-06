@@ -69,7 +69,9 @@ void SUIT_PYTHON::init_python(int argc, char **argv)
   script += "del _custom_except_hook, sys\n";
   PyRun_SimpleString(qUtf8Printable(script));
   // VSR (22/09/2016): end of workaround
+#if PY_VERSION_HEX < 0x03070000
   PyEval_InitThreads(); // Create (and acquire) the interpreter lock - can be called many times
+#endif
   // Py_InitThreads acquires the GIL
   PyThreadState *pts = PyGILState_GetThisThreadState(); 
   PyEval_ReleaseThread(pts);
