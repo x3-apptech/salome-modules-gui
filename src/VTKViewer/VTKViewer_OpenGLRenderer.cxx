@@ -72,6 +72,93 @@ void VTKViewer_OpenGLRenderer::SetGradientType( const int theGradientType )
   this->GradientType = theGradientType;
 }
 
+void VTKViewer_OpenGLRenderer::GetCornersColor(Vec2D& cornersColor)
+{
+  if( this->GradientBackground )
+  {
+    double* corner1 = 0;
+    double* corner2 = 0;
+    double* corner3 = 0;
+    double* corner4 = 0;
+    double dcorner1[3];
+    double dcorner2[3];
+
+    switch( this->GradientType )
+    {
+    case HorizontalGradient:
+      corner1 = this->Background;
+      corner2 = this->Background;
+      corner3 = this->Background2;
+      corner4 = this->Background2;
+      break;
+    case VerticalGradient:
+      corner1 = this->Background;
+      corner2 = this->Background2;
+      corner3 = this->Background2;
+      corner4 = this->Background;
+      break;
+    case FirstDiagonalGradient:
+      corner1 = this->Background;
+      corner3 = this->Background2;
+      dcorner1[0] = dcorner2[0] = 0.5F * ( corner1[0] + corner3[0] );
+      dcorner1[1] = dcorner2[1] = 0.5F * ( corner1[1] + corner3[1] );
+      dcorner1[2] = dcorner2[2] = 0.5F * ( corner1[2] + corner3[2] );
+      corner2 = dcorner1;
+      corner4 = dcorner2;
+      break;
+    case SecondDiagonalGradient:
+      corner2 = this->Background2;
+      corner4 = this->Background;
+      dcorner1[0] = dcorner2[0] = 0.5F * ( corner2[0] + corner4[0] );
+      dcorner1[1] = dcorner2[1] = 0.5F * ( corner2[1] + corner4[1] );
+      dcorner1[2] = dcorner2[2] = 0.5F * ( corner2[2] + corner4[2] );
+      corner1 = dcorner1;
+      corner3 = dcorner2;
+      break;
+    case FirstCornerGradient:
+      corner1 = this->Background2;
+      corner2 = this->Background2;
+      corner3 = this->Background;
+      corner4 = this->Background2;
+      break;
+    case SecondCornerGradient:
+      corner1 = this->Background2;
+      corner2 = this->Background2;
+      corner3 = this->Background2;
+      corner4 = this->Background;
+      break;
+    case ThirdCornerGradient:
+      corner1 = this->Background;
+      corner2 = this->Background2;
+      corner3 = this->Background2;
+      corner4 = this->Background2;
+      break;
+    case FourthCornerGradient:
+      corner1 = this->Background2;
+      corner2 = this->Background;
+      corner3 = this->Background2;
+      corner4 = this->Background2;
+      break;
+    default: // just in case
+      corner1 = this->Background;
+      corner2 = this->Background;
+      corner3 = this->Background;
+      corner4 = this->Background;
+      break;
+    }
+    cornersColor[0][0] = corner1[0]; cornersColor[0][1] = corner1[1]; cornersColor[0][2] = corner1[2];
+    cornersColor[1][0] = corner2[0]; cornersColor[1][1] = corner2[1]; cornersColor[1][2] = corner2[2];
+    cornersColor[2][0] = corner3[0]; cornersColor[2][1] = corner3[1]; cornersColor[2][2] = corner3[2];
+    cornersColor[3][0] = corner4[0]; cornersColor[3][1] = corner4[1]; cornersColor[3][2] = corner4[2];
+  }
+  else
+  {
+    for (int i = 0; i < 4; i++)
+      for(int j = 0; j < 3; j++)
+        cornersColor[i][j] = this->Background[j];
+  }
+}
+
 void VTKViewer_OpenGLRenderer::Clear(void)
 {
   vtkOpenGLRenderer::Clear();
@@ -81,12 +168,12 @@ void VTKViewer_OpenGLRenderer::Clear(void)
     if (this->BackgroundProgram == 0)
     {
 #if defined(WIN32) && defined(UNICODE)
-	std::wstring wFilePath = std::wstring( _wgetenv(L"GUI_ROOT_DIR") ) + L"/share/salome/resources/gui/Background";
-	std::string filePath = Kernel_Utils::utf8_encode_s( wFilePath );
+      std::wstring wFilePath = std::wstring( _wgetenv(L"GUI_ROOT_DIR") ) + L"/share/salome/resources/gui/Background";
+      std::string filePath = Kernel_Utils::utf8_encode_s( wFilePath );
 #else
-	std::string filePath = std::string(getenv("GUI_ROOT_DIR")) + "/share/salome/resources/gui/Background";
+      std::string filePath = std::string(getenv("GUI_ROOT_DIR")) + "/share/salome/resources/gui/Background";
 #endif
-      
+
       if (!this->OpenGLHelper.CreateShaderProgram (filePath,
                                                    this->BackgroundProgram,
                                                    this->BackgroundVertexShader,
@@ -154,147 +241,86 @@ void VTKViewer_OpenGLRenderer::Clear(void)
 
     if( this->GradientBackground )
     {
-      double* corner1 = 0;
-      double* corner2 = 0;
-      double* corner3 = 0;
-      double* corner4 = 0;
-      double dcorner1[3];
-      double dcorner2[3];
-
-      switch( this->GradientType )
-      {
-        case HorizontalGradient:
-          corner1 = this->Background;
-          corner2 = this->Background;
-          corner3 = this->Background2;
-          corner4 = this->Background2;
-          break;
-        case VerticalGradient:
-          corner1 = this->Background;
-          corner2 = this->Background2;
-          corner3 = this->Background2;
-          corner4 = this->Background;
-          break;
-        case FirstDiagonalGradient:
-          corner1 = this->Background;
-          corner3 = this->Background2;
-          dcorner1[0] = dcorner2[0] = 0.5F * ( corner1[0] + corner3[0] );
-          dcorner1[1] = dcorner2[1] = 0.5F * ( corner1[1] + corner3[1] );
-          dcorner1[2] = dcorner2[2] = 0.5F * ( corner1[2] + corner3[2] );
-          corner2 = dcorner1;
-          corner4 = dcorner2;
-          break;
-        case SecondDiagonalGradient:
-          corner2 = this->Background2;
-          corner4 = this->Background;
-          dcorner1[0] = dcorner2[0] = 0.5F * ( corner2[0] + corner4[0] );
-          dcorner1[1] = dcorner2[1] = 0.5F * ( corner2[1] + corner4[1] );
-          dcorner1[2] = dcorner2[2] = 0.5F * ( corner2[2] + corner4[2] );
-          corner1 = dcorner1;
-          corner3 = dcorner2;
-          break;
-        case FirstCornerGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background2;
-          corner3 = this->Background;
-          corner4 = this->Background2;
-          break;
-        case SecondCornerGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background2;
-          corner3 = this->Background2;
-          corner4 = this->Background;
-          break;
-        case ThirdCornerGradient:
-          corner1 = this->Background;
-          corner2 = this->Background2;
-          corner3 = this->Background2;
-          corner4 = this->Background2;
-          break;
-        case FourthCornerGradient:
-          corner1 = this->Background2;
-          corner2 = this->Background;
-          corner3 = this->Background2;
-          corner4 = this->Background2;
-          break;
-        default: // just in case
-          corner1 = this->Background;
-          corner2 = this->Background;
-          corner3 = this->Background;
-          corner4 = this->Background;
-          break;
-      }
+      Vec2D corners = {{0.0f,0.0f,0.0f},
+                     {0.0f,0.0f,0.0f},
+                     {0.0f,0.0f,0.0f},
+                     {0.0f,0.0f,0.0f}};
+      GetCornersColor(corners); 
 
 #ifdef VTK_OPENGL2
-  if (this->OpenGLHelper.IsInitialized())
-  {
-    if (this->VertexArrayObject == 0)
-    {
-      this->OpenGLHelper.vglGenVertexArraysARB (1, &this->VertexArrayObject);
-    }
+      if (this->OpenGLHelper.IsInitialized())
+      {
+        if (this->VertexArrayObject == 0)
+        {
+          this->OpenGLHelper.vglGenVertexArraysARB (1, &this->VertexArrayObject);
+        }
 
-    this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
-    this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
+        this->OpenGLHelper.vglUseProgramObjectARB (this->BackgroundProgram);
+        this->OpenGLHelper.vglBindVertexArrayARB  (this->VertexArrayObject);
 
-    GLfloat data[7 * 4];
-    if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
-    {
-      const float tmpData[] = { (float)corner1[0], (float)corner1[1], (float)corner1[2], 1.0f,       -1.0f,  1.0f, 0.0f,
-                                (float)corner2[0], (float)corner2[1], (float)corner2[2], 1.0f,       -1.0f, -1.0f, 0.0f,
-                                (float)corner3[0], (float)corner3[1], (float)corner3[2], 1.0f,        1.0f, -1.0f, 0.0f,
-                                (float)corner4[0], (float)corner4[1], (float)corner4[2], 1.0f,        1.0f,  1.0f, 0.0f };
-      memcpy (data, tmpData, sizeof(float) * 7 * 4);
-    }
-    else //if( this->GradientType == FirstCornerGradient || this->GradientType == ThirdCornerGradient )
-    {
-      const float tmpData[] = { (float)corner2[0], (float)corner2[1], (float)corner2[2], 1.0f,       -1.0f, -1.0f, 0.0f,
-                                (float)corner3[0], (float)corner3[1], (float)corner3[2], 1.0f,       -1.0f,  1.0f, 0.0f,
-                                (float)corner4[0], (float)corner4[1], (float)corner4[2], 1.0f,        1.0f,  1.0f, 0.0f,
-                                (float)corner1[0], (float)corner1[1], (float)corner1[2], 1.0f,        1.0f, -1.0f, 0.0f };
-      memcpy (data, tmpData, sizeof(float) * 7 * 4);
-    }
+        GLfloat data[10 * 4];
+        if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
+        {
+          const float tmpData[] = { (float)corners[0][0], (float)corners[0][1], (float)corners[0][2], 1.0f,       -1.0f,  1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[1][0], (float)corners[1][1], (float)corners[1][2], 1.0f,       -1.0f, -1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[2][0], (float)corners[2][1], (float)corners[2][2], 1.0f,        1.0f, -1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[3][0], (float)corners[3][1], (float)corners[3][2], 1.0f,        1.0f,  1.0f, 0.0f,    0.0f, 0.0f, 0.0f};
+          memcpy (data, tmpData, sizeof(float) * 10 * 4);
+        }
+        else //if( this->GradientType == FirstCornerGradient || this->GradientType == ThirdCornerGradient )
+        {
+          const float tmpData[] = { (float)corners[1][0], (float)corners[1][1], (float)corners[1][2], 1.0f,       -1.0f, -1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[2][0], (float)corners[2][1], (float)corners[2][2], 1.0f,       -1.0f,  1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[3][0], (float)corners[3][1], (float)corners[3][2], 1.0f,        1.0f,  1.0f, 0.0f,    0.0f, 0.0f, 0.0f,
+                                    (float)corners[0][0], (float)corners[0][1], (float)corners[0][2], 1.0f,        1.0f, -1.0f, 0.0f,    0.0f, 0.0f, 0.0f};
+          memcpy (data, tmpData, sizeof(float) * 10 * 4);
+        }
 
-    GLuint vertexBuffer;
-    this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
-    this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, vertexBuffer);
-    this->OpenGLHelper.vglBufferDataARB (GL_ARRAY_BUFFER_ARB, sizeof(data), data, GL_STATIC_DRAW_ARB);
+        GLuint vertexBuffer;
+        this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
+        this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, vertexBuffer);
+        this->OpenGLHelper.vglBufferDataARB (GL_ARRAY_BUFFER_ARB, sizeof(data), data, GL_STATIC_DRAW_ARB);
 
-    GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Color");
-    GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Vertex");
-    GLsizei vertexSize = sizeof(GLfloat) * 7;
+        GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Color");
+        GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Vertex");
+        GLint bgColorAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "ColorBG");
+        GLsizei vertexSize = sizeof(GLfloat) * 10;
 
-    this->OpenGLHelper.vglVertexAttribPointerARB (colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0);
-    this->OpenGLHelper.vglEnableVertexAttribArrayARB (colorAttrib);
+        this->OpenGLHelper.vglVertexAttribPointerARB (colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0);
+        this->OpenGLHelper.vglEnableVertexAttribArrayARB (colorAttrib);
 
-    this->OpenGLHelper.vglVertexAttribPointerARB (vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4));
-    this->OpenGLHelper.vglEnableVertexAttribArrayARB (vertexAttrib);
+        this->OpenGLHelper.vglVertexAttribPointerARB (vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4));
+        this->OpenGLHelper.vglEnableVertexAttribArrayARB (vertexAttrib);
 
-    this->OpenGLHelper.vglUniform1iARB (this->myLocations.UseTexture, 0);
+        this->OpenGLHelper.vglVertexAttribPointerARB (bgColorAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 7));
+        this->OpenGLHelper.vglEnableVertexAttribArrayARB (bgColorAttrib);
 
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        this->OpenGLHelper.vglUniform1iARB (this->myLocations.UseTexture, 0);
 
-    this->OpenGLHelper.vglDisableVertexAttribArrayARB (0);
-    this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-    this->OpenGLHelper.vglDeleteBuffersARB (1, &vertexBuffer);
-    this->OpenGLHelper.vglBindVertexArrayARB (0);
-    this->OpenGLHelper.vglUseProgramObjectARB (0);
-  }
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+        this->OpenGLHelper.vglDisableVertexAttribArrayARB (0);
+        this->OpenGLHelper.vglBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+        this->OpenGLHelper.vglDeleteBuffersARB (1, &vertexBuffer);
+        this->OpenGLHelper.vglBindVertexArrayARB (0);
+        this->OpenGLHelper.vglUseProgramObjectARB (0);
+      }
 #else
 
       glBegin( GL_TRIANGLE_FAN );
       if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
       {
-        glColor3f( corner1[0], corner1[1], corner1[2] ); glVertex2f( 0.F, 0.F );
-        glColor3f( corner2[0], corner2[1], corner2[2] ); glVertex2f( 1.F, 0.F );
-        glColor3f( corner3[0], corner3[1], corner3[2] ); glVertex2f( 1.F, 1.F );
-        glColor3f( corner4[0], corner4[1], corner4[2] ); glVertex2f( 0.F, 1.F );
+        glColor3f( corners[0][0], corners[0][1], corners[0][2] ); glVertex2f( 0.F, 0.F );
+        glColor3f( corners[1][0], corners[1][1], corners[1][2] ); glVertex2f( 1.F, 0.F );
+        glColor3f( corners[2][0], corners[2][1], corners[2][2] ); glVertex2f( 1.F, 1.F );
+        glColor3f( corners[3][0], corners[3][1], corners[3][2] ); glVertex2f( 0.F, 1.F );
       }
       else //if( this->GradientType == FirstCornerGradient || this->GradientType == ThirdCornerGradient )
       {
-        glColor3f( corner2[0], corner2[1], corner2[2] ); glVertex2f( 1.F, 0.F );
-        glColor3f( corner3[0], corner3[1], corner3[2] ); glVertex2f( 1.F, 1.F );
-        glColor3f( corner4[0], corner4[1], corner4[2] ); glVertex2f( 0.F, 1.F );
-        glColor3f( corner1[0], corner1[1], corner1[2] ); glVertex2f( 0.F, 0.F );
+        glColor3f( corners[1][0], corners[1][1], corners[1][2] ); glVertex2f( 1.F, 0.F );
+        glColor3f( corners[2][0], corners[2][1], corners[2][2] ); glVertex2f( 1.F, 1.F );
+        glColor3f( corners[3][0], corners[3][1], corners[3][2] ); glVertex2f( 0.F, 1.F );
+        glColor3f( corners[0][0], corners[0][1], corners[0][2] ); glVertex2f( 0.F, 0.F );
       }
       glEnd();
 #endif
@@ -348,12 +374,30 @@ void VTKViewer_OpenGLRenderer::Clear(void)
           GLfloat dx = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aWidth / (GLfloat)aViewWidth )) : 1.0f;
           GLfloat dy = (aPosition == VTKViewer_Texture::Centered) ? (( (GLfloat)aHeight / (GLfloat)aViewHeight )) : (aPosition == VTKViewer_Texture::Stretched) ? 1.0f : -1.0f;
 
-
+          // call to get backcolor
+          Vec2D bgColor = {{0.0f,0.0f,0.0f},
+                           {0.0f,0.0f,0.0f},
+                           {0.0f,0.0f,0.0f},
+                           {0.0f,0.0f,0.0f}};
+          GetCornersColor(bgColor);            
           // First 4 components of Vertex is TexCoords now.
-          GLfloat data[7 * 4] = { 0.0f, texY, 0.0f, 1.0f,       -dx,  dy, 0.0f,
-                                  0.0f, 0.0f, 0.0f, 1.0f,       -dx, -dy, 0.0f,
-                                  texX, 0.0f, 0.0f, 1.0f,        dx, -dy, 0.0f,
-                                  texX, texY, 0.0f, 1.0f,        dx,  dy, 0.0f };
+          GLfloat data[10 * 4];
+          if( this->GradientType != FirstCornerGradient && this->GradientType != ThirdCornerGradient )
+          {
+            const float tmpData[] = { 0.0f, texY, 0.0f, 1.0f,       -dx,  dy, 0.0f, (float)bgColor[0][0], (float)bgColor[0][1], (float)bgColor[0][2],
+                                      0.0f, 0.0f, 0.0f, 1.0f,       -dx, -dy, 0.0f, (float)bgColor[1][0], (float)bgColor[1][1], (float)bgColor[1][2],
+                                      texX, 0.0f, 0.0f, 1.0f,        dx, -dy, 0.0f, (float)bgColor[2][0], (float)bgColor[2][1], (float)bgColor[2][2],
+                                      texX, texY, 0.0f, 1.0f,        dx,  dy, 0.0f, (float)bgColor[3][0], (float)bgColor[3][1], (float)bgColor[3][2] };
+            memcpy (data, tmpData, sizeof(float) * 10 * 4);
+          }
+          else //if( this->GradientType == FirstCornerGradient || this->GradientType == ThirdCornerGradient )
+          {
+            const float tmpData[] = { 0.0f, texY, 0.0f, 1.0f,       -dx,  dy, 0.0f, (float)bgColor[2][0], (float)bgColor[2][1], (float)bgColor[2][2],
+                                      0.0f, 0.0f, 0.0f, 1.0f,       -dx, -dy, 0.0f, (float)bgColor[1][0], (float)bgColor[1][1], (float)bgColor[1][2],
+                                      texX, 0.0f, 0.0f, 1.0f,        dx, -dy, 0.0f, (float)bgColor[0][0], (float)bgColor[0][1], (float)bgColor[0][2],
+                                      texX, texY, 0.0f, 1.0f,        dx,  dy, 0.0f, (float)bgColor[3][0], (float)bgColor[3][1], (float)bgColor[3][2] };
+            memcpy (data, tmpData, sizeof(float) * 10 * 4);
+          }
 
           GLuint vertexBuffer;
           this->OpenGLHelper.vglGenBuffersARB (1, &vertexBuffer);
@@ -362,13 +406,17 @@ void VTKViewer_OpenGLRenderer::Clear(void)
 
           GLint colorAttrib  = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Color");
           GLint vertexAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "Vertex");
-          GLsizei vertexSize = sizeof(GLfloat) * 7;
+          GLint bgColorAttrib = this->OpenGLHelper.vglGetAttribLocationARB (this->BackgroundProgram, "ColorBG");
+          GLsizei vertexSize = sizeof(GLfloat) * 10;
 
           this->OpenGLHelper.vglVertexAttribPointerARB (colorAttrib, 4, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)0);
           this->OpenGLHelper.vglEnableVertexAttribArrayARB (colorAttrib);
 
           this->OpenGLHelper.vglVertexAttribPointerARB (vertexAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 4));
           this->OpenGLHelper.vglEnableVertexAttribArrayARB (vertexAttrib);
+
+          this->OpenGLHelper.vglVertexAttribPointerARB (bgColorAttrib, 3, GL_FLOAT, GL_FALSE, vertexSize, (const GLvoid*)(sizeof(GLfloat) * 7));
+          this->OpenGLHelper.vglEnableVertexAttribArrayARB (bgColorAttrib);
 
           this->OpenGLHelper.vglUniform1iARB (this->myLocations.UseTexture, 1);
           this->OpenGLHelper.vglUniform1iARB (this->myLocations.BackgroundTexture, GL_TEXTURE0);

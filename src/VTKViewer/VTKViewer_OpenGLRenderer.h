@@ -56,6 +56,9 @@ protected:
 private:
   int GradientType;
 
+  typedef std::vector< std::vector<double> > Vec2D;
+  void GetCornersColor(Vec2D&);
+
 #ifdef VTK_OPENGL2
   VTKViewer_OpenGLHelper OpenGLHelper;
   GLhandleARB            BackgroundProgram;

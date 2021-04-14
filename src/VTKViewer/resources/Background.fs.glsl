@@ -11,11 +11,15 @@
 uniform int       uUseTexture;
 uniform sampler2D uBackgroundTexture;
 
-in vec4 VSColor;
+in vec4[2] VSColor;
 void main()
 {
   if (uUseTexture == 1)
-    outColor = Texture2D(uBackgroundTexture, VSColor.xy);
+  {
+    outColor = Texture2D(uBackgroundTexture, VSColor[0].xy);
+    outColor = (outColor * outColor.a) + (VSColor[1] * (1 - outColor.a));
+    outColor.a = 1.0;
+  }
   else
-    outColor = VSColor;
+    outColor = VSColor[0];
 }
