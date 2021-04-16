@@ -35,7 +35,6 @@
 #endif
 
 class vtkUnstructuredGrid;
-struct vtkExcludedFaces;
 
 /*! \brief This class used same as vtkGeometryFilter. See documentation on VTK for more information.
  */
@@ -143,7 +142,7 @@ protected:
                          bool triangulate = false);
 
   // Delegate VTKViewer_GeometryFilter::UnstructuredGridExecute to vtkGeometryFilter::UnstructuredGridExecute
-  bool delegateToVtk = true;
+  bool delegateToVtk = false;
     
 private:
   TVectorId myVTK2ObjIds;

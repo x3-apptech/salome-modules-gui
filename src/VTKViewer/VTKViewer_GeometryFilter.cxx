@@ -182,6 +182,7 @@ VTKViewer_GeometryFilter
      return 0;
     }
 
+#if VTK_VERSION_NUMBER >= VTK_VERSION_CHECK(9,0,0)
   if (delegateToVtk)
     {
 
@@ -247,11 +248,14 @@ VTKViewer_GeometryFilter
      return this->vtkGeometryFilter::DataSetExecute(input, output, &exc);
     }  
     else // !delegateToVtk
+#endif
     {
      if (input->GetDataObjectType() == VTK_UNSTRUCTURED_GRID){
        return this->UnstructuredGridExecute(input, output, outInfo);
-     }else
+     }
+     else {
        return Superclass::RequestData(request,inputVector,outputVector);
+     }
     }
 }
 
