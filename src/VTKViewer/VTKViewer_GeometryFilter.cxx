@@ -92,6 +92,8 @@
 #endif
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
+#include "Qtx.h"
+
 vtkStandardNewMacro(VTKViewer_GeometryFilter)
 
 VTKViewer_GeometryFilter
@@ -102,7 +104,15 @@ VTKViewer_GeometryFilter
   myAppendCoincident3D(0),
   myMaxArcAngle(2),
   myIsBuildArc(false)
-{}
+{
+  static int forceDelegateToVtk = -1;
+  if ( forceDelegateToVtk < 0 )
+  {
+    QString env = Qtx::getenv( "SALOME_ACTOR_DELEGATE_TO_VTK" );
+    forceDelegateToVtk = (int)(env == "1");
+  }
+  delegateToVtk = forceDelegateToVtk > 0;
+}
 
 
 VTKViewer_GeometryFilter
