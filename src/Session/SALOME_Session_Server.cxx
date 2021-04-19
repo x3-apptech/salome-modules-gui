@@ -33,6 +33,7 @@
 #include <Utils_SALOME_Exception.hxx>
 #include <Utils_SINGLETON.hxx>
 #include <utilities.h>
+#include "KernelBasis.hxx"
 
 #include "Session_Session_i.hxx"
 #include "Session_ServerCheck.hxx"
@@ -383,6 +384,7 @@ int AbstractGUIAppMain(int argc, char **argv);
 class GUIAppOldStyle
 {
 public:
+  static constexpr bool SSL_MODE = false;
   using NamingServiceImplementation = OldStyleNS;
   void connectToNSIfNeeded(CORBA::ORB_ptr orb) { _NS.reset(new SALOME_NamingService(orb)); }
   void shutdownCORBAStufIfNeeded(bool shutdownAll, CORBA::ORB_ptr orb);
@@ -396,6 +398,7 @@ private:
 class GUIAppNewStyle
 {
 public:
+  static constexpr bool SSL_MODE = true;
   using NamingServiceImplementation = NewStyleNS;
   void connectToNSIfNeeded(CORBA::ORB_ptr orb) { /*! nothing */ }
   void shutdownCORBAStufIfNeeded(bool shutdownAll, CORBA::ORB_ptr orb) { /*! nothing */ }
@@ -451,6 +454,7 @@ template<class GUI_APP_STYLE>
 int AbstractGUIAppMain(int argc, char **argv)
 {
   using NamingServiceImplementation = typename GUI_APP_STYLE::NamingServiceImplementation;
+  setSSLMode(GUI_APP_STYLE::SSL_MODE);
   GUI_APP_STYLE self;
   // Set-up application settings configuration (as for QSettings)
   // Note: these are default settings which can be customized (see below)
