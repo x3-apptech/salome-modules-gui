@@ -28,8 +28,8 @@ int main(int argc, char *argv[])
   constexpr char MAIN_PROGRAM[] = "SALOME_Session_Server_No_Server";
   constexpr char NO_SERVER_ENV_VAR[] = "SALOME_EMB_SERVANT";
 #ifndef WIN32
-  const char *MODULES[]={"SHAPERSTUDY","GEOM","SMESH","HYBRIDPLUGIN","GHS3DPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","HEXOTICPLUGIN","GHS3DPRLPLUGIN","NETGENPLUGIN"};
-  const char *MODULES_PATH[]={"GUI","SHAPER","SHAPERSTUDY","GEOM","SMESH","HYBRIDPLUGIN","GHS3DPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","GHS3DPRLPLUGIN","NETGENPLUGIN"};
+  const char *MODULES[]={"SHAPERSTUDY","GEOM","SMESH","YACS","HYBRIDPLUGIN","GHS3DPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","HEXOTICPLUGIN","GHS3DPRLPLUGIN","NETGENPLUGIN"};
+  const char *MODULES_PATH[]={"GUI","SHAPER","SHAPERSTUDY","GEOM","SMESH","YACS","HYBRIDPLUGIN","GHS3DPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","GHS3DPRLPLUGIN","NETGENPLUGIN"};
 #else
   const char *MODULES[]={"SHAPERSTUDY","GEOM","SMESH","HYBRIDPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","HEXOTICPLUGIN","NETGENPLUGIN"};
   const char *MODULES_PATH[]={"GUI","SHAPER","SHAPERSTUDY","GEOM","SMESH","HYBRIDPLUGIN","BLSURFPLUGIN","GMSHPLUGIN","HEXABLOCKPLUGIN","NETGENPLUGIN"};
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
   args << catalogs.join("::");
   args << ")";
   args << "--with" << "SALOMEDS" <<  "(" << ")" << "--with" << "Container" << "(" << "FactoryServer" << ")" << "--with" << "SalomeAppEngine" << "(" << ")" << "CPP";
-  args << QString("--resources=%1").arg(resfile) << "--modules" << "(SHAPER:GEOM:SMESH)";
+  args << QString("--resources=%1").arg(resfile) << "--modules" << "(SHAPER:GEOM:SMESH:YACS)";
   if( pe.contains("VERBOSE") )
   {
     std::cout << "Overloaded env var :" << std::endl;
