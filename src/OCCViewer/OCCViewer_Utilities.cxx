@@ -43,7 +43,9 @@ Handle(Image_PixMap) OCCViewer_Utilities::imageToPixmap( const QImage& anImage )
   Handle(Image_PixMap) aPixmap = new Image_PixMap();
   if ( !anImage.isNull() ) {
     aPixmap->InitTrash( Image_PixMap::ImgBGRA, anImage.width(), anImage.height() );
+#if OCC_VERSION_LARGE < 0x07050000
     aPixmap->SetTopDown( Standard_True );
+#endif
 
     const uchar* aImageBytes = anImage.bits();
 
