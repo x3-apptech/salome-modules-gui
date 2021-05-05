@@ -113,7 +113,7 @@
 #endif
 
 // Use workaround for rendering transparent object over MESA
-#defing USE_WORKAROUND_FOR_MESA
+#define USE_WORKAROUND_FOR_MESA
 
 namespace SVTK
 {
