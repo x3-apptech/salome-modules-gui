@@ -112,6 +112,9 @@
 #include <GL/gl.h>
 #endif
 
+// Use workaround for rendering transparent object over MESA
+#defing USE_WORKAROUND_FOR_MESA
+
 namespace SVTK
 {
   int convertAction( const int accelAction )
@@ -251,6 +254,11 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
   myKeyFreeInteractorStyle->AddObserver(SVTK::OperationFinished,
                                         myEventCallbackCommand.GetPointer(), 0.0);
 
+#ifdef USE_WORKAROUND_FOR_MESA
+  char *mesavar = getenv("SALOME_USE_MESA");
+  if (mesavar)
+    getRenderer()->SetUseDepthPeeling(1);
+#endif //USE_WORKAROUND_FOR_MESA
 
   getRenderer()->SetBackgroundAlpha(1.0);
   myInteractor->getRenderWindow()->SetMultiSamples(0);
