@@ -2237,12 +2237,17 @@ Qt::HANDLE Qtx::getVisual()
   // Find an appropriate visual
 
   int doubleBufferVisual[]  = {
-    GLX_RGBA,           // Needs to support OpenGL
-    GLX_DEPTH_SIZE, 16, // Needs to support a 16 bit depth buffer
-    GLX_DOUBLEBUFFER,   // Needs to support double-buffering
-    GLX_STEREO,         // Needs to support stereo rendering
+    GLX_RENDER_TYPE, GLX_RGBA_BIT, // Needs to support OpenGL
+    GLX_RED_SIZE, 1,
+    GLX_GREEN_SIZE, 1,
+    GLX_BLUE_SIZE, 1,
+    GLX_ALPHA_SIZE, 1,
+    GLX_DEPTH_SIZE, 16,    // Needs to support a 16 bit depth buffer
+    GLX_DOUBLEBUFFER, 1,   // Needs to support double-buffering
+    GLX_STEREO, 1,         // Needs to support stereo rendering
     GLX_STENCIL_SIZE, 1,
-    None                // end of list
+    0x20B2, 1,             // Needs to support srgb profile
+    None                   // end of list
   };
 
   // Try for the double-bufferd visual first
@@ -2285,7 +2290,7 @@ void Qtx::initDefaultSurfaceFormat()
 #ifdef WIN32
   fmt.setAlphaBufferSize(0);
 #else
-  fmt.setAlphaBufferSize(1);
+  fmt.setAlphaBufferSize(0);
 #endif
   fmt.setStereo(false);
   fmt.setSamples(0);

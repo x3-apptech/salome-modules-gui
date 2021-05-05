@@ -252,7 +252,8 @@ void SVTK_ViewWindow::Initialize(SVTK_ViewModelBase* theModel)
                                         myEventCallbackCommand.GetPointer(), 0.0);
 
 
-
+  getRenderer()->SetBackgroundAlpha(1.0);
+  myInteractor->getRenderWindow()->SetMultiSamples(0);
   myInteractor->getRenderWindow()->Render();
   setBackground( Qtx::BackgroundData( Qt::black ) ); // set default background
   onResetView();
