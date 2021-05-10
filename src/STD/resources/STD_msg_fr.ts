@@ -140,11 +140,11 @@ Un répertoire avec ce nom existe déjà sur le disque. Essayez d&apos;utiliser 
     </message>
     <message>
         <source>TOT_DESK_FILE_NEW</source>
-        <translation>Créer un nouveau document</translation>
+        <translation>Créer une nouvelle étude</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_NEW</source>
-        <translation>Crée un nouveau document</translation>
+        <translation>Créer une nouvelle étude</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_MRU</source>
@@ -200,7 +200,7 @@ Un répertoire avec ce nom existe déjà sur le disque. Essayez d&apos;utiliser 
     </message>
     <message>
         <source>INF_DESK_DOC_CREATE</source>
-        <translation>Créer un nouveau document</translation>
+        <translation>Créer une nouvelle étude</translation>
     </message>
     <message>
         <source>QUE_DOC_ALREADYOPEN</source>
@@ -356,7 +356,7 @@ Voulez-vous l&apos;écraser ?</translation>
     </message>
     <message>
         <source>TOT_DESK_FILE_SAVE</source>
-        <translation>Enregistrer le document</translation>
+        <translation>Enregistrer l'étude</translation>
     </message>
     <message>
         <source>TOT_DESK_FILE_EXIT</source>
@@ -364,11 +364,11 @@ Voulez-vous l&apos;écraser ?</translation>
     </message>
     <message>
         <source>TOT_DESK_FILE_OPEN</source>
-        <translation>Ouvrir un document</translation>
+        <translation>Ouvrir une étude</translation>
     </message>
     <message>
         <source>TOT_DESK_FILE_REOPEN</source>
-        <translation>Réouvrir un document</translation>
+        <translation>Réouvrir une étude</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_EXIT</source>
@@ -376,15 +376,15 @@ Voulez-vous l&apos;écraser ?</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_OPEN</source>
-        <translation>Ouvre un document existant</translation>
+        <translation>Ouvre une étude existant</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_REOPEN</source>
-        <translation>Réouvrir le document actuel à partir d&apos;un fichier</translation>
+        <translation>Réouvrir l'étude actuelle à partir d&apos;un fichier</translation>
     </message>
     <message>
         <source>PRP_DESK_FILE_SAVE</source>
-        <translation>Sauvegarder le document actuel</translation>
+        <translation>Sauvegarder l'étude actuelle</translation>
     </message>
     <message>
         <source>PRP_DESK_WINDOW_HTILE</source>

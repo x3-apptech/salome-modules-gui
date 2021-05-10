@@ -48,19 +48,19 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>SALOME_SITE</source>
-        <translation type="unfinished">SALOME Website</translation>
+        <translation>Site WEB SALOME</translation>
     </message>
     <message>
         <source>SALOME_FORUM</source>
-        <translation type="unfinished">SALOME Forum</translation>
+        <translation>Forum SALOME</translation>
     </message>
     <message>
         <source>SALOME_VIDEO_TUTORIALS</source>
-        <translation type="unfinished">Video Tutorials</translation>
+        <translation>Tutorials vidéo</translation>
     </message>
     <message>
         <source>PRP_SALOME_VIDEO_TUTORIALS</source>
-        <translation type="unfinished">Visit YouTube channel with some videos</translation>
+        <translation>Visitez la chaîne YouTube pour des vidéos</translation>
     </message>
     <message>
         <source>SALOME_TUTORIALS</source>
@@ -68,7 +68,7 @@ CEA/DEN, CEDRAT, EDF R&amp;D, LEG, PRINCIPIA R&amp;D, BUREAU VERITAS</translatio
     </message>
     <message>
         <source>PRP_SALOME_TUTORIALS</source>
-        <translation type="unfinished">Try tutorials from SALOME site</translation>
+        <translation>Essayez les tutorials depuis le site de SALOME</translation>
     </message>
     <message>
         <source>ENTRY_COLUMN</source>
@@ -182,7 +182,7 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>INFO_PANEL</source>
-        <translation type="unfinished">Help panel</translation>
+        <translation>Panneau d'aide</translation>
     </message>
     <message>
         <source>PRP_DESK_PREFERENCES</source>
@@ -230,15 +230,15 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_POLYGON_SELECTION</source>
-        <translation>Polygon</translation>
+        <translation>Polygone</translation>
     </message>
     <message>
         <source>PREF_CIRCLE_SELECTION</source>
-        <translation>Circle</translation>
+        <translation>Cercle</translation>
     </message>
     <message>
         <source>PREF_SELECTION_STYLE</source>
-        <translation>Advanced selection</translation>
+        <translation>Sélection avancée</translation>
     </message>
     <message>
         <source>PREF_NAVIGATION</source>
@@ -266,11 +266,11 @@ Les modifications seront appliquées à la prochaine session.</translation>
     </message>
     <message>
         <source>PREF_INCREMENTAL_SPEED</source>
-        <translation>Incrément de vitesse:</translation>
+        <translation>Incrément de vitesse :</translation>
     </message>
     <message>
         <source>PREF_INCREMENTAL_SPEED_MODE</source>
-        <translation>Mode de modification:</translation>
+        <translation>Mode de modification :</translation>
     </message>
     <message>
         <source>PREF_ARITHMETIC</source>
@@ -1139,15 +1139,15 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
       <source>INFO_WELCOME_TO_SALOME</source>
-      <translation type="unfinished">Welcome to SALOME</translation>
+      <translation>Bienvenue dans SALOME</translation>
     </message>
     <message>
       <source>INFO_GETTING_STARTED</source>
-      <translation type="unfinished">Getting started</translation>
+      <translation>Pour démarrer</translation>
     </message>
     <message>
       <source>INFO_AVAILABLE_MODULES</source>
-      <translation type="unfinished">Available modules</translation>
+      <translation>Modules disponibles</translation>
     </message>
 </context>
 <context>
@@ -1260,7 +1260,7 @@ Le fichier n&apos;existe pas</translation>
     </message>
     <message>
         <source>PREF_NEED_RESTART</source>
-        <translation>Des changements prendront effets seulement après un redémarrage de l&apos;application</translation>
+        <translation>Les changements prendront effet seulement après un redémarrage de l&apos;application</translation>
     </message>
 </context>
 <context>
