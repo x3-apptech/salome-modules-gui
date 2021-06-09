@@ -30,6 +30,7 @@
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewWindow.h>
 #include <SUIT_ViewManager.h>
+#include <SUIT_ViewModel.h>
 #include <SUIT_DataObjectIterator.h>
 #include <CAM_DataModel.h>
 #include <LightApp_Application.h>
