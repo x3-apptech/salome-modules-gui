@@ -27,7 +27,7 @@
 class QMutex;
 class QWaitCondition;
 
-class Engines_Container_i;
+class Abstract_Engines_Container_i;
 
 class SESSION_EXPORT OldStyleNS
 {
@@ -38,7 +38,7 @@ public:
   void Register(CORBA::Object_ptr ObjRef, const char* Path) { _NS.Register(ObjRef,Path); }
   CORBA::Object_ptr Resolve(const char* Path) { return _NS.Resolve(Path); }
   RealNS *getNS() { return &_NS; }
-  Engines_Container_i *activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char** argv);
+  Abstract_Engines_Container_i *activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char** argv);
   static void defineDefaultSALOMEKERNELNamingService() { /* nothing to do by default true NamingService server is considered */ }
   static void activateContainerManager(CORBA::ORB_var orb);
   static void activateSession(CORBA::ORB_var orb, PortableServer::POA_var poa, QMutex *GUIMutex, QWaitCondition *GUILauncher, int argc, char ** argv);
@@ -61,7 +61,7 @@ public:
   void Register(CORBA::Object_ptr ObjRef, const char* Path) { _NS.Register(ObjRef,Path); }
   CORBA::Object_ptr Resolve(const char* Path) { return _NS.Resolve(Path); }
   RealNS *getNS() { return &_NS; }
-  Engines_Container_i *activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char** argv);
+  Abstract_Engines_Container_i *activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char** argv);
   static void defineDefaultSALOMEKERNELNamingService();
   static void activateContainerManager(CORBA::ORB_var orb);
   static void activateSession(CORBA::ORB_var orb, PortableServer::POA_var poa, QMutex *GUIMutex, QWaitCondition *GUILauncher, int argc, char ** argv);

@@ -62,7 +62,7 @@ void CommonActivateSession(CORBA::ORB_var orb, PortableServer::POA_var poa, QMut
   }
 }
 
-Engines_Container_i *OldStyleNS::activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char **argv)
+Abstract_Engines_Container_i *OldStyleNS::activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char **argv)
 {
   Engines_Container_i *_container = nullptr;
   try
@@ -230,7 +230,7 @@ void NewStyleNS::defineDefaultSALOMEKERNELNamingService()
   KERNEL::assignNamingServiceSL();
 }
 
-Engines_Container_i *NewStyleNS::activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char **argv)
+Abstract_Engines_Container_i *NewStyleNS::activateContainer(CORBA::ORB_var orb, PortableServer::POA_var poa, int argc, char **argv)
 {
   return KERNEL::getContainerSA();
 }
