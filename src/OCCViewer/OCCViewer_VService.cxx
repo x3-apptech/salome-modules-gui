@@ -59,8 +59,7 @@ Handle(Aspect_Window) OCCViewer_VService::CreateWindow( const Handle(V3d_View)& 
 */
 Handle(V3d_Viewer) OCCViewer_VService::CreateViewer()
 {
-  static Handle(OpenGl_GraphicDriver) aGraphicDriver;
-  if (aGraphicDriver.IsNull())
-    aGraphicDriver = new OpenGl_GraphicDriver(new Aspect_DisplayConnection());
+  Handle(OpenGl_GraphicDriver) aGraphicDriver =
+    new OpenGl_GraphicDriver(new Aspect_DisplayConnection());
   return new V3d_Viewer(aGraphicDriver);
 }
