@@ -77,6 +77,18 @@
 #include <QTextStream>
 #include <QWaitCondition>
 
+#ifdef WIN32
+extern "C" {
+// For DWORD (see end of file)
+#include "windef.h"
+// Force high-performance graphics on dual-GPU systems
+  // http://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+  __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+  // https://community.amd.com/thread/169965
+  __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+#endif
+
 //! CORBA server for SALOME GUI session
 /*!
  * SALOME_Session_Server launches a SALOME session servant.
