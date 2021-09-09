@@ -467,6 +467,7 @@ int AbstractGUIAppMain(int argc, char **argv)
 {
   using NamingServiceImplementation = typename GUI_APP_STYLE::NamingServiceImplementation;
   setSSLMode(GUI_APP_STYLE::SSL_MODE);
+  setGUIMode(true);
   GUI_APP_STYLE self;
   // Set-up application settings configuration (as for QSettings)
   // Note: these are default settings which can be customized (see below)
