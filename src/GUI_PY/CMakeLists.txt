@@ -35,7 +35,6 @@ PYQT_WRAP_UIC(_pyuic_SCRIPTS ${_pyuic_FILES} TARGET_NAME _target_name_pyuic)
 
 # scripts / static
 SET(_other_SCRIPTS 
-  __init__.py
   genericdialog.py
   helper.py
   mytestdialog.py
@@ -48,6 +47,7 @@ SET(_bin_SCRIPTS
 )
 
 SALOME_CONFIGURE_FILE(qtsalome.py.in qtsalome.py)
+SALOME_CONFIGURE_FILE(__init__.py __init__.py INSTALL ${SALOME_INSTALL_PYTHON}/salome/gui)
 
 SET(_gen_SCRIPTS
     ${CMAKE_CURRENT_BINARY_DIR}/qtsalome.py
