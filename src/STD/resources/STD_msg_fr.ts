@@ -221,7 +221,7 @@ Voulez-vous le réouvrir?</translation>
     </message>
     <message>
         <source>INF_DESK_EXIT</source>
-        <translation>&amp;Quitter</translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <source>ERR_UNKNOWN</source>
